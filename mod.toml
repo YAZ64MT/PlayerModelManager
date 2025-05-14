@@ -63,9 +63,10 @@ data_reference_syms_files = [ "Zelda64RecompSyms/mm.us.rev1.datasyms.toml", "Zel
 additional_files = [ ]
 
 [[manifest.config_options]]
-id = "zobj_path"
-name = "Zobj Path"
-description = "Path to zobj on the local machine."
+id = "zobj_name"
+name = "Zobj Name"
+description = """
+Enter the name of the zobj. It should be located in the mods folder."""
 type = "String"
 default = ""
 
