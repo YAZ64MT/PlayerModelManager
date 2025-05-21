@@ -114,21 +114,6 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     shims[LINK_SHIMDL_SHIELD1_ODD] = createShimWithMatrix(&mtx[LINK_EQUIP_MATRIX_SHIELD1_ODD], 1, &dls[LINK_DL_SHIELD1]);
 }
 
-#undef SHIM_ITEM_HAND
-#undef SHIM_ITEM_LFIST
-#undef SHIM_ITEM_RFIST
-#undef SHIM_ITEM_LHAND
-#undef SHIM_ITEM_RHAND
-#undef SHIM_HILT_BACK
-#undef SHIM_SWORD_SHEATHED
-#undef SHIM_SHIELD_BACK
-#undef SHIM_SWORD_SHIELD_UNSHEATHED
-#undef SHIM_SWORD_SHIELD_SHEATH
-#undef SHIM_SWORD_SHIELD_SHEATHED
-#undef SHIM_SWORD
-#undef SHIM_SWORD_LFIST
-#undef SHIM_SHIELD_RFIST
-
 #define PROXY_TO_SHIM(dlName) gSPBranchList(&formProxy->displayLists[LINK_DL_##dlName], formProxy->shimDisplayListPtrs[LINK_SHIMDL_##dlName])
 
 void setProxyToShims(Link_FormProxy *formProxy) {
@@ -205,8 +190,6 @@ void setProxyToShims(Link_FormProxy *formProxy) {
     PROXY_TO_SHIM(FPS_RHAND_SLINGSHOT);
     PROXY_TO_SHIM(FPS_RHAND_HOOKSHOT);
 }
-
-#undef PROXY_TO_SHIM
 
 void refreshProxyDls(Link_FormProxy *formProxy) {
     setProxyToShims(formProxy);
