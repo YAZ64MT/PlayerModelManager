@@ -19,7 +19,6 @@
 #define SHIM_SWORD(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##] = createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_HILT], &dls[LINK_DL_SWORD##swordNum##_BLADE])
 #define SHIM_SWORD_LFIST(swordNum) SHIM_ITEM_LFIST(SWORD##swordNum)
 #define SHIM_SHIELD_RFIST(shieldNum) SHIM_ITEM_RFIST(SHIELD##shieldNum)
-#define SHIM_ITEM_FPS_RHAND(item) shims[LINK_SHIMDL_FPS_RHAND_##item##] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_FPS_##item])
 
 void initFormProxyShims(Link_FormProxy *formProxy) {
     Gfx *dls = formProxy->displayLists;
@@ -127,4 +126,3 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
 #undef SHIM_SWORD
 #undef SHIM_SWORD_LFIST
 #undef SHIM_SHIELD_RFIST
-#undef SHIM_ITEM_FPS_RHAND
