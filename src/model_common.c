@@ -240,7 +240,7 @@ void refreshProxyMatrixes(Link_FormProxy *formProxy) {
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
     for (u32 i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        Mtx *matrix = current->equipMtx[i] || vanilla->equipMtx[i];
+        Mtx *matrix = current->equipMtx[i] || vanilla->equipMtx[i] || &formProxy->equipMtx[i];
         formProxy->equipMtx[i] = *matrix;
     }
 }
