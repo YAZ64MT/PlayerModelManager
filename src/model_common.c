@@ -262,3 +262,28 @@ void refreshProxyMatrixes(Link_FormProxy *formProxy) {
         formProxy->equipMtx[i] = *matrix;
     }
 }
+
+void refreshProxySkeleton(Link_FormProxy *formProxy) {
+    FlexSkeletonHeader* skel = formProxy->current.skeleton;
+
+    if (!skel) {
+        skel = formProxy->vanilla.skeleton;
+    }
+
+    if (!skel) {
+        skel = &formProxy->skeleton;
+    }
+
+    formProxy->skeleton = *skel;
+}
+
+void initFormProxy(Link_FormProxy *formProxy) {
+    initFormProxyShims(formProxy);
+}
+
+void refreshFormProxy(Link_FormProxy *formProxy) {
+    refreshProxySkeleton(formProxy);
+    refreshProxyDls(formProxy);
+    refreshProxyMatrixes(formProxy);
+    refreshProxyFaceTextures(formProxy);
+}
