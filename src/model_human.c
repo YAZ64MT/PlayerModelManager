@@ -5,6 +5,7 @@
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "playermodelmanager_mm.h"
+#include "playermodelmanager_utils.h"
 
 // handless ocarina
 Gfx gLinkHumanOcarinaDL[] = {
@@ -234,7 +235,10 @@ Gfx gLinkHumanFirstPersonArm[] = {
 extern Link_FormProxy sLinkFormProxies[PLAYER_FORM_MAX];
 
 void setupVanillaHuman() {
+
     Link_FormProxy *formModel = &sLinkFormProxies[PLAYER_FORM_HUMAN];
+
+    clearLinkModelInfo(&formModel->vanilla);
 
     formModel->vanilla.skeleton = &gLinkHumanSkel;
 
