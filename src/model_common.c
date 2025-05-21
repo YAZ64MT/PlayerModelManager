@@ -112,3 +112,19 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     shims[LINK_SHIMDL_FPS_RHAND_BOW] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_BOW]);
     shims[LINK_SHIMDL_FPS_RHAND_HOOKSHOT] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_FPS_HOOKSHOT]);
 }
+
+#undef SHIM_ITEM_HAND
+#undef SHIM_ITEM_LFIST
+#undef SHIM_ITEM_RFIST
+#undef SHIM_ITEM_LHAND
+#undef SHIM_ITEM_RHAND
+#undef SHIM_HILT_BACK
+#undef SHIM_SWORD_SHEATHED
+#undef SHIM_SHIELD_BACK
+#undef SHIM_SWORD_SHIELD_UNSHEATHED
+#undef SHIM_SWORD_SHIELD_SHEATH
+#undef SHIM_SWORD_SHIELD_SHEATHED
+#undef SHIM_SWORD
+#undef SHIM_SWORD_LFIST
+#undef SHIM_SHIELD_RFIST
+#undef SHIM_ITEM_FPS_RHAND
