@@ -23,7 +23,7 @@
 void initFormProxyShims(Link_FormProxy *formProxy) {
     Gfx *dls = formProxy->displayLists;
     Mtx *mtx = formProxy->equipMtx;
-    Gfx **shims = formProxy->shimDisplayLists;
+    Gfx **shims = formProxy->shimDisplayListPtrs;
 
     // init by pointing all to DF command
     for (u32 i; i < LINK_SHIMDL_MAX; ++i) {
@@ -110,6 +110,8 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     shims[LINK_SHIMDL_FPS_RHAND_SLINGSHOT] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_SLINGSHOT]);
     shims[LINK_SHIMDL_FPS_RHAND_BOW] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_BOW]);
     shims[LINK_SHIMDL_FPS_RHAND_HOOKSHOT] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_FPS_HOOKSHOT]);
+
+    shims[LINK_SHIMDL_SHIELD1_ODD] = createShimWithMatrix(&mtx[LINK_EQUIP_MATRIX_SHIELD1_ODD], 1, &dls[LINK_DL_SHIELD1]);
 }
 
 #undef SHIM_ITEM_HAND
@@ -126,3 +128,119 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
 #undef SHIM_SWORD
 #undef SHIM_SWORD_LFIST
 #undef SHIM_SHIELD_RFIST
+
+#define PROXY_TO_SHIM(dlName) gSPBranchList(&formProxy->displayLists[LINK_DL_##dlName##], formProxy->shimDisplayListPtrs[LINK_SHIMDL_##dlName##])
+
+void setProxyToShims(Link_FormProxy *formProxy) {
+    PROXY_TO_SHIM(SWORD1);
+    PROXY_TO_SHIM(SWORD2);
+    PROXY_TO_SHIM(SWORD3);
+    PROXY_TO_SHIM(SWORD4);
+    PROXY_TO_SHIM(SWORD4_BROKEN);
+
+    PROXY_TO_SHIM(SWORD1_HILT_BACK);
+    PROXY_TO_SHIM(SWORD2_HILT_BACK);
+    PROXY_TO_SHIM(SWORD3_HILT_BACK);
+    PROXY_TO_SHIM(SWORD4_HILT_BACK);
+
+    PROXY_TO_SHIM(SHIELD1_BACK);
+    PROXY_TO_SHIM(SHIELD2_BACK);
+    PROXY_TO_SHIM(SHIELD3_BACK);
+
+    PROXY_TO_SHIM(SWORD1_SHIELD1_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD1_SHIELD2_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD1_SHIELD3_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHIELD1_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHIELD2_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHIELD3_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHIELD1_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHIELD2_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHIELD3_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHIELD1_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHIELD2_UNSHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHIELD3_UNSHEATHED);
+
+    PROXY_TO_SHIM(SWORD1_SHIELD1_SHEATH);
+    PROXY_TO_SHIM(SWORD1_SHIELD2_SHEATH);
+    PROXY_TO_SHIM(SWORD1_SHIELD3_SHEATH);
+    PROXY_TO_SHIM(SWORD2_SHIELD1_SHEATH);
+    PROXY_TO_SHIM(SWORD2_SHIELD2_SHEATH);
+    PROXY_TO_SHIM(SWORD2_SHIELD3_SHEATH);
+    PROXY_TO_SHIM(SWORD3_SHIELD1_SHEATH);
+    PROXY_TO_SHIM(SWORD3_SHIELD2_SHEATH);
+    PROXY_TO_SHIM(SWORD3_SHIELD3_SHEATH);
+    PROXY_TO_SHIM(SWORD4_SHIELD1_SHEATH);
+    PROXY_TO_SHIM(SWORD4_SHIELD2_SHEATH);
+    PROXY_TO_SHIM(SWORD4_SHIELD3_SHEATH);
+
+    PROXY_TO_SHIM(SWORD1_SHIELD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD1_SHIELD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD1_SHIELD3_SHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHIELD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHIELD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHIELD3_SHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHIELD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHIELD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHIELD3_SHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHIELD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHIELD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHIELD3_SHEATHED);
+
+    PROXY_TO_SHIM(LFIST_SWORD1);
+    PROXY_TO_SHIM(LFIST_SWORD2);
+    PROXY_TO_SHIM(LFIST_SWORD3);
+    PROXY_TO_SHIM(LFIST_SWORD4);
+    PROXY_TO_SHIM(LFIST_SWORD4_BROKEN);
+
+    PROXY_TO_SHIM(LFIST_HAMMER);
+    PROXY_TO_SHIM(LFIST_BOOMERANG);
+    PROXY_TO_SHIM(RFIST_BOW);
+    PROXY_TO_SHIM(RFIST_SLINGSHOT);
+    PROXY_TO_SHIM(RFIST_HOOKSHOT);
+    PROXY_TO_SHIM(RHAND_OCARINA_FAIRY);
+    PROXY_TO_SHIM(RHAND_OCARINA_TIME);
+    PROXY_TO_SHIM(LHAND_GUITAR);
+
+    PROXY_TO_SHIM(FPS_RHAND_BOW);
+    PROXY_TO_SHIM(FPS_RHAND_SLINGSHOT);
+    PROXY_TO_SHIM(FPS_RHAND_HOOKSHOT);
+}
+
+#undef PROXY_TO_SHIM
+
+void refreshProxyDls(Link_FormProxy *formProxy) {
+    Gfx *dls = formProxy->displayLists;
+    Link_ModelInfo *current = &formProxy->current;
+    Link_ModelInfo *vanilla = &formProxy->vanilla;
+
+    for (u32 i = 0; i < LINK_DL_MAX; ++i) {
+        Gfx* dl = current->models[i] || vanilla->models[i] || (Gfx *)dls[i].words.w1;
+        gSPBranchList(&dls[i], dl);
+    }
+}
+
+extern TexturePtr sPlayerEyesTextures[];
+extern TexturePtr sPlayerMouthTextures[];
+
+void refreshProxyFaceTextures(Link_FormProxy *formProxy) {
+    Link_ModelInfo *current = &formProxy->current;
+    Link_ModelInfo *vanilla = &formProxy->vanilla;
+
+    for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        sPlayerEyesTextures[i] = current->eyesTextures[i];
+    }
+
+    for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        sPlayerMouthTextures[i] = current->mouthTextures[i];
+    }
+}
+
+void refreshProxyMatrixes(Link_FormProxy *formProxy) {
+    Link_ModelInfo *current = &formProxy->current;
+    Link_ModelInfo *vanilla = &formProxy->vanilla;
+
+    for (u32 i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
+        Mtx *matrix = current->equipMtx[i] || vanilla->equipMtx[i];
+        formProxy->equipMtx[i] = *matrix;
+    }
+}
