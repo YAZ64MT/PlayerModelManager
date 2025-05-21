@@ -5,18 +5,18 @@
 #include "playermodelmanager.h"
 #include "playermodelmanager_utils.h"
 
-#define SHIM_ITEM_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item##] = createShimDisplayList(2, &dls[LINK_DL_##hand##], &dls[LINK_DL_##item##])
+#define SHIM_ITEM_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item] = createShimDisplayList(2, &dls[LINK_DL_##hand], &dls[LINK_DL_##item])
 #define SHIM_ITEM_LFIST(item) SHIM_ITEM_HAND(LFIST, item)
 #define SHIM_ITEM_RFIST(item) SHIM_ITEM_HAND(RFIST, item)
 #define SHIM_ITEM_LHAND(item) SHIM_ITEM_HAND(LHAND, item)
 #define SHIM_ITEM_RHAND(item) SHIM_ITEM_HAND(RHAND, item)
 #define SHIM_HILT_BACK(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_HILT_BACK] = createShimWithMatrix(&mtx[LINK_EQUIP_MATRIX_SWORD##swordNum##_BACK], 1, &dls[LINK_DL_SWORD##swordNum##_HILT])
 #define SHIM_SWORD_SHEATHED(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHEATHED] = createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_SHEATH], &dls[LINK_DL_SWORD##swordNum##_SHEATHED])
-#define SHIM_SHIELD_BACK(shieldNum) shims[LINK_SHIMDL_SHIELD##shieldNum##_BACK] = createShimWithMatrix(&mtx[LINK_EQUIP_MATRIX_SHIELD##shieldNum##_BACK], 1, &dls[LINK_DL_SHIELD##shieldNum##])
+#define SHIM_SHIELD_BACK(shieldNum) shims[LINK_SHIMDL_SHIELD##shieldNum##_BACK] = createShimWithMatrix(&mtx[LINK_EQUIP_MATRIX_SHIELD##shieldNum##_BACK], 1, &dls[LINK_DL_SHIELD##shieldNum])
 #define SHIM_SWORD_SHIELD_UNSHEATHED(swordNum, shieldNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_UNSHEATHED] = createShimDisplayList(1, &dls[LINK_DL_SWORD##swordNum##_SHEATH])
 #define SHIM_SWORD_SHIELD_SHEATH(swordNum, shieldNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_SHEATH] = createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_SHEATH], &dls[LINK_DL_SHIELD##shieldNum##_BACK])
 #define SHIM_SWORD_SHIELD_SHEATHED(swordNum, shieldNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_SHEATHED] = createShimDisplayList(3, &dls[LINK_DL_SWORD##swordNum##_SHEATHED], &dls[LINK_DL_SHIELD##shieldNum##_BACK])
-#define SHIM_SWORD(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##] = createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_HILT], &dls[LINK_DL_SWORD##swordNum##_BLADE])
+#define SHIM_SWORD(swordNum) shims[LINK_SHIMDL_SWORD##swordNum] = createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_HILT], &dls[LINK_DL_SWORD##swordNum##_BLADE])
 #define SHIM_SWORD_LFIST(swordNum) SHIM_ITEM_LFIST(SWORD##swordNum)
 #define SHIM_SHIELD_RFIST(shieldNum) SHIM_ITEM_RFIST(SHIELD##shieldNum)
 
@@ -26,7 +26,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     Gfx **shims = formProxy->shimDisplayListPtrs;
 
     // init by pointing all to DF command
-    for (u32 i; i < LINK_SHIMDL_MAX; ++i) {
+    for (u32 i = 0; i < LINK_SHIMDL_MAX; ++i) {
         gSPBranchList(shims[i], &dls[LINK_DL_DF_COMMAND]);
     }
 
@@ -129,7 +129,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
 #undef SHIM_SWORD_LFIST
 #undef SHIM_SHIELD_RFIST
 
-#define PROXY_TO_SHIM(dlName) gSPBranchList(&formProxy->displayLists[LINK_DL_##dlName##], formProxy->shimDisplayListPtrs[LINK_SHIMDL_##dlName##])
+#define PROXY_TO_SHIM(dlName) gSPBranchList(&formProxy->displayLists[LINK_DL_##dlName], formProxy->shimDisplayListPtrs[LINK_SHIMDL_##dlName])
 
 void setProxyToShims(Link_FormProxy *formProxy) {
     PROXY_TO_SHIM(SWORD1);
@@ -209,13 +209,22 @@ void setProxyToShims(Link_FormProxy *formProxy) {
 #undef PROXY_TO_SHIM
 
 void refreshProxyDls(Link_FormProxy *formProxy) {
+    setProxyToShims(formProxy);
+
     Gfx *dls = formProxy->displayLists;
     Link_ModelInfo *current = &formProxy->current;
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
     for (u32 i = 0; i < LINK_DL_MAX; ++i) {
-        Gfx* dl = current->models[i] || vanilla->models[i] || (Gfx *)dls[i].words.w1;
-        gSPBranchList(&dls[i], dl);
+        Gfx* dl = current->models[i];
+
+        if (!dl) {
+            dl = vanilla->models[i];
+        }
+
+        if (dl) {
+            gSPBranchList(&dls[i], dl);
+        }
     }
 }
 
@@ -240,7 +249,16 @@ void refreshProxyMatrixes(Link_FormProxy *formProxy) {
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
     for (u32 i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        Mtx *matrix = current->equipMtx[i] || vanilla->equipMtx[i] || &formProxy->equipMtx[i];
+        Mtx *matrix = current->equipMtx[i];
+
+        if (!matrix) {
+            matrix = vanilla->equipMtx[i];
+        }
+
+        if (!matrix) {
+            matrix = &formProxy->equipMtx[i];
+        }
+
         formProxy->equipMtx[i] = *matrix;
     }
 }

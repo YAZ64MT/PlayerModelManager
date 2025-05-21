@@ -243,7 +243,7 @@ void setupVanillaHuman() {
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = &gLinkHumanSheathedRazorSwordMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = &gLinkHumanHerosShieldMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD3_MIRROR_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
 
     Gfx **models = formModel->vanilla.models;
 

@@ -84,7 +84,7 @@ void restoreVanillaModel(PlayerTransformation playerForm) {
 void changeFormPtrsToProxy(PlayerTransformation playerForm) {
     Link_FormProxy *modelInfo = &sLinkFormProxies[playerForm];
 
-    gPlayerSkeletons[playerForm] = &modelInfo->proxySkeleton;
+    gPlayerSkeletons[playerForm] = &modelInfo->skeleton;
     gPlayerRightHandOpenDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_RHAND];
     gPlayerRightHandOpenDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_RHAND];
     gPlayerRightHandClosedDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_RFIST];
