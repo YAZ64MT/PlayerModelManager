@@ -7,8 +7,11 @@
 #include "recompdata.h"
 #include "z64recomp_api.h"
 #include "simplefileloader.h"
+#include "ml64compat_mm.h"
+#include "model_common.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
+RECOMP_IMPORT(".", Link_FormProxy *getLinkFormProxies());
 
 RecompuiContext context;
 RecompuiResource root;
@@ -263,13 +266,32 @@ void freeOldFiles() {
     }
 }
 
+u8* currentZobj = NULL;
+
 void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         u32 index = *(u32 *)userdata;
 
         if (index >= 0 && index < detectedFiles.length && detectedFiles.files[index] != NULL_STRING) {
+
             char *zobjPath = SFL_getCombinedPath(2, zobjDir, detectedFiles.files[index]);
-            setHumanGraphics(zobjPath);
+
+            SFL_File newZobjFile = SFL_loadFile(zobjPath);
+
+            if (newZobjFile.data) {
+
+                Link_FormProxy* proxy = &getLinkFormProxies()[PLAYER_FORM_HUMAN];
+
+                setupZobjMmo(&proxy->current, newZobjFile.data);
+                refreshFormProxy(proxy);
+
+                if (currentZobj) {
+                    recomp_free(currentZobj);
+                }
+
+                currentZobj = newZobjFile.data;
+            }
+            
             recomp_free(zobjPath);
         } else {
             recomp_printf("Invalid button index: %d", index);

@@ -7,6 +7,8 @@
 #include "playermodelmanager_mm.h"
 #include "playermodelmanager_utils.h"
 
+RECOMP_IMPORT(".", Link_FormProxy *getLinkFormProxies());
+
 // handless ocarina
 Gfx gLinkHumanOcarinaDL[] = {
     gsDPPipeSync(),
@@ -232,11 +234,9 @@ Gfx gLinkHumanFirstPersonArm[] = {
     gsSPEndDisplayList(),
 };
 
-extern Link_FormProxy sLinkFormProxies[PLAYER_FORM_MAX];
-
 void setupVanillaHuman() {
 
-    Link_FormProxy *formModel = &sLinkFormProxies[PLAYER_FORM_HUMAN];
+    Link_FormProxy *formModel = &getLinkFormProxies()[PLAYER_FORM_HUMAN];
 
     clearLinkModelInfo(&formModel->vanilla);
 

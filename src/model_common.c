@@ -273,6 +273,8 @@ Mtx zeroMtx = {0};
 void initFormProxyDisplayLists(Link_FormProxy *formProxy) {
     for (u32 i = 0; i < LINK_DL_MAX; ++i) {
         gSPBranchList(&formProxy->displayLists[i], &formProxy->displayLists[LINK_DL_DF_COMMAND]);
+
+        formProxy->vanilla.equipMtx[i] = &zeroMtx;
     }
     gSPBranchList(&formProxy->displayLists[LINK_DL_DF_COMMAND], dfCommand);
 }

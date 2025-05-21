@@ -56,17 +56,11 @@ extern TexturePtr gLinkHumanMouthTeethTex;  // PLAYER_MOUTH_TEETH
 extern TexturePtr gLinkHumanMouthAngryTex;  // PLAYER_MOUTH_ANGRY
 extern TexturePtr gLinkHumanMouthHappyTex;  // PLAYER_MOUTH_HAPPY
 
-Gfx dfCommand[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx callDfCommand[] = {
-    gsSPBranchList(dfCommand),
-};
-
-Mtx zeroMtx = {0};
-
 static Link_FormProxy sLinkFormProxies[PLAYER_FORM_MAX];
+
+RECOMP_EXPORT Link_FormProxy* getLinkFormProxies() {
+    return sLinkFormProxies;
+}
 
 void changeFormPtrsToProxy(PlayerTransformation playerForm) {
     Link_FormProxy *formProxy = &sLinkFormProxies[playerForm];
@@ -144,17 +138,22 @@ void initFormProxies() {
 
         initFormProxy(formProxy);
 
-        for (u16 j = 0; j < LINK_EQUIP_MATRIX_MAX; ++j) {
-            formProxy->vanilla.equipMtx[j] = &zeroMtx;
-        }
+        // vanilla forms share these ptrs
+        TexturePtr* eyesTex = formProxy->vanilla.eyesTextures;
+        eyesTex[0] = gLinkHumanEyesOpenTex;
+        eyesTex[1] = gLinkHumanEyesHalfTex;
+        eyesTex[2] = gLinkHumanEyesClosedTex;
+        eyesTex[3] = gLinkHumanEyesRollRightTex;
+        eyesTex[4] = gLinkHumanEyesRollLeftTex;
+        eyesTex[5] = gLinkHumanEyesRollUpTex;
+        eyesTex[6] = gLinkHumanEyesRollDownTex;
+        eyesTex[7] = object_link_child_Tex_003800;
 
-        for (u16 j = 0; j < PLAYER_EYES_MAX; ++j) {
-            formProxy->vanilla.eyesTextures[j] = sPlayerEyesTextures[j];
-        }
-
-        for (u16 j = 0; j < PLAYER_MOUTH_MAX; ++j) {
-            formProxy->vanilla.mouthTextures[j] = sPlayerMouthTextures[j];
-        }
+        TexturePtr *mouthTex = formProxy->vanilla.mouthTextures;
+        eyesTex[0] = gLinkHumanMouthClosedTex;
+        eyesTex[1] = gLinkHumanMouthTeethTex;
+        eyesTex[2] = gLinkHumanMouthAngryTex;
+        eyesTex[3] = gLinkHumanMouthHappyTex;
 
         // uncomment these when all forms supported
         // changeFormPtrsToProxy(i);
@@ -163,7 +162,7 @@ void initFormProxies() {
     // Only human is supported for now
     changeFormPtrsToProxy(PLAYER_FORM_HUMAN);
     repointHumanEquipmentModelsToProxy(PLAYER_FORM_HUMAN);
-    restoreVanillaModel(PLAYER_FORM_HUMAN);
+    refreshFormProxy(&sLinkFormProxies[PLAYER_FORM_HUMAN]);
 }
 
 RECOMP_CALLBACK("*", recomp_on_play_main)

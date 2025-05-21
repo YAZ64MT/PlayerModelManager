@@ -5,8 +5,17 @@
 #include "playermodelmanager_mm.h"
 #include "playermodelmanager_utils.h"
 #include "defines_mmo.h"
+#include "zobjutils.h"
 
-// TODO: MERGE THESE
+void repointMmoZobj(u8 *zobj) {
+    u32 current = MMO_LUT_DL_WAIST;
+    u32 end = MMO_LUT_DL_DF_COMMAND;
+    while (current < end) {
+        ZobjUtils_repointGfxCommand(zobj, current, 0x06, zobj);
+        current += 8;
+    }
+}
+
 #define SET_MODEL(dest, src) modelInfo->models[dest] = (Gfx *)&zobj[src]
 #define SET_Z64O_MODEL(dest, src, modName) SET_MODEL(LINK_DL_##dest, modName##_LUT_DL_##src)
 
@@ -14,9 +23,15 @@
 #define QSET_MMO_MODEL(dlName) SET_MMO_MODEL(dlName, dlName)
 
 void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
+
+    u32 skeletonHeaderOffset = SEGMENT_OFFSET(zobj[MMO_SKELETON_HEADER_POINTER]);
+
+    repointMmoZobj(zobj);
+    ZobjUtils_repointFlexSkeleton(zobj, skeletonHeaderOffset, 0x06, zobj);
+
     clearLinkModelInfo(modelInfo);
 
-    modelInfo->skeleton = (FlexSkeletonHeader *)&zobj[SEGMENT_OFFSET(zobj[MMO_SKELETON_HEADER_POINTER])];
+    modelInfo->skeleton = (FlexSkeletonHeader *)&zobj[skeletonHeaderOffset];
 
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = (Mtx *)&zobj[MMO_MATRIX_SWORD_A];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = (Mtx *)&zobj[MMO_MATRIX_SWORD_B];
@@ -68,5 +83,6 @@ void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
     SET_MMO_MODEL(FPS_HOOKSHOT, HOOKSHOT);
     SET_MMO_MODEL(FPS_LFOREARM, LFOREARM);
     SET_MMO_MODEL(FPS_LHAND, LFIST);
+    SET_MMO_MODEL(FPS_RHAND, DF_COMMAND);
     QSET_MMO_MODEL(FPS_RHAND);
 }
