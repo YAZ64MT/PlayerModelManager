@@ -2,7 +2,7 @@
 #include "global.h"
 #include "recomputils.h"
 #include "recompconfig.h"
-#include "playermodelmanager.h"
+#include "playermodelmanager_mm.h"
 #include "simplefileloader.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
@@ -65,100 +65,111 @@ Gfx callDfCommand[] = {
 
 Mtx zeroMtx = {0};
 
-static Link_FormModel sLinkFormModels[PLAYER_FORM_MAX];
+static Link_FormProxy sLinkFormProxies[PLAYER_FORM_MAX];
 
 const char *zobjDir = NULL;
 
 void updateProxy(PlayerTransformation playerForm, Gfx** models) {
-    Link_FormModel *modelInfo = &sLinkFormModels[playerForm];
+    Link_FormProxy *modelInfo = &sLinkFormProxies[playerForm];
 
     for (u32 i = 0; i < LINK_DL_MAX; ++i) {
-        modelInfo->proxyDisplayLists[i].words.w1 = (u32)models[i];
+        gSPBranchList(&modelInfo->displayLists[i], models[i]);
     }
 }
 
 void restoreVanillaModel(PlayerTransformation playerForm) {
-    updateProxy(playerForm, sLinkFormModels[playerForm].vanilla.models);
+    updateProxy(playerForm, sLinkFormProxies[playerForm].vanilla.models);
 }
 
 void changeFormPtrsToProxy(PlayerTransformation playerForm) {
-    Link_FormModel *modelInfo = &sLinkFormModels[playerForm];
+    Link_FormProxy *modelInfo = &sLinkFormProxies[playerForm];
 
     gPlayerSkeletons[playerForm] = &modelInfo->proxySkeleton;
-    gPlayerRightHandOpenDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_RHAND];
-    gPlayerRightHandOpenDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_RHAND];
-    gPlayerRightHandClosedDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_RFIST];
-    gPlayerRightHandClosedDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_RFIST];
-    gPlayerRightHandInstrumentDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_RHAND_OCARINA_TIME];
-    gPlayerRightHandInstrumentDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_RHAND_OCARINA_TIME];
-    gPlayerRightHandHookshotDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_RFIST_HOOKSHOT];
-    gPlayerRightHandHookshotDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_RFIST_HOOKSHOT];
+    gPlayerRightHandOpenDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_RHAND];
+    gPlayerRightHandOpenDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_RHAND];
+    gPlayerRightHandClosedDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_RFIST];
+    gPlayerRightHandClosedDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_RFIST];
+    gPlayerRightHandInstrumentDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_RHAND_OCARINA_TIME];
+    gPlayerRightHandInstrumentDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_RHAND_OCARINA_TIME];
+    gPlayerRightHandHookshotDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_RFIST_HOOKSHOT];
+    gPlayerRightHandHookshotDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_RFIST_HOOKSHOT];
 
-    gPlayerLeftHandOpenDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_LHAND];
-    gPlayerLeftHandOpenDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_LHAND];
-    gPlayerLeftHandClosedDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST];
-    gPlayerLeftHandClosedDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST];
-    gPlayerLeftHandTwoHandSwordDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST_SWORD4];
-    gPlayerLeftHandTwoHandSwordDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST_SWORD4];
-    gPlayerLeftHandOneHandSwordDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST_SWORD1];
-    gPlayerLeftHandOneHandSwordDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST_SWORD1];
-    gPlayerLeftHandBottleDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_LHAND_BOTTLE];
-    gPlayerLeftHandBottleDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_LHAND_BOTTLE];
+    gPlayerLeftHandOpenDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_LHAND];
+    gPlayerLeftHandOpenDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_LHAND];
+    gPlayerLeftHandClosedDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_LFIST];
+    gPlayerLeftHandClosedDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_LFIST];
+    gPlayerLeftHandTwoHandSwordDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_LFIST_SWORD4]; // Great Fairy Sword / Fierce Deity Sword
+    gPlayerLeftHandTwoHandSwordDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_LFIST_SWORD4];
+    gPlayerLeftHandOneHandSwordDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    gPlayerLeftHandOneHandSwordDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    gPlayerLeftHandBottleDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_LHAND_BOTTLE];
+    gPlayerLeftHandBottleDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_LHAND_BOTTLE];
 
-    gPlayerRightHandBowDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_RFIST_BOW];
-    gPlayerRightHandBowDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_RFIST_BOW];
+    gPlayerRightHandBowDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_RFIST_BOW];
+    gPlayerRightHandBowDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_RFIST_BOW];
 
-    sPlayerFirstPersonLeftForearmDLs[playerForm] = &modelInfo->proxyDisplayLists[LINK_DL_FPS_LFOREARM];
-    sPlayerFirstPersonLeftHandDLs[playerForm] = &modelInfo->proxyDisplayLists[LINK_DL_FPS_LHAND];
-    sPlayerFirstPersonRightShoulderDLs[playerForm] = &modelInfo->proxyDisplayLists[LINK_DL_RSHOULDER];
-    sPlayerFirstPersonRightHandDLs[playerForm] = &modelInfo->proxyDisplayLists[LINK_DL_FPS_RARM_BOW];
-    sPlayerFirstPersonRightHandHookshotDLs[playerForm] = &modelInfo->proxyDisplayLists[LINK_DL_FPS_RARM_HOOKSHOT];
+    sPlayerFirstPersonLeftForearmDLs[playerForm] = &modelInfo->displayLists[LINK_DL_FPS_LFOREARM];
+    sPlayerFirstPersonLeftHandDLs[playerForm] = &modelInfo->displayLists[LINK_DL_FPS_LHAND];
+    sPlayerFirstPersonRightShoulderDLs[playerForm] = &modelInfo->displayLists[LINK_DL_RSHOULDER];
+    sPlayerFirstPersonRightHandDLs[playerForm] = &modelInfo->displayLists[LINK_DL_FPS_RHAND];
+    sPlayerFirstPersonRightHandHookshotDLs[playerForm] = &modelInfo->displayLists[LINK_DL_FPS_RHAND_HOOKSHOT];
 
-    gPlayerWaistDLs[playerForm * 2 + 0] = &modelInfo->proxyDisplayLists[LINK_DL_WAIST];
-    gPlayerWaistDLs[playerForm * 2 + 1] = &modelInfo->proxyDisplayLists[LINK_DL_WAIST];
+    gPlayerWaistDLs[playerForm * 2 + 0] = &modelInfo->displayLists[LINK_DL_WAIST];
+    gPlayerWaistDLs[playerForm * 2 + 1] = &modelInfo->displayLists[LINK_DL_WAIST];
 }
 
-void repointHumanSpecificModelsToProxy() {
-    Link_FormModel *modelInfo = &sLinkFormModels[PLAYER_FORM_HUMAN];
+void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
+    Link_FormProxy *modelInfo = &sLinkFormProxies[playerForm];
 
-    D_801C018C[0] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST_SWORD1];
-    D_801C018C[1] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST_SWORD1];
-    D_801C018C[2] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST_SWORD2];
-    D_801C018C[3] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST_SWORD2];
-    D_801C018C[4] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST_SWORD3];
-    D_801C018C[5] = &modelInfo->proxyDisplayLists[LINK_DL_LFIST_SWORD4];
+    D_801C018C[0] = &modelInfo->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    D_801C018C[1] = &modelInfo->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    D_801C018C[2] = &modelInfo->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
+    D_801C018C[3] = &modelInfo->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
+    D_801C018C[4] = &modelInfo->displayLists[LINK_DL_LFIST_SWORD_GILDED];
+    D_801C018C[5] = &modelInfo->displayLists[LINK_DL_LFIST_SWORD_GILDED];
 
-    gPlayerShields[0] = &modelInfo->proxyDisplayLists[LINK_DL_SHIELD1_BACK];
-    gPlayerShields[1] = &modelInfo->proxyDisplayLists[LINK_DL_SHIELD1_BACK];
-    gPlayerShields[2] = &modelInfo->proxyDisplayLists[LINK_DL_SHIELD2_BACK];
-    gPlayerShields[3] = &modelInfo->proxyDisplayLists[LINK_DL_SHIELD2_BACK];
+    gPlayerShields[0] = &modelInfo->displayLists[LINK_DL_SHIELD_HERO_BACK];
+    gPlayerShields[1] = &modelInfo->displayLists[LINK_DL_SHIELD_HERO_BACK];
+    gPlayerShields[2] = &modelInfo->displayLists[LINK_DL_SHIELD_MIRROR_BACK];
+    gPlayerShields[3] = &modelInfo->displayLists[LINK_DL_SHIELD_MIRROR_BACK];
 
-    gPlayerSheathedSwords[0] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD1_SHEATHED];
-    gPlayerSheathedSwords[1] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD1_SHEATHED];
-    gPlayerSheathedSwords[2] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD2_SHEATHED];
-    gPlayerSheathedSwords[3] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD2_SHEATHED];
-    gPlayerSheathedSwords[4] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD3_SHEATHED];
-    gPlayerSheathedSwords[5] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD3_SHEATHED];
+    gPlayerSheathedSwords[0] = &modelInfo->displayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
+    gPlayerSheathedSwords[1] = &modelInfo->displayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
+    gPlayerSheathedSwords[2] = &modelInfo->displayLists[LINK_DL_SWORD_RAZOR_SHEATHED];
+    gPlayerSheathedSwords[3] = &modelInfo->displayLists[LINK_DL_SWORD_RAZOR_SHEATHED];
+    gPlayerSheathedSwords[4] = &modelInfo->displayLists[LINK_DL_SWORD_GILDED_SHEATHED];
+    gPlayerSheathedSwords[5] = &modelInfo->displayLists[LINK_DL_SWORD_GILDED_SHEATHED];
 
-    gPlayerSwordSheaths[0] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD_SHEATH_1];
-    gPlayerSwordSheaths[1] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD_SHEATH_1];
-    gPlayerSwordSheaths[2] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD_SHEATH_2];
-    gPlayerSwordSheaths[3] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD_SHEATH_2];
-    gPlayerSwordSheaths[4] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD_SHEATH_3];
-    gPlayerSwordSheaths[5] = &modelInfo->proxyDisplayLists[LINK_DL_SWORD_SHEATH_3];
+    gPlayerSwordSheaths[0] = &modelInfo->displayLists[LINK_DL_SWORD_KOKIRI_SHEATH];
+    gPlayerSwordSheaths[1] = &modelInfo->displayLists[LINK_DL_SWORD_KOKIRI_SHEATH];
+    gPlayerSwordSheaths[2] = &modelInfo->displayLists[LINK_DL_SWORD_RAZOR_SHEATH];
+    gPlayerSwordSheaths[3] = &modelInfo->displayLists[LINK_DL_SWORD_RAZOR_SHEATH];
+    gPlayerSwordSheaths[4] = &modelInfo->displayLists[LINK_DL_SWORD_GILDED_SHEATH];
+    gPlayerSwordSheaths[5] = &modelInfo->displayLists[LINK_DL_SWORD_GILDED_SHEATH];
 }
 
 // initialize player models as blank display lists
 void initPlayerModels() {
     for (u8 i = 0; i < PLAYER_FORM_MAX; ++i) {
-        sLinkFormModels[i].vanilla.skeleton = sLinkFormModels[i].current.skeleton = gPlayerSkeletons[i];
+        Link_FormProxy *formProxy = &sLinkFormProxies[i];
+
+        formProxy->vanilla.skeleton = formProxy->current.skeleton = gPlayerSkeletons[i];
 
         for (u16 j = 0; j < LINK_DL_MAX; ++j) {
-            sLinkFormModels[i].proxyDisplayLists[j].words = callDfCommand[0].words;
+            gSPBranchList(&formProxy->displayLists[j], &formProxy->displayLists[LINK_DL_DF_COMMAND]);
         }
+        gSPBranchList(&formProxy->displayLists[LINK_DL_DF_COMMAND], dfCommand);
 
         for (u16 j = 0; j < LINK_EQUIP_MATRIX_MAX; ++j) {
-            sLinkFormModels[i].vanilla.equipMtx[j] = &zeroMtx;
+            formProxy->vanilla.equipMtx[j] = &zeroMtx;
+        }
+
+        for (u16 j = 0; j < PLAYER_EYES_MAX; ++j) {
+            formProxy->vanilla.eyesTextures[j] = sPlayerEyesTextures[j];
+        }
+
+        for (u16 j = 0; j < PLAYER_MOUTH_MAX; ++j) {
+            formProxy->vanilla.mouthTextures[j] = sPlayerMouthTextures[j];
         }
 
         // uncomment these when all forms supported
@@ -167,7 +178,7 @@ void initPlayerModels() {
 
     // Only human is supported for now
     changeFormPtrsToProxy(PLAYER_FORM_HUMAN);
-    repointHumanSpecificModelsToProxy();
+    repointHumanEquipmentModelsToProxy(PLAYER_FORM_HUMAN);
     restoreVanillaModel(PLAYER_FORM_HUMAN);
 }
 

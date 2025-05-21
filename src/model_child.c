@@ -4,7 +4,7 @@
 #include "recompconfig.h"
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
-#include "playermodelmanager.h"
+#include "playermodelmanager_mm.h"
 
 // handless ocarina
 Gfx gLinkHumanOcarinaDL[] = {
@@ -231,19 +231,19 @@ Gfx gLinkHumanFirstPersonArm[] = {
     gsSPEndDisplayList(),
 };
 
-extern Link_FormModel sLinkFormModels[PLAYER_FORM_MAX];
+extern Link_FormProxy sLinkFormProxies[PLAYER_FORM_MAX];
 
 void setupVanillaHuman() {
-    Link_FormModel *formModel = &sLinkFormModels[PLAYER_FORM_HUMAN];
+    Link_FormProxy *formModel = &sLinkFormProxies[PLAYER_FORM_HUMAN];
 
     formModel->vanilla.skeleton = &gLinkHumanSkel;
 
     Mtx **equipMatrixes = formModel->vanilla.equipMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD1_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD2_BACK] = &gLinkHumanSheathedRazorSwordMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD3_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD1_BACK] = &gLinkHumanHerosShieldMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD2_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = &gLinkHumanSheathedRazorSwordMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = &gLinkHumanHerosShieldMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD3_MIRROR_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
 
     Gfx **models = formModel->vanilla.models;
 
@@ -272,24 +272,23 @@ void setupVanillaHuman() {
     models[LINK_DL_RFIST] = gLinkHumanRightHandClosedDL;
 
     // sword sheathes
-    models[LINK_DL_SWORD_SHEATH_1] = gLinkHumanKokiriSwordSheathDL;
-    models[LINK_DL_SWORD_SHEATH_2] = gLinkHumanRazorSwordSheathDL;
-    models[LINK_DL_SWORD_SHEATH_3] = gLinkHumanGildedSwordSheathDL;
+    models[LINK_DL_SWORD_KOKIRI_SHEATH] = gLinkHumanKokiriSwordSheathDL;
+    models[LINK_DL_SWORD_RAZOR_SHEATH] = gLinkHumanRazorSwordSheathDL;
+    models[LINK_DL_SWORD_GILDED_SHEATH] = gLinkHumanGildedSwordSheathDL;
 
     // sword hilts
-    models[LINK_DL_SWORD_HILT_1] = gKokiriSwordHandleDL;
-    models[LINK_DL_SWORD_HILT_2] = gRazorSwordHandleDL;
-    models[LINK_DL_SWORD_HILT_3] = gLinkHumanGildedSwordHandleDL;
+    models[LINK_DL_SWORD_KOKIRI_HILT] = gKokiriSwordHandleDL;
+    models[LINK_DL_SWORD_RAZOR_HILT] = gRazorSwordHandleDL;
+    models[LINK_DL_SWORD_GILDED_HILT] = gLinkHumanGildedSwordHandleDL;
 
     // sword blades
-    models[LINK_DL_SWORD_BLADE_1] = gKokiriSwordBladeDL;
-    models[LINK_DL_SWORD_BLADE_2] = gRazorSwordBladeDL;
-    models[LINK_DL_SWORD_BLADE_3] = gLinkHumanGildedSwordBladeDL;
+    models[LINK_DL_SWORD_KOKIRI_HILT] = gKokiriSwordBladeDL;
+    models[LINK_DL_SWORD_RAZOR_HILT] = gRazorSwordBladeDL;
+    models[LINK_DL_SWORD_GILDED_HILT] = gLinkHumanGildedSwordBladeDL;
 
     // shields
-    models[LINK_DL_SHIELD_1] = gLinkHumanHerosShieldDL;
-    models[LINK_DL_SHIELD_2] = gLinkHumanMirrorShieldDL;
-    //models[LINK_DL_SHIELD_3];
+    models[LINK_DL_SHIELD_HERO] = gLinkHumanHerosShieldDL;
+    models[LINK_DL_SHIELD_MIRROR] = gLinkHumanMirrorShieldDL;
 
     // items
     models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL;
@@ -303,19 +302,19 @@ void setupVanillaHuman() {
     // First Person
     models[LINK_DL_FPS_LFOREARM] = gLinkHumanLeftForearmDL;
     models[LINK_DL_FPS_LHAND] = gLinkHumanLeftHandClosedDL;
-    models[LINK_DL_FPS_RFOREARM] = gLinkHumanRightForearmDL;
+    models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArm;
     models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshot;
 
     // masks
-    models[LINK_DL_DEKU_MASK] = gDekuMaskDL;
-    models[LINK_DL_GORON_MASK] = gGoronMaskDL;
-    models[LINK_DL_ZORA_MASK] = gZoraMaskDL;
-    models[LINK_DL_DEITY_MASK] = gFierceDeityMaskDL;
+    models[LINK_DL_MASK_DEKU] = gDekuMaskDL;
+    models[LINK_DL_MASK_GORON] = gGoronMaskDL;
+    models[LINK_DL_MASK_ZORA] = gZoraMaskDL;
+    models[LINK_DK_MASK_DEITY] = gFierceDeityMaskDL;
 
     // bottles
     models[LINK_DL_BOTTLE_FILLING] = gBottleContentsDL;
-    models[LINK_DL_SWORD_HILT_BIG] = gBottleGlassDL;
+    models[LINK_DL_BOTTLE_GLASS] = gBottleGlassDL;
 
     // whole sword
-    models[LINK_DL_SWORD] = gLinkHumanGreatFairysSwordDL;
+    models[LINK_DL_SWORD_GREATFAIRY] = gLinkHumanGreatFairysSwordDL;
 }
