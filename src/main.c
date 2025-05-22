@@ -153,8 +153,6 @@ void postPlayerInit() {
     }
 }
 
-
-
 RECOMP_HOOK("TitleSetup_SetupTitleScreen")
 void onInit(PlayState *play) {
     if (!isInitialized) {

@@ -148,6 +148,11 @@ void setDlToShims(Link_FormProxy *formProxy) {
     PROXY_TO_SHIM(SWORD3_HILT_BACK);
     PROXY_TO_SHIM(SWORD4_HILT_BACK);
 
+    PROXY_TO_SHIM(SWORD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHEATHED);
+
     PROXY_TO_SHIM(SHIELD1_BACK);
     PROXY_TO_SHIM(SHIELD2_BACK);
     PROXY_TO_SHIM(SHIELD3_BACK);
@@ -294,12 +299,11 @@ void refreshProxySkeleton(Link_FormProxy *formProxy) {
     if (!hasCustomSkeleton) {
         limbTrans = formProxy->vanilla.limbTranslations;
     }
-
-    if (limbTrans) {
-        for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
+    
+    for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
             formProxy->skeleton.limbs[i].jointPos = limbTrans[i];
-        }
     }
+    
 }
 
 void initFormProxyMatrixes(Link_FormProxy *formProxy) {

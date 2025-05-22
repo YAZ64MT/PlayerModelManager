@@ -29,7 +29,7 @@ void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, MMO_SKELETON_HEADER_POINTER));
 
-    repointSkeleton(zobj, skelHeader, 0x06);
+    ZobjUtils_repointFlexSkeleton(zobj, skelHeader, 0x06, zobj);
 
     clearLinkModelInfo(modelInfo);
 
@@ -89,6 +89,6 @@ void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
     SET_MMO_MODEL(FPS_HOOKSHOT, HOOKSHOT);
     SET_MMO_MODEL(FPS_LFOREARM, LFOREARM);
     SET_MMO_MODEL(FPS_LHAND, LFIST);
-    SET_MMO_MODEL(FPS_RHAND, DF_COMMAND);
+    SET_MMO_MODEL(FPS_RFOREARM, DF_COMMAND);
     QSET_MMO_MODEL(FPS_RHAND);
 }
