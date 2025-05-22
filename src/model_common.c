@@ -328,27 +328,29 @@ void initFormProxyDisplayLists(Link_FormProxy *formProxy) {
 
 LodLimb skeletonBase[PLAYER_LIMB_COUNT] = {
     {{0, 0, 0}, PLAYER_LIMB_WAIST - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_LOWER_ROOT - 1, PLAYER_LIMB_UPPER_ROOT - 1, {(Gfx *)LINK_DL_WAIST, (Gfx *)LINK_DL_WAIST}},
+    {{0, 0, 0}, PLAYER_LIMB_LOWER_ROOT - 1, PLAYER_LIMB_UPPER_ROOT - 1, {dfCommand, dfCommand}},
     {{0, 0, 0}, PLAYER_LIMB_RIGHT_THIGH - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_SHIN - 1, PLAYER_LIMB_LEFT_THIGH - 1, {(Gfx *)LINK_DL_RTHIGH, (Gfx *)LINK_DL_RTHIGH}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOOT - 1, LIMB_DONE, {(Gfx *)LINK_DL_RSHIN, (Gfx *)LINK_DL_RSHIN}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {(Gfx *)LINK_DL_RFOOT, (Gfx *)LINK_DL_RFOOT}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_SHIN - 1, LIMB_DONE, {(Gfx *)LINK_DL_LTHIGH, (Gfx *)LINK_DL_LTHIGH}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOOT - 1, LIMB_DONE, {(Gfx *)LINK_DL_LSHIN, (Gfx *)LINK_DL_LSHIN}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {(Gfx *)LINK_DL_LFOOT, (Gfx *)LINK_DL_LFOOT}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_SHIN - 1, PLAYER_LIMB_LEFT_THIGH - 1, {dfCommand, dfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOOT - 1, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_SHIN - 1, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOOT - 1, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
     {{0, 0, 0}, PLAYER_LIMB_HEAD - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_HAT - 1, PLAYER_LIMB_COLLAR - 1, {(Gfx *)LINK_DL_HEAD, (Gfx *)LINK_DL_HEAD}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {(Gfx *)LINK_DL_HAT, (Gfx *)LINK_DL_HAT}},
-    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_LEFT_SHOULDER - 1, {(Gfx *)LINK_DL_COLLAR, (Gfx *)LINK_DL_COLLAR}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOREARM - 1, PLAYER_LIMB_RIGHT_SHOULDER - 1, {(Gfx *)LINK_DL_LSHOULDER, (Gfx *)LINK_DL_LSHOULDER}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_HAND - 1, LIMB_DONE, {(Gfx *)LINK_DL_LFOREARM, (Gfx *)LINK_DL_LFOREARM}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {(Gfx *)LINK_DL_LHAND, (Gfx *)LINK_DL_LHAND}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOREARM - 1, PLAYER_LIMB_SHEATH - 1, {(Gfx *)LINK_DL_RSHOULDER, (Gfx *)LINK_DL_RSHOULDER}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_HAND - 1, LIMB_DONE, {(Gfx *)LINK_DL_RFOREARM, (Gfx *)LINK_DL_RFOREARM}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {(Gfx *)LINK_DL_RHAND, (Gfx *)LINK_DL_RHAND}},
-    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_TORSO - 1, {(Gfx *)LINK_DL_SWORD1_SHEATH, (Gfx *)LINK_DL_SWORD1_SHEATH}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {(Gfx *)LINK_DL_TORSO, (Gfx *)LINK_DL_TORSO}},
+    {{0, 0, 0}, PLAYER_LIMB_HAT - 1, PLAYER_LIMB_COLLAR - 1, {dfCommand, dfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_LEFT_SHOULDER - 1, {dfCommand, dfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOREARM - 1, PLAYER_LIMB_RIGHT_SHOULDER - 1, {dfCommand, dfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_HAND - 1, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOREARM - 1, PLAYER_LIMB_SHEATH - 1, {dfCommand, dfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_HAND - 1, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_TORSO - 1, {dfCommand, dfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
 };
+
+#define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = proxyLimbName
 
 void initFormProxySkeleton(Link_FormProxy *formProxy) {
 
@@ -357,18 +359,31 @@ void initFormProxySkeleton(Link_FormProxy *formProxy) {
     flex->dListCount = 18;
     flex->sh.limbCount = PLAYER_LIMB_COUNT;
 
+    u32 currLimbWithDl = 0;
     for (u32 i = 0; i < PLAYER_LIMB_COUNT; i++) {
         skel->limbPtrs[i] = &skel->limbs[i];
 
         skel->limbs[i] = skeletonBase[i];
-
-        Gfx** dLists = skel->limbs[i].dLists;
-
-        if (dLists[0]) { // limbs with a NULL display list pointer should be ignored
-            dLists[0] = &formProxy->proxyDisplayLists[(u32)dLists[0]];
-            dLists[1] = &formProxy->proxyDisplayLists[(u32)dLists[1]];
-        }
     }
+
+    SET_LIMB_DL(PLAYER_LIMB_WAIST, LINK_DL_WAIST);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_THIGH, LINK_DL_RTHIGH);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHIN, LINK_DL_RSHIN);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOOT, LINK_DL_RFOOT);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_THIGH, LINK_DL_LTHIGH);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_SHIN, LINK_DL_LSHIN);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_FOOT, LINK_DL_LFOOT);
+    SET_LIMB_DL(PLAYER_LIMB_HEAD, LINK_DL_HEAD);
+    SET_LIMB_DL(PLAYER_LIMB_HAT, LINK_DL_HAT);
+    SET_LIMB_DL(PLAYER_LIMB_COLLAR, LINK_DL_COLLAR);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_SHOULDER, LINK_DL_LSHOULDER);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_FOREARM, LINK_DL_LFOREARM);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_HAND, LINK_DL_LHAND);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHOULDER, LINK_DL_RSHOULDER);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOREARM, LINK_DL_RFOREARM);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_HAND, LINK_DL_RHAND);
+    SET_LIMB_DL(PLAYER_LIMB_SHEATH, LINK_DL_SHEATH_NONE);
+    SET_LIMB_DL(PLAYER_LIMB_TORSO, LINK_DL_TORSO);
 
     flex->sh.segment = (void **)skel->limbPtrs;
 }
