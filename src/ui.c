@@ -221,7 +221,7 @@ void on_init() {
     unsigned char *modFolderPath = recomp_get_mod_folder_path();
     zobjDir = SFL_getCombinedPath(2, modFolderPath, "zobj");
     recomp_free(modFolderPath);
-    recomp_printf("zobj folder path: %s", zobjDir);
+    recomp_printf("zobj folder path: %s\n", zobjDir);
 }
 
 typedef struct {
@@ -280,10 +280,13 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
 
             if (newZobjFile.data) {
 
-                Link_FormProxy* proxy = &getLinkFormProxies()[PLAYER_FORM_HUMAN];
+                Link_FormProxy* proxies = getLinkFormProxies();
 
-                setupZobjMmo(&proxy->current, newZobjFile.data);
-                refreshFormProxy(proxy);
+                Link_FormProxy* humanProxy = &proxies[PLAYER_FORM_HUMAN];
+
+                setupZobjMmo(&humanProxy->current, newZobjFile.data);
+                refreshFormProxy(humanProxy);
+                matchFaceTexturesToProxy(&proxies[GET_PLAYER_FORM]);
 
                 if (currentZobj) {
                     recomp_free(currentZobj);
@@ -334,10 +337,16 @@ void refreshFileList() {
     recompui_close_context(context);
 }
 
+bool checkButtonCombo(PlayState *play) {
+    Input *input = CONTROLLER1(&play->state);
+    return (CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_R)) ||
+           (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_R));
+}
+
 // Hook Play_UpdateMain to check if the L button is pressed and show this mod's UI if so.
 RECOMP_HOOK("Play_UpdateMain")
 void on_play_update(PlayState *play) {
-    if (CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_L)) {
+    if (checkButtonCombo(play)) {
         if (!context_shown) {
             refreshFileList();
             recompui_show_context(context);

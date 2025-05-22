@@ -10,8 +10,9 @@
 void repointMmoZobj(u8 *zobj) {
     u32 current = MMO_LUT_DL_WAIST;
     u32 end = MMO_LUT_DL_DF_COMMAND;
+
     while (current < end) {
-        ZobjUtils_repointGfxCommand(zobj, current, 0x06, zobj);
+        ZobjUtils_repointDisplayList(zobj, current, 0x06, zobj);
         current += 8;
     }
 }
@@ -24,14 +25,19 @@ void repointMmoZobj(u8 *zobj) {
 
 void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
 
-    u32 skeletonHeaderOffset = SEGMENT_OFFSET(zobj[MMO_SKELETON_HEADER_POINTER]);
-
     repointMmoZobj(zobj);
-    ZobjUtils_repointFlexSkeleton(zobj, skeletonHeaderOffset, 0x06, zobj);
+
+    u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, MMO_SKELETON_HEADER_POINTER));
+
+    repointSkeleton(zobj, skelHeader, 0x06);
 
     clearLinkModelInfo(modelInfo);
 
-    modelInfo->skeleton = (FlexSkeletonHeader *)&zobj[skeletonHeaderOffset];
+    FlexSkeletonHeader *flexHeader = (FlexSkeletonHeader *)&zobj[skelHeader];
+    for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
+        LodLimb **limbs = (LodLimb **)flexHeader->sh.segment;
+        modelInfo->limbTranslations[i] = limbs[i]->jointPos;
+    }
 
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = (Mtx *)&zobj[MMO_MATRIX_SWORD_A];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = (Mtx *)&zobj[MMO_MATRIX_SWORD_B];

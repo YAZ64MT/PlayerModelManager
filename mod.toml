@@ -15,13 +15,13 @@ display_name = "Player Model Manager"
 
 # The description that will show up when this mod is displayed in the mod menu. This should be human readable.
 description =  """
-This is a mod for Majora's Mask: Recompiled that allows Link's model to be swapped out on the fly
+This is a mod for Majora's Mask: Recompiled that allows Link's model to be swapped out on the fly.
 
 For now, only zobjs are supported."""
 
 # A short description that will show up in this mod's entry in the mod list. This should be human readable and kept short
 # to prevent it from being cut off due to the limited space.
-short_description = "Always perform a quickspin when swinging your sword."
+short_description = "Customize Link's model."
 
 # Authors of this mod.
 authors = [ "Neirn" ]
@@ -61,29 +61,3 @@ data_reference_syms_files = [ "Zelda64RecompSyms/mm.us.rev1.datasyms.toml", "Zel
 
 # Additional files to include in the mod.
 additional_files = [ ]
-
-[[manifest.config_options]]
-id = "zobj_name"
-name = "Zobj Name"
-description = """
-Enter the name of the zobj. It should be located in the mods folder."""
-type = "String"
-default = ""
-
-[[manifest.config_options]]
-id = "adult_fixes_enabled"
-name = "Is Adult Model"
-description = """
-Off: Use default human Link properties
-On: Apply adult Link properties to human Link."""
-type = "Enum"
-options = [ "Off", "On" ]
-default = "Off"
-
-[[manifest.config_options]]
-id = "refresh_model"
-name = "Refresh Model"
-description = "Switch which option is selected to reload the zobj."
-type = "Enum"
-options = [ "First", "Second" ]
-default = "First"

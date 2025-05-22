@@ -6,6 +6,8 @@
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "playermodelmanager_mm.h"
 #include "playermodelmanager_utils.h"
+#include "model_common.h"
+#include "z64object.h"
 
 RECOMP_IMPORT(".", Link_FormProxy *getLinkFormProxies());
 
@@ -235,21 +237,39 @@ Gfx gLinkHumanFirstPersonArm[] = {
 };
 
 void setupVanillaHuman() {
+    Link_FormProxy *formProxy = &getLinkFormProxies()[PLAYER_FORM_HUMAN];
 
-    Link_FormProxy *formModel = &getLinkFormProxies()[PLAYER_FORM_HUMAN];
+    TexturePtr eyesTex[PLAYER_EYES_MAX];
+    TexturePtr mouthTex[PLAYER_MOUTH_MAX];
 
-    clearLinkModelInfo(&formModel->vanilla);
+    for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
+        eyesTex[i] = formProxy->vanilla.eyesTextures[i];
+    }
 
-    formModel->vanilla.skeleton = &gLinkHumanSkel;
+    for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        mouthTex[i] = formProxy->vanilla.mouthTextures[i];
+    }
 
-    Mtx **equipMatrixes = formModel->vanilla.equipMtx;
+    clearLinkModelInfo(&formProxy->vanilla);
+
+    for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
+        formProxy->vanilla.eyesTextures[i] = eyesTex[i];
+    }
+
+    for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        formProxy->vanilla.mouthTextures[i] = mouthTex[i];
+    }
+
+    loadVanillaSkeletonTransforms(&formProxy->vanilla, OBJECT_LINK_CHILD, gLinkHumanSkelLimbs);
+
+    Mtx **equipMatrixes = formProxy->vanilla.equipMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = &gLinkHumanSheathedRazorSwordMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = &gLinkHumanHerosShieldMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = &gLinkHumanMirrorShieldMtx;
 
-    Gfx **models = formModel->vanilla.models;
+    Gfx **models = formProxy->vanilla.models;
 
     // limbs
     models[LINK_DL_WAIST] = gLinkHumanWaistDL;
@@ -286,9 +306,9 @@ void setupVanillaHuman() {
     models[LINK_DL_SWORD_GILDED_HILT] = gLinkHumanGildedSwordHandleDL;
 
     // sword blades
-    models[LINK_DL_SWORD_KOKIRI_HILT] = gKokiriSwordBladeDL;
-    models[LINK_DL_SWORD_RAZOR_HILT] = gRazorSwordBladeDL;
-    models[LINK_DL_SWORD_GILDED_HILT] = gLinkHumanGildedSwordBladeDL;
+    models[LINK_DL_SWORD_KOKIRI_BLADE] = gKokiriSwordBladeDL;
+    models[LINK_DL_SWORD_RAZOR_BLADE] = gRazorSwordBladeDL;
+    models[LINK_DL_SWORD_GILDED_BLADE] = gLinkHumanGildedSwordBladeDL;
 
     // shields
     models[LINK_DL_SHIELD_HERO] = gLinkHumanHerosShieldDL;
@@ -306,6 +326,7 @@ void setupVanillaHuman() {
     // First Person
     models[LINK_DL_FPS_LFOREARM] = gLinkHumanLeftForearmDL;
     models[LINK_DL_FPS_LHAND] = gLinkHumanLeftHandClosedDL;
+    models[LINK_DL_FPS_RFOREARM] = dfCommand;
     models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArm;
     models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshot;
 

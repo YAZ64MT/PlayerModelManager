@@ -385,21 +385,30 @@ typedef enum {
     LINK_EQUIP_MATRIX_MAX,
 } Link_EquipmentMatrix;
 
+#define PLAYER_LIMB_COUNT 21
+
 typedef struct {
-    FlexSkeletonHeader *skeleton;
     Gfx *models[LINK_DL_MAX];
     Mtx *equipMtx[LINK_EQUIP_MATRIX_MAX];
     TexturePtr eyesTextures[PLAYER_EYES_MAX];
     TexturePtr mouthTextures[PLAYER_MOUTH_MAX];
+    Vec3s limbTranslations[PLAYER_LIMB_COUNT];
 } Link_ModelInfo;
+
+typedef struct {
+    FlexSkeletonHeader flexSkeleton;
+    LodLimb *limbPtrs[PLAYER_LIMB_COUNT];
+    LodLimb limbs[PLAYER_LIMB_COUNT];
+} Link_SkeletonProxy;
 
 typedef struct {
     Link_ModelInfo current;
     Link_ModelInfo vanilla;
-    FlexSkeletonHeader skeleton;
+    Link_SkeletonProxy skeleton;
     Gfx *shimDisplayListPtrs[LINK_SHIMDL_MAX];
-    Mtx equipMtx[LINK_EQUIP_MATRIX_MAX];
+    Gfx *mtxDisplayLists[LINK_EQUIP_MATRIX_MAX];
     Gfx displayLists[LINK_DL_MAX];
+    Gfx proxyDisplayLists[LINK_DL_MAX];
 } Link_FormProxy;
 
 #endif
