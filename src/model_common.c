@@ -291,15 +291,15 @@ void refreshProxySkeleton(Link_FormProxy *formProxy) {
     // while, technically, there *could* be a custom model where all bones are at (0,0,0)
     // but in practice this doesn't happen, so all transforms being at (0,0,0) will be 
     // treated as no custom skeleton
-    bool hasCustomSkeleton = false;
-    for (u32 i = 0; !hasCustomSkeleton && i < PLAYER_LIMB_COUNT; ++i) {
-        hasCustomSkeleton = limbTrans->x != 0 || limbTrans->y != 0 || limbTrans->z != 0;
+    bool isCustomSkeleton = false;
+    for (u32 i = 0; !isCustomSkeleton && i < PLAYER_LIMB_COUNT; ++i) {
+        isCustomSkeleton = limbTrans->x != 0 || limbTrans->y != 0 || limbTrans->z != 0;
     }
 
-    if (!hasCustomSkeleton) {
+    if (!isCustomSkeleton) {
         limbTrans = formProxy->vanilla.limbTranslations;
     }
-    
+
     for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
             formProxy->skeleton.limbs[i].jointPos = limbTrans[i];
     }

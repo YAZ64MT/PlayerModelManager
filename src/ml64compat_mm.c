@@ -7,6 +7,37 @@
 #include "defines_mmo.h"
 #include "zobjutils.h"
 
+void setupFaceTextures(Link_ModelInfo *modelInfo, u8 *zobj) {
+    for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
+        modelInfo->eyesTextures[i] = (TexturePtr)&zobj[Z64O_TEX_EYES_START + Z64O_TEX_EYES_SIZE * i];
+    }
+
+    for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        modelInfo->mouthTextures[i] = (TexturePtr)&zobj[Z64O_TEX_MOUTH_START + Z64O_TEX_MOUTH_SIZE * i];
+    }
+}
+
+void repointZobjDls(u8* zobj, u32 start, u32 end) {
+    u32 current = start;
+
+    while (current < end) {
+        ZobjUtils_repointDisplayList(zobj, current, 0x06, zobj);
+        current += 8;
+    }
+}
+
+void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
+    u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, Z64O_SKELETON_HEADER_POINTER));
+
+    ZobjUtils_repointFlexSkeleton(zobj, skelHeader, 0x06, zobj);
+
+    FlexSkeletonHeader *flexHeader = (FlexSkeletonHeader *)&zobj[skelHeader];
+    LodLimb **limbs = (LodLimb **)flexHeader->sh.segment;
+    for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
+        modelInfo->limbTranslations[i] = limbs[i]->jointPos;
+    }
+}
+
 void repointMmoZobj(u8 *zobj) {
     u32 current = MMO_LUT_DL_WAIST;
     u32 end = MMO_LUT_DL_DF_COMMAND;
@@ -25,33 +56,17 @@ void repointMmoZobj(u8 *zobj) {
 
 void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
 
-    repointMmoZobj(zobj);
-
-    u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, Z64O_SKELETON_HEADER_POINTER));
-
-    ZobjUtils_repointFlexSkeleton(zobj, skelHeader, 0x06, zobj);
-
     clearLinkModelInfo(modelInfo);
 
-    FlexSkeletonHeader *flexHeader = (FlexSkeletonHeader *)&zobj[skelHeader];
-    for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
-        LodLimb **limbs = (LodLimb **)flexHeader->sh.segment;
-        modelInfo->limbTranslations[i] = limbs[i]->jointPos;
-    }
+    repointZobj(zobj, MMO_LUT_DL_WAIST, MMO_LUT_DL_DF_COMMAND);
+
+    handleZobjSkeleton(modelInfo, zobj);
 
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = (Mtx *)&zobj[MMO_MATRIX_SWORD_A];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = (Mtx *)&zobj[MMO_MATRIX_SWORD_B];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = (Mtx *)&zobj[MMO_MATRIX_SWORD_A];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = (Mtx *)&zobj[MMO_MATRIX_SHIELD_A];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = (Mtx *)&zobj[MMO_MATRIX_SHIELD_B];
-
-    for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
-        modelInfo->eyesTextures[i] = (TexturePtr)&zobj[Z64O_TEX_EYES_START + Z64O_TEX_EYES_SIZE * i];
-    }
-
-    for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        modelInfo->mouthTextures[i] = (TexturePtr)&zobj[Z64O_TEX_MOUTH_START + Z64O_TEX_MOUTH_SIZE * i];
-    }
 
     QSET_MMO_MODEL(WAIST);
     QSET_MMO_MODEL(RTHIGH);
