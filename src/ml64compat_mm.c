@@ -27,7 +27,7 @@ void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     repointMmoZobj(zobj);
 
-    u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, MMO_SKELETON_HEADER_POINTER));
+    u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, Z64O_SKELETON_HEADER_POINTER));
 
     ZobjUtils_repointFlexSkeleton(zobj, skelHeader, 0x06, zobj);
 
@@ -46,11 +46,11 @@ void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = (Mtx *)&zobj[MMO_MATRIX_SHIELD_B];
 
     for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
-        modelInfo->eyesTextures[i] = (TexturePtr)&zobj[MMO_TEX_EYES_START + MMO_TEX_EYES_SIZE * i];
+        modelInfo->eyesTextures[i] = (TexturePtr)&zobj[Z64O_TEX_EYES_START + Z64O_TEX_EYES_SIZE * i];
     }
 
     for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        modelInfo->mouthTextures[i] = (TexturePtr)&zobj[MMO_TEX_MOUTH_START + MMO_TEX_MOUTH_SIZE * i];
+        modelInfo->mouthTextures[i] = (TexturePtr)&zobj[Z64O_TEX_MOUTH_START + Z64O_TEX_MOUTH_SIZE * i];
     }
 
     QSET_MMO_MODEL(WAIST);
