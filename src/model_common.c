@@ -350,7 +350,7 @@ LodLimb skeletonBase[PLAYER_LIMB_COUNT] = {
     {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
 };
 
-#define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = proxyLimbName
+#define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = &formProxy->proxyDisplayLists[proxyLimbName]
 
 void initFormProxySkeleton(Link_FormProxy *formProxy) {
 
