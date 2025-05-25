@@ -297,7 +297,7 @@ void refreshProxySkeleton(Link_FormProxy *formProxy) {
     // treated as no custom skeleton
     bool isCustomSkeleton = false;
     for (u32 i = 0; !isCustomSkeleton && i < PLAYER_LIMB_COUNT; ++i) {
-        isCustomSkeleton = limbTrans->x != 0 || limbTrans->y != 0 || limbTrans->z != 0;
+        isCustomSkeleton = limbTrans[i].x != 0 || limbTrans[i].y != 0 || limbTrans[i].z != 0;
     }
 
     if (!isCustomSkeleton) {
@@ -305,7 +305,9 @@ void refreshProxySkeleton(Link_FormProxy *formProxy) {
     }
 
     for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
-            formProxy->skeleton.limbs[i].jointPos = limbTrans[i];
+        Vec3s *infoTrans = &limbTrans[i];
+        Vec3s *proxyTrans = &formProxy->skeleton.limbs[i].jointPos;
+        formProxy->skeleton.limbs[i].jointPos = limbTrans[i];
     }
     
 }
