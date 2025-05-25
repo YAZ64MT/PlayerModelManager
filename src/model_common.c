@@ -357,13 +357,11 @@ LodLimb skeletonBase[PLAYER_LIMB_COUNT] = {
 #define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = &formProxy->proxyDisplayLists[proxyLimbName]
 
 void initFormProxySkeleton(Link_FormProxy *formProxy) {
-
     Link_SkeletonProxy *skel = &formProxy->skeleton;
     FlexSkeletonHeader *flex = &skel->flexSkeleton;
     flex->dListCount = 18;
     flex->sh.limbCount = PLAYER_LIMB_COUNT;
 
-    u32 currLimbWithDl = 0;
     for (u32 i = 0; i < PLAYER_LIMB_COUNT; i++) {
         skel->limbPtrs[i] = &skel->limbs[i];
 
