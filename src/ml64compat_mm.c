@@ -124,7 +124,6 @@ void Recolor_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **d
 #define SET_OOTO_CHILD_MODEL(dest, src) SET_Z64O_MODEL(dest, src, OOTO_CHILD)
 #define QSET_OOTO_CHILD_MODEL(dlName) SET_OOTO_CHILD_MODEL(dlName, dlName)
 
-// TODO: FIGURE OUT WHY LEFT SHOULDER ISN'T IMPORTED CORRECTLY
 void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     clearLinkModelInfo(modelInfo);
