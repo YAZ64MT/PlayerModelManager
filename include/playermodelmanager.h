@@ -3,6 +3,7 @@
 
 #include "global.h"
 
+// Parts after LINK_DL_ need to be kept in sync with Link_ShimDisplayList
 typedef enum {
     LINK_DL_WAIST,
     LINK_DL_RTHIGH,
@@ -263,6 +264,7 @@ typedef enum {
     LINK_DL_MAX
 } Link_DisplayList;
 
+// Parts after LINK_SHIMDL_ need to be kept in sync with Link_DisplayList
 typedef enum {
     // Hilt + Blade
     LINK_SHIMDL_SWORD1,
@@ -408,6 +410,13 @@ typedef struct {
     Gfx *shimDisplayListPtrs[LINK_SHIMDL_MAX];
     Gfx *mtxDisplayLists[LINK_EQUIP_MATRIX_MAX];
     Gfx displayLists[LINK_DL_MAX];
+
+    // Do not touch these after initialization
+
+    // otherwise, display list changes won't
+    // show up untilthe model is reloaded
+
+    // Modify the displayLists member instead
     Gfx proxyDisplayLists[LINK_DL_MAX];
 } Link_FormProxy;
 
