@@ -1,3 +1,8 @@
+#ifndef __DEFINES_MMO_H__
+#define __DEFINES_MMO_H__
+
+#include "defines_z64o.h"
+
 #define LUT_DL_SHIELD_DEKU 0x50D0
 #define LUT_DL_WAIST 0x50D8
 #define LUT_DL_RTHIGH 0x50E0
@@ -71,3 +76,5 @@
 #define LUT_DL_RHAND_OCARINA_TIME 0x5388
 #define DL_FPS_RARM_SLINGSHOT 0x5390
 #define LUT_DL_FPS_RARM_SLINGSHOT 0x53A0
+
+#endif
