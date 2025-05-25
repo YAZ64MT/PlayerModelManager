@@ -4,6 +4,7 @@
 #include "defines_z64o.h"
 
 #define MMO_FORM_BYTE_CHILD 0x04
+#define MMO_FORM_BYTE_ADULT 0x68
 #define MMO_MATRIX_SHIELD_A 0x5010
 #define MMO_MATRIX_SHIELD_B 0x5050
 #define MMO_MATRIX_SWORD_A 0x5090
