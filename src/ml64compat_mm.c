@@ -8,6 +8,7 @@
 #include "defines_ooto.h"
 #include "zobjutils.h"
 #include "model_common.h"
+#include "ml64compat.h"
 
 void setupFaceTextures(Link_ModelInfo *modelInfo, u8 *zobj) {
     for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
@@ -181,6 +182,14 @@ void Recolor_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **d
 void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     clearLinkModelInfo(modelInfo);
+
+    // OotoFixHeaderSkelPtr MUST run before OotoFixChildLeftShoulder to ensure the latter reads the right offset for the skeleton in old zobjs
+    // OotoFixChildLeftShoulder MUST run before repointZobjDls to ensure the left shoulder is repointed in old zobjs
+
+    // old versions of manifest did not write header ptr
+    OotoFixHeaderSkelPtr(zobj);
+    // old versions of manifests had a typo that pointed the left shoulder entry to the forearm
+    OotoFixChildLeftShoulder(zobj);
 
     repointZobjDls(zobj, OOTO_CHILD_LUT_DL_WAIST, OOTO_CHILD_LUT_DL_FPS_RARM_SLINGSHOT);
 
