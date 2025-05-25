@@ -8,7 +8,6 @@
 #include "defines_ooto.h"
 #include "zobjutils.h"
 #include "model_common.h"
-#include 
 
 void setupFaceTextures(Link_ModelInfo *modelInfo, u8 *zobj) {
     for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
@@ -41,16 +40,6 @@ void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
     }
 }
 
-void repointMmoZobj(u8 *zobj) {
-    u32 current = MMO_LUT_DL_WAIST;
-    u32 end = MMO_LUT_DL_DF_COMMAND;
-
-    while (current < end) {
-        ZobjUtils_repointDisplayList(zobj, current, 0x06, zobj);
-        current += 8;
-    }
-}
-
 #define SET_MODEL(dest, src) modelInfo->models[dest] = (Gfx *)&zobj[src]
 #define SET_Z64O_MODEL(dest, src, modName) SET_MODEL(LINK_DL_##dest, modName##_LUT_DL_##src)
 
@@ -61,7 +50,7 @@ void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     clearLinkModelInfo(modelInfo);
 
-    repointZobj(zobj, MMO_LUT_DL_WAIST, MMO_LUT_DL_DF_COMMAND);
+    repointZobjDls(zobj, MMO_LUT_DL_WAIST, MMO_LUT_DL_DF_COMMAND);
 
     handleZobjSkeleton(modelInfo, zobj);
 
@@ -118,7 +107,7 @@ void setupZobjOoTOChild(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     clearLinkModelInfo(modelInfo);
 
-    repointZobj(zobj, MMO_LUT_DL_WAIST, MMO_LUT_DL_DF_COMMAND);
+    repointZobjDls(zobj, OOTO_CHILD_LUT_DL_WAIST, OOTO_CHILD_LUT_DL_FPS_RARM_SLINGSHOT);
 
     handleZobjSkeleton(modelInfo, zobj);
 
