@@ -36,6 +36,8 @@ extern Gfx *D_801C018C[];
 extern Gfx *gPlayerSheathedSwords[];
 extern Gfx *gPlayerSwordSheaths[];
 extern Gfx *gPlayerShields[];
+extern Gfx *gPlayerHandHoldingShields[];
+;
 
 extern TexturePtr sPlayerEyesTextures[];
 extern TexturePtr sPlayerMouthTextures[];
@@ -97,6 +99,11 @@ void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
     gPlayerShields[1] = &formProxy->proxyDisplayLists[LINK_DL_SHIELD_HERO_BACK];
     gPlayerShields[2] = &formProxy->proxyDisplayLists[LINK_DL_SHIELD_MIRROR_BACK];
     gPlayerShields[3] = &formProxy->proxyDisplayLists[LINK_DL_SHIELD_MIRROR_BACK];
+
+    gPlayerHandHoldingShields[0] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_SHIELD_HERO];
+    gPlayerHandHoldingShields[1] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_SHIELD_HERO];
+    gPlayerHandHoldingShields[2] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_SHIELD_MIRROR];
+    gPlayerHandHoldingShields[3] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_SHIELD_MIRROR];
 
     gPlayerSheathedSwords[0] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
     gPlayerSheathedSwords[1] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
