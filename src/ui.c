@@ -284,7 +284,7 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
 
                 Link_FormProxy* humanProxy = &proxies[PLAYER_FORM_HUMAN];
 
-                setupZobjMmo(&humanProxy->current, newZobjFile.data);
+                setupZobjZ64o(&humanProxy->current, newZobjFile.data);
                 refreshFormProxy(humanProxy);
                 matchFaceTexturesToProxy(&proxies[GET_PLAYER_FORM]);
 

@@ -19,7 +19,7 @@ void setupFaceTextures(Link_ModelInfo *modelInfo, u8 *zobj) {
     }
 }
 
-void repointZobjDls(u8* zobj, u32 start, u32 end) {
+void repointZobjDls(u8 *zobj, u32 start, u32 end) {
     u32 current = start;
 
     while (current < end) {
@@ -27,6 +27,8 @@ void repointZobjDls(u8* zobj, u32 start, u32 end) {
         current += 8;
     }
 }
+
+#define SET_LIMB_DL(playerLimb, modelName) modelInfo->models[modelName] = (Gfx *)limbs[playerLimb - 1]->dLists[0] == NULL ? callDfCommand : (Gfx *)limbs[playerLimb - 1]->dLists[0]
 
 void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
     u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, Z64O_SKELETON_HEADER_POINTER));
@@ -38,6 +40,58 @@ void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
     for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
         modelInfo->limbTranslations[i] = limbs[i]->jointPos;
     }
+}
+
+void clearSkeletonDls(Link_ModelInfo *modelInfo, u8 *zobj) {
+    u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, Z64O_SKELETON_HEADER_POINTER));
+
+    FlexSkeletonHeader *flexHeader = (FlexSkeletonHeader *)&zobj[skelHeader];
+    LodLimb **limbs = (LodLimb **)flexHeader->sh.segment;
+
+    SET_LIMB_DL(PLAYER_LIMB_WAIST, LINK_DL_WAIST);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_THIGH, LINK_DL_RTHIGH);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHIN, LINK_DL_RSHIN);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOOT, LINK_DL_RFOOT);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_THIGH, LINK_DL_LTHIGH);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_SHIN, LINK_DL_LSHIN);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_FOOT, LINK_DL_LFOOT);
+    SET_LIMB_DL(PLAYER_LIMB_HEAD, LINK_DL_HEAD);
+    SET_LIMB_DL(PLAYER_LIMB_HAT, LINK_DL_HAT);
+    SET_LIMB_DL(PLAYER_LIMB_COLLAR, LINK_DL_COLLAR);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_SHOULDER, LINK_DL_LSHOULDER);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_FOREARM, LINK_DL_LFOREARM);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_HAND, LINK_DL_LHAND);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHOULDER, LINK_DL_RSHOULDER);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOREARM, LINK_DL_RFOREARM);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_HAND, LINK_DL_RHAND);
+    SET_LIMB_DL(PLAYER_LIMB_SHEATH, LINK_DL_SHEATH_NONE);
+    SET_LIMB_DL(PLAYER_LIMB_TORSO, LINK_DL_TORSO);
+}
+
+void setSkeletonDls(Link_ModelInfo *modelInfo, u8 *zobj) {
+    u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, Z64O_SKELETON_HEADER_POINTER));
+
+    FlexSkeletonHeader *flexHeader = (FlexSkeletonHeader *)&zobj[skelHeader];
+    LodLimb **limbs = (LodLimb **)flexHeader->sh.segment;
+
+    SET_LIMB_DL(PLAYER_LIMB_WAIST, LINK_DL_WAIST);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_THIGH, LINK_DL_RTHIGH);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHIN, LINK_DL_RSHIN);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOOT, LINK_DL_RFOOT);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_THIGH, LINK_DL_LTHIGH);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_SHIN, LINK_DL_LSHIN);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_FOOT, LINK_DL_LFOOT);
+    SET_LIMB_DL(PLAYER_LIMB_HEAD, LINK_DL_HEAD);
+    SET_LIMB_DL(PLAYER_LIMB_HAT, LINK_DL_HAT);
+    SET_LIMB_DL(PLAYER_LIMB_COLLAR, LINK_DL_COLLAR);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_SHOULDER, LINK_DL_LSHOULDER);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_FOREARM, LINK_DL_LFOREARM);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_HAND, LINK_DL_LHAND);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHOULDER, LINK_DL_RSHOULDER);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOREARM, LINK_DL_RFOREARM);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_HAND, LINK_DL_RHAND);
+    SET_LIMB_DL(PLAYER_LIMB_SHEATH, LINK_DL_SHEATH_NONE);
+    SET_LIMB_DL(PLAYER_LIMB_TORSO, LINK_DL_TORSO);
 }
 
 #define SET_MODEL(dest, src) modelInfo->models[dest] = (Gfx *)&zobj[src]
@@ -53,6 +107,8 @@ void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
     repointZobjDls(zobj, MMO_LUT_DL_WAIST, MMO_LUT_DL_DF_COMMAND);
 
     handleZobjSkeleton(modelInfo, zobj);
+
+    setupFaceTextures(modelInfo, zobj);
 
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = (Mtx *)&zobj[MMO_MATRIX_SWORD_A];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = (Mtx *)&zobj[MMO_MATRIX_SWORD_B];
@@ -100,16 +156,37 @@ void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_MMO_MODEL(FPS_RHAND);
 }
 
+void fixTunicColor(PlayState *play) {
+    OPEN_DISPS(play->state.gfxCtx);
+
+    gDPSetEnvColor(POLY_OPA_DISP++, 30, 105, 27, 0);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+RECOMP_HOOK("Player_OverrideLimbDrawGameplayDefault")
+void Recolor_OverrideLimbDrawDefault(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
+    fixTunicColor(play);
+}
+
+RECOMP_HOOK("Player_OverrideLimbDrawGameplayFirstPerson")
+void Recolor_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
+    fixTunicColor(play);
+}
+
 #define SET_OOTO_CHILD_MODEL(dest, src) SET_Z64O_MODEL(dest, src, OOTO_CHILD)
 #define QSET_OOTO_CHILD_MODEL(dlName) SET_OOTO_CHILD_MODEL(dlName, dlName)
 
-void setupZobjOoTOChild(Link_ModelInfo *modelInfo, u8 *zobj) {
+// TODO: FIGURE OUT WHY LEFT SHOULDER ISN'T IMPORTED CORRECTLY
+void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     clearLinkModelInfo(modelInfo);
 
     repointZobjDls(zobj, OOTO_CHILD_LUT_DL_WAIST, OOTO_CHILD_LUT_DL_FPS_RARM_SLINGSHOT);
 
     handleZobjSkeleton(modelInfo, zobj);
+
+    setupFaceTextures(modelInfo, zobj);
 
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = (Mtx *)&zobj[OOTO_CHILD_MATRIX_SWORD_BACK];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = (Mtx *)&zobj[OOTO_CHILD_MATRIX_SHIELD_BACK];
@@ -143,4 +220,19 @@ void setupZobjOoTOChild(Link_ModelInfo *modelInfo, u8 *zobj) {
     SET_OOTO_CHILD_MODEL(FPS_LHAND, LFIST);
     modelInfo->models[LINK_DL_FPS_RFOREARM] = dfCommand;
     QSET_OOTO_CHILD_MODEL(FPS_RHAND);
+}
+
+void setupZobjZ64o(Link_ModelInfo *modelInfo, u8 *zobj) {
+    switch (zobj[Z64O_FORM_BYTE]) {
+    case MMO_FORM_BYTE_CHILD:
+        setupZobjMmo(modelInfo, zobj);
+        break;
+
+    case OOTO_FORM_BYTE_CHILD:
+        setupZobjOotoChild(modelInfo, zobj);
+        break;
+
+    default:
+        break;
+    }
 }
