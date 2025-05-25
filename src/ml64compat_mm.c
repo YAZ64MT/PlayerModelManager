@@ -47,7 +47,7 @@ void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
 #define SET_MMO_MODEL(dest, src) SET_Z64O_MODEL(dest, src, MMO)
 #define QSET_MMO_MODEL(dlName) SET_MMO_MODEL(dlName, dlName)
 
-void setupZobjMmo(Link_ModelInfo *modelInfo, u8 *zobj) {
+void setupZobjMmoHuman(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     clearLinkModelInfo(modelInfo);
 
@@ -179,7 +179,8 @@ void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
 void setupZobjZ64o(Link_ModelInfo *modelInfo, u8 *zobj) {
     switch (zobj[Z64O_FORM_BYTE]) {
     case MMO_FORM_BYTE_CHILD:
-        setupZobjMmo(modelInfo, zobj);
+    case MMO_FORM_BYTE_ADULT:
+        setupZobjMmoHuman(modelInfo, zobj);
         break;
 
     case OOTO_FORM_BYTE_CHILD:
