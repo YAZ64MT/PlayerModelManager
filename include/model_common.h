@@ -7,6 +7,7 @@ extern Gfx dfCommand[];
 extern Gfx callDfCommand[];
 extern Gfx popModelViewMtx[];
 extern Mtx zeroMtx;
+extern Link_FormProxy gLinkFormProxies[];
 
 void matchFaceTexturesToProxy(Link_FormProxy *formProxy);
 void initFormProxy(Link_FormProxy *formProxy);

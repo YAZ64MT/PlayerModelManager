@@ -42,14 +42,10 @@ extern Gfx *gPlayerHandHoldingShields[];
 extern TexturePtr sPlayerEyesTextures[];
 extern TexturePtr sPlayerMouthTextures[];
 
-static Link_FormProxy sLinkFormProxies[PLAYER_FORM_MAX];
-
-RECOMP_EXPORT Link_FormProxy* getLinkFormProxies() {
-    return sLinkFormProxies;
-}
+Link_FormProxy gLinkFormProxies[PLAYER_FORM_MAX];
 
 void changeFormPtrsToProxy(PlayerTransformation playerForm) {
-    Link_FormProxy *formProxy = &sLinkFormProxies[playerForm];
+    Link_FormProxy *formProxy = &gLinkFormProxies[playerForm];
 
     gPlayerSkeletons[playerForm] = &formProxy->skeleton.flexSkeleton;
     gPlayerRightHandOpenDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_RHAND];
@@ -86,7 +82,7 @@ void changeFormPtrsToProxy(PlayerTransformation playerForm) {
 }
 
 void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
-    Link_FormProxy *formProxy = &sLinkFormProxies[playerForm];
+    Link_FormProxy *formProxy = &gLinkFormProxies[playerForm];
 
     D_801C018C[0] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD_KOKIRI];
     D_801C018C[1] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD_KOKIRI];
@@ -124,7 +120,7 @@ void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
 void initFormProxies() {
     
     for (u8 i = 0; i < PLAYER_FORM_MAX; ++i) {
-        Link_FormProxy *formProxy = &sLinkFormProxies[i];
+        Link_FormProxy *formProxy = &gLinkFormProxies[i];
 
         initFormProxy(formProxy);
 
@@ -144,11 +140,11 @@ void initFormProxies() {
 
     // Only human is supported for now
     setupVanillaHuman();
-    refreshFormProxy(&sLinkFormProxies[PLAYER_FORM_HUMAN]);
+    refreshFormProxy(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
     changeFormPtrsToProxy(PLAYER_FORM_HUMAN);
     repointHumanEquipmentModelsToProxy(PLAYER_FORM_HUMAN);
 
-    matchFaceTexturesToProxy(&sLinkFormProxies[GET_PLAYER_FORM]);
+    matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
 }
 
 bool isInitialized = false;
@@ -156,7 +152,7 @@ bool isInitialized = false;
 RECOMP_HOOK_RETURN("Player_Init")
 void postPlayerInit() {
     if (isInitialized) {
-        matchFaceTexturesToProxy(&sLinkFormProxies[GET_PLAYER_FORM]);
+        matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
     }
 }
 

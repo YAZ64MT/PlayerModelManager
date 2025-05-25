@@ -11,7 +11,6 @@
 #include "model_common.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
-RECOMP_IMPORT(".", Link_FormProxy *getLinkFormProxies());
 
 RecompuiContext context;
 RecompuiResource root;
@@ -280,13 +279,11 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
 
             if (newZobjFile.data) {
 
-                Link_FormProxy* proxies = getLinkFormProxies();
-
-                Link_FormProxy* humanProxy = &proxies[PLAYER_FORM_HUMAN];
+                Link_FormProxy* humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
                 setupZobjZ64o(&humanProxy->current, newZobjFile.data);
                 refreshFormProxy(humanProxy);
-                matchFaceTexturesToProxy(&proxies[GET_PLAYER_FORM]);
+                matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
 
                 if (currentZobj) {
                     recomp_free(currentZobj);

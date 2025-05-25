@@ -9,8 +9,6 @@
 #include "model_common.h"
 #include "z64object.h"
 
-RECOMP_IMPORT(".", Link_FormProxy *getLinkFormProxies());
-
 // handless ocarina
 Gfx gLinkHumanOcarinaDL[] = {
     gsDPPipeSync(),
@@ -237,7 +235,7 @@ Gfx gLinkHumanFirstPersonArm[] = {
 };
 
 void setupVanillaHuman() {
-    Link_FormProxy *formProxy = &getLinkFormProxies()[PLAYER_FORM_HUMAN];
+    Link_FormProxy *formProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
     TexturePtr eyesTex[PLAYER_EYES_MAX];
     TexturePtr mouthTex[PLAYER_MOUTH_MAX];
