@@ -177,6 +177,68 @@ void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_OOTO_CHILD_MODEL(FPS_RHAND);
 }
 
+#define SET_OOTO_ADULT_MODEL(dest, src) SET_Z64O_MODEL(dest, src, OOTO_ADULT)
+#define QSET_OOTO_ADULT_MODEL(dlName) SET_OOTO_ADULT_MODEL(dlName, dlName)
+
+void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
+
+    clearLinkModelInfo(modelInfo);
+
+    // OotoFixHeaderSkelPtr MUST run before repointZobjDls to ensure the latter reads the right offset for the skeleton in old zobjs
+
+    // old versions of manifest did not write header ptr
+    OotoFixHeaderSkelPtr(zobj);
+
+    repointZobjDls(zobj, OOTO_ADULT_LUT_DL_WAIST, OOTO_ADULT_LUT_DL_FPS_LHAND_HOOKSHOT);
+
+    handleZobjSkeleton(modelInfo, zobj);
+
+    setupFaceTextures(modelInfo, zobj);
+
+    modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = (Mtx *)&zobj[OOTO_ADULT_MATRIX_SWORD_BACK];
+    modelInfo->equipMtx[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = (Mtx *)&zobj[OOTO_ADULT_MATRIX_SHIELD_BACK];
+    modelInfo->equipMtx[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = (Mtx *)&zobj[OOTO_ADULT_MATRIX_SHIELD_BACK];
+
+    QSET_OOTO_ADULT_MODEL(WAIST);
+    QSET_OOTO_ADULT_MODEL(RTHIGH);
+    QSET_OOTO_ADULT_MODEL(RSHIN);
+    QSET_OOTO_ADULT_MODEL(RFOOT);
+    QSET_OOTO_ADULT_MODEL(LTHIGH);
+    QSET_OOTO_ADULT_MODEL(LSHIN);
+    QSET_OOTO_ADULT_MODEL(LFOOT);
+    QSET_OOTO_ADULT_MODEL(HEAD);
+    QSET_OOTO_ADULT_MODEL(HAT);
+    QSET_OOTO_ADULT_MODEL(COLLAR);
+    QSET_OOTO_ADULT_MODEL(LSHOULDER);
+    QSET_OOTO_ADULT_MODEL(LFOREARM);
+    QSET_OOTO_ADULT_MODEL(RSHOULDER);
+    QSET_OOTO_ADULT_MODEL(RFOREARM);
+    QSET_OOTO_ADULT_MODEL(TORSO);
+    QSET_OOTO_ADULT_MODEL(LHAND);
+    QSET_OOTO_ADULT_MODEL(LFIST);
+    QSET_OOTO_ADULT_MODEL(LHAND_BOTTLE);
+    QSET_OOTO_ADULT_MODEL(RHAND);
+    QSET_OOTO_ADULT_MODEL(RFIST);
+    SET_OOTO_ADULT_MODEL(SWORD_GILDED_SHEATH, SWORD_MASTER_SHEATH);
+    SET_OOTO_ADULT_MODEL(SWORD_GILDED_HILT, SWORD_MASTER_HILT);
+    SET_OOTO_ADULT_MODEL(SWORD_GILDED_BLADE, SWORD_MASTER_BLADE);
+    SET_OOTO_ADULT_MODEL(SWORD4_HILT, BIGSWORD_HILT);
+    SET_OOTO_ADULT_MODEL(SWORD4_BLADE, BIGSWORD_BLADE);
+    SET_OOTO_ADULT_MODEL(SHIELD_HERO, SHIELD_HYLIAN);
+    QSET_OOTO_ADULT_MODEL(SHIELD_MIRROR);
+    QSET_OOTO_ADULT_MODEL(OCARINA_TIME);
+    QSET_OOTO_ADULT_MODEL(HOOKSHOT_HOOK);
+    QSET_OOTO_ADULT_MODEL(HOOKSHOT_RETICLE);
+    QSET_OOTO_ADULT_MODEL(HOOKSHOT);
+    QSET_OOTO_ADULT_MODEL(BOW);
+    QSET_OOTO_ADULT_MODEL(BOW_STRING);
+    QSET_OOTO_ADULT_MODEL(FPS_LFOREARM);
+    QSET_OOTO_ADULT_MODEL(FPS_LHAND);
+    QSET_OOTO_ADULT_MODEL(FPS_RFOREARM);
+    QSET_OOTO_ADULT_MODEL(FPS_RHAND);
+    QSET_OOTO_ADULT_MODEL(FPS_HOOKSHOT);
+}
+
 void setupZobjZ64o(Link_ModelInfo *modelInfo, u8 *zobj) {
     switch (zobj[Z64O_FORM_BYTE]) {
     case MMO_FORM_BYTE_CHILD:
@@ -186,6 +248,10 @@ void setupZobjZ64o(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     case OOTO_FORM_BYTE_CHILD:
         setupZobjOotoChild(modelInfo, zobj);
+        break;
+
+    case OOTO_FORM_BYTE_ADULT:
+        setupZobjOotoAdult(modelInfo, zobj);
         break;
 
     default:
