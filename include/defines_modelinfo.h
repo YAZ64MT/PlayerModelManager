@@ -1,0 +1,6 @@
+#ifndef __DEFINES_MODELINFO_H__
+#define __DEFINES_MODELINFO_H__
+
+#define LINK_MODELINFO_FLAG_MM_ADULT_FIX 0x1
+
+#endif

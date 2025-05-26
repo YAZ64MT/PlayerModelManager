@@ -9,6 +9,7 @@
 #include "zobjutils.h"
 #include "model_common.h"
 #include "ml64compat.h"
+#include "defines_modelinfo.h"
 
 void setupFaceTextures(Link_ModelInfo *modelInfo, u8 *zobj) {
     for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
@@ -50,6 +51,10 @@ void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
 void setupZobjMmoHuman(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     clearLinkModelInfo(modelInfo);
+
+    if (zobj[Z64O_FORM_BYTE] == MMO_FORM_BYTE_ADULT) {
+        modelInfo->flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
+    }
 
     repointZobjDls(zobj, MMO_LUT_DL_WAIST, MMO_LUT_DL_DF_COMMAND);
 
@@ -183,6 +188,8 @@ void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
 void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     clearLinkModelInfo(modelInfo);
+
+    modelInfo->flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
 
     // OotoFixHeaderSkelPtr MUST run before repointZobjDls to ensure the latter reads the right offset for the skeleton in old zobjs
 

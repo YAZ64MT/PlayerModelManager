@@ -390,6 +390,7 @@ typedef enum {
 #define PLAYER_LIMB_COUNT 21
 
 typedef struct {
+    u64 flags;
     Gfx *models[LINK_DL_MAX];
     Mtx *equipMtx[LINK_EQUIP_MATRIX_MAX];
     TexturePtr eyesTextures[PLAYER_EYES_MAX];

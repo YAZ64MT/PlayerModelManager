@@ -6,6 +6,8 @@
 #include "simplefileloader.h"
 #include "model_common.h"
 #include "model_human.h"
+#include "mm_adultfixes.h"
+#include "playermodelmanager_utils.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
@@ -122,6 +124,8 @@ void initFormProxies() {
     for (u8 i = 0; i < PLAYER_FORM_MAX; ++i) {
         Link_FormProxy *formProxy = &gLinkFormProxies[i];
 
+        clearLinkModelInfo(&formProxy->current);
+
         initFormProxy(formProxy);
 
         // vanilla forms share these segmented ptrs
@@ -153,6 +157,7 @@ RECOMP_HOOK_RETURN("Player_Init")
 void postPlayerInit() {
     if (isInitialized) {
         matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
+        gIsAgePropertyRefreshRequested = true;
     }
 }
 

@@ -9,6 +9,7 @@
 #include "simplefileloader.h"
 #include "ml64compat_mm.h"
 #include "model_common.h"
+#include "mm_adultfixes.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
@@ -283,6 +284,7 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
 
                 setupZobjZ64o(&humanProxy->current, newZobjFile.data);
                 refreshFormProxy(humanProxy);
+                gIsAgePropertyRefreshRequested = true;
                 matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
 
                 if (currentZobj) {

@@ -8,6 +8,8 @@
 #include "model_common.h"
 #include "z64object.h"
 
+bool gIsAgePropertyRefreshRequested = false;
+
 Gfx dfCommand[] = {
     gsSPEndDisplayList(),
 };
