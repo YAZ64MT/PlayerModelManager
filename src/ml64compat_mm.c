@@ -180,6 +180,7 @@ void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
     SET_OOTO_CHILD_MODEL(FPS_LHAND, LFIST);
     modelInfo->models[LINK_DL_FPS_RFOREARM] = dfCommand;
     QSET_OOTO_CHILD_MODEL(FPS_RHAND);
+    QSET_OOTO_CHILD_MODEL(BOTTLE_GLASS);
 }
 
 #define SET_OOTO_ADULT_MODEL(dest, src) SET_Z64O_MODEL(dest, src, OOTO_ADULT)

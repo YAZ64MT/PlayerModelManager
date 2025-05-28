@@ -10,6 +10,7 @@
 #include "ml64compat_mm.h"
 #include "model_common.h"
 #include "mm_adultfixes.h"
+#include "zproxy_manager.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
@@ -266,6 +267,9 @@ void freeOldFiles() {
     }
 }
 
+extern Gfx gBottleGlassDL[];
+extern Gfx gBottleContentsDL[];
+
 u8* currentZobj = NULL;
 
 void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
@@ -286,6 +290,9 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
                 refreshFormProxy(humanProxy);
                 gIsAgePropertyRefreshRequested = true;
                 matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
+
+                ZProxyManager_setCustomDisplayList(GAMEPLAY_KEEP, &gBottleGlassDL, &humanProxy->proxyDisplayLists[LINK_DL_BOTTLE_GLASS]);
+                ZProxyManager_setCustomDisplayList(GAMEPLAY_KEEP, &gBottleContentsDL, &humanProxy->proxyDisplayLists[LINK_DL_BOTTLE_FILLING]);
 
                 if (currentZobj) {
                     recomp_free(currentZobj);
