@@ -93,7 +93,8 @@ bool ZProxy_refreshAllContainers(ZProxy *this) {
     ZProxy_ProxyContainer *container;
 
     while (curr) {
-        container = recomputil_u32_memory_hashmap_get((u32)container->vanillaDisplayList, (u32)this->vanillaToCustomMap);
+        u32 vanilla = (u32)curr->data;
+        container = recomputil_u32_memory_hashmap_get(this->vanillaToCustomMap, vanilla);
         if (container && isContainerDisplayListEmpty(&container->displayList)) {
             u32 segOffset = SEGMENT_OFFSET(container->vanillaDisplayList);
 

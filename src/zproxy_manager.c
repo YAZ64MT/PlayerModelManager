@@ -132,10 +132,15 @@ void post_DmaMgr_RequestSync() {
     gRam = NULL;
 }
 
-RECOMP_CALLBACK("*", recomp_on_init)
+RECOMP_HOOK("TitleSetup_SetupTitleScreen")
 void initZProxyManagerOnce(PlayState *play) {
     if (!gIsManagerInitialized) {
-        ZProxyManager_initManager();
         ZProxyManager_onInit();
+        gIsManagerInitialized = true;
     }
+}
+
+RECOMP_CALLBACK("*", recomp_on_init)
+void readPendingInitsOnce(PlayState *play) {
+    ZProxyManager_initManager();
 }
