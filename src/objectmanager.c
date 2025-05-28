@@ -56,7 +56,9 @@ Gfx *ObjectManager_getRebasedGfxPtr(uintptr_t vrom, size_t size, Gfx *segmentedA
     U32HashsetHandle set;
     recomputil_u32_value_hashmap_get(gRepointTracker, vrom, &set);
 
-    if (!recomputil_u32_hashset_insert(set, (u32)segmentedAddr)) {
+    //recomp_printf("Trying to insert 0x0%X into hash set %d\n", (u32)segmentedAddr, set);
+    if (recomputil_u32_hashset_insert(set, (u32)segmentedAddr)) {
+        //recomp_printf("Repointing gfx ptr 0x0%X -> 0x%X!\n", segmentedAddr, (u32)obj + SEGMENT_OFFSET(segmentedAddr));
         ZobjUtils_repointDisplayList(obj, SEGMENT_OFFSET(segmentedAddr), SEGMENT_NUMBER(segmentedAddr), obj);
     }
 
