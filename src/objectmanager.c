@@ -56,9 +56,9 @@ Gfx *ObjectManager_getRebasedGfxPtr(uintptr_t vrom, size_t size, Gfx *segmentedA
     U32HashsetHandle set;
     recomputil_u32_value_hashmap_get(gRepointTracker, vrom, &set);
 
-    //recomp_printf("Trying to insert 0x0%X into hash set %d\n", (u32)segmentedAddr, set);
+    // recomp_printf("Trying to insert 0x0%X into hash set %d\n", (u32)segmentedAddr, set);
     if (recomputil_u32_hashset_insert(set, (u32)segmentedAddr)) {
-        //recomp_printf("Repointing gfx ptr 0x0%X -> 0x%X!\n", segmentedAddr, (u32)obj + SEGMENT_OFFSET(segmentedAddr));
+        // recomp_printf("Repointing gfx ptr 0x0%X -> 0x%X!\n", segmentedAddr, (u32)obj + SEGMENT_OFFSET(segmentedAddr));
         ZobjUtils_repointDisplayList(obj, SEGMENT_OFFSET(segmentedAddr), SEGMENT_NUMBER(segmentedAddr), obj);
     }
 
@@ -71,6 +71,33 @@ Gfx *ObjectManager_getRebasedGfxPtrById(ObjectId id, Gfx *segmentedAddr) {
     size_t size = gObjectTable[id].vromEnd - vrom;
 
     return ObjectManager_getRebasedGfxPtr(vrom, size, segmentedAddr);
+}
+
+void ObjectManager_rebaseNPCHierarchy(uintptr_t vrom, size_t size, FlexSkeletonHeader *skel) {
+    void *obj = ObjectManager_get(vrom, size);
+    uintptr_t objAddr = (uintptr_t)obj;
+
+    skel = (FlexSkeletonHeader *)((uintptr_t)skel + (uintptr_t)obj);
+
+    u8 limbCount = skel->sh.limbCount;
+    void** limbPtrs = skel->sh.segment;
+
+    for (u8 i = 0; i < limbCount; ++i) {
+        StandardLimb *limb = (StandardLimb *)(objAddr + SEGMENT_OFFSET(limbPtrs[i]));
+        if (limb->dList) {
+            limb->dList = (Gfx *)((uintptr_t)obj + SEGMENT_OFFSET(limb->dList));
+        }
+
+        limbPtrs[i] = limb;
+    }
+}
+
+void ObjectManager_rebaseNPCHierarchyById(ObjectId id, FlexSkeletonHeader *skel) {
+    uintptr_t vrom = gObjectTable[id].vromStart;
+
+    size_t size = gObjectTable[id].vromEnd - vrom;
+
+    ObjectManager_rebaseNPCHierarchy(vrom, size, skel);
 }
 
 RECOMP_CALLBACK("*", recomp_on_init)

@@ -5,7 +5,7 @@
 #include "zobjutils.h"
 
 // A workaround for object dependency issues
-// This class keeps the objects loaded 
+// This class keeps the objects loaded
 
 void ObjectManager_init();
 
@@ -18,5 +18,9 @@ void *ObjectManager_getById(ObjectId id);
 Gfx *ObjectManager_getRebasedGfxPtr(uintptr_t vrom, size_t size, Gfx *segmentedAddr);
 
 Gfx *ObjectManager_getRebasedGfxPtrById(ObjectId id, Gfx *segmentedAddr);
+
+void ObjectManager_rebaseNPCHierarchy(uintptr_t vrom, size_t size, FlexSkeletonHeader *skel);
+
+void ObjectManager_rebaseNPCHierarchyById(ObjectId id, FlexSkeletonHeader *skel);
 
 #endif
