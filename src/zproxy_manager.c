@@ -3,8 +3,11 @@
 #include "recomputils.h"
 #include "libc/string.h"
 #include "zobjutils.h"
+#include "objectmanager.h"
 
 RECOMP_DECLARE_EVENT(ZProxyManager_onInit())
+
+bool gDisableProxyLoader = false;
 
 typedef struct ZProxyManager {
     U32MemoryHashmapHandle vromToZProxyMap;
@@ -103,12 +106,14 @@ void on_DmaMgr_RequestSync(DmaRequest *req) {
 
 RECOMP_HOOK_RETURN("DmaMgr_ProcessRequest")
 void post_DmaMgr_RequestSync() {
+    if (gDisableProxyLoader) {
+        return;
+    }
+
     ZProxy *zProxy = GET_ZPROXY_FROM_VROM(gVrom);
     if (zProxy) {
         if (!zProxy->vanillaObject) {
-            void *zobj = recomp_alloc(gSize);
-            zProxy->vanillaObject = zobj;
-            memcpy(zobj, gRam, gSize);
+            zProxy->vanillaObject = ObjectManager_get(gVrom, gSize);
             ZProxy_refreshAllContainers(zProxy);
         }
 
@@ -119,7 +124,7 @@ void post_DmaMgr_RequestSync() {
             ZProxy_ProxyContainer *container = recomputil_u32_memory_hashmap_get(zProxy->vanillaToCustomMap, vanilla);
 
             if (container) {
-                recomp_printf("Injecting Proxy: 0x%x -> 0x%x\n", vanilla, &container->proxyDisplayList + SEGMENT_OFFSET(vanilla));
+                //recomp_printf("Injecting Proxy: 0x%x -> 0x%x\n", vanilla, &container->proxyDisplayList + SEGMENT_OFFSET(vanilla));
 
                 gSPBranchList((uintptr_t)gRam + SEGMENT_OFFSET(vanilla), &container->proxyDisplayList);
             }
@@ -133,7 +138,7 @@ void post_DmaMgr_RequestSync() {
 }
 
 RECOMP_HOOK("TitleSetup_SetupTitleScreen")
-void initZProxyManagerOnce(PlayState *play) {
+void readPendingInitsOnce(PlayState *play) {
     if (!gIsManagerInitialized) {
         ZProxyManager_onInit();
         gIsManagerInitialized = true;
@@ -141,6 +146,6 @@ void initZProxyManagerOnce(PlayState *play) {
 }
 
 RECOMP_CALLBACK("*", recomp_on_init)
-void readPendingInitsOnce(PlayState *play) {
+void initZProxyManagerOnce(PlayState *play) {
     ZProxyManager_initManager();
 }

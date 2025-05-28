@@ -325,9 +325,8 @@ void initFormProxyMatrixes(Link_FormProxy *formProxy) {
 
 void initFormProxyDisplayLists(Link_FormProxy *formProxy) {
     for (u32 i = 0; i < LINK_DL_MAX; ++i) {
-        gSPBranchList(&formProxy->displayLists[i], &formProxy->displayLists[LINK_DL_DF_COMMAND]);
+        gSPBranchList(&formProxy->displayLists[i], callDfCommand);
     }
-    gSPBranchList(&formProxy->displayLists[LINK_DL_DF_COMMAND], dfCommand);
 
     for (u32 i = 0; i < LINK_DL_MAX; ++i) {
         gSPBranchList(&formProxy->proxyDisplayLists[i], &formProxy->displayLists[i]);

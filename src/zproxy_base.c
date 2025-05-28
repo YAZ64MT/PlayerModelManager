@@ -13,10 +13,6 @@ void ZProxy_initZProxy(ZProxy *this) {
 
 void ZProxy_destroyZProxy(ZProxy *this) {
     recomputil_destroy_u32_memory_hashmap(this->vanillaToCustomMap);
-    
-    if (this->vanillaObject) {
-        recomp_free(this->vanillaObject);
-    }
 }
 
 bool zProxy_reserveContainer(ZProxy *this, void *vanillaDisplayList) {

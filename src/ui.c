@@ -58,7 +58,6 @@ void button_pressed(RecompuiResource resource, const RecompuiEventData *data, vo
                 recomp_free(password_value);
             }
         } else {
-            recomp_printf("Pressed close button\n");
             recompui_hide_context(context);
             context_shown = false;
         }
@@ -269,6 +268,7 @@ void freeOldFiles() {
 
 extern Gfx gBottleGlassDL[];
 extern Gfx gBottleContentsDL[];
+extern Gfx gDekuStickDL[];
 
 u8* currentZobj = NULL;
 
@@ -293,6 +293,7 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
 
                 ZProxyManager_setCustomDisplayList(GAMEPLAY_KEEP, &gBottleGlassDL, &humanProxy->proxyDisplayLists[LINK_DL_BOTTLE_GLASS]);
                 ZProxyManager_setCustomDisplayList(GAMEPLAY_KEEP, &gBottleContentsDL, &humanProxy->proxyDisplayLists[LINK_DL_BOTTLE_FILLING]);
+                ZProxyManager_setCustomDisplayList(GAMEPLAY_KEEP, &gDekuStickDL, &humanProxy->proxyDisplayLists[LINK_DL_DEKU_STICK]);
 
                 if (currentZobj) {
                     recomp_free(currentZobj);

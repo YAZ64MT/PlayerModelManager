@@ -7,7 +7,7 @@ extern Gfx gBottleGlassDL[];
 
 RECOMP_CALLBACK(".", ZProxyManager_onInit)
 void reserveGlassBottle() {
-    recomp_printf("Reserving glass bottle slots...\n");
+    //recomp_printf("Reserving glass bottle slots...\n");
     ZProxyManager_reserveVanillaDisplayList(GAMEPLAY_KEEP, &gBottleGlassDL);
     ZProxyManager_reserveVanillaDisplayList(GAMEPLAY_KEEP, &gBottleContentsDL);
 }

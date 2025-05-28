@@ -8,6 +8,7 @@
 #include "playermodelmanager_utils.h"
 #include "model_common.h"
 #include "z64object.h"
+#include "objectmanager.h"
 
 // handless ocarina
 Gfx gLinkHumanOcarinaDL[] = {
@@ -260,84 +261,92 @@ void setupVanillaHuman() {
 
     loadVanillaSkeletonTransforms(&formProxy->vanilla, OBJECT_LINK_CHILD, gLinkHumanSkelLimbs);
 
+    void *human = ObjectManager_getById(OBJECT_LINK_CHILD);
+
     Mtx **equipMatrixes = formProxy->vanilla.equipMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = &gLinkHumanSheathedRazorSwordMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = &gLinkHumanSheathedKokiriSwordMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = &gLinkHumanHerosShieldMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = &gLinkHumanMirrorShieldMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanSheathedKokiriSwordMtx));
+    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanSheathedRazorSwordMtx));
+    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanSheathedKokiriSwordMtx));
+    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanHerosShieldMtx));
+    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanMirrorShieldMtx));
 
     Gfx **models = formProxy->vanilla.models;
 
     // limbs
-    models[LINK_DL_WAIST] = gLinkHumanWaistDL;
-    models[LINK_DL_RTHIGH] = gLinkHumanRightThighDL;
-    models[LINK_DL_RSHIN] = gLinkHumanRightShinDL;
-    models[LINK_DL_RFOOT] = gLinkHumanRightFootDL;
-    models[LINK_DL_LTHIGH] = gLinkHumanLeftThighDL;
-    models[LINK_DL_LSHIN] = gLinkHumanLeftShinDL;
-    models[LINK_DL_LFOOT] = gLinkHumanLeftFootDL;
-    models[LINK_DL_HEAD] = gLinkHumanHeadDL;
-    models[LINK_DL_HAT] = gLinkHumanHatDL;
-    models[LINK_DL_COLLAR] = gLinkHumanCollarDL;
-    models[LINK_DL_LSHOULDER] = gLinkHumanLeftShoulderDL;
-    models[LINK_DL_LFOREARM] = gLinkHumanLeftForearmDL;
-    models[LINK_DL_RSHOULDER] = gLinkHumanRightShoulderDL;
-    models[LINK_DL_RFOREARM] = gLinkHumanRightForearmDL;
-    models[LINK_DL_TORSO] = gLinkHumanTorsoDL;
+    models[LINK_DL_WAIST] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanWaistDL);
+    models[LINK_DL_RTHIGH] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanRightThighDL);
+    models[LINK_DL_RSHIN] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanRightShinDL);
+    models[LINK_DL_RFOOT] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanRightFootDL);
+    models[LINK_DL_LTHIGH] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanLeftThighDL);
+    models[LINK_DL_LSHIN] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanLeftShinDL);
+    models[LINK_DL_LFOOT] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanLeftFootDL);
+    models[LINK_DL_HEAD] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanHeadDL);
+    models[LINK_DL_HAT] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanHatDL);
+    models[LINK_DL_COLLAR] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanCollarDL);
+    models[LINK_DL_LSHOULDER] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanLeftShoulderDL);
+    models[LINK_DL_LFOREARM] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanLeftForearmDL);
+    models[LINK_DL_RSHOULDER] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanRightShoulderDL);
+    models[LINK_DL_RFOREARM] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanRightForearmDL);
+    models[LINK_DL_TORSO] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanTorsoDL);
 
     // hands
-    models[LINK_DL_LHAND] = gLinkHumanLeftHandOpenDL;
-    models[LINK_DL_LFIST] = gLinkHumanLeftHandClosedDL;
-    models[LINK_DL_LHAND_BOTTLE] = gLinkHumanLeftHandHoldBottleDL;
-    models[LINK_DL_RHAND] = gLinkHumanRightHandOpenDL;
-    models[LINK_DL_RFIST] = gLinkHumanRightHandClosedDL;
+    models[LINK_DL_LHAND] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanLeftHandOpenDL);
+    models[LINK_DL_LFIST] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanLeftHandClosedDL);
+    models[LINK_DL_LHAND_BOTTLE] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanLeftHandHoldBottleDL);
+    models[LINK_DL_RHAND] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanRightHandOpenDL);
+    models[LINK_DL_RFIST] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanRightHandClosedDL);
 
     // sword sheathes
-    models[LINK_DL_SWORD_KOKIRI_SHEATH] = gLinkHumanKokiriSwordSheathDL;
-    models[LINK_DL_SWORD_RAZOR_SHEATH] = gLinkHumanRazorSwordSheathDL;
-    models[LINK_DL_SWORD_GILDED_SHEATH] = gLinkHumanGildedSwordSheathDL;
+    models[LINK_DL_SWORD_KOKIRI_SHEATH] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanKokiriSwordSheathDL);
+    models[LINK_DL_SWORD_RAZOR_SHEATH] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanRazorSwordSheathDL);
+    models[LINK_DL_SWORD_GILDED_SHEATH] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL);
 
     // sword hilts
-    models[LINK_DL_SWORD_KOKIRI_HILT] = gKokiriSwordHandleDL;
-    models[LINK_DL_SWORD_RAZOR_HILT] = gRazorSwordHandleDL;
-    models[LINK_DL_SWORD_GILDED_HILT] = gLinkHumanGildedSwordHandleDL;
+    models[LINK_DL_SWORD_KOKIRI_HILT] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gKokiriSwordHandleDL);
+    models[LINK_DL_SWORD_RAZOR_HILT] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gRazorSwordHandleDL);
+    models[LINK_DL_SWORD_GILDED_HILT] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanGildedSwordHandleDL);
 
     // sword blades
-    models[LINK_DL_SWORD_KOKIRI_BLADE] = gKokiriSwordBladeDL;
-    models[LINK_DL_SWORD_RAZOR_BLADE] = gRazorSwordBladeDL;
-    models[LINK_DL_SWORD_GILDED_BLADE] = gLinkHumanGildedSwordBladeDL;
+    models[LINK_DL_SWORD_KOKIRI_BLADE] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gKokiriSwordBladeDL);
+    models[LINK_DL_SWORD_RAZOR_BLADE] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gRazorSwordBladeDL);
+    models[LINK_DL_SWORD_GILDED_BLADE] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanGildedSwordBladeDL);
 
     // shields
-    models[LINK_DL_SHIELD_HERO] = gLinkHumanHerosShieldDL;
-    models[LINK_DL_SHIELD_MIRROR] = gLinkHumanMirrorShieldDL;
+    models[LINK_DL_SHIELD_HERO] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanHerosShieldDL);
+    models[LINK_DL_SHIELD_MIRROR] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanMirrorShieldDL);
 
     // items
-    models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL;
-    models[LINK_DL_DEKU_STICK] = gDekuStickDL;
-    models[LINK_DL_BOW] = gLinkHumanBowDL;
+    models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL; // not in Link obj
+    ZobjUtils_repointDisplayList((u8 *)gLinkHumanOcarinaDL, 0, 0x06, human); // repoint vertices, textures, etc. to static link obj
+
+    models[LINK_DL_DEKU_STICK] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gDekuStickDL);
+    models[LINK_DL_BOW] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanBowDL);
     //models[LINK_DL_BOW_STRING];
-    models[LINK_DL_HOOKSHOT] = gLinkHumanHookshotDL;
-    models[LINK_DL_HOOKSHOT_CHAIN] = gHookshotChainDL;
-    models[LINK_DL_HOOKSHOT_RETICLE] = gHookshotReticleDL;
+    models[LINK_DL_HOOKSHOT] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanHookshotDL);
+    models[LINK_DL_HOOKSHOT_CHAIN] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gHookshotChainDL);
+    models[LINK_DL_HOOKSHOT_RETICLE] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gHookshotReticleDL);
 
     // First Person
-    models[LINK_DL_FPS_LFOREARM] = gLinkHumanLeftForearmDL;
-    models[LINK_DL_FPS_LHAND] = gLinkHumanLeftHandClosedDL;
+    models[LINK_DL_FPS_LFOREARM] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanLeftForearmDL);
+    models[LINK_DL_FPS_LHAND] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanLeftHandClosedDL);
     models[LINK_DL_FPS_RFOREARM] = dfCommand;
-    models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArm;
-    models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshot;
+
+    models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArm; // not in Link obj
+    ZobjUtils_repointDisplayList((u8 *)gLinkHumanFirstPersonArm, 0, 0x06, human); // repoint vertices, textures, etc. to static link obj
+
+    models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshot; // not in Link obj
+    ZobjUtils_repointDisplayList((u8 *)gLinkHumanFirstPersonHookshot, 0, 0x06, human); // repoint vertices, textures, etc. to static link obj
 
     // masks
-    models[LINK_DL_MASK_DEKU] = gDekuMaskDL;
-    models[LINK_DL_MASK_GORON] = gGoronMaskDL;
-    models[LINK_DL_MASK_ZORA] = gZoraMaskDL;
-    models[LINK_DK_MASK_DEITY] = gFierceDeityMaskDL;
+    models[LINK_DL_MASK_DEKU] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gDekuMaskDL);
+    models[LINK_DL_MASK_GORON] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gGoronMaskDL);
+    models[LINK_DL_MASK_ZORA] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gZoraMaskDL);
+    models[LINK_DK_MASK_DEITY] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gFierceDeityMaskDL);
 
     // bottles
-    models[LINK_DL_BOTTLE_FILLING] = gBottleContentsDL;
-    models[LINK_DL_BOTTLE_GLASS] = gBottleGlassDL;
+    models[LINK_DL_BOTTLE_FILLING] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gBottleContentsDL);
+    models[LINK_DL_BOTTLE_GLASS] = ObjectManager_getRebasedGfxPtrById(GAMEPLAY_KEEP, gBottleGlassDL);
 
     // whole sword
-    models[LINK_DL_SWORD_GREATFAIRY] = gLinkHumanGreatFairysSwordDL;
+    models[LINK_DL_SWORD_GREATFAIRY] = ObjectManager_getRebasedGfxPtrById(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL);
 }
