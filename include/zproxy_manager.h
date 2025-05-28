@@ -8,7 +8,7 @@
 
 struct ZProxyManager;
 
-extern bool gDisableProxyLoader;
+extern bool gIsProxyLoaderDisabled;
 
 void ZProxyManager_initManager();
 

@@ -4,7 +4,7 @@
 #include "recomputils.h"
 #include "zobjutils.h"
 
-extern bool gDisableProxyLoader;
+extern bool gIsProxyLoaderDisabled;
 
 // we can use a U32 value hash map because ptrs are 32 bit
 U32ValueHashmapHandle gVromToObjMap;
@@ -19,13 +19,13 @@ void ObjectManager_init() {
 
 void *loadObjectFromVrom(uintptr_t vromAddr, size_t size) {
 
-    gDisableProxyLoader = true;
+    gIsProxyLoaderDisabled = true;
 
     void *obj = recomp_alloc(size);
 
     DmaMgr_RequestSync(obj, vromAddr, size);
 
-    gDisableProxyLoader = false;
+    gIsProxyLoaderDisabled = false;
 
     return obj;
 }

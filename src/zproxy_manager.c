@@ -7,7 +7,7 @@
 
 RECOMP_DECLARE_EVENT(ZProxyManager_onInit())
 
-bool gDisableProxyLoader = false;
+bool gIsProxyLoaderDisabled = false;
 
 typedef struct ZProxyManager {
     U32MemoryHashmapHandle vromToZProxyMap;
@@ -106,7 +106,7 @@ void on_DmaMgr_RequestSync(DmaRequest *req) {
 
 RECOMP_HOOK_RETURN("DmaMgr_ProcessRequest")
 void post_DmaMgr_RequestSync() {
-    if (gDisableProxyLoader) {
+    if (gIsProxyLoaderDisabled) {
         return;
     }
 
