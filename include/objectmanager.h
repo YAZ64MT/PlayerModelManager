@@ -15,8 +15,8 @@ void *ObjectManager_get(uintptr_t vromAddr, size_t size);
 
 void *ObjectManager_getById(ObjectId id);
 
-void *ObjectManager_getRebasedGfxPtr(uintptr_t vrom, size_t size, Gfx *segmentedAddr);
+Gfx *ObjectManager_getRebasedGfxPtr(uintptr_t vrom, size_t size, Gfx *segmentedAddr);
 
-void *ObjectManager_getRebasedGfxPtrById(ObjectId id, Gfx *segmentedAddr);
+Gfx *ObjectManager_getRebasedGfxPtrById(ObjectId id, Gfx *segmentedAddr);
 
 #endif

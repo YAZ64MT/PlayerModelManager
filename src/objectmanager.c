@@ -50,7 +50,7 @@ void *ObjectManager_getById(ObjectId id) {
     return ObjectManager_get(vrom, size);
 }
 
-void *ObjectManager_getRebasedGfxPtr(uintptr_t vrom, size_t size, Gfx *segmentedAddr) {
+Gfx *ObjectManager_getRebasedGfxPtr(uintptr_t vrom, size_t size, Gfx *segmentedAddr) {
     void *obj = ObjectManager_get(vrom, size);
 
     U32HashsetHandle set;
@@ -63,7 +63,7 @@ void *ObjectManager_getRebasedGfxPtr(uintptr_t vrom, size_t size, Gfx *segmented
     return (void *)((u32)obj + SEGMENT_OFFSET(segmentedAddr));
 }
 
-void *ObjectManager_getRebasedGfxPtrById(ObjectId id, Gfx *segmentedAddr) {
+Gfx *ObjectManager_getRebasedGfxPtrById(ObjectId id, Gfx *segmentedAddr) {
     uintptr_t vrom = gObjectTable[id].vromStart;
 
     size_t size = gObjectTable[id].vromEnd - vrom;
