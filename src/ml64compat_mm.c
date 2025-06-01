@@ -6,7 +6,7 @@
 #include "playermodelmanager_utils.h"
 #include "defines_mmo.h"
 #include "defines_ooto.h"
-#include "zobjutils.h"
+#include "globalobjects_api.h"
 #include "model_common.h"
 #include "ml64compat.h"
 #include "defines_modelinfo.h"
