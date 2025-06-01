@@ -23,12 +23,11 @@
 //
 // If a gSPBranchList or gSPDisplayList command is encountered, this function is called recursively
 // on the DL pointed to by the respective command.
-RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void ZGlobalObj_rebaseDL(void *newBase, Gfx *globalPtr, unsigned targetSegment));
+RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void ZGlobalObj_rebaseDL(void *newBase, Gfx *dlToRebase, unsigned targetSegment));
 
-// Wrapper for ZGlobalObj_rebaseDL that is shorter than writing the equivalent
-// ZGlobalObj_rebaseDL(obj, TO_GLOBAL_PTR(obj, segmentedPtr), SEGMENT_NUMBER(segmentedPtr))
-// for every vanilla display list
-RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void ZGlobalObj_globalizeVanillaDL(void *obj, Gfx *segmentedPtr));
+// Wrapper for ZGlobalObj_rebaseDL that takes a segmented pointer into the passed in object and uses
+// address of the passed in object as the new base.
+RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void ZGlobalObj_globalizeSegmentedDL(void *obj, Gfx *segmentedPtr));
 
 // Converts a LodLimb skeleton's segmented limb pointers and limb display list pointers to global pointers.
 //
