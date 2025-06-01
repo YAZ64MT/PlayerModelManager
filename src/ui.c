@@ -6,7 +6,7 @@
 #include "recompui.h"
 #include "recompdata.h"
 #include "z64recomp_api.h"
-#include "simplefileloader.h"
+#include "qdfileloader_api.h"
 #include "ml64compat_mm.h"
 #include "model_common.h"
 #include "mm_adultfixes.h"
@@ -219,7 +219,7 @@ void on_init() {
     context_shown = false;
 
     unsigned char *modFolderPath = recomp_get_mod_folder_path();
-    zobjDir = SFL_getCombinedPath(2, modFolderPath, "zobj");
+    zobjDir = QDFL_getCombinedPath(2, modFolderPath, "zobj");
     recomp_free(modFolderPath);
     recomp_printf("zobj folder path: %s\n", zobjDir);
 }
@@ -278,15 +278,17 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
 
         if (index >= 0 && index < detectedFiles.length && detectedFiles.files[index] != NULL_STRING) {
 
-            char *zobjPath = SFL_getCombinedPath(2, zobjDir, detectedFiles.files[index]);
+            char *zobjPath = QDFL_getCombinedPath(2, zobjDir, detectedFiles.files[index]);
 
-            SFL_File newZobjFile = SFL_loadFile(zobjPath);
+            void* newZobjFile = NULL;
 
-            if (newZobjFile.data) {
+            QDFL_loadFile(zobjPath, &newZobjFile);
+
+            if (newZobjFile) {
 
                 Link_FormProxy* humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
-                setupZobjZ64o(&humanProxy->current, newZobjFile.data);
+                setupZobjZ64o(&humanProxy->current, newZobjFile);
                 refreshFormProxy(humanProxy);
                 gIsAgePropertyRefreshRequested = true;
                 matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
@@ -299,7 +301,7 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
                     recomp_free(currentZobj);
                 }
 
-                currentZobj = newZobjFile.data;
+                currentZobj = newZobjFile;
             }
             
             recomp_free(zobjPath);
@@ -314,24 +316,29 @@ void refreshFileList() {
 
     recompui_open_context(context);
 
-    u32 numFiles = SFL_getNumDirEntries(zobjDir);
+    unsigned long numFiles;
 
-    oldFileList = detectedFiles;
+    QDFL_STATUS err = QDFL_getNumDirEntries(zobjDir, &numFiles);
 
-    detectedFiles.files = recomp_alloc(numFiles * sizeof(char *));
-    detectedFiles.buttons = recomp_alloc(numFiles * sizeof(RecompuiResource));
-    detectedFiles.buttonIndexes = recomp_alloc(numFiles * sizeof(u32));
-    detectedFiles.length = numFiles;
+    if (err == QDFL_STATUS_OK) {
+        oldFileList = detectedFiles;
 
-    for (u32 i = 0; i < numFiles; i++) {
-        detectedFiles.files[i] = SFL_getDirEntryNameByIndex(zobjDir, i);
-        detectedFiles.buttonIndexes[i] = i;
-        if (!detectedFiles.files[i]) {
-            detectedFiles.files[i] = NULL_STRING;
-            detectedFiles.buttons[i] = 0;
-        } else {
-            detectedFiles.buttons[i] = recompui_create_button(context, container, detectedFiles.files[i], BUTTONSTYLE_PRIMARY);
-            recompui_register_callback(detectedFiles.buttons[i], button_zobj_pressed, &detectedFiles.buttonIndexes[i]);
+        detectedFiles.files = recomp_alloc(numFiles * sizeof(char *));
+        detectedFiles.buttons = recomp_alloc(numFiles * sizeof(RecompuiResource));
+        detectedFiles.buttonIndexes = recomp_alloc(numFiles * sizeof(u32));
+        detectedFiles.length = numFiles;
+
+        for (size_t i = 0; i < numFiles; i++) {
+            detectedFiles.files[i] = NULL;
+            QDFL_getDirEntryNameByIndex(zobjDir, i, &detectedFiles.files[i]);
+                detectedFiles.buttonIndexes[i] = i;
+            if (!detectedFiles.files[i]) {
+                detectedFiles.files[i] = NULL_STRING;
+                detectedFiles.buttons[i] = 0;
+            } else {
+                detectedFiles.buttons[i] = recompui_create_button(context, container, detectedFiles.files[i], BUTTONSTYLE_PRIMARY);
+                recompui_register_callback(detectedFiles.buttons[i], button_zobj_pressed, &detectedFiles.buttonIndexes[i]);
+            }
         }
     }
 
