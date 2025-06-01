@@ -8,7 +8,6 @@
 #include "playermodelmanager_utils.h"
 #include "model_common.h"
 #include "z64object.h"
-#include "objectmanager.h"
 
 // handless ocarina
 Gfx gLinkHumanOcarinaDL[] = {
