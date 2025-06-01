@@ -37,7 +37,7 @@ dependencies = [
 # Example dependency:
 #    "modname:1.0.0"
     "mm_recomp_zobjutils:0.1.0",
-    "mm_recomp_simplefileloader:0.1.0"
+    "yazmt_mm_qdfileloader:0.1.0"
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.
