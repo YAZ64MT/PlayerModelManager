@@ -3,7 +3,6 @@
 #include "recomputils.h"
 #include "recompconfig.h"
 #include "playermodelmanager_mm.h"
-#include "simplefileloader.h"
 #include "model_common.h"
 #include "model_human.h"
 #include "mm_adultfixes.h"
