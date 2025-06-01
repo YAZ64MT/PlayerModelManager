@@ -1,11 +1,11 @@
 #include "global.h"
 #include "recomputils.h"
-#include "zproxy_manager.h"
+#include "modelreplacer_api.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 
-RECOMP_CALLBACK(".", ZProxyManager_onInit)
+RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, ZModelReplacer_onReady)
 void reserveGlassBottle() {
     //recomp_printf("Reserving glass bottle slots...\n");
-    ZProxyManager_reserveVanillaDisplayList(GAMEPLAY_KEEP, &gBottleGlassDL);
-    ZProxyManager_reserveVanillaDisplayList(GAMEPLAY_KEEP, &gBottleContentsDL);
+    ZModelReplacer_preregisterDL(GAMEPLAY_KEEP, &gBottleGlassDL);
+    ZModelReplacer_preregisterDL(GAMEPLAY_KEEP, &gBottleContentsDL);
 }
