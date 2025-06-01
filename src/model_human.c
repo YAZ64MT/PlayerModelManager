@@ -260,7 +260,7 @@ void setupVanillaHuman() {
 
     loadVanillaSkeletonTransforms(&formProxy->vanilla, OBJECT_LINK_CHILD, gLinkHumanSkelLimbs);
 
-    void *human = ObjectManager_getById(OBJECT_LINK_CHILD);
+    void *human = ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD);
 
     Mtx **equipMatrixes = formProxy->vanilla.equipMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanSheathedKokiriSwordMtx));
