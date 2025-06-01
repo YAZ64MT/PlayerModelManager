@@ -5,5 +5,5 @@
 
 RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, ZModelReplacer_onReady)
 void reserveDekuStick() {
-    ZModelReplacer_preregisterDL(GAMEPLAY_KEEP, &gDekuStickDL);
+    ZModelReplacer_preregisterDL(GAMEPLAY_KEEP, gDekuStickDL);
 }

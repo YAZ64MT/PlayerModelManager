@@ -5,6 +5,6 @@
 
 RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, ZModelReplacer_onReady)
 void reserveGlassBottle() {
-    ZModelReplacer_preregisterDL(GAMEPLAY_KEEP, &gBottleGlassDL);
-    ZModelReplacer_preregisterDL(GAMEPLAY_KEEP, &gBottleContentsDL);
+    ZModelReplacer_preregisterDL(GAMEPLAY_KEEP, gBottleGlassDL);
+    ZModelReplacer_preregisterDL(GAMEPLAY_KEEP, gBottleContentsDL);
 }
