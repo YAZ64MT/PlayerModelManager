@@ -12,7 +12,6 @@ PlayState *gPlayState;
 s32 gLimbIndex;
 Gfx **gFirstPersonDList;
 
-// restore left forearm display list
 RECOMP_HOOK("Player_OverrideLimbDrawGameplayFirstPerson")
 void pre_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
     gPlayState = play;
