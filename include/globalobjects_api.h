@@ -16,11 +16,19 @@
 // For a Gfx global pointer, use ZGlobalObj_getGlobalGfxPtr instead.
 #define SEGMENTED_TO_GLOBAL_PTR(globalObj, segmentedPtr) ((void *)((uintptr_t)globalObj + SEGMENT_OFFSET(segmentedPtr)))
 
-// Converts the segmented pointers of the Gfx commands in a display list to their global pointers.
+// Converts the segmented pointers with segment targetSegment of the Gfx commands in a display list 
+// to global pointers relative to newBase.
+//
+// Pointers with segment 04 will be repointed to a static gameplay_keep object.
 //
 // If a gSPBranchList or gSPDisplayList command is encountered, this function is called recursively
 // on the DL pointed to by the respective command.
-RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void ZGlobalObj_globalizeDL(void *obj, Gfx *segmentedPtr));
+RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void ZGlobalObj_rebaseDL(void *newBase, Gfx *globalPtr, unsigned targetSegment));
+
+// Wrapper for ZGlobalObj_rebaseDL that is shorter than writing the equivalent
+// ZGlobalObj_rebaseDL(obj, TO_GLOBAL_PTR(obj, segmentedPtr), SEGMENT_NUMBER(segmentedPtr))
+// for every vanilla display list
+RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void ZGlobalObj_globalizeVanillaDL(void *obj, Gfx *segmentedPtr));
 
 // Converts a LodLimb skeleton's segmented limb pointers and limb display list pointers to global pointers.
 //
