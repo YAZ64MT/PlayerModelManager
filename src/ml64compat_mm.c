@@ -25,7 +25,7 @@ void repointZobjDls(u8 *zobj, u32 start, u32 end) {
     u32 current = start;
 
     while (current < end) {
-        ZobjUtils_repointDisplayList(zobj, current, 0x06, zobj);
+        ZGlobalObj_globalizeSegmentedDL(zobj, (Gfx *)SEGMENT_ADDR(0x06, current));
         current += 8;
     }
 }
@@ -33,9 +33,10 @@ void repointZobjDls(u8 *zobj, u32 start, u32 end) {
 void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
     u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, Z64O_SKELETON_HEADER_POINTER));
 
-    ZobjUtils_repointFlexSkeleton(zobj, skelHeader, 0x06, zobj);
+    FlexSkeletonHeader *flexHeader = SEGMENTED_TO_GLOBAL_PTR(zobj, skelHeader);
 
-    FlexSkeletonHeader *flexHeader = (FlexSkeletonHeader *)&zobj[skelHeader];
+    ZGlobalObj_globalizeLodLimbSkeleton(zobj, flexHeader);
+
     LodLimb **limbs = (LodLimb **)flexHeader->sh.segment;
     for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
         modelInfo->limbTranslations[i] = limbs[i]->jointPos;
