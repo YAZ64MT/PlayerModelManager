@@ -7,6 +7,7 @@
 #include "recompdata.h"
 #include "z64recomp_api.h"
 #include "qdfileloader_api.h"
+#include "modelreplacer_api.h"
 #include "ml64compat_mm.h"
 #include "model_common.h"
 #include "mm_adultfixes.h"
@@ -264,10 +265,6 @@ void freeOldFiles() {
         oldFileList.length = 0;
     }
 }
-
-extern Gfx gBottleGlassDL[];
-extern Gfx gBottleContentsDL[];
-extern Gfx gDekuStickDL[];
 
 u8* currentZobj = NULL;
 

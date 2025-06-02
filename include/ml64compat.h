@@ -5,7 +5,9 @@
 #include "modding.h"
 #include "playermodelmanager.h"
 
-void OotoFixHeaderSkelPtr(u8 *zobj);
-void OotoFixChildLeftShoulder(u8* zobj);
+void OotoFixHeaderSkelPtr(void *obj);
+void OotoFixChildLeftShoulder(void *obj);
+void setSegmentPtrRemap(u32 key, u32 value);
+void applySegmentPtrRemaps(void *obj, Gfx *dl);
 
 #endif

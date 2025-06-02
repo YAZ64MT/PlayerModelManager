@@ -10,6 +10,8 @@
 #include "model_common.h"
 #include "ml64compat.h"
 #include "defines_modelinfo.h"
+#include "assets/objects/gameplay_keep/gameplay_keep.h"
+#include "assets/objects/object_link_child/object_link_child.h"
 
 void setupFaceTextures(Link_ModelInfo *modelInfo, u8 *zobj) {
     for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
@@ -18,6 +20,15 @@ void setupFaceTextures(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
         modelInfo->mouthTextures[i] = (TexturePtr)&zobj[Z64O_TEX_MOUTH_START + Z64O_TEX_MOUTH_SIZE * i];
+    }
+}
+
+void repointExternalSegments(u8 *zobj, u32 start, u32 end) {
+    u32 current = start;
+
+    while (current < end) {
+        applySegmentPtrRemaps(zobj, (Gfx *)SEGMENT_ADDR(0x06, current));
+        current += 8;
     }
 }
 
@@ -125,6 +136,22 @@ void Recolor_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **d
     fixTunicColor(play);
 }
 
+extern Color_RGB8 sPlayerBottleColors[];
+
+RECOMP_HOOK("func_80128640")
+void fixBottleEnv_func_80128640(PlayState *play, Player *player, Gfx *dList) {
+    if (player->leftHandType == PLAYER_MODELTYPE_LH_BOTTLE) {
+        PlayerBottle bottle = Player_BottleFromIA(player, player->itemAction);
+
+        OPEN_DISPS(play->state.gfxCtx);
+        Color_RGB8 *bottleColor = &sPlayerBottleColors[bottle];
+
+        gDPSetEnvColor(POLY_XLU_DISP++, bottleColor->r, bottleColor->g, bottleColor->b, 0);
+
+        CLOSE_DISPS(play->state.gfxCtx);
+    }
+}
+
 #define SET_OOTO_CHILD_MODEL(dest, src) SET_Z64O_MODEL(dest, src, OOTO_CHILD)
 #define QSET_OOTO_CHILD_MODEL(dlName) SET_OOTO_CHILD_MODEL(dlName, dlName)
 
@@ -139,6 +166,8 @@ void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
     OotoFixHeaderSkelPtr(zobj);
     // old versions of manifests had a typo that pointed the left shoulder entry to the left forearm
     OotoFixChildLeftShoulder(zobj);
+
+    repointExternalSegments(zobj, OOTO_CHILD_LUT_DL_WAIST, OOTO_CHILD_LUT_DL_FPS_RARM_SLINGSHOT);
 
     repointZobjDls(zobj, OOTO_CHILD_LUT_DL_WAIST, OOTO_CHILD_LUT_DL_FPS_RARM_SLINGSHOT);
 
@@ -171,6 +200,7 @@ void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_OOTO_CHILD_MODEL(RFIST);
     QSET_OOTO_CHILD_MODEL(DEKU_STICK);
     QSET_OOTO_CHILD_MODEL(BOTTLE_GLASS);
+    modelInfo->models[LINK_DL_BOTTLE_FILLING] = dfCommand;
     QSET_OOTO_CHILD_MODEL(SWORD_KOKIRI_SHEATH);
     QSET_OOTO_CHILD_MODEL(SWORD_KOKIRI_HILT);
     QSET_OOTO_CHILD_MODEL(SWORD_KOKIRI_BLADE);
@@ -195,6 +225,8 @@ void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     // old versions of manifest did not write header ptr
     OotoFixHeaderSkelPtr(zobj);
+
+    repointExternalSegments(zobj, OOTO_CHILD_LUT_DL_WAIST, OOTO_CHILD_LUT_DL_FPS_RARM_SLINGSHOT);
 
     repointZobjDls(zobj, OOTO_ADULT_LUT_DL_WAIST, OOTO_ADULT_LUT_DL_FPS_LHAND_HOOKSHOT);
 
@@ -240,6 +272,7 @@ void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_OOTO_ADULT_MODEL(BOW);
     QSET_OOTO_ADULT_MODEL(BOW_STRING);
     QSET_OOTO_ADULT_MODEL(BOTTLE_GLASS);
+    modelInfo->models[LINK_DL_BOTTLE_FILLING] = dfCommand;
     QSET_OOTO_ADULT_MODEL(FPS_LFOREARM);
     QSET_OOTO_ADULT_MODEL(FPS_LHAND);
     QSET_OOTO_ADULT_MODEL(FPS_RFOREARM);
@@ -249,20 +282,56 @@ void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
 
 void setupZobjZ64o(Link_ModelInfo *modelInfo, u8 *zobj) {
     switch (zobj[Z64O_FORM_BYTE]) {
-    case MMO_FORM_BYTE_CHILD:
-    case MMO_FORM_BYTE_ADULT:
-        setupZobjMmoHuman(modelInfo, zobj);
-        break;
+        case MMO_FORM_BYTE_CHILD:
+        case MMO_FORM_BYTE_ADULT:
+            setupZobjMmoHuman(modelInfo, zobj);
+            break;
 
-    case OOTO_FORM_BYTE_CHILD:
-        setupZobjOotoChild(modelInfo, zobj);
-        break;
+        case OOTO_FORM_BYTE_CHILD:
+            setupZobjOotoChild(modelInfo, zobj);
+            break;
 
-    case OOTO_FORM_BYTE_ADULT:
-        setupZobjOotoAdult(modelInfo, zobj);
-        break;
+        case OOTO_FORM_BYTE_ADULT:
+            setupZobjOotoAdult(modelInfo, zobj);
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
+}
+
+u64 gOotHylianShieldTex[] = {
+#include "crossgame/oot/assets/objects/gameplay_keep/hylian_shield_design.rgba16.inc.c"
+};
+
+u64 gOotBottleGlassTex[] = {
+#include "crossgame/oot/assets/objects/gameplay_keep/bottle_glass.rgba16.inc.c"
+};
+
+void remapSegmentPtrs() {
+
+#define OOT_HILITE_1_TEX 0x04000000
+#define OOT_OCARINA_OF_TIME_TEX 0x04001400
+#define OOT_GK_DEKU_STICK_TEX 0x04001A00
+#define OOT_GK_HYLIAN_SHIELD_TEX 0x04000400
+#define OOT_GK_BOTTLE_GLASS_TEX 0x04001800
+#define PTR_OBJ_REMAP_SET(obj, key, val) setSegmentPtrRemap(key, (u32)SEGMENTED_TO_GLOBAL_PTR(obj, val))
+#define PTR_GK_REMAP_SET(key, val) PTR_OBJ_REMAP_SET(gk, key, val);
+
+    void *gk = ZGlobalObj_getGlobalObject(GAMEPLAY_KEEP);
+
+    void *human = ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD);
+
+    PTR_GK_REMAP_SET(OOT_HILITE_1_TEX, gameplay_keep_Tex_00C830);
+    PTR_GK_REMAP_SET(OOT_GK_DEKU_STICK_TEX, gDekuStickTex);
+
+    PTR_OBJ_REMAP_SET(human, OOT_OCARINA_OF_TIME_TEX, gLinkHumanOcarinaTex);
+
+    setSegmentPtrRemap(OOT_GK_HYLIAN_SHIELD_TEX, (u32)gOotHylianShieldTex);
+    setSegmentPtrRemap(OOT_GK_BOTTLE_GLASS_TEX, (u32)gOotBottleGlassTex);
+}
+
+RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyML64CompatBase)
+void initML64CompatMM_onReadyML64CompatBase() {
+    remapSegmentPtrs();
 }

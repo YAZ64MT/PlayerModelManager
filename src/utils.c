@@ -71,3 +71,7 @@ void writeU32(u8 array[], u32 offset, u32 value) {
     array[offset + 2] = (value & 0x0000FF00) >> 8;
     array[offset + 3] = (value & 0x000000FF);
 }
+
+bool isSegmentedPtr(void *p) {
+    return (uintptr_t)p >> 24 <= 0xF;
+}

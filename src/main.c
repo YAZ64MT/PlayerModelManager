@@ -8,6 +8,7 @@
 #include "mm_adultfixes.h"
 #include "playermodelmanager_utils.h"
 #include "modelreplacer_api.h"
+#include "assets/objects/gameplay_keep/gameplay_keep.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
@@ -39,7 +40,6 @@ extern Gfx *gPlayerSheathedSwords[];
 extern Gfx *gPlayerSwordSheaths[];
 extern Gfx *gPlayerShields[];
 extern Gfx *gPlayerHandHoldingShields[];
-;
 
 extern TexturePtr sPlayerEyesTextures[];
 extern TexturePtr sPlayerMouthTextures[];
@@ -118,6 +118,26 @@ void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
     gPlayerSwordSheaths[5] = &formProxy->displayLists[LINK_DL_SWORD_GILDED_SHEATH];
 }
 
+void addProxyExternalDLs() {
+    Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
+
+    ZModelReplacer_addCustomDL(GAMEPLAY_KEEP, gBottleGlassDL, &humanProxy->displayLists[LINK_DL_BOTTLE_GLASS]);
+
+    ZModelReplacer_addCustomDL(GAMEPLAY_KEEP, gBottleContentsDL, &humanProxy->displayLists[LINK_DL_BOTTLE_FILLING]);
+
+    ZModelReplacer_addCustomDL(GAMEPLAY_KEEP, gDekuStickDL, &humanProxy->displayLists[LINK_DL_DEKU_STICK]);
+}
+
+void removeProxyEternalDLs() {
+    Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
+
+    ZModelReplacer_removeCustomDL(GAMEPLAY_KEEP, gBottleGlassDL, &humanProxy->displayLists[LINK_DL_BOTTLE_GLASS]);
+
+    ZModelReplacer_removeCustomDL(GAMEPLAY_KEEP, gBottleContentsDL, &humanProxy->displayLists[LINK_DL_BOTTLE_FILLING]);
+
+    ZModelReplacer_removeCustomDL(GAMEPLAY_KEEP, gDekuStickDL, &humanProxy->displayLists[LINK_DL_DEKU_STICK]);
+}
+
 // initialize player models as blank display lists
 void initFormProxies() {
     
@@ -154,6 +174,14 @@ void initFormProxies() {
 RECOMP_HOOK_RETURN("Player_Init")
 void postPlayerInit() {
     matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
+
+    if (GET_PLAYER_FORM == PLAYER_FORM_HUMAN) {
+        addProxyExternalDLs();
+    }
+    else {
+        removeProxyEternalDLs();
+    }
+
     gIsAgePropertyRefreshRequested = true;
 }
 
