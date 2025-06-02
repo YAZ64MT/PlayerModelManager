@@ -84,7 +84,7 @@ void changeFormPtrsToProxy(PlayerTransformation playerForm) {
 }
 
 void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
-    Link_FormProxy *formProxy = &GET_PLAYER_FORM_PROXY;
+    Link_FormProxy *formProxy = &gLinkFormProxies[playerForm];
 
     D_801C018C[0] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
     D_801C018C[1] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
@@ -157,7 +157,10 @@ void postPlayerInit() {
     gIsAgePropertyRefreshRequested = true;
 }
 
+RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyFormProxies());
+
 RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, ZModelReplacer_onReady)
 void onModelReplacerReady() {
     initFormProxies();
+    PlayerModelManager_internal_onReadyFormProxies();
 }
