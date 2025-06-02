@@ -144,6 +144,7 @@ void fixBottleEnv_func_80128640(PlayState *play, Player *player, Gfx *dList) {
         PlayerBottle bottle = Player_BottleFromIA(player, player->itemAction);
 
         OPEN_DISPS(play->state.gfxCtx);
+
         Color_RGB8 *bottleColor = &sPlayerBottleColors[bottle];
 
         gDPSetEnvColor(POLY_XLU_DISP++, bottleColor->r, bottleColor->g, bottleColor->b, 0);
@@ -226,7 +227,7 @@ void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
     // old versions of manifest did not write header ptr
     OotoFixHeaderSkelPtr(zobj);
 
-    repointExternalSegments(zobj, OOTO_CHILD_LUT_DL_WAIST, OOTO_CHILD_LUT_DL_FPS_RARM_SLINGSHOT);
+    repointExternalSegments(zobj, OOTO_ADULT_LUT_DL_WAIST, OOTO_ADULT_LUT_DL_FPS_LHAND_HOOKSHOT);
 
     repointZobjDls(zobj, OOTO_ADULT_LUT_DL_WAIST, OOTO_ADULT_LUT_DL_FPS_LHAND_HOOKSHOT);
 
