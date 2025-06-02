@@ -31,14 +31,14 @@ void repointZobjDls(u8 *zobj, u32 start, u32 end) {
 }
 
 void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
-    u32 skelHeader = SEGMENT_OFFSET(readU32(zobj, Z64O_SKELETON_HEADER_POINTER));
+    u32 skelHeader = readU32(zobj, Z64O_SKELETON_HEADER_POINTER);
+
+    ZGlobalObj_globalizeLodLimbSkeleton(zobj, (void *)skelHeader);
 
     FlexSkeletonHeader *flexHeader = SEGMENTED_TO_GLOBAL_PTR(zobj, skelHeader);
-
-    ZGlobalObj_globalizeLodLimbSkeleton(zobj, flexHeader);
-
     LodLimb **limbs = (LodLimb **)flexHeader->sh.segment;
-    for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
+    for (int i = 0; i < PLAYER_LIMB_COUNT; ++i) {
+        recomp_printf("limb %d: 0x%X\n", i, limbs[i]);
         modelInfo->limbTranslations[i] = limbs[i]->jointPos;
     }
 }
@@ -267,4 +267,6 @@ void setupZobjZ64o(Link_ModelInfo *modelInfo, u8 *zobj) {
     default:
         break;
     }
+
+    recomp_printf("GOT HERE!!!!!!!!!!!!!\n");
 }
