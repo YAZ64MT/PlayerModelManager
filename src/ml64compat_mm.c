@@ -114,7 +114,7 @@ void setupZobjMmoHuman(Link_ModelInfo *modelInfo, u8 *zobj) {
     SET_MMO_MODEL(FPS_HOOKSHOT, HOOKSHOT);
     SET_MMO_MODEL(FPS_LFOREARM, LFOREARM);
     SET_MMO_MODEL(FPS_LHAND, LFIST);
-    SET_MMO_MODEL(FPS_RFOREARM, DF_COMMAND);
+    modelInfo->models[LINK_DL_FPS_RFOREARM] = dfCommand;
     QSET_MMO_MODEL(FPS_RHAND);
 }
 

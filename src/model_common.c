@@ -49,7 +49,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     // init by pointing all to DF command
     for (u32 i = 0; i < LINK_SHIMDL_MAX; ++i) {
         shims[i] = recomp_alloc(sizeof(Gfx));
-        gSPBranchList(shims[i], &dls[LINK_DL_DF_COMMAND]);
+        gSPBranchList(shims[i], dfCommand);
     }
 
     SHIM_SWORD(1);
