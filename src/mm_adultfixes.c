@@ -109,7 +109,7 @@ void return_Player_GetHeight(void) {
 bool gPushedMatrixBremen = false;
 
 RECOMP_HOOK("Player_Draw")
-void on_Player_Draw(Actor *thisx, PlayState *play) {
+void fixAdultBrement_on_Player_Draw(Actor *thisx, PlayState *play) {
     if (IS_HUMAN_ADULT_LINK_MODEL) {
         Player *this = (Player *)thisx;
 
@@ -125,7 +125,7 @@ void on_Player_Draw(Actor *thisx, PlayState *play) {
 }
 
 RECOMP_HOOK_RETURN("Player_Draw")
-void return_Player_Draw(Actor *thisx, PlayState *play) {
+void fixAdultBrement_on_return_Player_Draw(Actor *thisx, PlayState *play) {
     if (IS_HUMAN_ADULT_LINK_MODEL) {
         if (gPushedMatrixBremen) {
             Matrix_Pop();
