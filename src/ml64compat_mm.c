@@ -38,7 +38,6 @@ void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
     FlexSkeletonHeader *flexHeader = SEGMENTED_TO_GLOBAL_PTR(zobj, skelHeader);
     LodLimb **limbs = (LodLimb **)flexHeader->sh.segment;
     for (int i = 0; i < PLAYER_LIMB_COUNT; ++i) {
-        recomp_printf("limb %d: 0x%X\n", i, limbs[i]);
         modelInfo->limbTranslations[i] = limbs[i]->jointPos;
     }
 }
@@ -267,6 +266,4 @@ void setupZobjZ64o(Link_ModelInfo *modelInfo, u8 *zobj) {
     default:
         break;
     }
-
-    recomp_printf("GOT HERE!!!!!!!!!!!!!\n");
 }
