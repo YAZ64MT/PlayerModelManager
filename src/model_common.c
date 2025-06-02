@@ -323,16 +323,6 @@ void initFormProxyMatrixes(Link_FormProxy *formProxy) {
     }
 }
 
-void initFormProxyDisplayLists(Link_FormProxy *formProxy) {
-    for (u32 i = 0; i < LINK_DL_MAX; ++i) {
-        gSPBranchList(&formProxy->displayLists[i], callDfCommand);
-    }
-
-    for (u32 i = 0; i < LINK_DL_MAX; ++i) {
-        gSPBranchList(&formProxy->proxyDisplayLists[i], &formProxy->displayLists[i]);
-    }
-}
-
 LodLimb skeletonBase[PLAYER_LIMB_COUNT] = {
     {{0, 0, 0}, PLAYER_LIMB_WAIST - 1, LIMB_DONE, {NULL, NULL}},
     {{0, 0, 0}, PLAYER_LIMB_LOWER_ROOT - 1, PLAYER_LIMB_UPPER_ROOT - 1, {dfCommand, dfCommand}},
@@ -357,7 +347,7 @@ LodLimb skeletonBase[PLAYER_LIMB_COUNT] = {
     {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
 };
 
-#define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = &formProxy->proxyDisplayLists[proxyLimbName]
+#define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = &formProxy->displayLists[proxyLimbName]
 
 void initFormProxySkeleton(Link_FormProxy *formProxy) {
     Link_SkeletonProxy *skel = &formProxy->skeleton;
@@ -414,7 +404,6 @@ void loadVanillaSkeletonTransforms(Link_ModelInfo *modelInfo, ObjectId objectId,
 
 void initFormProxy(Link_FormProxy *formProxy) {
     initFormProxySkeleton(formProxy);
-    initFormProxyDisplayLists(formProxy);
     initFormProxyMatrixes(formProxy);
     initFormProxyShims(formProxy);
 }

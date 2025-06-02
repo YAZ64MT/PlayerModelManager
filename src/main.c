@@ -50,72 +50,72 @@ void changeFormPtrsToProxy(PlayerTransformation playerForm) {
     Link_FormProxy *formProxy = &gLinkFormProxies[playerForm];
 
     gPlayerSkeletons[playerForm] = &formProxy->skeleton.flexSkeleton;
-    gPlayerRightHandOpenDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_RHAND];
-    gPlayerRightHandOpenDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_RHAND];
-    gPlayerRightHandClosedDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_RFIST];
-    gPlayerRightHandClosedDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_RFIST];
-    gPlayerRightHandInstrumentDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_RHAND_OCARINA_TIME];
-    gPlayerRightHandInstrumentDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_RHAND_OCARINA_TIME];
-    gPlayerRightHandHookshotDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_HOOKSHOT];
-    gPlayerRightHandHookshotDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_HOOKSHOT];
+    gPlayerRightHandOpenDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RHAND];
+    gPlayerRightHandOpenDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RHAND];
+    gPlayerRightHandClosedDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RFIST];
+    gPlayerRightHandClosedDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RFIST];
+    gPlayerRightHandInstrumentDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RHAND_OCARINA_TIME];
+    gPlayerRightHandInstrumentDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RHAND_OCARINA_TIME];
+    gPlayerRightHandHookshotDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RFIST_HOOKSHOT];
+    gPlayerRightHandHookshotDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RFIST_HOOKSHOT];
 
-    gPlayerLeftHandOpenDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_LHAND];
-    gPlayerLeftHandOpenDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_LHAND];
-    gPlayerLeftHandClosedDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_LFIST];
-    gPlayerLeftHandClosedDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_LFIST];
-    gPlayerLeftHandTwoHandSwordDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD4]; // Great Fairy Sword / Fierce Deity Sword
-    gPlayerLeftHandTwoHandSwordDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD4];
-    gPlayerLeftHandOneHandSwordDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD_KOKIRI];
-    gPlayerLeftHandOneHandSwordDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD_KOKIRI];
-    gPlayerLeftHandBottleDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_LHAND_BOTTLE];
-    gPlayerLeftHandBottleDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_LHAND_BOTTLE];
+    gPlayerLeftHandOpenDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_LHAND];
+    gPlayerLeftHandOpenDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_LHAND];
+    gPlayerLeftHandClosedDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_LFIST];
+    gPlayerLeftHandClosedDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_LFIST];
+    gPlayerLeftHandTwoHandSwordDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_LFIST_SWORD4]; // Great Fairy Sword / Fierce Deity Sword
+    gPlayerLeftHandTwoHandSwordDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_LFIST_SWORD4];
+    gPlayerLeftHandOneHandSwordDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    gPlayerLeftHandOneHandSwordDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    gPlayerLeftHandBottleDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_LHAND_BOTTLE];
+    gPlayerLeftHandBottleDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_LHAND_BOTTLE];
 
-    gPlayerRightHandBowDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_BOW];
-    gPlayerRightHandBowDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_BOW];
+    gPlayerRightHandBowDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RFIST_BOW];
+    gPlayerRightHandBowDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RFIST_BOW];
 
-    sPlayerFirstPersonLeftForearmDLs[playerForm] = &formProxy->proxyDisplayLists[LINK_DL_FPS_LFOREARM];
-    sPlayerFirstPersonLeftHandDLs[playerForm] = &formProxy->proxyDisplayLists[LINK_DL_FPS_LHAND];
-    sPlayerFirstPersonRightShoulderDLs[playerForm] = &formProxy->proxyDisplayLists[LINK_DL_RSHOULDER];
-    sPlayerFirstPersonRightHandDLs[playerForm] = &formProxy->proxyDisplayLists[LINK_DL_FPS_RHAND_BOW];
-    sPlayerFirstPersonRightHandHookshotDLs[playerForm] = &formProxy->proxyDisplayLists[LINK_DL_FPS_RHAND_HOOKSHOT];
+    sPlayerFirstPersonLeftForearmDLs[playerForm] = &formProxy->displayLists[LINK_DL_FPS_LFOREARM];
+    sPlayerFirstPersonLeftHandDLs[playerForm] = &formProxy->displayLists[LINK_DL_FPS_LHAND];
+    sPlayerFirstPersonRightShoulderDLs[playerForm] = &formProxy->displayLists[LINK_DL_RSHOULDER];
+    sPlayerFirstPersonRightHandDLs[playerForm] = &formProxy->displayLists[LINK_DL_FPS_RHAND_BOW];
+    sPlayerFirstPersonRightHandHookshotDLs[playerForm] = &formProxy->displayLists[LINK_DL_FPS_RHAND_HOOKSHOT];
 
-    gPlayerWaistDLs[playerForm * 2 + 0] = &formProxy->proxyDisplayLists[LINK_DL_WAIST];
-    gPlayerWaistDLs[playerForm * 2 + 1] = &formProxy->proxyDisplayLists[LINK_DL_WAIST];
+    gPlayerWaistDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_WAIST];
+    gPlayerWaistDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_WAIST];
 }
 
 void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
     Link_FormProxy *formProxy = &gLinkFormProxies[playerForm];
 
-    D_801C018C[0] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD_KOKIRI];
-    D_801C018C[1] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD_KOKIRI];
-    D_801C018C[2] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD_RAZOR];
-    D_801C018C[3] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD_RAZOR];
-    D_801C018C[4] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD_GILDED];
-    D_801C018C[5] = &formProxy->proxyDisplayLists[LINK_DL_LFIST_SWORD_GILDED];
+    D_801C018C[0] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    D_801C018C[1] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    D_801C018C[2] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
+    D_801C018C[3] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
+    D_801C018C[4] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_GILDED];
+    D_801C018C[5] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_GILDED];
 
-    gPlayerShields[0] = &formProxy->proxyDisplayLists[LINK_DL_SHIELD_HERO_BACK];
-    gPlayerShields[1] = &formProxy->proxyDisplayLists[LINK_DL_SHIELD_HERO_BACK];
-    gPlayerShields[2] = &formProxy->proxyDisplayLists[LINK_DL_SHIELD_MIRROR_BACK];
-    gPlayerShields[3] = &formProxy->proxyDisplayLists[LINK_DL_SHIELD_MIRROR_BACK];
+    gPlayerShields[0] = &formProxy->displayLists[LINK_DL_SHIELD_HERO_BACK];
+    gPlayerShields[1] = &formProxy->displayLists[LINK_DL_SHIELD_HERO_BACK];
+    gPlayerShields[2] = &formProxy->displayLists[LINK_DL_SHIELD_MIRROR_BACK];
+    gPlayerShields[3] = &formProxy->displayLists[LINK_DL_SHIELD_MIRROR_BACK];
 
-    gPlayerHandHoldingShields[0] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_SHIELD_HERO];
-    gPlayerHandHoldingShields[1] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_SHIELD_HERO];
-    gPlayerHandHoldingShields[2] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_SHIELD_MIRROR];
-    gPlayerHandHoldingShields[3] = &formProxy->proxyDisplayLists[LINK_DL_RFIST_SHIELD_MIRROR];
+    gPlayerHandHoldingShields[0] = &formProxy->displayLists[LINK_DL_RFIST_SHIELD_HERO];
+    gPlayerHandHoldingShields[1] = &formProxy->displayLists[LINK_DL_RFIST_SHIELD_HERO];
+    gPlayerHandHoldingShields[2] = &formProxy->displayLists[LINK_DL_RFIST_SHIELD_MIRROR];
+    gPlayerHandHoldingShields[3] = &formProxy->displayLists[LINK_DL_RFIST_SHIELD_MIRROR];
 
-    gPlayerSheathedSwords[0] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
-    gPlayerSheathedSwords[1] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
-    gPlayerSheathedSwords[2] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_RAZOR_SHEATHED];
-    gPlayerSheathedSwords[3] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_RAZOR_SHEATHED];
-    gPlayerSheathedSwords[4] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_GILDED_SHEATHED];
-    gPlayerSheathedSwords[5] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_GILDED_SHEATHED];
+    gPlayerSheathedSwords[0] = &formProxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
+    gPlayerSheathedSwords[1] = &formProxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
+    gPlayerSheathedSwords[2] = &formProxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATHED];
+    gPlayerSheathedSwords[3] = &formProxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATHED];
+    gPlayerSheathedSwords[4] = &formProxy->displayLists[LINK_DL_SWORD_GILDED_SHEATHED];
+    gPlayerSheathedSwords[5] = &formProxy->displayLists[LINK_DL_SWORD_GILDED_SHEATHED];
 
-    gPlayerSwordSheaths[0] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_KOKIRI_SHEATH];
-    gPlayerSwordSheaths[1] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_KOKIRI_SHEATH];
-    gPlayerSwordSheaths[2] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_RAZOR_SHEATH];
-    gPlayerSwordSheaths[3] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_RAZOR_SHEATH];
-    gPlayerSwordSheaths[4] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_GILDED_SHEATH];
-    gPlayerSwordSheaths[5] = &formProxy->proxyDisplayLists[LINK_DL_SWORD_GILDED_SHEATH];
+    gPlayerSwordSheaths[0] = &formProxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATH];
+    gPlayerSwordSheaths[1] = &formProxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATH];
+    gPlayerSwordSheaths[2] = &formProxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATH];
+    gPlayerSwordSheaths[3] = &formProxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATH];
+    gPlayerSwordSheaths[4] = &formProxy->displayLists[LINK_DL_SWORD_GILDED_SHEATH];
+    gPlayerSwordSheaths[5] = &formProxy->displayLists[LINK_DL_SWORD_GILDED_SHEATH];
 }
 
 // initialize player models as blank display lists
