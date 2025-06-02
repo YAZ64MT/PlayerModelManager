@@ -142,7 +142,7 @@ void return_Player_Draw(Actor *thisx, PlayState *play) {
 }
 
 #define ADULT_MASK_SCALE_MODIFIER 1.0f
-#define ADULT_MASK_DOWNWARDS_OFFSET -200.f
+#define ADULT_MASK_DOWNWARDS_OFFSET 0.0f
 #define ADULT_MASK_FORWARDS_OFSSEET 0.0f
 #define ADULT_MASK_LATERAL_OFFSET 0.0f
 bool gPushedMaskMatrix = false;
