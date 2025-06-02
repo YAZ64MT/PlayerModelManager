@@ -141,6 +141,32 @@ void fixAdultBrement_on_return_Player_Draw(Actor *thisx, PlayState *play) {
     }
 }
 
+#define TRANSLATE_ARROW_X -112
+#define TRANSLATE_ARROW_Y 288
+#define TRANSLATE_ARROW_Z 0
+RECOMP_HOOK("Player_PostLimbDrawGameplay")
+void fixArrowPos_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
+    if (IS_HUMAN_ADULT_LINK_MODEL) {
+        Player *player = (Player *)actor;
+        if (limbIndex == PLAYER_LIMB_LEFT_HAND && player->actor.scale.y >= 0.0f) {
+            Actor *heldActor = player->heldActor;
+            MtxF sp230;
+            if (!Player_IsHoldingHookshot(player) && heldActor != NULL) {
+                if ((player->stateFlags3 & PLAYER_STATE3_40) && (player->transformation != PLAYER_FORM_DEKU)) {
+                    if (player->transformation == PLAYER_FORM_HUMAN) {
+                        Vec3s *temp_s1;
+                        Matrix_Translate(TRANSLATE_ARROW_X, TRANSLATE_ARROW_Y, TRANSLATE_ARROW_Z, MTXMODE_APPLY);
+                        Matrix_Get(&sp230);
+                        temp_s1 = &heldActor->world.rot;
+                        Matrix_MtxFToYXZRot(&sp230, temp_s1, false);
+                        heldActor->shape.rot = *temp_s1;
+                    }
+                }
+            }
+        }
+    }
+}
+
 // TODO: figure out what do do with this later
 /*
 #define ADULT_MASK_SCALE_MODIFIER 1.0f
