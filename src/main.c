@@ -84,7 +84,7 @@ void changeFormPtrsToProxy(PlayerTransformation playerForm) {
 }
 
 void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
-    Link_FormProxy *formProxy = &gLinkFormProxies[playerForm];
+    Link_FormProxy *formProxy = &GET_PLAYER_FORM_PROXY;
 
     D_801C018C[0] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
     D_801C018C[1] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
@@ -148,12 +148,12 @@ void initFormProxies() {
     changeFormPtrsToProxy(PLAYER_FORM_HUMAN);
     repointHumanEquipmentModelsToProxy(PLAYER_FORM_HUMAN);
 
-    matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
+    matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
 }
 
 RECOMP_HOOK_RETURN("Player_Init")
 void postPlayerInit() {
-    matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
+    matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
     gIsAgePropertyRefreshRequested = true;
 }
 

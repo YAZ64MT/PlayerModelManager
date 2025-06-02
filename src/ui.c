@@ -290,7 +290,7 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
                 setupZobjZ64o(&humanProxy->current, newZobjFile);
                 refreshFormProxy(humanProxy);
                 gIsAgePropertyRefreshRequested = true;
-                matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
+                matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
 
                 if (currentZobj) {
                     recomp_free(currentZobj);

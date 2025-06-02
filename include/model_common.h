@@ -3,6 +3,8 @@
 
 #include "playermodelmanager.h"
 
+#define GET_PLAYER_FORM_PROXY gLinkFormProxies[GET_PLAYER_FORM]
+
 extern Gfx dfCommand[];
 extern Gfx callDfCommand[];
 extern Gfx popModelViewMtx[];
