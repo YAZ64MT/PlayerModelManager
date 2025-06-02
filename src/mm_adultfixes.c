@@ -141,6 +141,9 @@ void return_Player_Draw(Actor *thisx, PlayState *play) {
     }
 }
 
+
+// TODO: figure out what do do with this later
+/*
 #define ADULT_MASK_SCALE_MODIFIER 1.0f
 #define ADULT_MASK_DOWNWARDS_OFFSET 0.0f
 #define ADULT_MASK_FORWARDS_OFSSEET 0.0f
@@ -180,3 +183,4 @@ void return_Player_PostLimbDrawGameplay(void) {
     }
     gPushedMaskMatrix = false;
 }
+*/
