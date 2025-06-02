@@ -7,6 +7,7 @@
 #include "model_human.h"
 #include "mm_adultfixes.h"
 #include "playermodelmanager_utils.h"
+#include "modelreplacer_api.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
@@ -150,20 +151,13 @@ void initFormProxies() {
     matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
 }
 
-bool isInitialized = false;
-
 RECOMP_HOOK_RETURN("Player_Init")
 void postPlayerInit() {
-    if (isInitialized) {
-        matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
-        gIsAgePropertyRefreshRequested = true;
-    }
+    matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER_FORM]);
+    gIsAgePropertyRefreshRequested = true;
 }
 
-RECOMP_HOOK("TitleSetup_SetupTitleScreen")
-void onInit(PlayState *play) {
-    if (!isInitialized) {
-        initFormProxies();
-        isInitialized = true;
-    }
+RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, ZModelReplacer_onReady)
+void onModelReplacerReady() {
+    initFormProxies();
 }
