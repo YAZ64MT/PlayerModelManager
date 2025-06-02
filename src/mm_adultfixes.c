@@ -33,8 +33,6 @@ PlayerAgeProperties gVanillaHumanLinkAgeProps;
 extern PlayerAgeProperties sPlayerAgeProperties[];
 
 void initAdultLinkAgeProperties() {
-    gVanillaHumanLinkAgeProps = sPlayerAgeProperties[PLAYER_FORM_HUMAN];
-
     PlayerAgeProperties *fdProps = &sPlayerAgeProperties[PLAYER_FORM_FIERCE_DEITY];
     gAdultLinkAgeProps = sPlayerAgeProperties[PLAYER_FORM_ZORA];
 
@@ -54,12 +52,21 @@ void initAdultLinkAgeProperties() {
     gAdultLinkAgeProps.surfaceSfxIdOffset = 0x80;
 }
 
+bool isAdultAgePropsInitialized() {
+    return gAdultLinkAgeProps.surfaceSfxIdOffset == 0x80;
+}
+
 extern PlayerAnimationHeader *D_8085BE84[PLAYER_ANIMGROUP_MAX][PLAYER_ANIMTYPE_MAX];
 extern LinkAnimationHeader gPlayerAnim_clink_demo_doorA_link;
 extern LinkAnimationHeader gPlayerAnim_clink_demo_doorB_link;
 
 RECOMP_HOOK("Player_Update")
 void handleAgeProps_onPlayerUpdate(Actor *thisx, PlayState *play) {
+    if (!isAdultAgePropsInitialized()) {
+        gVanillaHumanLinkAgeProps = sPlayerAgeProperties[PLAYER_FORM_HUMAN];
+        initAdultLinkAgeProperties();
+    }
+
     if (gIsAgePropertyRefreshRequested) {
         gIsAgePropertyRefreshRequested = false;
         if (IS_HUMAN_ADULT_LINK_MODEL) {
@@ -176,8 +183,3 @@ void return_Player_PostLimbDrawGameplay(void) {
     gPushedMaskMatrix = false;
 }
 */
-
-RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyFormProxies)
-void initAdultAgeProperties_onReadyFormProxies() {
-    initAdultLinkAgeProperties();
-}
