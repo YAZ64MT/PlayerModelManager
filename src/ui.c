@@ -13,8 +13,21 @@
 #include "model_common.h"
 #include "mm_adultfixes.h"
 #include "playermodelmanager_utils.h"
+#include "custommodelentry.h"
+#include "libc/string.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
+
+typedef struct {
+    CustomModelEntry modelEntry;
+    RecompuiResource button;
+} DiskModelEntry;
+
+typedef struct {
+    DiskModelEntry *entries;
+    unsigned length;
+    unsigned maxLength;
+} DiskModelEntries;
 
 RecompuiContext context;
 RecompuiResource root;
@@ -109,7 +122,7 @@ void on_init() {
 
     // Set up the root element's padding so the modal contents don't touch the screen edges.
     recompui_set_padding(root, body_padding, UNIT_DP);
-    //recompui_set_background_color(root, &bg_color);
+    // recompui_set_background_color(root, &bg_color);
 
     // Set up the flexbox properties of the root element.
     recompui_set_flex_direction(root, FLEX_DIRECTION_COLUMN);
@@ -123,7 +136,7 @@ void on_init() {
     recompui_set_height(container, 25.0f, UNIT_PERCENT);
     recompui_set_flex_grow(container, 1.0f);
     recompui_set_max_width(container, modal_max_width, UNIT_DP);
-    recompui_set_width(container, 25.0f, UNIT_PERCENT);
+    recompui_set_width(container, 33.0f, UNIT_PERCENT);
 
     // Set up the properties of the container.
     recompui_set_display(container, DISPLAY_FLEX);
@@ -177,8 +190,9 @@ void on_init() {
     recompui_set_align_items(modelListContainer, ALIGN_ITEMS_FLEX_START);
     recompui_set_gap(modelListContainer, 16.0f, UNIT_DP);
     recompui_set_overflow_y(modelListContainer, OVERFLOW_SCROLL);
+    recompui_set_overflow_x(modelListContainer, OVERFLOW_HIDDEN);
 
-    // hook up remove model button to close button
+    // set up and hook up remove model button to close button and vice versa
     buttonRemoveModel = recompui_create_button(context, modelListContainer, "Remove Model", BUTTONSTYLE_SECONDARY);
     recompui_set_flex_shrink(buttonRemoveModel, 0);
     recompui_set_nav(buttonClose, NAVDIRECTION_DOWN, buttonRemoveModel);
@@ -195,80 +209,37 @@ void on_init() {
     recomp_printf("zobj folder path: %s\n", zobjDir);
 }
 
-typedef struct {
-    char **files;
-    RecompuiResource *buttons;
-    u32 *buttonIndexes;
-    u32 length;
-} FileList;
-
-FileList detectedFiles = {.files = NULL, .length = 0, .buttons = NULL, .buttonIndexes = NULL};
-FileList oldFileList = {.files = NULL, .length = 0, .buttons = NULL};
-
-char NULL_STRING[] = "null";
-
-void freeOldFiles() {
-
-    if (oldFileList.files) {
-        for (u32 i = 0; i < oldFileList.length; i++) {
-            if (oldFileList.files[i] == NULL_STRING) {
-                oldFileList.files[i] = NULL;
-            }
-        }
-
-        for (u32 i = 0; i < oldFileList.length; i++) {
-            if (oldFileList.files[i]) {
-                recomp_free(oldFileList.files[i]);
-            }
-
-            if (oldFileList.buttons[i]) {
-                recompui_destroy_element(modelListContainer, oldFileList.buttons[i]);
-            }
-        }
-
-        recomp_free(oldFileList.files);
-        recomp_free(oldFileList.buttons);
-        recomp_free(oldFileList.buttonIndexes);
-
-        oldFileList.buttons = NULL;
-        oldFileList.files = NULL;
-        oldFileList.buttonIndexes = 0;
-        oldFileList.length = 0;
-    }
-}
+DiskModelEntries gCurrentDiskModels;
 
 void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        u32 index = *(u32 *)userdata;
+        DiskModelEntry *entry = userdata;
 
-        if (index >= 0 && index < detectedFiles.length && detectedFiles.files[index] != NULL_STRING) {
+        char *zobjPath = QDFL_getCombinedPath(2, zobjDir, entry->modelEntry.filePath);
 
-            char *zobjPath = QDFL_getCombinedPath(2, zobjDir, detectedFiles.files[index]);
+        void *newZobjFile = NULL;
 
-            void *newZobjFile = NULL;
+        QDFL_loadFile(zobjPath, &newZobjFile);
 
-            QDFL_loadFile(zobjPath, &newZobjFile);
+        if (newZobjFile) {
+            Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
-            if (newZobjFile) {
+            setupZobjZ64o(&humanProxy->current, newZobjFile);
 
-                Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
+            refreshFormProxy(humanProxy);
 
-                setupZobjZ64o(&humanProxy->current, newZobjFile);
-                refreshFormProxy(humanProxy);
-                gIsAgePropertyRefreshRequested = true;
-                matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
+            gIsAgePropertyRefreshRequested = true;
 
-                if (currentZobj) {
-                    recomp_free(currentZobj);
-                }
+            matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
 
-                currentZobj = newZobjFile;
+            if (currentZobj) {
+                recomp_free(currentZobj);
             }
 
-            recomp_free(zobjPath);
-        } else {
-            recomp_printf("Invalid button index: %d", index);
+            currentZobj = newZobjFile;
         }
+
+        recomp_free(zobjPath);
     }
 }
 
@@ -310,8 +281,6 @@ bool isValidZobj(const char *path) {
 }
 
 void refreshFileList() {
-    freeOldFiles();
-
     recompui_open_context(context);
 
     unsigned long numFiles;
@@ -319,33 +288,76 @@ void refreshFileList() {
     QDFL_STATUS err = QDFL_getNumDirEntries(zobjDir, &numFiles);
 
     if (err == QDFL_STATUS_OK) {
-        oldFileList = detectedFiles;
 
-        detectedFiles.files = recomp_alloc(numFiles * sizeof(char *));
-        detectedFiles.buttons = recomp_alloc(numFiles * sizeof(RecompuiResource));
-        detectedFiles.buttonIndexes = recomp_alloc(numFiles * sizeof(u32));
-        detectedFiles.length = numFiles;
+        if (gCurrentDiskModels.maxLength < numFiles) {
+            DiskModelEntry *newEntries = recomp_alloc(sizeof(DiskModelEntry) * numFiles);
 
-        for (size_t i = 0; i < numFiles; i++) {
-            detectedFiles.files[i] = NULL;
-            QDFL_getDirEntryNameByIndex(zobjDir, i, &detectedFiles.files[i]);
-            detectedFiles.buttonIndexes[i] = i;
-            if (!detectedFiles.files[i] || !isValidZobj(detectedFiles.files[i])) {
-                detectedFiles.files[i] = NULL_STRING;
-                detectedFiles.buttons[i] = 0;
-            } else {
-                detectedFiles.buttons[i] = recompui_create_button(context, modelListContainer, detectedFiles.files[i], BUTTONSTYLE_PRIMARY);
-                recompui_set_flex_shrink(detectedFiles.buttons[i], 0);
-                recompui_register_callback(detectedFiles.buttons[i], button_zobj_pressed, &detectedFiles.buttonIndexes[i]);
+            Lib_MemCpy(newEntries, gCurrentDiskModels.entries, gCurrentDiskModels.length * sizeof(DiskModelEntry *));
+
+            recomp_free(gCurrentDiskModels.entries);
+
+            gCurrentDiskModels.entries = newEntries;
+
+            gCurrentDiskModels.maxLength = numFiles;
+        }
+
+        for (unsigned i = 0; i < gCurrentDiskModels.length; ++i) {
+            recompui_destroy_element(modelListContainer, gCurrentDiskModels.entries[i].button);
+            if (gCurrentDiskModels.entries[i].modelEntry.filePath) {
+                recomp_free(gCurrentDiskModels.entries[i].modelEntry.filePath);
+                recomp_free(gCurrentDiskModels.entries[i].modelEntry.displayName);
             }
         }
+
+        unsigned newLength = 0;
+        char *path;
+
+        for (unsigned i = 0; i < numFiles; i++) {
+            path = NULL;
+
+            QDFL_getDirEntryNameByIndex(zobjDir, i, &path);
+
+            if (path && isValidZobj(path)) {
+                DiskModelEntry *entry = &gCurrentDiskModels.entries[newLength];
+
+                CustomModelEntry_init(&entry->modelEntry);
+
+                entry->modelEntry.filePath = path;
+
+                unsigned nameSize = strlen(path);
+
+                entry->modelEntry.displayName = recomp_alloc(nameSize);
+
+                strcpy(entry->modelEntry.displayName, path);
+
+                char *c = &entry->modelEntry.displayName[nameSize - 1];
+
+                // get rid of file extension
+                while (c != entry->modelEntry.displayName) {
+                    if (*c == '.') {
+                        *c = '\0';
+                        break;
+                    }
+
+                    c--;
+                }
+
+                RecompuiResource button = recompui_create_button(context, modelListContainer, entry->modelEntry.displayName, BUTTONSTYLE_PRIMARY);
+
+                entry->button = button;
+
+                recompui_set_flex_shrink(button, 0);
+
+                recompui_register_callback(button, button_zobj_pressed, entry);
+
+                newLength++;
+            }
+        }
+
+        gCurrentDiskModels.length = newLength;
     }
 
-    // recompui_destroy_element(container, labelradio);
-
-    // labelradio = recompui_create_labelradio(context, container, detectedFiles.files, numFiles);
-
-    freeOldFiles();
+    // freeOldFiles();
 
     recompui_close_context(context);
 }
