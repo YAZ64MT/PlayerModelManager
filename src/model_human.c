@@ -340,7 +340,7 @@ void setupVanillaHuman() {
     models[LINK_DL_MASK_DEKU] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gDekuMaskDL);
     models[LINK_DL_MASK_GORON] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gGoronMaskDL);
     models[LINK_DL_MASK_ZORA] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gZoraMaskDL);
-    models[LINK_DK_MASK_DEITY] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gFierceDeityMaskDL);
+    models[LINK_DL_MASK_FIERCE_DEITY] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gFierceDeityMaskDL);
 
     // bottles
     models[LINK_DL_BOTTLE_FILLING] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gBottleContentsDL);
