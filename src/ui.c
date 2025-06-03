@@ -9,8 +9,10 @@
 #include "qdfileloader_api.h"
 #include "modelreplacer_api.h"
 #include "ml64compat_mm.h"
+#include "defines_z64o.h"
 #include "model_common.h"
 #include "mm_adultfixes.h"
+#include "playermodelmanager_utils.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
@@ -18,10 +20,8 @@ RecompuiContext context;
 RecompuiResource root;
 RecompuiResource container;
 RecompuiResource row1;
-RecompuiResource button;
-RecompuiResource button2;
-RecompuiResource textinput;
-RecompuiResource textinput_button;
+RecompuiResource buttonClose;
+RecompuiResource buttonRemoveModel;
 
 RecompuiResource imageview;
 RecompuiTextureHandle bomb_texture_handle;
@@ -38,39 +38,33 @@ bool showing_bow = false;
 
 char *zobjDir;
 
-RecompuiResource modelListContainer;
+void *currentZobj = NULL;
 
-void button_pressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+RecompuiResource modelListContainer;
+RecompuiResource uiTitle;
+
+void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        if (resource == button) {
-            recomp_printf("Pressed button 1\n");
-            showing_bow = !showing_bow;
-            if (showing_bow) {
-                recompui_set_imageview_texture(imageview, bow_texture_handle);
-            } else {
-                recompui_set_imageview_texture(imageview, bomb_texture_handle);
-            }
-            recomp_printf("Slider value: %d (%5.2f)\n", recompui_get_input_value_u32(slider), recompui_get_input_value_float(slider));
-            recomp_printf("Label radio value: %d (%5.2f)\n", recompui_get_input_value_u32(labelradio), recompui_get_input_value_float(labelradio));
-            char *password_value = recompui_get_input_text(passwordinput);
-            if (password_value != NULL) {
-                recomp_printf("Password value: %s\n", password_value);
-                recomp_free(password_value);
-            }
-        } else {
-            recompui_hide_context(context);
-            context_shown = false;
+        Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
+
+        clearLinkModelInfo(&humanProxy->current);
+
+        refreshFormProxy(humanProxy);
+
+        gIsAgePropertyRefreshRequested = true;
+
+        matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
+
+        if (currentZobj) {
+            recomp_free(currentZobj);
         }
     }
 }
 
-void textinput_enter_pressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+void button_pressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        char *textinput_value = recompui_get_input_text(textinput);
-        recomp_printf("  Textinput submitted: %s\n", textinput_value);
-        recomp_free(textinput_value);
-        recompui_set_input_value_u32(slider, 0);
-        recompui_set_input_value_float(labelradio, 0.0);
+        recompui_hide_context(context);
+        context_shown = false;
     }
 }
 
@@ -115,12 +109,12 @@ void on_init() {
 
     // Set up the root element's padding so the modal contents don't touch the screen edges.
     recompui_set_padding(root, body_padding, UNIT_DP);
-    recompui_set_background_color(root, &bg_color);
+    //recompui_set_background_color(root, &bg_color);
 
     // Set up the flexbox properties of the root element.
     recompui_set_flex_direction(root, FLEX_DIRECTION_COLUMN);
-    recompui_set_justify_content(root, JUSTIFY_CONTENT_CENTER);
-    recompui_set_align_items(root, ALIGN_ITEMS_CENTER);
+    recompui_set_justify_content(root, JUSTIFY_CONTENT_FLEX_START);
+    recompui_set_align_items(root, ALIGN_ITEMS_FLEX_START);
 
     // Create a container to act as the modal background and hold the elements in the modal.
     container = recompui_create_element(context, root);
@@ -129,7 +123,7 @@ void on_init() {
     recompui_set_height(container, 25.0f, UNIT_PERCENT);
     recompui_set_flex_grow(container, 1.0f);
     recompui_set_max_width(container, modal_max_width, UNIT_DP);
-    recompui_set_width(container, 100.0f, UNIT_PERCENT);
+    recompui_set_width(container, 25.0f, UNIT_PERCENT);
 
     // Set up the properties of the container.
     recompui_set_display(container, DISPLAY_FLEX);
@@ -145,39 +139,21 @@ void on_init() {
     recompui_set_border_color(container, &border_color);
     recompui_set_background_color(container, &modal_color);
 
-    // Create the two rows in the container.
     row1 = recompui_create_element(context, container);
     recompui_set_flex_basis(row1, 100.0f, UNIT_DP);
     recompui_set_flex_grow(row1, 0);
+    recompui_set_flex_shrink(row1, 0);
     recompui_set_display(row1, DISPLAY_FLEX);
     recompui_set_flex_direction(row1, FLEX_DIRECTION_ROW);
     recompui_set_justify_content(row1, JUSTIFY_CONTENT_FLEX_START);
     recompui_set_align_items(row1, ALIGN_ITEMS_FLEX_END);
     recompui_set_gap(row1, 16.0f, UNIT_DP);
 
-    // Create some buttons.
-    button = recompui_create_button(context, row1, "Swap item", BUTTONSTYLE_PRIMARY);
-    recompui_set_text_align(button, TEXT_ALIGN_CENTER);
-
-    button2 = recompui_create_button(context, row1, "Close", BUTTONSTYLE_SECONDARY);
-    recompui_set_text_align(button2, TEXT_ALIGN_CENTER);
+    buttonClose = recompui_create_button(context, row1, "Close", BUTTONSTYLE_SECONDARY);
+    recompui_set_text_align(buttonClose, TEXT_ALIGN_CENTER);
 
     // Bind the shared callback to the two buttons.
-    recompui_register_callback(button, button_pressed, NULL);
-    recompui_register_callback(button2, button_pressed, NULL);
-
-    // Create a text input
-    textinput = recompui_create_textinput(context, row1);
-
-    // Create a button to correspond to the text input
-    textinput_button = recompui_create_button(context, row1, "Start", BUTTONSTYLE_SECONDARY);
-    recompui_set_text_align(textinput_button, TEXT_ALIGN_CENTER);
-    recompui_set_flex_basis(textinput_button, 150.0f, UNIT_DP);
-    recompui_set_flex_grow(textinput_button, 0.0f);
-    recompui_set_flex_shrink(textinput_button, 0.0f);
-
-    // Bind the callback for the text input button.
-    recompui_register_callback(textinput_button, textinput_enter_pressed, NULL);
+    recompui_register_callback(buttonClose, button_pressed, NULL);
 
     // Load the texture data and create UI textures for the bomb and bow icons.
     CmpDma_LoadFile(SEGMENT_ROM_START(icon_item_static_yar), ITEM_BOMB, bomb_texture_data, sizeof(bomb_texture_data));
@@ -190,29 +166,24 @@ void on_init() {
     recompui_set_min_width(imageview, 100.0f, UNIT_DP);
     recompui_set_min_height(imageview, 100.0f, UNIT_DP);
 
-    // Create a label above the password
-    recompui_create_label(context, container, "Password", LABELSTYLE_NORMAL);
+    // set up scrolling container for models
+    modelListContainer = recompui_create_element(context, container);
+    recompui_set_flex_basis(modelListContainer, 100.0f, UNIT_DP);
+    recompui_set_flex_grow(modelListContainer, 1.0f);
+    recompui_set_flex_shrink(modelListContainer, 0.0f);
+    recompui_set_display(modelListContainer, DISPLAY_FLEX);
+    recompui_set_flex_direction(modelListContainer, FLEX_DIRECTION_COLUMN);
+    recompui_set_justify_content(modelListContainer, JUSTIFY_CONTENT_FLEX_START);
+    recompui_set_align_items(modelListContainer, ALIGN_ITEMS_FLEX_START);
+    recompui_set_gap(modelListContainer, 16.0f, UNIT_DP);
+    recompui_set_overflow_y(modelListContainer, OVERFLOW_SCROLL);
 
-    // Create a password input
-    passwordinput = recompui_create_passwordinput(context, container);
-    recompui_set_width(passwordinput, 400.0f, UNIT_DP);
-
-    // Create a label above the password
-    recompui_create_label(context, container, "Slider", LABELSTYLE_NORMAL);
-
-    // Create a slider
-    slider = recompui_create_slider(context, container, SLIDERTYPE_INTEGER, 0.0f, 100.0f, 1.0f, 45.0f);
-    recompui_set_width(slider, 380.0f, UNIT_DP);
-
-    // Create a label above the password
-    recompui_create_label(context, container, "Label Radio", LABELSTYLE_NORMAL);
-
-    // Create a label radio
-    const char *labelradio_options[] = {
-        "First",
-        "Second",
-        "Third"};
-    labelradio = recompui_create_labelradio(context, container, labelradio_options, ARRAY_COUNT(labelradio_options));
+    // hook up remove model button to close button
+    buttonRemoveModel = recompui_create_button(context, modelListContainer, "Remove Model", BUTTONSTYLE_SECONDARY);
+    recompui_set_flex_shrink(buttonRemoveModel, 0);
+    recompui_set_nav(buttonClose, NAVDIRECTION_DOWN, buttonRemoveModel);
+    recompui_set_nav(buttonRemoveModel, NAVDIRECTION_UP, buttonClose);
+    recompui_register_callback(buttonRemoveModel, removeButtonPressed, NULL);
 
     recompui_close_context(context);
 
@@ -251,7 +222,7 @@ void freeOldFiles() {
             }
 
             if (oldFileList.buttons[i]) {
-                recompui_destroy_element(container, oldFileList.buttons[i]);
+                recompui_destroy_element(modelListContainer, oldFileList.buttons[i]);
             }
         }
 
@@ -266,8 +237,6 @@ void freeOldFiles() {
     }
 }
 
-u8* currentZobj = NULL;
-
 void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         u32 index = *(u32 *)userdata;
@@ -276,13 +245,13 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
 
             char *zobjPath = QDFL_getCombinedPath(2, zobjDir, detectedFiles.files[index]);
 
-            void* newZobjFile = NULL;
+            void *newZobjFile = NULL;
 
             QDFL_loadFile(zobjPath, &newZobjFile);
 
             if (newZobjFile) {
 
-                Link_FormProxy* humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
+                Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
                 setupZobjZ64o(&humanProxy->current, newZobjFile);
                 refreshFormProxy(humanProxy);
@@ -295,12 +264,49 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
 
                 currentZobj = newZobjFile;
             }
-            
+
             recomp_free(zobjPath);
         } else {
             recomp_printf("Invalid button index: %d", index);
         }
     }
+}
+
+bool isValidZobj(const char *path) {
+    char *zobjPath = QDFL_getCombinedPath(2, zobjDir, path);
+
+    void *file = NULL;
+
+    unsigned long fileSize = 0;
+
+    QDFL_getFileSize(zobjPath, &fileSize);
+
+    // playas zobjs always have an alias table of at least 0x800 bytes at offset 0x5000
+    bool isValid = fileSize >= 0x5800;
+
+    if (isValid) {
+        QDFL_loadFile(zobjPath, &file);
+
+        if (file) {
+            u8 *zobj = file;
+
+            const char ML64_HEADER[] = "MODLOADER64";
+
+            isValid = true;
+
+            for (unsigned i = 0; isValid && i < ARRAY_COUNT(ML64_HEADER) - 1; ++i) {
+                if (zobj[i + Z64O_MODLOADER_HEADER] != ML64_HEADER[i]) {
+                    isValid = false;
+                }
+            }
+
+            recomp_free(file);
+        }
+    }
+
+    recomp_free(zobjPath);
+
+    return isValid;
 }
 
 void refreshFileList() {
@@ -323,12 +329,13 @@ void refreshFileList() {
         for (size_t i = 0; i < numFiles; i++) {
             detectedFiles.files[i] = NULL;
             QDFL_getDirEntryNameByIndex(zobjDir, i, &detectedFiles.files[i]);
-                detectedFiles.buttonIndexes[i] = i;
-            if (!detectedFiles.files[i]) {
+            detectedFiles.buttonIndexes[i] = i;
+            if (!detectedFiles.files[i] || !isValidZobj(detectedFiles.files[i])) {
                 detectedFiles.files[i] = NULL_STRING;
                 detectedFiles.buttons[i] = 0;
             } else {
-                detectedFiles.buttons[i] = recompui_create_button(context, container, detectedFiles.files[i], BUTTONSTYLE_PRIMARY);
+                detectedFiles.buttons[i] = recompui_create_button(context, modelListContainer, detectedFiles.files[i], BUTTONSTYLE_PRIMARY);
+                recompui_set_flex_shrink(detectedFiles.buttons[i], 0);
                 recompui_register_callback(detectedFiles.buttons[i], button_zobj_pressed, &detectedFiles.buttonIndexes[i]);
             }
         }
