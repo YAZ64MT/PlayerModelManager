@@ -6,5 +6,6 @@
 extern ZModelReplacerHandle gProxyBottleGlass;
 extern ZModelReplacerHandle gProxyBottleContents;
 extern ZModelReplacerHandle gProxyDekuStick;
+extern ZModelReplacerHandle gProxyBowString;
 
 #endif

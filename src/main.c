@@ -125,12 +125,14 @@ void addProxyExternalDLs() {
     ZModelReplacer_setReplacerModel(gProxyBottleGlass, &humanProxy->displayLists[LINK_DL_BOTTLE_GLASS]);
     ZModelReplacer_setReplacerModel(gProxyBottleContents, &humanProxy->displayLists[LINK_DL_BOTTLE_CONTENTS]);
     ZModelReplacer_setReplacerModel(gProxyDekuStick, &humanProxy->displayLists[LINK_DL_DEKU_STICK]);
+    ZModelReplacer_setReplacerModel(gProxyBowString, &humanProxy->displayLists[LINK_DL_BOW_STRING]);
 }
 
 void removeProxyEternalDLs() {
     ZModelReplacer_setReplacerModel(gProxyBottleGlass, NULL);
     ZModelReplacer_setReplacerModel(gProxyBottleContents, NULL);
     ZModelReplacer_setReplacerModel(gProxyDekuStick, NULL);
+    ZModelReplacer_setReplacerModel(gProxyBowString, NULL);
 }
 
 void refreshExternalDLs() {

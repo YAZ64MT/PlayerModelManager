@@ -9,7 +9,7 @@ ZModelReplacerHandle gProxyBottleContents;
 ZModelReplacerHandle gProxyDekuStick;
 
 RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyFormProxies)
-void reserveGlassBottle() {
+void setupGameplayKeepDLReplacements() {
     gProxyBottleGlass = ZModelReplacer_createReplacer(GAMEPLAY_KEEP, gBottleGlassDL);
     gProxyBottleContents = ZModelReplacer_createReplacer(GAMEPLAY_KEEP, gBottleContentsDL);
     gProxyDekuStick = ZModelReplacer_createReplacer(GAMEPLAY_KEEP, gDekuStickDL);
