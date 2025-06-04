@@ -320,7 +320,7 @@ void setupVanillaHuman() {
 
     models[LINK_DL_DEKU_STICK] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gDekuStickDL);
     models[LINK_DL_BOW] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanBowDL);
-    //models[LINK_DL_BOW_STRING];
+    models[LINK_DL_BOW_STRING] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, object_link_child_DL_017818);
     models[LINK_DL_HOOKSHOT] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanHookshotDL);
     models[LINK_DL_HOOKSHOT_CHAIN] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gHookshotChainDL);
     models[LINK_DL_HOOKSHOT_RETICLE] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gHookshotReticleDL);
