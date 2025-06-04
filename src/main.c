@@ -120,15 +120,25 @@ void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
 }
 
 void addProxyExternalDLs() {
-    ZModelReplacer_pushReplacer(gProxyBottleGlass);
-    ZModelReplacer_pushReplacer(gProxyBottleContents);
-    ZModelReplacer_pushReplacer(gProxyDekuStick);
+    Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
+
+    ZModelReplacer_setReplacerModel(gProxyBottleGlass, &humanProxy->displayLists[LINK_DL_BOTTLE_GLASS]);
+    ZModelReplacer_setReplacerModel(gProxyBottleContents, &humanProxy->displayLists[LINK_DL_BOTTLE_CONTENTS]);
+    ZModelReplacer_setReplacerModel(gProxyDekuStick, &humanProxy->displayLists[LINK_DL_DEKU_STICK]);
 }
 
 void removeProxyEternalDLs() {
-    ZModelReplacer_removeReplacer(gProxyBottleGlass);
-    ZModelReplacer_removeReplacer(gProxyBottleContents);
-    ZModelReplacer_removeReplacer(gProxyDekuStick);
+    ZModelReplacer_setReplacerModel(gProxyBottleGlass, NULL);
+    ZModelReplacer_setReplacerModel(gProxyBottleContents, NULL);
+    ZModelReplacer_setReplacerModel(gProxyDekuStick, NULL);
+}
+
+void refreshExternalDLs() {
+    if (GET_PLAYER_FORM == PLAYER_FORM_HUMAN) {
+        addProxyExternalDLs();
+    } else {
+        removeProxyEternalDLs();
+    }
 }
 
 // initialize player models as blank display lists
@@ -168,12 +178,7 @@ RECOMP_HOOK_RETURN("Player_Init")
 void postPlayerInit() {
     matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
 
-    if (GET_PLAYER_FORM == PLAYER_FORM_HUMAN) {
-        addProxyExternalDLs();
-    }
-    else {
-        removeProxyEternalDLs();
-    }
+    refreshExternalDLs();
 
     gIsAgePropertyRefreshRequested = true;
 }

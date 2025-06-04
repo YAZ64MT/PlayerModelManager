@@ -19,4 +19,8 @@ void reserveGlassBottle() {
     ZModelReplacer_setReplacerModel(gProxyBottleGlass, &humanProxy->displayLists[LINK_DL_BOTTLE_GLASS]);
     ZModelReplacer_setReplacerModel(gProxyBottleContents, &humanProxy->displayLists[LINK_DL_BOTTLE_CONTENTS]);
     ZModelReplacer_setReplacerModel(gProxyDekuStick, &humanProxy->displayLists[LINK_DL_DEKU_STICK]);
+
+    ZModelReplacer_pushReplacer(gProxyBottleGlass);
+    ZModelReplacer_pushReplacer(gProxyBottleContents);
+    ZModelReplacer_pushReplacer(gProxyDekuStick);
 }
