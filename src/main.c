@@ -9,6 +9,7 @@
 #include "playermodelmanager_utils.h"
 #include "modelreplacer_api.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
+#include "externaldisplaylists.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
@@ -119,23 +120,15 @@ void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
 }
 
 void addProxyExternalDLs() {
-    Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
-
-    ZModelReplacer_addCustomDL(GAMEPLAY_KEEP, gBottleGlassDL, &humanProxy->displayLists[LINK_DL_BOTTLE_GLASS]);
-
-    ZModelReplacer_addCustomDL(GAMEPLAY_KEEP, gBottleContentsDL, &humanProxy->displayLists[LINK_DL_BOTTLE_FILLING]);
-
-    ZModelReplacer_addCustomDL(GAMEPLAY_KEEP, gDekuStickDL, &humanProxy->displayLists[LINK_DL_DEKU_STICK]);
+    ZModelReplacer_pushReplacer(gProxyBottleGlass);
+    ZModelReplacer_pushReplacer(gProxyBottleContents);
+    ZModelReplacer_pushReplacer(gProxyDekuStick);
 }
 
 void removeProxyEternalDLs() {
-    Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
-
-    ZModelReplacer_removeCustomDL(GAMEPLAY_KEEP, gBottleGlassDL, &humanProxy->displayLists[LINK_DL_BOTTLE_GLASS]);
-
-    ZModelReplacer_removeCustomDL(GAMEPLAY_KEEP, gBottleContentsDL, &humanProxy->displayLists[LINK_DL_BOTTLE_FILLING]);
-
-    ZModelReplacer_removeCustomDL(GAMEPLAY_KEEP, gDekuStickDL, &humanProxy->displayLists[LINK_DL_DEKU_STICK]);
+    ZModelReplacer_removeReplacer(gProxyBottleGlass);
+    ZModelReplacer_removeReplacer(gProxyBottleContents);
+    ZModelReplacer_removeReplacer(gProxyDekuStick);
 }
 
 // initialize player models as blank display lists

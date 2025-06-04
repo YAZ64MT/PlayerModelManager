@@ -343,7 +343,7 @@ void setupVanillaHuman() {
     models[LINK_DL_MASK_FIERCE_DEITY] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gFierceDeityMaskDL);
 
     // bottles
-    models[LINK_DL_BOTTLE_FILLING] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gBottleContentsDL);
+    models[LINK_DL_BOTTLE_CONTENTS] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gBottleContentsDL);
     models[LINK_DL_BOTTLE_GLASS] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gBottleGlassDL);
 
     // whole sword
