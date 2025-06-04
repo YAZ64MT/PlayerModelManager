@@ -18,6 +18,8 @@
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
+void refreshFileList();
+
 typedef struct {
     CustomModelEntry modelEntry;
     RecompuiResource button;
@@ -35,6 +37,7 @@ RecompuiResource container;
 RecompuiResource row1;
 RecompuiResource buttonClose;
 RecompuiResource buttonRemoveModel;
+RecompuiResource buttonRefreshFiles;
 
 RecompuiResource imageview;
 RecompuiTextureHandle bomb_texture_handle;
@@ -49,9 +52,9 @@ RecompuiResource labelradio;
 bool context_shown = false;
 bool showing_bow = false;
 
-char *zobjDir;
+char *gZobjDir;
 
-void *currentZobj = NULL;
+void *gCurrentZobj = NULL;
 
 RecompuiResource modelListContainer;
 RecompuiResource uiTitle;
@@ -68,18 +71,24 @@ void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *dat
 
         matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
 
-        if (currentZobj) {
-            recomp_free(currentZobj);
+        if (gCurrentZobj) {
+            recomp_free(gCurrentZobj);
         }
 
-        currentZobj = NULL;
+        gCurrentZobj = NULL;
     }
 }
 
-void button_pressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         recompui_hide_context(context);
         context_shown = false;
+    }
+}
+
+void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        refreshFileList();
     }
 }
 
@@ -168,8 +177,9 @@ void on_init() {
     recompui_set_text_align(buttonClose, TEXT_ALIGN_CENTER);
 
     // Bind the shared callback to the two buttons.
-    recompui_register_callback(buttonClose, button_pressed, NULL);
+    recompui_register_callback(buttonClose, closeButtonPressed, NULL);
 
+    /*
     // Load the texture data and create UI textures for the bomb and bow icons.
     CmpDma_LoadFile(SEGMENT_ROM_START(icon_item_static_yar), ITEM_BOMB, bomb_texture_data, sizeof(bomb_texture_data));
     bomb_texture_handle = recompui_create_texture_rgba32(bomb_texture_data, ICON_ITEM_TEX_WIDTH, ICON_ITEM_TEX_HEIGHT);
@@ -180,6 +190,7 @@ void on_init() {
     imageview = recompui_create_imageview(context, row1, bomb_texture_handle);
     recompui_set_min_width(imageview, 100.0f, UNIT_DP);
     recompui_set_min_height(imageview, 100.0f, UNIT_DP);
+    */
 
     // set up scrolling container for models
     modelListContainer = recompui_create_element(context, container);
@@ -199,25 +210,38 @@ void on_init() {
     recompui_set_flex_shrink(buttonRemoveModel, 0);
     recompui_set_nav(buttonClose, NAVDIRECTION_DOWN, buttonRemoveModel);
     recompui_set_nav(buttonRemoveModel, NAVDIRECTION_UP, buttonClose);
+    recompui_set_nav(buttonRemoveModel, NAVDIRECTION_LEFT, buttonClose);
     recompui_register_callback(buttonRemoveModel, removeButtonPressed, NULL);
+
+    buttonRefreshFiles = recompui_create_button(context, row1, "Refresh File List", BUTTONSTYLE_SECONDARY);
+    recompui_set_text_align(buttonRefreshFiles, TEXT_ALIGN_CENTER);
+    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_DOWN, buttonRemoveModel);
+    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_RIGHT, buttonRemoveModel);
+    recompui_register_callback(buttonRefreshFiles, refreshButtonPressed, NULL);
 
     recompui_close_context(context);
 
     context_shown = false;
 
     unsigned char *modFolderPath = recomp_get_mod_folder_path();
-    zobjDir = QDFL_getCombinedPath(2, modFolderPath, "zobj");
+    gZobjDir = QDFL_getCombinedPath(2, modFolderPath, "zobj");
     recomp_free(modFolderPath);
-    recomp_printf("zobj folder path: %s\n", zobjDir);
+    recomp_printf("zobj folder path: %s\n", gZobjDir);
+
+    recompui_open_context(context);
+
+    refreshFileList();
+
+    recompui_close_context(context);
 }
 
 DiskModelEntries gCurrentDiskModels;
 
-void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+void zobjButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         DiskModelEntry *entry = userdata;
 
-        char *zobjPath = QDFL_getCombinedPath(2, zobjDir, entry->modelEntry.filePath);
+        char *zobjPath = QDFL_getCombinedPath(2, gZobjDir, entry->modelEntry.filePath);
 
         void *newZobjFile = NULL;
 
@@ -234,11 +258,11 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
 
             matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
 
-            if (currentZobj) {
-                recomp_free(currentZobj);
+            if (gCurrentZobj) {
+                recomp_free(gCurrentZobj);
             }
 
-            currentZobj = newZobjFile;
+            gCurrentZobj = newZobjFile;
         }
 
         recomp_free(zobjPath);
@@ -246,7 +270,7 @@ void button_zobj_pressed(RecompuiResource resource, const RecompuiEventData *dat
 }
 
 bool isValidZobj(const char *path) {
-    char *zobjPath = QDFL_getCombinedPath(2, zobjDir, path);
+    char *zobjPath = QDFL_getCombinedPath(2, gZobjDir, path);
 
     void *file = NULL;
 
@@ -283,11 +307,11 @@ bool isValidZobj(const char *path) {
 }
 
 void refreshFileList() {
-    recompui_open_context(context);
+    // MUST CALL INSIDE UI CONTEXT
 
     unsigned long numFiles;
 
-    QDFL_STATUS err = QDFL_getNumDirEntries(zobjDir, &numFiles);
+    QDFL_STATUS err = QDFL_getNumDirEntries(gZobjDir, &numFiles);
 
     if (err == QDFL_STATUS_OK) {
 
@@ -314,10 +338,10 @@ void refreshFileList() {
         unsigned newLength = 0;
         char *path;
 
-        for (unsigned i = 0; i < numFiles; i++) {
+        for (unsigned i = 0; i < numFiles; ++i) {
             path = NULL;
 
-            QDFL_getDirEntryNameByIndex(zobjDir, i, &path);
+            QDFL_getDirEntryNameByIndex(gZobjDir, i, &path);
 
             if (path && isValidZobj(path)) {
                 DiskModelEntry *entry = &gCurrentDiskModels.entries[newLength];
@@ -350,18 +374,33 @@ void refreshFileList() {
 
                 recompui_set_flex_shrink(button, 0);
 
-                recompui_register_callback(button, button_zobj_pressed, entry);
+                recompui_register_callback(button, zobjButtonPressed, entry);
+
+                recompui_set_nav(button, NAVDIRECTION_LEFT, buttonClose);
 
                 newLength++;
+            }
+
+            if (newLength > 0) {
+                RecompuiResource lastEntryButton = gCurrentDiskModels.entries[newLength - 1].button;
+                recompui_set_nav(lastEntryButton, NAVDIRECTION_DOWN, buttonRemoveModel);
+                recompui_set_nav(buttonClose, NAVDIRECTION_UP, lastEntryButton);
+                recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_UP, lastEntryButton);
+
+                for (unsigned i = 0; i < newLength - 1; ++i) {
+                    RecompuiResource button = gCurrentDiskModels.entries[i].button;
+                    recompui_set_nav(button, NAVDIRECTION_RIGHT, lastEntryButton);
+                    recompui_set_nav(button, NAVDIRECTION_DOWN, gCurrentDiskModels.entries[i + 1].button);
+                }
+            }
+            else {
+                recompui_set_nav_none(buttonClose, NAVDIRECTION_UP);
+                recompui_set_nav_none(buttonRefreshFiles, NAVDIRECTION_UP);
             }
         }
 
         gCurrentDiskModels.length = newLength;
     }
-
-    // freeOldFiles();
-
-    recompui_close_context(context);
 }
 
 bool checkButtonCombo(PlayState *play) {
@@ -375,7 +414,6 @@ RECOMP_HOOK("Play_UpdateMain")
 void on_play_update(PlayState *play) {
     if (checkButtonCombo(play)) {
         if (!context_shown) {
-            refreshFileList();
             recompui_show_context(context);
             context_shown = true;
         }
