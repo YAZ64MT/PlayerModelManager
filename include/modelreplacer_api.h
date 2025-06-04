@@ -56,7 +56,7 @@ RECOMP_IMPORT(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, bool ZModelReplacer_pushReplace
 
 // Removes the Replacer from the Replacer stack
 //
-// // Returns true if removal ocurred, false if nothing happened.
+// Returns true if removal ocurred, false if nothing happened.
 //
 // Removes a Replacer from the stack. To get it to render again, you must push it back on
 // at some point.
