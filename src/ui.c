@@ -71,6 +71,8 @@ void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *dat
         if (currentZobj) {
             recomp_free(currentZobj);
         }
+
+        currentZobj = NULL;
     }
 }
 
