@@ -128,7 +128,7 @@ void addProxyExternalDLs() {
     ZModelReplacer_setReplacerModel(gProxyBowString, &humanProxy->displayLists[LINK_DL_BOW_STRING]);
 }
 
-void removeProxyEternalDLs() {
+void removeProxyExternalDLs() {
     ZModelReplacer_setReplacerModel(gProxyBottleGlass, NULL);
     ZModelReplacer_setReplacerModel(gProxyBottleContents, NULL);
     ZModelReplacer_setReplacerModel(gProxyDekuStick, NULL);
@@ -139,7 +139,7 @@ void refreshExternalDLs() {
     if (GET_PLAYER_FORM == PLAYER_FORM_HUMAN) {
         addProxyExternalDLs();
     } else {
-        removeProxyEternalDLs();
+        removeProxyExternalDLs();
     }
 }
 
