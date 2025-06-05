@@ -234,6 +234,18 @@ Gfx gLinkHumanFirstPersonArmDL[] = {
     gsSPEndDisplayList(),
 };
 
+Gfx *getHumanDL(Gfx *dl) {
+    return ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, dl);
+}
+
+Mtx *getHumanMtx(Mtx *mtx) {
+    return (Mtx *)((uintptr_t)ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD) + SEGMENT_OFFSET(&mtx));
+}
+
+Gfx *getGameplayKeepDL(Gfx *dl) {
+    return ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, dl);
+}
+
 void setupVanillaHuman() {
     Link_FormProxy *formProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
@@ -263,71 +275,71 @@ void setupVanillaHuman() {
     void *human = ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD);
 
     Mtx **equipMatrixes = formProxy->vanilla.equipMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanSheathedKokiriSwordMtx));
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanSheathedRazorSwordMtx));
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanSheathedKokiriSwordMtx));
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanHerosShieldMtx));
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = (Mtx *)((uintptr_t)human + SEGMENT_OFFSET(&gLinkHumanMirrorShieldMtx));
+    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx);
+    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = getHumanMtx(&gLinkHumanSheathedRazorSwordMtx);
+    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx);
+    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = getHumanMtx(&gLinkHumanHerosShieldMtx);
+    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = getHumanMtx(&gLinkHumanMirrorShieldMtx);
 
     Gfx **models = formProxy->vanilla.models;
 
     // limbs
-    models[LINK_DL_WAIST] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanWaistDL);
-    models[LINK_DL_RTHIGH] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanRightThighDL);
-    models[LINK_DL_RSHIN] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanRightShinDL);
-    models[LINK_DL_RFOOT] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanRightFootDL);
-    models[LINK_DL_LTHIGH] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanLeftThighDL);
-    models[LINK_DL_LSHIN] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanLeftShinDL);
-    models[LINK_DL_LFOOT] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanLeftFootDL);
-    models[LINK_DL_HEAD] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanHeadDL);
-    models[LINK_DL_HAT] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanHatDL);
-    models[LINK_DL_COLLAR] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanCollarDL);
-    models[LINK_DL_LSHOULDER] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanLeftShoulderDL);
-    models[LINK_DL_LFOREARM] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanLeftForearmDL);
-    models[LINK_DL_RSHOULDER] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanRightShoulderDL);
-    models[LINK_DL_RFOREARM] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanRightForearmDL);
-    models[LINK_DL_TORSO] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanTorsoDL);
+    models[LINK_DL_WAIST] = getHumanDL(gLinkHumanWaistDL);
+    models[LINK_DL_RTHIGH] = getHumanDL(gLinkHumanRightThighDL);
+    models[LINK_DL_RSHIN] = getHumanDL(gLinkHumanRightShinDL);
+    models[LINK_DL_RFOOT] = getHumanDL(gLinkHumanRightFootDL);
+    models[LINK_DL_LTHIGH] = getHumanDL(gLinkHumanLeftThighDL);
+    models[LINK_DL_LSHIN] = getHumanDL(gLinkHumanLeftShinDL);
+    models[LINK_DL_LFOOT] = getHumanDL(gLinkHumanLeftFootDL);
+    models[LINK_DL_HEAD] = getHumanDL(gLinkHumanHeadDL);
+    models[LINK_DL_HAT] = getHumanDL(gLinkHumanHatDL);
+    models[LINK_DL_COLLAR] = getHumanDL(gLinkHumanCollarDL);
+    models[LINK_DL_LSHOULDER] = getHumanDL(gLinkHumanLeftShoulderDL);
+    models[LINK_DL_LFOREARM] = getHumanDL(gLinkHumanLeftForearmDL);
+    models[LINK_DL_RSHOULDER] = getHumanDL(gLinkHumanRightShoulderDL);
+    models[LINK_DL_RFOREARM] = getHumanDL(gLinkHumanRightForearmDL);
+    models[LINK_DL_TORSO] = getHumanDL(gLinkHumanTorsoDL);
 
     // hands
-    models[LINK_DL_LHAND] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanLeftHandOpenDL);
-    models[LINK_DL_LFIST] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanLeftHandClosedDL);
-    models[LINK_DL_LHAND_BOTTLE] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanLeftHandHoldBottleDL);
-    models[LINK_DL_RHAND] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanRightHandOpenDL);
-    models[LINK_DL_RFIST] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanRightHandClosedDL);
+    models[LINK_DL_LHAND] = getHumanDL(gLinkHumanLeftHandOpenDL);
+    models[LINK_DL_LFIST] = getHumanDL(gLinkHumanLeftHandClosedDL);
+    models[LINK_DL_LHAND_BOTTLE] = getHumanDL(gLinkHumanLeftHandHoldBottleDL);
+    models[LINK_DL_RHAND] = getHumanDL(gLinkHumanRightHandOpenDL);
+    models[LINK_DL_RFIST] = getHumanDL(gLinkHumanRightHandClosedDL);
 
     // sword sheathes
-    models[LINK_DL_SWORD_KOKIRI_SHEATH] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanKokiriSwordSheathDL);
-    models[LINK_DL_SWORD_RAZOR_SHEATH] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanRazorSwordSheathDL);
-    models[LINK_DL_SWORD_GILDED_SHEATH] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL);
+    models[LINK_DL_SWORD_KOKIRI_SHEATH] = getHumanDL(gLinkHumanKokiriSwordSheathDL);
+    models[LINK_DL_SWORD_RAZOR_SHEATH] = getHumanDL(gLinkHumanRazorSwordSheathDL);
+    models[LINK_DL_SWORD_GILDED_SHEATH] = getHumanDL(gLinkHumanGildedSwordSheathDL);
 
     // sword hilts
-    models[LINK_DL_SWORD_KOKIRI_HILT] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gKokiriSwordHandleDL);
-    models[LINK_DL_SWORD_RAZOR_HILT] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gRazorSwordHandleDL);
-    models[LINK_DL_SWORD_GILDED_HILT] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanGildedSwordHandleDL);
+    models[LINK_DL_SWORD_KOKIRI_HILT] = getGameplayKeepDL(gKokiriSwordHandleDL);
+    models[LINK_DL_SWORD_RAZOR_HILT] = getGameplayKeepDL(gRazorSwordHandleDL);
+    models[LINK_DL_SWORD_GILDED_HILT] = getHumanDL(gLinkHumanGildedSwordHandleDL);
 
     // sword blades
-    models[LINK_DL_SWORD_KOKIRI_BLADE] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gKokiriSwordBladeDL);
-    models[LINK_DL_SWORD_RAZOR_BLADE] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gRazorSwordBladeDL);
-    models[LINK_DL_SWORD_GILDED_BLADE] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanGildedSwordBladeDL);
+    models[LINK_DL_SWORD_KOKIRI_BLADE] = getGameplayKeepDL(gKokiriSwordBladeDL);
+    models[LINK_DL_SWORD_RAZOR_BLADE] = getGameplayKeepDL(gRazorSwordBladeDL);
+    models[LINK_DL_SWORD_GILDED_BLADE] = getHumanDL(gLinkHumanGildedSwordBladeDL);
 
     // shields
-    models[LINK_DL_SHIELD_HERO] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanHerosShieldDL);
-    models[LINK_DL_SHIELD_MIRROR] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanMirrorShieldDL);
+    models[LINK_DL_SHIELD_HERO] = getHumanDL(gLinkHumanHerosShieldDL);
+    models[LINK_DL_SHIELD_MIRROR] = getHumanDL(gLinkHumanMirrorShieldDL);
 
     // items
     models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL; // not in Link obj
     ZGlobalObj_rebaseDL(human, gLinkHumanOcarinaDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
-    models[LINK_DL_DEKU_STICK] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gDekuStickDL);
-    models[LINK_DL_BOW] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanBowDL);
-    models[LINK_DL_BOW_STRING] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, object_link_child_DL_017818);
-    models[LINK_DL_HOOKSHOT] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanHookshotDL);
-    models[LINK_DL_HOOKSHOT_CHAIN] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gHookshotChainDL);
-    models[LINK_DL_HOOKSHOT_RETICLE] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gHookshotReticleDL);
+    models[LINK_DL_DEKU_STICK] = getGameplayKeepDL(gDekuStickDL);
+    models[LINK_DL_BOW] = getHumanDL(gLinkHumanBowDL);
+    models[LINK_DL_BOW_STRING] = getHumanDL(object_link_child_DL_017818);
+    models[LINK_DL_HOOKSHOT] = getHumanDL(gLinkHumanHookshotDL);
+    models[LINK_DL_HOOKSHOT_CHAIN] = getGameplayKeepDL(gHookshotChainDL);
+    models[LINK_DL_HOOKSHOT_RETICLE] = getGameplayKeepDL(gHookshotReticleDL);
 
     // First Person
-    models[LINK_DL_FPS_LFOREARM] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanLeftForearmDL);
-    models[LINK_DL_FPS_LHAND] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanLeftHandClosedDL);
+    models[LINK_DL_FPS_LFOREARM] = getHumanDL(gLinkHumanLeftForearmDL);
+    models[LINK_DL_FPS_LHAND] = getHumanDL(gLinkHumanLeftHandClosedDL);
     models[LINK_DL_FPS_RFOREARM] = dfCommand;
 
     models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArmDL; // not in Link obj
@@ -337,15 +349,15 @@ void setupVanillaHuman() {
     ZGlobalObj_rebaseDL(human, gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
     // masks
-    models[LINK_DL_MASK_DEKU] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gDekuMaskDL);
-    models[LINK_DL_MASK_GORON] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gGoronMaskDL);
-    models[LINK_DL_MASK_ZORA] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gZoraMaskDL);
-    models[LINK_DL_MASK_FIERCE_DEITY] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gFierceDeityMaskDL);
+    models[LINK_DL_MASK_DEKU] = getGameplayKeepDL(gDekuMaskDL);
+    models[LINK_DL_MASK_GORON] = getGameplayKeepDL(gGoronMaskDL);
+    models[LINK_DL_MASK_ZORA] = getGameplayKeepDL(gZoraMaskDL);
+    models[LINK_DL_MASK_FIERCE_DEITY] = getGameplayKeepDL(gFierceDeityMaskDL);
 
     // bottles
-    models[LINK_DL_BOTTLE_CONTENTS] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gBottleContentsDL);
-    models[LINK_DL_BOTTLE_GLASS] = ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, gBottleGlassDL);
+    models[LINK_DL_BOTTLE_CONTENTS] = getGameplayKeepDL(gBottleContentsDL);
+    models[LINK_DL_BOTTLE_GLASS] = getGameplayKeepDL(gBottleGlassDL);
 
     // whole sword
-    models[LINK_DL_SWORD_GREATFAIRY] = ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL);
+    models[LINK_DL_SWORD_GREATFAIRY] = getHumanDL(gLinkHumanGreatFairysSwordDL);
 }
