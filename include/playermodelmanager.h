@@ -4,6 +4,7 @@
 #include "global.h"
 
 // Parts after LINK_DL_ need to be kept in sync with Link_ShimDisplayList
+// MUST BE KEPT IN SYNC WITH ZPlayerModel_DisplayListId iIN playermodelmanager_api.h
 typedef enum {
     LINK_DL_WAIST,
     LINK_DL_RTHIGH,
