@@ -14,7 +14,7 @@ typedef enum {
     QDFL_STATUS_EXPECTED_FILE,
     QDFL_STATUS_EXPECTED_DIR,
     QDFL_STATUS_ERR_FILE_TOO_LARGE,
-} QDFL_STATUS;
+} QDFL_Status;
 
 // Returns 1 if path corresponds to an existing file or directory.
 //
@@ -33,20 +33,20 @@ RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, int QDFL_isDirectory(const char *path
 
 // Writes the size (in bytes) of the file at the path into out and returns QDFL_STATUS_OK.
 //
-// If an error occurs, a different QDFL_STATUS is returned, and out is left unmodified.
-RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_STATUS QDFL_getFileSize(const char *path, unsigned long *out));
+// If an error occurs, a different QDFL_Status is returned, and out is left unmodified.
+RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_Status QDFL_getFileSize(const char *path, unsigned long *out));
 
 // Reads a file into memory, writes the pointer to out, and returns QDFL_STATUS_OK.
 //
-// If the file cannot be read, a different QDFL_STATUS is returned, and out is left unmodified.
+// If the file cannot be read, a different QDFL_Status is returned, and out is left unmodified.
 //
 // Remember to recomp_free this file when you are done with it.
-RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_STATUS QDFL_loadFile(const char *path, void **out));
+RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_Status QDFL_loadFile(const char *path, void **out));
 
 // Writes number of files and folders in the directory to out and returns QDFL_STATUS_OK.
 //
-// If an error occurs, out is left unmodified, and a different QDFL_STATUS is returned.
-RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_STATUS QDFL_getNumDirEntries(const char *dirPath, unsigned long *out));
+// If an error occurs, out is left unmodified, and a different QDFL_Status is returned.
+RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_Status QDFL_getNumDirEntries(const char *dirPath, unsigned long *out));
 
 // Writes a pointer to a string representing the file or folder at the index in dirPath to out and
 // returns QDFL_STATUS_OK.
@@ -59,7 +59,7 @@ RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_STATUS QDFL_getNumDirEntries(con
 // recomp_free this string when you are done with it to avoid a memory leak.
 //
 // If an error occurs, a different status is returned, and out is left unmodified.
-RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_STATUS QDFL_getDirEntryNameByIndex(const char *dirPath, unsigned long index, char **out));
+RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_Status QDFL_getDirEntryNameByIndex(const char *dirPath, unsigned long index, char **out));
 
 // Combines count number of paths into a single string.
 //

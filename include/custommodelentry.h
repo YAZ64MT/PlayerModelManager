@@ -11,18 +11,31 @@ typedef enum {
     CUSTOM_MODEL_TYPE_GORON,
     CUSTOM_MODEL_TYPE_ZORA,
     CUSTOM_MODEL_TYPE_FIERCE_DEITY
-} CUSTOM_MODEL_TYPE;
+} CustomModelType;
 
-typedef struct {
+typedef struct CustomModelEntry {
+    CustomModelType type;
     u64 flags;
     char *displayName;
-    char *filePath;
+    char *internalName;
+    bool (*applyToModelInfo)(void *this, Link_ModelInfo *modelInfo);
     void (*onModelLoad)(void *userdata);
     void *onModelLoadData;
     void (*onModelUnload)(void *userdata);
     void *onModelUnloadData;
-    Gfx *displayListPtrs[LINK_DL_MAX];
 } CustomModelEntry;
+
+typedef struct {
+    CustomModelEntry modelEntry;
+    char *filePath;
+    void *fileData;
+} CustomModelDiskEntry;
+
+typedef struct {
+    CustomModelEntry modelEntry;
+    Gfx *displayListPtrs[LINK_DL_MAX];
+    Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
+} CustomModelMemoryEntry;
 
 void CustomModelEntry_init(CustomModelEntry *entry);
 

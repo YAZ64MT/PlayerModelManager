@@ -23,10 +23,10 @@ void refreshFileList();
 typedef struct {
     CustomModelEntry modelEntry;
     RecompuiResource button;
-} DiskModelEntry;
+} ListEntry;
 
 typedef struct {
-    DiskModelEntry *entries;
+    ListEntry *entries;
     unsigned length;
     unsigned maxLength;
 } DiskModelEntries;
@@ -137,8 +137,8 @@ void on_init() {
 
     // Set up the flexbox properties of the root element.
     recompui_set_flex_direction(root, FLEX_DIRECTION_COLUMN);
-    recompui_set_justify_content(root, JUSTIFY_CONTENT_FLEX_START);
-    recompui_set_align_items(root, ALIGN_ITEMS_FLEX_START);
+    recompui_set_justify_content(root, JUSTIFY_CONTENT_CENTER);
+    recompui_set_align_items(root, ALIGN_ITEMS_CENTER);
 
     // Create a container to act as the modal background and hold the elements in the modal.
     container = recompui_create_element(context, root);
@@ -239,7 +239,7 @@ DiskModelEntries gCurrentDiskModels;
 
 void zobjButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        DiskModelEntry *entry = userdata;
+        CustomModelEntry *entry = userdata;
 
         char *zobjPath = QDFL_getCombinedPath(2, gZobjDir, entry->modelEntry.filePath);
 
@@ -311,7 +311,7 @@ void refreshFileList() {
 
     unsigned long numFiles;
 
-    QDFL_STATUS err = QDFL_getNumDirEntries(gZobjDir, &numFiles);
+    QDFL_Status err = QDFL_getNumDirEntries(gZobjDir, &numFiles);
 
     if (err == QDFL_STATUS_OK) {
 
