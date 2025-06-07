@@ -2,6 +2,7 @@
 #include "custommodelentry.h"
 #include "qdfileloader_api.h"
 #include "ml64compat_mm.h"
+#include "recomputils.h"
 
 void CustomModelEntry_init(CustomModelEntry *this) {
     this->displayName = NULL;
@@ -50,6 +51,15 @@ bool applyCustomModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
+void unloadCustomModelDiskEntry(void *userdata) {
+    CustomModelDiskEntry *this = userdata;
+
+    if (this->fileData) {
+        recomp_free(this->fileData);
+        this->fileData = NULL;
+    }
+}
+
 void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this) {
     CustomModelEntry_init(&this->modelEntry);
 
@@ -70,4 +80,8 @@ void CustomModelDiskEntry_init(CustomModelDiskEntry *this) {
     this->fileData = NULL;
 
     this->filePath = NULL;
+
+    this->modelEntry.applyToModelInfo = applyCustomModelDiskEntry;
+    this->modelEntry.onModelUnload = unloadCustomModelDiskEntry;
+    this->modelEntry.onModelUnloadData = this;
 }

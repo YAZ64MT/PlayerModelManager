@@ -14,6 +14,7 @@
 #include "mm_adultfixes.h"
 #include "playermodelmanager_utils.h"
 #include "custommodelentry.h"
+#include "custommodelentrymanager.h"
 #include "libc/string.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
@@ -241,31 +242,19 @@ void zobjButtonPressed(RecompuiResource resource, const RecompuiEventData *data,
     if (data->type == UI_EVENT_CLICK) {
         CustomModelEntry *entry = userdata;
 
-        char *zobjPath = QDFL_getCombinedPath(2, gZobjDir, entry->modelEntry.filePath);
-
-        void *newZobjFile = NULL;
-
-        QDFL_loadFile(zobjPath, &newZobjFile);
-
-        if (newZobjFile) {
-            Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
-
-            setupZobjZ64o(&humanProxy->current, newZobjFile);
-
-            refreshFormProxy(humanProxy);
-
-            gIsAgePropertyRefreshRequested = true;
-
-            matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
-
-            if (gCurrentZobj) {
-                recomp_free(gCurrentZobj);
+        if (entry->applyToModelInfo(entry, &gLinkFormProxies[PLAYER_FORM_HUMAN])) {
+            if (entry->onModelLoad) {
+                entry->onModelLoad(entry->onModelLoadData);
             }
 
-            gCurrentZobj = newZobjFile;
-        }
+            CustomModelEntry *curr = CMEM_getCurrentEntry();
 
-        recomp_free(zobjPath);
+            if (curr && curr->onModelUnload) {
+                curr->onModelUnload(curr->onModelUnloadData);
+            }
+
+            CMEM_setCurrentEntry(entry);
+        }
     }
 }
 
