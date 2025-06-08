@@ -394,8 +394,6 @@ void loadVanillaSkeletonTransforms(Link_ModelInfo *modelInfo, ObjectId objectId,
 
     DmaMgr_RequestSync(vanillaObj, gObjectTable[objectId].vromStart, size);
 
-    recomp_printf("Limb ptr: 0x%x\nSegment Offset: 0x%x\n", limbs, SEGMENT_OFFSET(limbs));
-
     LodLimb **realLimbsPtr = (LodLimb **)(SEGMENT_OFFSET(limbs) + (u32)vanillaObj);
 
     for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
