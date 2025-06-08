@@ -4,20 +4,8 @@
 #include "recomputils.h"
 #include "recompconfig.h"
 #include "recompui.h"
-#include "recompdata.h"
-#include "z64recomp_api.h"
-#include "qdfileloader_api.h"
-#include "modelreplacer_api.h"
-#include "ml64compat_mm.h"
-#include "defines_z64o.h"
-#include "model_common.h"
-#include "playermodelmanager_utils.h"
-#include "custommodelentry.h"
 #include "custommodelentrymanager.h"
-#include "libc/string.h"
 #include "model_common.h"
-
-RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
 void refreshFileList();
 
