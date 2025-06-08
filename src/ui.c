@@ -222,15 +222,14 @@ void destroyModelButtons() {
 void createModelButtons() {
     // MUST CALL INSIDE UI CONTEXT
 
-    size_t oldCount = sButtonEntries.count;
-
     CMEM_refreshDiskEntries();
 
     sButtonEntries.entries = CMEM_getCombinedEntries(&sButtonEntries.count);
 
-    if (sButtonEntries.count > oldCount) {
+    if (sButtonEntries.count > sButtonEntries.capacity) {
         recomp_free(sButtonEntries.buttons);
         sButtonEntries.buttons = recomp_alloc(sizeof(*sButtonEntries.buttons) * sButtonEntries.count);
+        sButtonEntries.capacity = sButtonEntries.count;
     }
 
     for (size_t i = 0; i < sButtonEntries.count; ++i) {
