@@ -286,10 +286,7 @@ void refreshProxyMatrixes(Link_FormProxy *formProxy) {
         }
 
         if (matrix) {
-            //recomp_printf("Old DL:%X%X %X%X\n", formProxy->mtxDisplayLists[i][0].words.w0, formProxy->mtxDisplayLists[i][0].words.w1, formProxy->mtxDisplayLists[i][1].words.w0, formProxy->mtxDisplayLists[i][1].words.w1);
-            //recomp_printf("Repointing matrix 0x%x -> 0x%x\n", formProxy->mtxDisplayLists[i][0].words.w1, matrix);
             gSPMatrix(&formProxy->mtxDisplayLists[i][0], matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
-            //recomp_printf("New DL:%X%X %X%X\n", formProxy->mtxDisplayLists[i][0].words.w0, formProxy->mtxDisplayLists[i][0].words.w1, formProxy->mtxDisplayLists[i][1].words.w0, formProxy->mtxDisplayLists[i][1].words.w1);
         }
     }
 }
