@@ -3,6 +3,7 @@
 #include "qdfileloader_api.h"
 #include "ml64compat_mm.h"
 #include "recomputils.h"
+#include "playermodelmanager_utils.h"
 
 void CustomModelEntry_init(CustomModelEntry *this) {
     this->displayName = NULL;
@@ -16,6 +17,8 @@ void CustomModelEntry_init(CustomModelEntry *this) {
 }
 
 bool applyCustomModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
+    clearLinkModelInfo(modelInfo);
+
     CustomModelMemoryEntry *this = thisx;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
