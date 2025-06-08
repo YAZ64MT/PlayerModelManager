@@ -1,6 +1,9 @@
 #ifndef __PLAYERMODELMANAGER_API__
 #define __PLAYERMODELMANAGER_API__
 
+#include "global.h"
+#include "modding.h"
+
 typedef unsigned long ZPlayerModelHandle;
 
 // Used for keeping compatibility between versions
@@ -268,23 +271,39 @@ typedef enum {
 } ZPlayerModel_DisplayListId;
 
 typedef enum {
-    LINK_EQUIP_MATRIX_SWORD1_BACK,
-    LINK_EQUIP_MATRIX_SWORD2_BACK,
-    LINK_EQUIP_MATRIX_SWORD3_BACK,
-    LINK_EQUIP_MATRIX_SWORD4_BACK,
-    LINK_EQUIP_MATRIX_SHIELD1_BACK,
-    LINK_EQUIP_MATRIX_SHIELD2_BACK,
-    LINK_EQUIP_MATRIX_SHIELD3_BACK,
-    LINK_EQUIP_MATRIX_SHIELD1_ODD,
-    LINK_EQUIP_MATRIX_UNK1,
-    LINK_EQUIP_MATRIX_UNK2,
-    LINK_EQUIP_MATRIX_UNK3,
-    LINK_EQUIP_MATRIX_UNK4,
-    LINK_EQUIP_MATRIX_UNK5,
-    LINK_EQUIP_MATRIX_UNK6,
-    LINK_EQUIP_MATRIX_UNK7,
-    LINK_EQUIP_MATRIX_UNK8,
-    LINK_EQUIP_MATRIX_MAX,
+    ZPM_MATRIX_SWORD1_BACK,
+    ZPM_MATRIX_SWORD2_BACK,
+    ZPM_MATRIX_SWORD3_BACK,
+    ZPM_MATRIX_SWORD4_BACK,
+    ZPM_MATRIX_SHIELD1_BACK,
+    ZPM_MATRIX_SHIELD2_BACK,
+    ZPM_MATRIX_SHIELD3_BACK,
+    ZPM_MATRIX_SHIELD1_ODD,
+    ZPM_MATRIX_UNK1,
+    ZPM_MATRIX_UNK2,
+    ZPM_MATRIX_UNK3,
+    ZPM_MATRIX_UNK4,
+    ZPM_MATRIX_UNK5,
+    ZPM_MATRIX_UNK6,
+    ZPM_MATRIX_UNK7,
+    ZPM_MATRIX_UNK8,
+    ZPM_MATRIX_MAX,
 } ZPlayerModel_MatrixId;
+
+RECOMP_IMPORT(ZPlayerModelHandle ZPlayerModel_registerModel(unsigned long apiVersion, const char *internalName));
+
+RECOMP_IMPORT(void ZPlayerModel_setDL(ZPlayerModelHandle h, Link_DisplayList dlId, Gfx *dl));
+
+RECOMP_IMPORT(void ZPlayerModel_setMtx(ZPlayerModelHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix));
+
+RECOMP_IMPORT(void ZPlayerModel_setLoadCallback(ZPlayerModelHandle h, void (*onModelLoad)(void *), void *userdata));
+
+RECOMP_IMPORT(void ZPlayerModel_setUnloadCallback(ZPlayerModelHandle h, void (*onModelUnload)(void *), void *userdata));
+
+RECOMP_IMPORT(void ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel));
+
+RECOMP_IMPORT(void ZPlayerModel_setEyesTextures(ZPlayerModelHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]));
+
+RECOMP_IMPORT(void ZPlayerModel_setMouthTextures(ZPlayerModelHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]));
 
 #endif
