@@ -294,9 +294,9 @@ typedef enum {
 
 #define ZPLAYERMODEL_FLAG_MM_ADULT_FIX 0x01ULL
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, ZPlayerModelHandle ZPlayerModel_registerModel(unsigned long apiVersion, const char *internalName));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, ZPlayerModelHandle ZPlayerModel_registerModel(unsigned long apiVersion, char *internalName));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setDisplayName(ZPlayerModelHandle h, const char *displayName));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setDisplayName(ZPlayerModelHandle h, char *displayName));
 
 RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setFlags(ZPlayerModelHandle h, u64 flags));
 
