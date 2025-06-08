@@ -36,6 +36,7 @@ typedef struct {
     CustomModelEntry modelEntry;
     Gfx *displayListPtrs[LINK_DL_MAX];
     Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
+    FlexSkeletonHeader *skel;
 } CustomModelMemoryEntry;
 
 void CustomModelEntry_init(CustomModelEntry *entry);

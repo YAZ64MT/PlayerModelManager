@@ -28,6 +28,12 @@ bool applyCustomModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
 
     modelInfo->flags = this->modelEntry.flags;
 
+    LodLimb **customLimbs = (LodLimb **)this->skel->sh.segment;
+
+    for (int i = 0; i < PLAYER_LIMB_MAX; ++i) {
+        modelInfo->limbTranslations[i] = customLimbs[i]->jointPos;
+    }
+
     return true;
 }
 
