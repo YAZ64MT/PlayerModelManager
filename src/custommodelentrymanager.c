@@ -282,7 +282,7 @@ ZPlayerModelHandle CMEM_createMemoryHandle() {
     return handle;
 }
 
-CustomModelDiskEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h) {
+CustomModelMemoryEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h) {
     return recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, h);
 }
 
