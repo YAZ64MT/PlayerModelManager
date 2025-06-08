@@ -31,6 +31,46 @@ RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerModel(unsigned long apiVer
     return CMEM_createMemoryHandle();
 }
 
+RECOMP_EXPORT void ZPlayerModel_setDisplayName(ZPlayerModelHandle h, const char* displayName) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setDisplayName");
+
+    if (!entry) {
+        return;
+    }
+
+    entry->modelEntry.displayName = displayName;
+}
+
+RECOMP_EXPORT void ZPlayerModel_setFlags(ZPlayerModelHandle h, u64 flags) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setFlags");
+
+    if (!entry) {
+        return;
+    }
+
+    entry->modelEntry.flags |= flags;
+}
+
+RECOMP_EXPORT void ZPlayerModel_clearFlags(ZPlayerModelHandle h, u64 flags) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_clearFlags");
+
+    if (!entry) {
+        return;
+    }
+
+    entry->modelEntry.flags &= ~flags;
+}
+
+RECOMP_EXPORT void ZPlayerModel_clearAllFlags(ZPlayerModelHandle h, u64 flags) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_clearAllFlags");
+
+    if (!entry) {
+        return;
+    }
+
+    entry->modelEntry.flags = 0;
+}
+
 RECOMP_EXPORT void ZPlayerModel_setDL(ZPlayerModelHandle h, Link_DisplayList dlId, Gfx *dl) {
     if (dlId >= LINK_DL_MAX || dlId < 0) {
         recomp_printf("PlayerModelManager: Invalid display list ID passed in to ZPlayerModel_setDL.\n");
