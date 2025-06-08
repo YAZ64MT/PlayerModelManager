@@ -2,6 +2,7 @@
 #include "custommodelentrymanager.h"
 #include "recomputils.h"
 #include "playermodelmanager.h"
+#include "model_common.h"
 
 static bool sIsAPILocked = true;
 
@@ -82,7 +83,9 @@ RECOMP_EXPORT void ZPlayerModel_setUnloadCallback(ZPlayerModelHandle h, void (*o
     entry->modelEntry.onModelUnloadData = userdata;
 }
 
-#define SET_LIMB_DL(pLimb, entryDL) entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dLists[0])
+#define SET_LIMB_DL(pLimb, entryDL)       \
+    if (!entry->displayListPtrs[entryDL]) \
+        entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : callDfCommand
 
 RECOMP_EXPORT void ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel) {
     CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setSkeleton");
