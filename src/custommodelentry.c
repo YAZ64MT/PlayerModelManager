@@ -34,6 +34,14 @@ bool applyCustomModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
         modelInfo->limbTranslations[i] = customLimbs[i]->jointPos;
     }
 
+    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        modelInfo->mouthTextures[i] = this->mouthTex[i];
+    }
+
+    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
+        modelInfo->eyesTextures[i] = this->eyesTex[i];
+    }
+
     return true;
 }
 
