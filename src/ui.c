@@ -271,7 +271,7 @@ void on_play_update(PlayState *play) {
     }
 }
 
-RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyCMEM)
+RECOMP_CALLBACK(".", PlayerModelManager_internal_onFinishedRegisterModels)
 void populateFirstFileList() {
     recompui_open_context(context);
     refreshFileList();

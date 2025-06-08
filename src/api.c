@@ -198,9 +198,12 @@ RECOMP_EXPORT void ZPlayerModel_setMouthTextures(ZPlayerModelHandle h, TexturePt
 
 RECOMP_DECLARE_EVENT(ZPlayerModels_onRegisterModels());
 
-RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyML64Compat)
+RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onFinishedRegisterModels());
+
+RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyCMEM)
 void doRegisterModels() {
     sIsAPILocked = false;
     ZPlayerModels_onRegisterModels();
     sIsAPILocked = true;
+    PlayerModelManager_internal_onFinishedRegisterModels();
 }
