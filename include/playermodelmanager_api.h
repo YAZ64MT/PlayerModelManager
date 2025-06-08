@@ -10,6 +10,8 @@ typedef unsigned long ZPlayerModelHandle;
 // DO NOT EDIT
 #define ZPMM_API_VERSION 1UL
 
+#define YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME "yazmt_mm_playermodelmanager"
+
 typedef enum {
     ZPM_DL_WAIST,
     ZPM_DL_RTHIGH,
@@ -290,20 +292,20 @@ typedef enum {
     ZPM_MATRIX_MAX,
 } ZPlayerModel_MatrixId;
 
-RECOMP_IMPORT(ZPlayerModelHandle ZPlayerModel_registerModel(unsigned long apiVersion, const char *internalName));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, ZPlayerModelHandle ZPlayerModel_registerModel(unsigned long apiVersion, const char *internalName));
 
-RECOMP_IMPORT(void ZPlayerModel_setDL(ZPlayerModelHandle h, Link_DisplayList dlId, Gfx *dl));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setDL(ZPlayerModelHandle h, ZPlayerModel_DisplayListId dlId, Gfx *dl));
 
-RECOMP_IMPORT(void ZPlayerModel_setMtx(ZPlayerModelHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setMtx(ZPlayerModelHandle h, ZPlayerModel_MatrixId mtxId, Mtx *matrix));
 
-RECOMP_IMPORT(void ZPlayerModel_setLoadCallback(ZPlayerModelHandle h, void (*onModelLoad)(void *), void *userdata));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setLoadCallback(ZPlayerModelHandle h, void (*onModelLoad)(void *), void *userdata));
 
-RECOMP_IMPORT(void ZPlayerModel_setUnloadCallback(ZPlayerModelHandle h, void (*onModelUnload)(void *), void *userdata));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setUnloadCallback(ZPlayerModelHandle h, void (*onModelUnload)(void *), void *userdata));
 
-RECOMP_IMPORT(void ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel));
 
-RECOMP_IMPORT(void ZPlayerModel_setEyesTextures(ZPlayerModelHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setEyesTextures(ZPlayerModelHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]));
 
-RECOMP_IMPORT(void ZPlayerModel_setMouthTextures(ZPlayerModelHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setMouthTextures(ZPlayerModelHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]));
 
 #endif
