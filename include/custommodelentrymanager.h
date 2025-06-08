@@ -11,6 +11,6 @@ bool CMEM_tryApplyEntry(CustomModelEntry *newEntry, Link_FormProxy *proxy);
 void CMEM_refreshDiskEntries();
 void CMEM_removeModel(Link_FormProxy *proxy);
 ZPlayerModelHandle CMEM_createMemoryHandle();
-CustomModelDiskEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h);
+CustomModelMemoryEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h);
 
 #endif
