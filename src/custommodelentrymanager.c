@@ -7,11 +7,15 @@
 #include "qdfileloader_api.h"
 #include "libc/string.h"
 #include "custommodelentrymanager.h"
-
-RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
+#include "recompdata.h"
 
 #define ARRAY_GROWTH_FACTOR 3 / 2
 #define ARRAY_STARTING_SIZE 16
+
+RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
+
+static U32MemoryHashmapHandle sHandleToMemoryEntry;
+static ZPlayerModelHandle sNextMemoryHandle = 1;
 
 typedef struct {
     void **entries;
@@ -72,17 +76,19 @@ void initEntryManager() {
     unsigned char *modFolderPath = recomp_get_mod_folder_path();
     sZobjDir = QDFL_getCombinedPath(2, modFolderPath, "zobj");
     recomp_free(modFolderPath);
+
+    sHandleToMemoryEntry = recomputil_create_u32_memory_hashmap(sizeof(CustomModelMemoryEntry));
 }
 
-void CMEM_pushMemoryEntry(CustomModelMemoryEntry *entry) {
+void pushMemoryEntry(CustomModelMemoryEntry *entry) {
     pushEntry(&sMemoryEntries, entry);
 }
 
-void CMEM_pushDiskEntry(CustomModelDiskEntry *entry) {
+void pushDiskEntry(CustomModelDiskEntry *entry) {
     pushEntry(&sDiskEntries, entry);
 }
 
-void CMEM_clearDiskEntries() {
+void clearDiskEntries() {
     for (size_t i = 0; i < sDiskEntries.count; ++i) {
         CustomModelDiskEntry *curr = sDiskEntries.entries[i];
         if (&curr->modelEntry != sCurrentModelEntry) {
@@ -205,7 +211,7 @@ char* getBaseNameNoExt(const char *path) {
 }
 
 void CMEM_refreshDiskEntries() {
-    CMEM_clearDiskEntries();
+    clearDiskEntries();
 
     unsigned long numFiles;
     QDFL_Status err = QDFL_getNumDirEntries(sZobjDir, &numFiles);
@@ -232,7 +238,7 @@ void CMEM_refreshDiskEntries() {
                 entry->filePath = fullPath;
                 entry->modelEntry.internalName = path;
                 entry->modelEntry.displayName = getBaseNameNoExt(path);
-                CMEM_pushDiskEntry(entry);
+                pushDiskEntry(entry);
             }
             else {
                 recomp_free(path);
@@ -258,6 +264,26 @@ void CMEM_removeModel(Link_FormProxy *proxy) {
 
         gIsAgePropertyRefreshRequested = true;
     }
+}
+
+ZPlayerModelHandle CMEM_createMemoryHandle() {
+    ZPlayerModelHandle handle = sNextMemoryHandle;
+    
+    sNextMemoryHandle++;
+
+    recomputil_u32_memory_hashmap_create(sHandleToMemoryEntry, handle);
+
+    CustomModelMemoryEntry *entry = recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, handle);
+
+    CustomModelMemoryEntry_init(entry);
+
+    pushMemoryEntry(entry);
+
+    return handle;
+}
+
+CustomModelDiskEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h) {
+    return recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, h);
 }
 
 RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyCMEM());
