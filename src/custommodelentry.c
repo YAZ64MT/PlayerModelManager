@@ -30,16 +30,22 @@ bool applyCustomModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
 
     LodLimb **customLimbs = (LodLimb **)this->skel->sh.segment;
 
-    for (int i = 0; i < PLAYER_LIMB_MAX; ++i) {
-        modelInfo->limbTranslations[i] = customLimbs[i]->jointPos;
+    if (this->skel) {
+        for (int i = 0; i < PLAYER_LIMB_MAX; ++i) {
+            modelInfo->limbTranslations[i] = customLimbs[i]->jointPos;
+        }
     }
 
-    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        modelInfo->mouthTextures[i] = this->mouthTex[i];
+    if (this->mouthTex) {
+        for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+            modelInfo->mouthTextures[i] = this->mouthTex[i];
+        }
     }
 
-    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
-        modelInfo->eyesTextures[i] = this->eyesTex[i];
+    if (this->eyesTex) {
+        for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
+            modelInfo->eyesTextures[i] = this->eyesTex[i];
+        }
     }
 
     return true;
