@@ -5,7 +5,7 @@
 
 # Unique ID of this mod. Pick something long enough that it'll never be the same as any other mod.
 # The name displayed in the mod management menu is separate from this so this doesn't need to be human readable.
-id = "mm_recomp_playermodelmanager"
+id = "yazmt_mm_playermodelmanager"
 
 # Version of this mod.
 version = "0.1.0"
@@ -16,8 +16,7 @@ display_name = "Player Model Manager"
 # The description that will show up when this mod is displayed in the mod menu. This should be human readable.
 description =  """
 This is a mod for Majora's Mask: Recompiled that allows Link's model to be swapped out on the fly.
-
-For now, only zobjs are supported."""
+"""
 
 # A short description that will show up in this mod's entry in the mod list. This should be human readable and kept short
 # to prevent it from being cut off due to the limited space.
@@ -54,7 +53,7 @@ native_libraries = [
 elf_path = "build/mod.elf"
 
 # Output mod filename.
-mod_filename = "mm_recomp_playermodelmanager"
+mod_filename = "yazmt_mm_playermodelmanager"
 
 # Reference symbol files.
 func_reference_syms_file = "Zelda64RecompSyms/mm.us.rev1.syms.toml"
