@@ -281,7 +281,7 @@ void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_OOTO_ADULT_MODEL(FPS_HOOKSHOT);
 }
 
-void setupZobjZ64o(Link_ModelInfo *modelInfo, u8 *zobj) {
+void setupZobjZ64O(Link_ModelInfo *modelInfo, u8 *zobj) {
     switch (zobj[Z64O_FORM_BYTE]) {
         case MMO_FORM_BYTE_CHILD:
         case MMO_FORM_BYTE_ADULT:

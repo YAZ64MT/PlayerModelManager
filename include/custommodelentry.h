@@ -29,6 +29,7 @@ typedef struct {
     CustomModelEntry modelEntry;
     char *filePath;
     void *fileData;
+    bool isOrphaned;
 } CustomModelDiskEntry;
 
 typedef struct {
@@ -38,5 +39,11 @@ typedef struct {
 } CustomModelMemoryEntry;
 
 void CustomModelEntry_init(CustomModelEntry *entry);
+
+void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this);
+
+void CustomModelDiskEntry_init(CustomModelDiskEntry *this);
+void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this);
+
 
 #endif

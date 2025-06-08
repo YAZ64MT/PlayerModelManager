@@ -5,6 +5,6 @@
 #include "modding.h"
 #include "playermodelmanager.h"
 
-#define IS_HUMAN_ADULT_LINK_MODEL (gLinkFormProxies[PLAYER_FORM_HUMAN].current.flags &LINK_MODELINFO_FLAG_MM_ADULT_FIX)
+#define IS_HUMAN_ADULT_LINK_MODEL (gLinkFormProxies[PLAYER_FORM_HUMAN].current.flags & LINK_MODELINFO_FLAG_MM_ADULT_FIX)
 
 #endif

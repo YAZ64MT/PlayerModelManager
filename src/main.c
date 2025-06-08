@@ -173,12 +173,12 @@ void initFormProxies() {
     changeFormPtrsToProxy(PLAYER_FORM_HUMAN);
     repointHumanEquipmentModelsToProxy(PLAYER_FORM_HUMAN);
 
-    matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
+    refreshFaceTextures();
 }
 
 RECOMP_HOOK_RETURN("Player_Init")
 void postPlayerInit() {
-    matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
+    refreshFaceTextures();
 
     refreshExternalDLs();
 
@@ -187,7 +187,7 @@ void postPlayerInit() {
 
 RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyFormProxies());
 
-RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, ZModelReplacer_onReady)
+ZMODELREPLACER_CALLBACK_ON_READY
 void onModelReplacerReady() {
     initFormProxies();
     PlayerModelManager_internal_onReadyFormProxies();

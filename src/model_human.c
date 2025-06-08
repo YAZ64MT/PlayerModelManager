@@ -239,7 +239,7 @@ Gfx *getHumanDL(Gfx *dl) {
 }
 
 Mtx *getHumanMtx(Mtx *mtx) {
-    return (Mtx *)((uintptr_t)ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD) + SEGMENT_OFFSET(&mtx));
+    return (Mtx *)((uintptr_t)ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD) + SEGMENT_OFFSET(mtx));
 }
 
 Gfx *getGameplayKeepDL(Gfx *dl) {

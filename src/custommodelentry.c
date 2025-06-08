@@ -46,7 +46,7 @@ bool applyCustomModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
         return false;
     }
 
-    setupZobjZ64o(modelInfo, this->fileData);
+    setupZobjZ64O(modelInfo, this->fileData);
 
     return true;
 }
@@ -57,6 +57,11 @@ void unloadCustomModelDiskEntry(void *userdata) {
     if (this->fileData) {
         recomp_free(this->fileData);
         this->fileData = NULL;
+    }
+
+    if (this->isOrphaned) {
+        CustomModelDiskEntry_freeMembers(this);
+        recomp_free(this);
     }
 }
 
@@ -84,4 +89,29 @@ void CustomModelDiskEntry_init(CustomModelDiskEntry *this) {
     this->modelEntry.applyToModelInfo = applyCustomModelDiskEntry;
     this->modelEntry.onModelUnload = unloadCustomModelDiskEntry;
     this->modelEntry.onModelUnloadData = this;
+    this->isOrphaned = false;
+}
+
+void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this) {
+    if (this->fileData) {
+        recomp_free(this->fileData);
+        this->fileData = NULL;
+    }
+
+    if (this->filePath) {
+        recomp_free(this->fileData);
+        this->filePath = NULL;
+    }
+
+    CustomModelEntry *entry = &this->modelEntry;
+
+    if (entry->displayName) {
+        recomp_free(entry->displayName);
+        entry->displayName = NULL;
+    }
+
+    if (entry->internalName) {
+        recomp_free(entry->internalName);
+        entry->internalName = NULL;
+    }
 }

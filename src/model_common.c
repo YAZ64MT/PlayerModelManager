@@ -270,6 +270,10 @@ void matchFaceTexturesToProxy(Link_FormProxy *formProxy) {
     }
 }
 
+void refreshFaceTextures() {
+    matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
+}
+
 void refreshProxyMatrixes(Link_FormProxy *formProxy) {
     Link_ModelInfo *current = &formProxy->current;
     Link_ModelInfo *vanilla = &formProxy->vanilla;

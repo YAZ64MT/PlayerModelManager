@@ -5,13 +5,7 @@
 
 ZModelReplacerHandle gProxyBowString;
 
-RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyFormProxies)
+ZMODELREPLACER_CALLBACK_REGISTER_REPLACERS
 void setupZPlayerLibDLReplacements() {
-    gProxyBowString = ZModelReplacer_createReplacer(OBJECT_LINK_CHILD, object_link_child_DL_017818);
-
-    Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
-
-    ZModelReplacer_setReplacerModel(gProxyBowString, &humanProxy->displayLists[LINK_DL_BOW_STRING]);
-
-    ZModelReplacer_pushReplacer(gProxyBowString);
+    gProxyBowString = ZModelReplacer_registerReplacer(OBJECT_LINK_CHILD, object_link_child_DL_017818, NULL);
 }

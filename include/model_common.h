@@ -13,6 +13,7 @@ extern Link_FormProxy gLinkFormProxies[];
 extern bool gIsAgePropertyRefreshRequested;
 
 void matchFaceTexturesToProxy(Link_FormProxy *formProxy);
+void refreshFaceTextures();
 void initFormProxy(Link_FormProxy *formProxy);
 void refreshFormProxy(Link_FormProxy *formProxy);
 void loadVanillaSkeletonTransforms(Link_ModelInfo *modelInfo, ObjectId objectId, void **limbs);

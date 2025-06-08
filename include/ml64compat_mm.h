@@ -5,6 +5,6 @@
 #include "modding.h"
 #include "playermodelmanager.h"
 
-void setupZobjZ64o(Link_ModelInfo *modelInfo, u8 *zobj);
+void setupZobjZ64O(Link_ModelInfo *modelInfo, u8 *zobj);
 
 #endif
