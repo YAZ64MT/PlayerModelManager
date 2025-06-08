@@ -82,6 +82,8 @@ RECOMP_EXPORT void ZPlayerModel_setUnloadCallback(ZPlayerModelHandle h, void (*o
     entry->modelEntry.onModelUnloadData = userdata;
 }
 
+#define SET_LIMB_DL(pLimb, entryDL) entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dLists[0])
+
 RECOMP_EXPORT void ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel) {
     CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setSkeleton");
 
@@ -90,7 +92,31 @@ RECOMP_EXPORT void ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHe
     }
 
     entry->skel = skel;
+
+    LodLimb **limbs = (LodLimb **)skel->sh.segment;
+    
+    SET_LIMB_DL(PLAYER_LIMB_WAIST, LINK_DL_WAIST);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_THIGH, LINK_DL_RTHIGH);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHIN, LINK_DL_RSHIN);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOOT, LINK_DL_RFOOT);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_THIGH, LINK_DL_LTHIGH);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_SHIN, LINK_DL_LSHIN);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_FOOT, LINK_DL_LFOOT);
+    SET_LIMB_DL(PLAYER_LIMB_HEAD, LINK_DL_HEAD);
+    SET_LIMB_DL(PLAYER_LIMB_HAT, LINK_DL_HAT);
+    SET_LIMB_DL(PLAYER_LIMB_COLLAR, LINK_DL_COLLAR);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_SHOULDER, LINK_DL_LSHOULDER);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_FOREARM, LINK_DL_LFOREARM);
+    SET_LIMB_DL(PLAYER_LIMB_LEFT_HAND, LINK_DL_LHAND);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHOULDER, LINK_DL_RSHOULDER);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOREARM, LINK_DL_RFOREARM);
+    SET_LIMB_DL(PLAYER_LIMB_RIGHT_HAND, LINK_DL_RHAND);
+    SET_LIMB_DL(PLAYER_LIMB_SHEATH, LINK_DL_SHEATH_NONE);
+    SET_LIMB_DL(PLAYER_LIMB_TORSO, LINK_DL_TORSO);
+    
 }
+
+#undef GET_LIMB_DL
 
 RECOMP_EXPORT void ZPlayerModel_setEyesTextures(ZPlayerModelHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]) {
     CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setEyesTextures");
