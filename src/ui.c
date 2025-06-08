@@ -211,6 +211,7 @@ static ModelButtonEntries sButtonEntries;
 void destroyModelButtons() {
     if (sButtonEntries.entries) {
         recomp_free(sButtonEntries.entries);
+        sButtonEntries.entries = NULL;
 
         for (size_t i = 0; i < sButtonEntries.count; ++i) {
             recompui_destroy_element(modelListContainer, sButtonEntries.buttons[i]);
