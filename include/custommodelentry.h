@@ -37,6 +37,8 @@ typedef struct {
     Gfx *displayListPtrs[LINK_DL_MAX];
     Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
     FlexSkeletonHeader *skel;
+    TexturePtr *eyesTex;
+    TexturePtr *mouthTex;
 } CustomModelMemoryEntry;
 
 void CustomModelEntry_init(CustomModelEntry *entry);

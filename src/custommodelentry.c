@@ -83,6 +83,12 @@ void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this) {
     }
 
     this->modelEntry.applyToModelInfo = applyCustomModelMemoryEntry;
+
+    this->skel = NULL;
+
+    this->mouthTex = NULL;
+
+    this->eyesTex = NULL;
 }
 
 void CustomModelDiskEntry_init(CustomModelDiskEntry *this) {
