@@ -22,16 +22,31 @@ CustomModelMemoryEntry *getEntryOrPrintErr(ZPlayerModelHandle h, const char *fun
     return entry;
 }
 
-RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerModel(unsigned long apiVersion, const char *internalName) {
+RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerModel(unsigned long apiVersion, char *internalName) {
     if (sIsAPILocked) {
         recomp_printf("PlayerModelManager: Models can only be registered during a ZPlayerModels_onRegisterModels callback.\n");
         return 0;
     }
 
-    return CMEM_createMemoryHandle();
+    if (!internalName) {
+        recomp_printf("PlayerModelManager: passed in NULL internal name to ZPlayerModel_registerModel.\n");
+        return 0;
+    }
+
+    ZPlayerModelHandle h = CMEM_createMemoryHandle();
+
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_registerModel");
+
+    if (!entry) {
+        return 0;
+    }
+
+    entry->modelEntry.internalName = internalName;
+
+    return h;
 }
 
-RECOMP_EXPORT void ZPlayerModel_setDisplayName(ZPlayerModelHandle h, const char* displayName) {
+RECOMP_EXPORT void ZPlayerModel_setDisplayName(ZPlayerModelHandle h, char* displayName) {
     CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setDisplayName");
 
     if (!entry) {
