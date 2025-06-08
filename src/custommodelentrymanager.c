@@ -79,7 +79,7 @@ void CMEM_pushMemoryEntry(CustomModelMemoryEntry *entry) {
 }
 
 void CMEM_pushDiskEntry(CustomModelDiskEntry *entry) {
-    pushEntry(&sMemoryEntries, entry);
+    pushEntry(&sDiskEntries, entry);
 }
 
 void CMEM_clearDiskEntries() {
