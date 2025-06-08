@@ -4,7 +4,7 @@
 #include "global.h"
 
 // Parts after LINK_DL_ need to be kept in sync with Link_ShimDisplayList
-// MUST BE KEPT IN SYNC WITH ZPlayerModel_DisplayListId iIN playermodelmanager_api.h
+// MUST BE KEPT IN SYNC WITH ZPlayerModel_DisplayListId IN playermodelmanager_api.h
 typedef enum {
     LINK_DL_WAIST,
     LINK_DL_RTHIGH,
@@ -368,6 +368,8 @@ typedef enum {
     LINK_SHIMDL_MAX,
 } Link_ShimDisplayList;
 
+// Parts after LINK_EQUI{_ need to be kept in sync with Link_ShimDisplayList
+// MUST BE KEPT IN SYNC WITH ZPlayerModel_MatrixId IN playermodelmanager_api.h
 typedef enum {
     LINK_EQUIP_MATRIX_SWORD1_BACK,
     LINK_EQUIP_MATRIX_SWORD2_BACK,
