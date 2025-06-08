@@ -332,7 +332,10 @@ void remapSegmentPtrs() {
     setSegmentPtrRemap(OOT_GK_BOTTLE_GLASS_TEX, (u32)gOotBottleGlassTex);
 }
 
+RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyML64Compat());
+
 RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyML64CompatBase)
 void initML64CompatMM_onReadyML64CompatBase() {
     remapSegmentPtrs();
+    PlayerModelManager_internal_onReadyML64Compat();
 }
