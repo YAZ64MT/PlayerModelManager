@@ -256,8 +256,8 @@ void refreshFileList() {
 
 bool checkButtonCombo(PlayState *play) {
     Input *input = CONTROLLER1(&play->state);
-    return (CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_R)) ||
-           (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_R));
+    return (CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_A)) ||
+           (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_A));
 }
 
 // Hook Play_UpdateMain to check if the L button is pressed and show this mod's UI if so.
