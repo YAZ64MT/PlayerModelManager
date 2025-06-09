@@ -8,6 +8,8 @@ ZModelReplacerHandle gProxyBottleGlass;
 ZModelReplacerHandle gProxyBottleContents;
 ZModelReplacerHandle gProxyDekuStick;
 ZModelReplacerHandle gProxyBowString;
+ZModelReplacerHandle gProxyBowArrow;
+ZModelReplacerHandle gProxyBowArrowLowPoly;
 
 ZMODELREPLACER_CALLBACK_REGISTER_REPLACERS
 void setupExternalReplacements() {
@@ -15,4 +17,6 @@ void setupExternalReplacements() {
     gProxyBottleContents = ZModelReplacer_registerReplacer(GAMEPLAY_KEEP, gBottleContentsDL, NULL);
     gProxyDekuStick = ZModelReplacer_registerReplacer(GAMEPLAY_KEEP, gDekuStickDL, NULL);
     gProxyBowString = ZModelReplacer_registerReplacer(OBJECT_LINK_CHILD, object_link_child_DL_017818, NULL);
+    gProxyBowArrow = ZModelReplacer_registerReplacer(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0, NULL);
+    gProxyBowArrowLowPoly = ZModelReplacer_registerReplacer(GAMEPLAY_KEEP, gameplay_keep_DL_014370, NULL);
 }

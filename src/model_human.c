@@ -333,6 +333,7 @@ void setupVanillaHuman() {
     models[LINK_DL_DEKU_STICK] = getGameplayKeepDL(gDekuStickDL);
     models[LINK_DL_BOW] = getHumanDL(gLinkHumanBowDL);
     models[LINK_DL_BOW_STRING] = getHumanDL(object_link_child_DL_017818);
+    models[LINK_DL_BOW_ARROW] = getGameplayKeepDL(gameplay_keep_DL_013FF0);
     models[LINK_DL_HOOKSHOT] = getHumanDL(gLinkHumanHookshotDL);
     models[LINK_DL_HOOKSHOT_CHAIN] = getGameplayKeepDL(gHookshotChainDL);
     models[LINK_DL_HOOKSHOT_RETICLE] = getGameplayKeepDL(gHookshotReticleDL);
