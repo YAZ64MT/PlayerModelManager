@@ -18,6 +18,7 @@ RecompuiContext context;
 RecompuiResource root;
 RecompuiResource container;
 RecompuiResource row1;
+RecompuiResource row2;
 RecompuiResource buttonClose;
 RecompuiResource buttonRemoveModel;
 RecompuiResource buttonRefreshFiles;
@@ -37,8 +38,25 @@ bool showing_bow = false;
 
 RecompuiResource modelListContainer;
 RecompuiResource uiTitle;
+RecompuiResource modelAuthorPrefix;
+RecompuiResource modelAuthor;
 
 static CustomModelEntry *sRealEntry = NULL;
+
+void destroyAuthor() {
+    if (modelAuthor) {
+        recompui_destroy_element(row2, modelAuthor);
+        recompui_destroy_element(row2, modelAuthorPrefix);
+    }
+    modelAuthor = 0;
+    modelAuthorPrefix = 0;
+}
+
+void setAuthor(const char* author) {
+    destroyAuthor();
+    modelAuthorPrefix = recompui_create_label(context, row2, "Author(s):", LABELSTYLE_NORMAL);
+    modelAuthor = recompui_create_label(context, row2, author, LABELSTYLE_NORMAL);
+}
 
 void applyRealEntry() {
     if (!sRealEntry) {
@@ -54,6 +72,7 @@ void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *dat
         sRealEntry = NULL;
         CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+        destroyAuthor();
         applyRealEntry();
     }
 }
@@ -69,6 +88,7 @@ void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data
         recompui_hide_context(context);
         context_shown = false;
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+        destroyAuthor();
         applyRealEntry();
     }
 }
@@ -79,6 +99,7 @@ void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *da
         sRealEntry = NULL;
         refreshFileList();
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+        destroyAuthor();
         applyRealEntry();
     }
 }
@@ -166,7 +187,7 @@ void on_init() {
     recompui_set_align_items(row1, ALIGN_ITEMS_FLEX_END);
     recompui_set_gap(row1, 16.0f, UNIT_DP);
 
-    buttonClose = recompui_create_button(context, row1, "Apply", BUTTONSTYLE_SECONDARY);
+    buttonClose = recompui_create_button(context, row1, "Close", BUTTONSTYLE_SECONDARY);
     recompui_set_text_align(buttonClose, TEXT_ALIGN_CENTER);
 
     // Bind the shared callback to the two buttons.
@@ -197,6 +218,16 @@ void on_init() {
     recompui_set_gap(modelListContainer, 16.0f, UNIT_DP);
     recompui_set_overflow_y(modelListContainer, OVERFLOW_SCROLL);
     recompui_set_overflow_x(modelListContainer, OVERFLOW_HIDDEN);
+
+    row2 = recompui_create_element(context, container);
+    recompui_set_flex_basis(row2, 100.0f, UNIT_DP);
+    recompui_set_flex_grow(row2, 0.0f);
+    recompui_set_flex_shrink(row2, 0.0f);
+    recompui_set_display(row2, DISPLAY_FLEX);
+    recompui_set_flex_direction(row2, FLEX_DIRECTION_ROW);
+    recompui_set_justify_content(row2, JUSTIFY_CONTENT_FLEX_START);
+    recompui_set_align_items(row2, ALIGN_ITEMS_FLEX_END);
+    recompui_set_gap(row2, 0.0f, UNIT_DP);
 
     // set up and hook up remove model button to close button and vice versa
     buttonRemoveModel = recompui_create_button(context, modelListContainer, "Remove Model", BUTTONSTYLE_SECONDARY);
@@ -232,11 +263,15 @@ typedef struct {
 static ModelButtonEntries sButtonEntries;
 
 void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    CustomModelEntry *entry = userdata;
+
     if (data->type == UI_EVENT_CLICK) {
         Audio_PlaySfx(NA_SE_SY_DECIDE);
-        CMEM_tryApplyEntry(userdata, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
-        sRealEntry = userdata;
+        CMEM_tryApplyEntry(entry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        sRealEntry = entry;
     } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
+        destroyAuthor();
+        setAuthor(entry->authorName);
         CMEM_tryApplyEntry(userdata, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
     }
 }

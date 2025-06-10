@@ -18,6 +18,7 @@ typedef struct CustomModelEntry {
     u64 flags;
     char *displayName;
     char *internalName;
+    char *authorName;
     bool (*applyToModelInfo)(void *this, Link_ModelInfo *modelInfo);
     void (*onModelLoad)(void *userdata);
     void *onModelLoadData;
@@ -45,7 +46,7 @@ void CustomModelEntry_init(CustomModelEntry *entry);
 void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this);
 
 void CustomModelDiskEntry_init(CustomModelDiskEntry *this);
-void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this);
 
+void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this);
 
 #endif
