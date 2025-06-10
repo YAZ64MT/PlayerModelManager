@@ -36,6 +36,11 @@ RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, int QDFL_isDirectory(const char *path
 // If an error occurs, a different QDFL_Status is returned, and out is left unmodified.
 RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_Status QDFL_getFileSize(const char *path, unsigned long *out));
 
+// Reads a file into memory, writes the data to buffer, and returns QDFL_STATUS_OK.
+//
+// If the file cannot be read, a different QDFL_Status is returned. buffer may be modified.
+RECOMP_IMPORT(YAZMT_QDFILELOADER_MOD_NAME, QDFL_Status QDFL_loadFileIntoBuffer(const char *path, void *buffer, size_t bufferSize));
+
 // Reads a file into memory, writes the pointer to out, and returns QDFL_STATUS_OK.
 //
 // If the file cannot be read, a different QDFL_Status is returned, and out is left unmodified.
