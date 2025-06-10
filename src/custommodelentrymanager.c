@@ -245,6 +245,10 @@ char* getBaseNameNoExt(const char *path) {
 }
 
 void CMEM_refreshDiskEntries() {
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        CMEM_removeModel(&gLinkFormProxies[i]);
+    }
+
     clearDiskEntries();
 
     unsigned long numFiles;
