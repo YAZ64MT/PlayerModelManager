@@ -165,7 +165,7 @@ void on_init() {
     recompui_set_align_items(row1, ALIGN_ITEMS_FLEX_END);
     recompui_set_gap(row1, 16.0f, UNIT_DP);
 
-    buttonClose = recompui_create_button(context, row1, "Close", BUTTONSTYLE_SECONDARY);
+    buttonClose = recompui_create_button(context, row1, "Apply", BUTTONSTYLE_SECONDARY);
     recompui_set_text_align(buttonClose, TEXT_ALIGN_CENTER);
 
     // Bind the shared callback to the two buttons.
