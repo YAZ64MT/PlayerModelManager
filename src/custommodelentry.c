@@ -120,7 +120,6 @@ void CustomModelDiskEntry_init(CustomModelDiskEntry *this) {
 
 void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this) {
     if (this->fileData) {
-        recomp_free(this->fileData);
         this->fileData = NULL;
     }
 
