@@ -5,10 +5,10 @@
 
 #define GET_PLAYER_FORM_PROXY gLinkFormProxies[GET_PLAYER_FORM]
 
-extern Gfx dfCommand[];
-extern Gfx callDfCommand[];
-extern Gfx popModelViewMtx[];
-extern Mtx zeroMtx;
+extern Gfx gDfCommand[];
+extern Gfx gCallDfCommand[];
+extern Gfx gPopModelViewMtx[];
+extern Mtx gZeroMtx;
 extern Link_FormProxy gLinkFormProxies[];
 extern bool gIsAgePropertyRefreshRequested;
 

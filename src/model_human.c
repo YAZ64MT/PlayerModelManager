@@ -341,7 +341,7 @@ void setupVanillaHuman() {
     // First Person
     models[LINK_DL_FPS_LFOREARM] = getHumanDL(gLinkHumanLeftForearmDL);
     models[LINK_DL_FPS_LHAND] = getHumanDL(gLinkHumanLeftHandClosedDL);
-    models[LINK_DL_FPS_RFOREARM] = dfCommand;
+    models[LINK_DL_FPS_RFOREARM] = gDfCommand;
 
     models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArmDL; // not in Link obj
     ZGlobalObj_rebaseDL(human, gLinkHumanFirstPersonArmDL, 0x06); // repoint vertices, textures, etc. to static link obj

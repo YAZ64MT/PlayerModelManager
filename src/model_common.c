@@ -10,29 +10,29 @@
 
 bool gIsAgePropertyRefreshRequested = false;
 
-Gfx dfCommand[] = {
+Gfx gDfCommand[] = {
     gsSPEndDisplayList(),
 };
 
-Gfx callDfCommand[] = {
-    gsSPBranchList(dfCommand),
+Gfx gCallDfCommand[] = {
+    gsSPBranchList(gDfCommand),
 };
 
-Gfx popModelViewMtx[] = {
+Gfx gPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
     gsSPEndDisplayList(),
 };
 
-Mtx zeroMtx = {0};
+Mtx gZeroMtx = {0};
 
 #define SHIM_ITEM_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item] = createShimDisplayList(2, &dls[LINK_DL_##hand], &dls[LINK_DL_##item])
 #define SHIM_ITEM_LFIST(item) SHIM_ITEM_HAND(LFIST, item)
 #define SHIM_ITEM_RFIST(item) SHIM_ITEM_HAND(RFIST, item)
 #define SHIM_ITEM_LHAND(item) SHIM_ITEM_HAND(LHAND, item)
 #define SHIM_ITEM_RHAND(item) SHIM_ITEM_HAND(RHAND, item)
-#define SHIM_HILT_BACK(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_HILT_BACK] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SWORD##swordNum##_BACK], &dls[LINK_DL_SWORD##swordNum##_HILT], popModelViewMtx)
+#define SHIM_HILT_BACK(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_HILT_BACK] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SWORD##swordNum##_BACK], &dls[LINK_DL_SWORD##swordNum##_HILT], gPopModelViewMtx)
 #define SHIM_SWORD_SHEATHED(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHEATHED] = createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_SHEATH], &dls[LINK_DL_SWORD##swordNum##_HILT_BACK])
-#define SHIM_SHIELD_BACK(shieldNum) shims[LINK_SHIMDL_SHIELD##shieldNum##_BACK] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD##shieldNum##_BACK], &dls[LINK_DL_SHIELD##shieldNum], popModelViewMtx)
+#define SHIM_SHIELD_BACK(shieldNum) shims[LINK_SHIMDL_SHIELD##shieldNum##_BACK] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD##shieldNum##_BACK], &dls[LINK_DL_SHIELD##shieldNum], gPopModelViewMtx)
 #define SHIM_SWORD_SHIELD_UNSHEATHED(swordNum, shieldNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_UNSHEATHED] = createShimDisplayList(1, &dls[LINK_DL_SWORD##swordNum##_SHEATH])
 #define SHIM_SWORD_SHIELD_SHEATH(swordNum, shieldNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_SHEATH] = createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_SHEATH], &dls[LINK_DL_SHIELD##shieldNum##_BACK])
 #define SHIM_SWORD_SHIELD_SHEATHED(swordNum, shieldNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_SHEATHED] = createShimDisplayList(3, &dls[LINK_DL_SWORD##swordNum##_SHEATHED], &dls[LINK_DL_SHIELD##shieldNum##_BACK])
@@ -49,7 +49,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     // init by pointing all to DF command
     for (u32 i = 0; i < LINK_SHIMDL_MAX; ++i) {
         shims[i] = recomp_alloc(sizeof(Gfx));
-        gSPBranchList(shims[i], dfCommand);
+        gSPBranchList(shims[i], gDfCommand);
     }
 
     SHIM_SWORD(1);
@@ -133,7 +133,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     shims[LINK_SHIMDL_FPS_RHAND_BOW] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_BOW]);
     shims[LINK_SHIMDL_FPS_RHAND_HOOKSHOT] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_FPS_HOOKSHOT]);
 
-    shims[LINK_SHIMDL_SHIELD1_ODD] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD1_ODD], &dls[LINK_DL_SHIELD1], popModelViewMtx);
+    shims[LINK_SHIMDL_SHIELD1_ODD] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD1_ODD], &dls[LINK_DL_SHIELD1], gPopModelViewMtx);
 }
 
 #define PROXY_TO_SHIM(dlName) gSPBranchList(&formProxy->displayLists[LINK_DL_##dlName], formProxy->shimDisplayListPtrs[LINK_SHIMDL_##dlName])
@@ -228,7 +228,7 @@ void refreshProxyDls(Link_FormProxy *formProxy) {
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        gSPBranchList(&dls[i], callDfCommand);
+        gSPBranchList(&dls[i], gCallDfCommand);
     }
 
     setDlToShims(formProxy);
@@ -323,33 +323,33 @@ void initFormProxyMatrixes(Link_FormProxy *formProxy) {
     for (u32 i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
         formProxy->mtxDisplayLists[i] = recomp_alloc(sizeof(Gfx) * 2);
 
-        gSPMatrix(&formProxy->mtxDisplayLists[i][0], &zeroMtx, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+        gSPMatrix(&formProxy->mtxDisplayLists[i][0], &gZeroMtx, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
         gSPEndDisplayList(&formProxy->mtxDisplayLists[i][1]);
     }
 }
 
 LodLimb skeletonBase[PLAYER_LIMB_COUNT] = {
     {{0, 0, 0}, PLAYER_LIMB_WAIST - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_LOWER_ROOT - 1, PLAYER_LIMB_UPPER_ROOT - 1, {dfCommand, dfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_LOWER_ROOT - 1, PLAYER_LIMB_UPPER_ROOT - 1, {gDfCommand, gDfCommand}},
     {{0, 0, 0}, PLAYER_LIMB_RIGHT_THIGH - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_SHIN - 1, PLAYER_LIMB_LEFT_THIGH - 1, {dfCommand, dfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOOT - 1, LIMB_DONE, {dfCommand, dfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_SHIN - 1, LIMB_DONE, {dfCommand, dfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOOT - 1, LIMB_DONE, {dfCommand, dfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_SHIN - 1, PLAYER_LIMB_LEFT_THIGH - 1, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOOT - 1, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_SHIN - 1, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOOT - 1, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
     {{0, 0, 0}, PLAYER_LIMB_HEAD - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_HAT - 1, PLAYER_LIMB_COLLAR - 1, {dfCommand, dfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
-    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_LEFT_SHOULDER - 1, {dfCommand, dfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOREARM - 1, PLAYER_LIMB_RIGHT_SHOULDER - 1, {dfCommand, dfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_HAND - 1, LIMB_DONE, {dfCommand, dfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOREARM - 1, PLAYER_LIMB_SHEATH - 1, {dfCommand, dfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_HAND - 1, LIMB_DONE, {dfCommand, dfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
-    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_TORSO - 1, {dfCommand, dfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {dfCommand, dfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_HAT - 1, PLAYER_LIMB_COLLAR - 1, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_LEFT_SHOULDER - 1, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOREARM - 1, PLAYER_LIMB_RIGHT_SHOULDER - 1, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_HAND - 1, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOREARM - 1, PLAYER_LIMB_SHEATH - 1, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_HAND - 1, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_TORSO - 1, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
 };
 
 #define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = &formProxy->displayLists[proxyLimbName]
