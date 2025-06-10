@@ -21,7 +21,8 @@ void pre_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList
 
 RECOMP_HOOK_RETURN("Player_OverrideLimbDrawGameplayFirstPerson")
 void post_OverrideLimbDrawFirstPerson() {
-    if (gLimbIndex == PLAYER_LIMB_RIGHT_FOREARM) {
+    // TODO: SUPPORT OTHER FORMS
+    if (gLimbIndex == PLAYER_LIMB_RIGHT_FOREARM && GET_PLAYER_FORM == PLAYER_FORM_HUMAN) {
         *gFirstPersonDList = &GET_PLAYER_FORM_PROXY.displayLists[LINK_DL_FPS_RFOREARM];
     }
 }
