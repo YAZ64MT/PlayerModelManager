@@ -223,13 +223,17 @@ void setDlToShims(Link_FormProxy *formProxy) {
 }
 
 void refreshProxyDls(Link_FormProxy *formProxy) {
-    setDlToShims(formProxy);
-
     Gfx *dls = formProxy->displayLists;
     Link_ModelInfo *current = &formProxy->current;
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
-    for (u32 i = 0; i < LINK_DL_MAX; ++i) {
+    for (int i = 0; i < LINK_DL_MAX; ++i) {
+        gSPBranchList(&dls[i], callDfCommand);
+    }
+
+    setDlToShims(formProxy);
+
+    for (int i = 0; i < LINK_DL_MAX; ++i) {
         Gfx *dl = current->models[i];
 
         if (!dl) {
