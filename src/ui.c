@@ -40,13 +40,21 @@ RecompuiResource uiTitle;
 
 static CustomModelEntry *sRealEntry = NULL;
 
+void applyRealEntry() {
+    if (!sRealEntry) {
+        CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
+    } else {
+        CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+    }
+}
+
 void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         Audio_PlaySfx(NA_SE_SY_DECIDE);
         sRealEntry = NULL;
         CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
-        CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        applyRealEntry();
     }
 }
 
@@ -61,24 +69,17 @@ void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data
         recompui_hide_context(context);
         context_shown = false;
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
-        if (!sRealEntry) {
-            CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
-        } else {
-            CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
-        }
+        applyRealEntry();
     }
 }
 
 void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         Audio_PlaySfx(NA_SE_SY_DECIDE);
+        sRealEntry = NULL;
         refreshFileList();
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
-        if (!sRealEntry) {
-            CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
-        } else {
-            CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
-        }
+        applyRealEntry();
     }
 }
 
