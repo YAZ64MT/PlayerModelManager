@@ -48,7 +48,7 @@ void increaseDiskBufferSizeifNeeded(size_t minSize) {
     }
 }
 
-void *CMEM_loadFromDisk(const char* path) {
+void *CMEM_loadFromDisk(const char *path) {
     unsigned long fileSize = 0;
 
     QDFL_getFileSize(path, &fileSize);
@@ -125,13 +125,8 @@ void pushDiskEntry(CustomModelDiskEntry *entry) {
 void clearDiskEntries() {
     for (size_t i = 0; i < sDiskEntries.count; ++i) {
         CustomModelDiskEntry *curr = sDiskEntries.entries[i];
-        if (&curr->modelEntry != sCurrentModelEntry) {
-            CustomModelDiskEntry_freeMembers(curr);
-            recomp_free(curr);
-        } else {
-            curr->isOrphaned = true;
-        }
-
+        CustomModelDiskEntry_freeMembers(curr);
+        recomp_free(curr);
         sDiskEntries.entries[i] = NULL;
     }
 
@@ -156,7 +151,7 @@ bool CMEM_tryApplyEntry(CustomModelEntry *newEntry, Link_FormProxy *proxy) {
             refreshFaceTextures();
 
             gIsAgePropertyRefreshRequested = true;
-            
+
             return true;
         }
     }
@@ -206,7 +201,7 @@ bool isValidZobj(void *data, size_t size) {
     return isValid;
 }
 
-char* getBaseNameNoExt(const char *path) {
+char *getBaseNameNoExt(const char *path) {
     if (!path || *path == '\0') {
         return NULL;
     }
@@ -221,8 +216,7 @@ char* getBaseNameNoExt(const char *path) {
             if (end == len) {
                 end = i;
             }
-        }
-        else if (path[i - 1] == '/' || path[i - 1] == '\\') {
+        } else if (path[i - 1] == '/' || path[i - 1] == '\\') {
             start = i;
         }
     }
@@ -245,9 +239,7 @@ char* getBaseNameNoExt(const char *path) {
 }
 
 void CMEM_refreshDiskEntries() {
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        CMEM_removeModel(&gLinkFormProxies[i]);
-    }
+    CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
 
     clearDiskEntries();
 
@@ -298,7 +290,7 @@ void CMEM_removeModel(Link_FormProxy *proxy) {
 
 ZPlayerModelHandle CMEM_createMemoryHandle() {
     ZPlayerModelHandle handle = sNextMemoryHandle;
-    
+
     sNextMemoryHandle++;
 
     recomputil_u32_memory_hashmap_create(sHandleToMemoryEntry, handle);
