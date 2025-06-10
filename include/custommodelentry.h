@@ -29,7 +29,6 @@ typedef struct {
     CustomModelEntry modelEntry;
     char *filePath;
     void *fileData;
-    bool isOrphaned;
 } CustomModelDiskEntry;
 
 typedef struct {
