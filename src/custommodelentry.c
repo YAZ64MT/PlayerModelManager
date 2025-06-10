@@ -79,10 +79,6 @@ void unloadCustomModelDiskEntry(void *userdata) {
     CustomModelDiskEntry *this = userdata;
 
     this->fileData = NULL;
-
-    if (this->isOrphaned) {
-        CustomModelDiskEntry_freeMembers(this);
-    }
 }
 
 void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this) {
@@ -115,7 +111,6 @@ void CustomModelDiskEntry_init(CustomModelDiskEntry *this) {
     this->modelEntry.applyToModelInfo = applyCustomModelDiskEntry;
     this->modelEntry.onModelUnload = unloadCustomModelDiskEntry;
     this->modelEntry.onModelUnloadData = this;
-    this->isOrphaned = false;
 }
 
 void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this) {
