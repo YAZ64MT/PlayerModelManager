@@ -41,7 +41,38 @@ void repointZobjDls(u8 *zobj, u32 start, u32 end) {
     }
 }
 
-void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
+typedef struct {
+    PlayerLimb limb;
+    u32 aliasTableIndex;
+} LimbToAlias;
+
+#define DECLARE_Z64O_LIMB_ALIAS(aliasName, modName, sheathDL)                                            \
+    static LimbToAlias aliasName[] = {                                                         \
+        {.limb = PLAYER_LIMB_WAIST, .aliasTableIndex = modName##_LUT_DL_WAIST},                \
+        {.limb = PLAYER_LIMB_RIGHT_THIGH, .aliasTableIndex = modName##_LUT_DL_RTHIGH},         \
+        {.limb = PLAYER_LIMB_RIGHT_SHIN, .aliasTableIndex = modName##_LUT_DL_RSHIN},           \
+        {.limb = PLAYER_LIMB_RIGHT_FOOT, .aliasTableIndex = modName##_LUT_DL_RFOOT},           \
+        {.limb = PLAYER_LIMB_LEFT_THIGH, .aliasTableIndex = modName##_LUT_DL_LTHIGH},          \
+        {.limb = PLAYER_LIMB_LEFT_SHIN, .aliasTableIndex = modName##_LUT_DL_LSHIN},            \
+        {.limb = PLAYER_LIMB_LEFT_FOOT, .aliasTableIndex = modName##_LUT_DL_LFOOT},            \
+        {.limb = PLAYER_LIMB_HEAD, .aliasTableIndex = modName##_LUT_DL_HEAD},                  \
+        {.limb = PLAYER_LIMB_HAT, .aliasTableIndex = modName##_LUT_DL_HAT},                    \
+        {.limb = PLAYER_LIMB_COLLAR, .aliasTableIndex = modName##_LUT_DL_COLLAR},              \
+        {.limb = PLAYER_LIMB_LEFT_SHOULDER, .aliasTableIndex = modName##_LUT_DL_LSHOULDER},    \
+        {.limb = PLAYER_LIMB_LEFT_FOREARM, .aliasTableIndex = modName##_LUT_DL_LFOREARM},      \
+        {.limb = PLAYER_LIMB_LEFT_HAND, .aliasTableIndex = modName##_LUT_DL_LHAND},            \
+        {.limb = PLAYER_LIMB_RIGHT_SHOULDER, .aliasTableIndex = modName##_LUT_DL_RSHOULDER},   \
+        {.limb = PLAYER_LIMB_RIGHT_FOREARM, .aliasTableIndex = modName##_LUT_DL_RFOREARM},     \
+        {.limb = PLAYER_LIMB_RIGHT_HAND, .aliasTableIndex = modName##_LUT_DL_RHAND},           \
+        {.limb = PLAYER_LIMB_SHEATH, .aliasTableIndex = sheathDL}, \
+        {.limb = PLAYER_LIMB_TORSO, .aliasTableIndex = modName##_LUT_DL_TORSO},                \
+    };
+
+DECLARE_Z64O_LIMB_ALIAS(sMMOLimbs, MMO, MMO_LUT_DL_SWORD_KOKIRI_SHEATH);
+DECLARE_Z64O_LIMB_ALIAS(sOoTOChildLimbs, OOTO_CHILD, OOTO_CHILD_LUT_DL_SWORD_KOKIRI_SHEATH);
+DECLARE_Z64O_LIMB_ALIAS(sOoTOAdultLimbs, OOTO_ADULT, OOTO_ADULT_LUT_DL_SWORD_MASTER_SHEATH);
+
+void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj, LimbToAlias limbsToAliases[]) {
     FlexSkeletonHeader *flexHeader = SEGMENTED_TO_GLOBAL_PTR(zobj, readU32(zobj, Z64O_SKELETON_HEADER_POINTER));
 
     ZGlobalObj_globalizeLodLimbSkeleton(zobj, flexHeader);
@@ -49,6 +80,14 @@ void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj) {
     LodLimb **limbs = (LodLimb **)flexHeader->sh.segment;
     for (int i = 0; i < PLAYER_LIMB_COUNT; ++i) {
         modelInfo->limbTranslations[i] = limbs[i]->jointPos;
+    }
+
+    for (size_t i = 0; i < ARRAY_COUNT(sMMOLimbs); ++i) {
+        LimbToAlias *l2a = &limbsToAliases[i];
+        int limbIdx = l2a->limb - 1;
+        if (!limbs[limbIdx]->dLists[0]) {
+            gSPBranchList(&zobj[l2a->aliasTableIndex], callDfCommand);
+        }
     }
 }
 
@@ -68,7 +107,7 @@ void setupZobjMmoHuman(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     repointZobjDls(zobj, MMO_LUT_DL_WAIST, MMO_LUT_DL_DF_COMMAND);
 
-    handleZobjSkeleton(modelInfo, zobj);
+    handleZobjSkeleton(modelInfo, zobj, sMMOLimbs);
 
     setupFaceTextures(modelInfo, zobj);
 
@@ -172,7 +211,7 @@ void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     repointZobjDls(zobj, OOTO_CHILD_LUT_DL_WAIST, OOTO_CHILD_LUT_DL_FPS_RARM_SLINGSHOT);
 
-    handleZobjSkeleton(modelInfo, zobj);
+    handleZobjSkeleton(modelInfo, zobj, sOoTOChildLimbs);
 
     setupFaceTextures(modelInfo, zobj);
 
@@ -231,7 +270,7 @@ void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     repointZobjDls(zobj, OOTO_ADULT_LUT_DL_WAIST, OOTO_ADULT_LUT_DL_FPS_LHAND_HOOKSHOT);
 
-    handleZobjSkeleton(modelInfo, zobj);
+    handleZobjSkeleton(modelInfo, zobj, sOoTOAdultLimbs);
 
     setupFaceTextures(modelInfo, zobj);
 
