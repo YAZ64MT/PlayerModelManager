@@ -8,7 +8,7 @@
 id = "yazmt_mm_playermodelmanager"
 
 # Version of this mod.
-version = "0.1.0"
+version = "0.0.3"
 
 # The name that will show up for this mod in the mod menu. This should be human readable.
 display_name = "Player Model Manager"
@@ -16,6 +16,12 @@ display_name = "Player Model Manager"
 # The description that will show up when this mod is displayed in the mod menu. This should be human readable.
 description =  """
 This is a mod for Majora's Mask: Recompiled that allows Link's model to be swapped out on the fly.
+
+To load ModLoader64 zobjs, throw them in a zobj folder in your MM Recomp mods folder.
+
+Press L + A to open the model menu.
+
+This is a testing build. Please do not distribute it since several features need to be finalized.
 """
 
 # A short description that will show up in this mod's entry in the mod list. This should be human readable and kept short
@@ -35,9 +41,9 @@ minimum_recomp_version = "1.2.0"
 dependencies = [
 # Example dependency:
 #    "modname:1.0.0"
-    "yazmt_mm_qdfileloader:0.1.0",
-    "yazmt_mm_global_objects:0.1.0",
-    "yazmt_mm_modelreplacer:0.1.0",
+    "yazmt_mm_qdfileloader",
+    "yazmt_mm_global_objects",
+    "yazmt_mm_modelreplacer",
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.
