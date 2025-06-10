@@ -30,6 +30,40 @@ static CustomModelEntry *sCurrentModelEntry;
 
 static char *sZobjDir;
 
+typedef struct {
+    void *buffer;
+    size_t capacity;
+} DiskEntryBuffer;
+
+static DiskEntryBuffer sDiskBuffer = {0};
+
+void increaseDiskBufferSizeifNeeded(size_t minSize) {
+    if (minSize > sDiskBuffer.capacity) {
+        if (sDiskBuffer.buffer) {
+            recomp_free(sDiskBuffer.buffer);
+        }
+
+        sDiskBuffer.buffer = recomp_alloc(minSize);
+        sDiskBuffer.capacity = minSize;
+    }
+}
+
+void *CMEM_loadFromDisk(const char* path) {
+    unsigned long fileSize = 0;
+
+    QDFL_getFileSize(path, &fileSize);
+
+    increaseDiskBufferSizeifNeeded(fileSize);
+
+    QDFL_Status s = QDFL_loadFileIntoBuffer(path, sDiskBuffer.buffer, sDiskBuffer.capacity);
+
+    if (s != QDFL_STATUS_OK) {
+        return NULL;
+    }
+
+    return sDiskBuffer.buffer;
+}
+
 CustomModelEntry *CMEM_getCurrentEntry() {
     return sCurrentModelEntry;
 }
@@ -108,12 +142,12 @@ bool CMEM_tryApplyEntry(CustomModelEntry *newEntry, Link_FormProxy *proxy) {
     CustomModelEntry *currEntry = CMEM_getCurrentEntry();
     if (newEntry != currEntry) {
         if (newEntry->applyToModelInfo(newEntry, &proxy->current)) {
-            if (newEntry->onModelLoad) {
-                newEntry->onModelLoad(newEntry->onModelLoadData);
-            }
-
             if (currEntry && currEntry->onModelUnload) {
                 currEntry->onModelUnload(currEntry->onModelUnloadData);
+            }
+
+            if (newEntry->onModelLoad) {
+                newEntry->onModelLoad(newEntry->onModelLoadData);
             }
 
             CMEM_setCurrentEntry(newEntry);
@@ -217,6 +251,7 @@ void CMEM_refreshDiskEntries() {
     QDFL_Status err = QDFL_getNumDirEntries(sZobjDir, &numFiles);
 
     if (err == QDFL_STATUS_OK) {
+        size_t minSize = 0;
         for (size_t i = 0; i < numFiles; ++i) {
             char *path = NULL;
 
@@ -224,29 +259,20 @@ void CMEM_refreshDiskEntries() {
 
             char *fullPath = QDFL_getCombinedPath(2, sZobjDir, path);
 
-            void *data = NULL;
-
-            QDFL_loadFile(fullPath, &data);
-
             unsigned long fileSize = 0;
-            
+
             QDFL_getFileSize(fullPath, &fileSize);
 
-            if (isValidZobj(data, fileSize)) {
+            if (isValidZobj(CMEM_loadFromDisk(fullPath), fileSize)) {
                 CustomModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
                 CustomModelDiskEntry_init(entry);
                 entry->filePath = fullPath;
                 entry->modelEntry.internalName = path;
                 entry->modelEntry.displayName = getBaseNameNoExt(path);
                 pushDiskEntry(entry);
-            }
-            else {
+            } else {
                 recomp_free(path);
                 recomp_free(fullPath);
-            }
-
-            if (data) {
-                recomp_free(data);
             }
         }
     }

@@ -38,22 +38,47 @@ bool showing_bow = false;
 RecompuiResource modelListContainer;
 RecompuiResource uiTitle;
 
+static CustomModelEntry *sRealEntry = NULL;
+
 void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
+        Audio_PlaySfx(NA_SE_SY_DECIDE);
+        sRealEntry = NULL;
+        CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
+    } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
     }
 }
 
 void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
+        if (!sRealEntry) {
+            CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        } else {
+            CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        }
+
         recompui_hide_context(context);
         context_shown = false;
+    } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+        if (!sRealEntry) {
+            CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        } else {
+            CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        }
     }
 }
 
 void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
+        Audio_PlaySfx(NA_SE_SY_DECIDE);
         refreshFileList();
+    } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+        if (!sRealEntry) {
+            CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        } else {
+            CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        }
     }
 }
 
@@ -179,12 +204,15 @@ void on_init() {
     recompui_set_nav(buttonRemoveModel, NAVDIRECTION_UP, buttonClose);
     recompui_set_nav(buttonRemoveModel, NAVDIRECTION_LEFT, buttonClose);
     recompui_register_callback(buttonRemoveModel, removeButtonPressed, NULL);
+    recompui_set_width(buttonRemoveModel, 100.0f, UNIT_PERCENT);
+    recompui_set_text_align(buttonRemoveModel, TEXT_ALIGN_CENTER);
 
     buttonRefreshFiles = recompui_create_button(context, row1, "Refresh File List", BUTTONSTYLE_SECONDARY);
     recompui_set_text_align(buttonRefreshFiles, TEXT_ALIGN_CENTER);
     recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_DOWN, buttonRemoveModel);
     recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_RIGHT, buttonRemoveModel);
     recompui_register_callback(buttonRefreshFiles, refreshButtonPressed, NULL);
+    recompui_set_text_align(buttonRefreshFiles, TEXT_ALIGN_CENTER);
 
     recompui_close_context(context);
 
@@ -193,20 +221,24 @@ void on_init() {
     PlayerModelManager_internal_onReadyUI();
 }
 
-void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
-    if (data->type == UI_EVENT_CLICK) {
-        CMEM_tryApplyEntry(userdata, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
-    }
-}
-
 typedef struct {
-    CustomModelEntry** entries;
+    CustomModelEntry **entries;
     RecompuiResource *buttons;
     size_t count;
     size_t capacity;
 } ModelButtonEntries;
 
 static ModelButtonEntries sButtonEntries;
+
+void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        Audio_PlaySfx(NA_SE_SY_DECIDE);
+        CMEM_tryApplyEntry(userdata, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        sRealEntry = userdata;
+    } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
+        CMEM_tryApplyEntry(userdata, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+    }
+}
 
 void destroyModelButtons() {
     if (sButtonEntries.entries) {
@@ -240,11 +272,53 @@ void createModelButtons() {
 
         RecompuiResource button = recompui_create_button(context, modelListContainer, name, BUTTONSTYLE_PRIMARY);
 
+        recompui_set_text_align(button, TEXT_ALIGN_CENTER);
+
+        recompui_set_width(button, 100.0f, UNIT_PERCENT);
+
         recompui_register_callback(button, onModelButtonPressed, sButtonEntries.entries[i]);
 
         recompui_set_flex_shrink(button, 0.0f);
 
         sButtonEntries.buttons[i] = button;
+    }
+
+    if (sButtonEntries.count > 0) {
+        RecompuiResource buttonFirst = sButtonEntries.buttons[0];
+        RecompuiResource buttonLast = sButtonEntries.buttons[sButtonEntries.count - 1];
+
+        recompui_set_nav(buttonClose, NAVDIRECTION_UP, buttonLast);
+        recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_UP, buttonLast);
+        recompui_set_nav(buttonRemoveModel, NAVDIRECTION_RIGHT, buttonLast);
+        recompui_set_nav(buttonRemoveModel, NAVDIRECTION_DOWN, buttonFirst);
+
+        recompui_set_nav(buttonFirst, NAVDIRECTION_UP, buttonRemoveModel);
+        recompui_set_nav(buttonFirst, NAVDIRECTION_LEFT, buttonClose);
+
+        recompui_set_nav(buttonLast, NAVDIRECTION_LEFT, buttonClose);
+
+        if (sButtonEntries.count > 1) {
+            recompui_set_nav(buttonFirst, NAVDIRECTION_DOWN, sButtonEntries.buttons[1]);
+            recompui_set_nav(buttonFirst, NAVDIRECTION_RIGHT, buttonLast);
+
+            recompui_set_nav(buttonLast, NAVDIRECTION_UP, sButtonEntries.buttons[sButtonEntries.count - 2]);
+
+            for (size_t i = 1; i < sButtonEntries.count - 1; ++i) {
+                RecompuiResource button = sButtonEntries.buttons[i];
+                recompui_set_nav(button, NAVDIRECTION_UP, sButtonEntries.buttons[i - 1]);
+                recompui_set_nav(button, NAVDIRECTION_DOWN, sButtonEntries.buttons[i + 1]);
+                recompui_set_nav(button, NAVDIRECTION_LEFT, buttonClose);
+                recompui_set_nav(button, NAVDIRECTION_RIGHT, buttonLast);
+            }
+        }
+
+        recompui_set_nav(buttonLast, NAVDIRECTION_DOWN, buttonRemoveModel);
+        recompui_set_nav_none(buttonLast, NAVDIRECTION_RIGHT);
+    } else {
+        recompui_set_nav(buttonClose, NAVDIRECTION_UP, buttonRemoveModel);
+        recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_UP, buttonRemoveModel);
+        recompui_set_nav_none(buttonRemoveModel, NAVDIRECTION_RIGHT);
+        recompui_set_nav(buttonRemoveModel, NAVDIRECTION_DOWN, buttonClose);
     }
 }
 
@@ -265,6 +339,7 @@ RECOMP_HOOK("Play_UpdateMain")
 void on_play_update(PlayState *play) {
     if (checkButtonCombo(play)) {
         if (!context_shown) {
+            sRealEntry = CMEM_getCurrentEntry();
             recompui_show_context(context);
             context_shown = true;
         }

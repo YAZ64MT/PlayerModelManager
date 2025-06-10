@@ -4,6 +4,7 @@
 
 typedef unsigned long ZPlayerModelHandle;
 
+void *CMEM_loadFromDisk(const char* path);
 void CMEM_setCurrentEntry(CustomModelEntry *e);
 CustomModelEntry *CMEM_getCurrentEntry();
 CustomModelEntry **CMEM_getCombinedEntries(size_t *count);

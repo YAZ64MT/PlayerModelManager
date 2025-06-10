@@ -4,6 +4,7 @@
 #include "ml64compat_mm.h"
 #include "recomputils.h"
 #include "playermodelmanager_utils.h"
+#include "custommodelentrymanager.h"
 
 void CustomModelEntry_init(CustomModelEntry *this) {
     this->displayName = NULL;
@@ -63,7 +64,7 @@ bool applyCustomModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
 
     this->fileData = NULL;
 
-    QDFL_loadFile(this->filePath, &this->fileData);
+    this->fileData = CMEM_loadFromDisk(this->filePath);
 
     if (!this->fileData) {
         return false;
@@ -77,14 +78,10 @@ bool applyCustomModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
 void unloadCustomModelDiskEntry(void *userdata) {
     CustomModelDiskEntry *this = userdata;
 
-    if (this->fileData) {
-        recomp_free(this->fileData);
-        this->fileData = NULL;
-    }
+    this->fileData = NULL;
 
     if (this->isOrphaned) {
         CustomModelDiskEntry_freeMembers(this);
-        recomp_free(this);
     }
 }
 
