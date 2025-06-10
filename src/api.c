@@ -140,7 +140,7 @@ RECOMP_EXPORT void ZPlayerModel_setUnloadCallback(ZPlayerModelHandle h, void (*o
 
 #define SET_LIMB_DL(pLimb, entryDL)       \
     if (!entry->displayListPtrs[entryDL]) \
-        entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gCallDfCommand
+        entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gCallEmptyDisplayList
 
 RECOMP_EXPORT void ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel) {
     CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setSkeleton");

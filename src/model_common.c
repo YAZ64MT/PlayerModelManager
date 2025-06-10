@@ -10,12 +10,12 @@
 
 bool gIsAgePropertyRefreshRequested = false;
 
-Gfx gDfCommand[] = {
+Gfx gEmptyDisplayList[] = {
     gsSPEndDisplayList(),
 };
 
-Gfx gCallDfCommand[] = {
-    gsSPBranchList(gDfCommand),
+Gfx gCallEmptyDisplayList[] = {
+    gsSPBranchList(gEmptyDisplayList),
 };
 
 Gfx gPopModelViewMtx[] = {
@@ -49,7 +49,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     // init by pointing all to DF command
     for (u32 i = 0; i < LINK_SHIMDL_MAX; ++i) {
         shims[i] = recomp_alloc(sizeof(Gfx));
-        gSPBranchList(shims[i], gDfCommand);
+        gSPBranchList(shims[i], gEmptyDisplayList);
     }
 
     SHIM_SWORD(1);
@@ -228,7 +228,7 @@ void refreshProxyDls(Link_FormProxy *formProxy) {
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        gSPBranchList(&dls[i], gCallDfCommand);
+        gSPBranchList(&dls[i], gCallEmptyDisplayList);
     }
 
     setDlToShims(formProxy);
@@ -330,26 +330,26 @@ void initFormProxyMatrixes(Link_FormProxy *formProxy) {
 
 LodLimb skeletonBase[PLAYER_LIMB_COUNT] = {
     {{0, 0, 0}, PLAYER_LIMB_WAIST - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_LOWER_ROOT - 1, PLAYER_LIMB_UPPER_ROOT - 1, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_LOWER_ROOT - 1, PLAYER_LIMB_UPPER_ROOT - 1, {gEmptyDisplayList, gEmptyDisplayList}},
     {{0, 0, 0}, PLAYER_LIMB_RIGHT_THIGH - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_SHIN - 1, PLAYER_LIMB_LEFT_THIGH - 1, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOOT - 1, LIMB_DONE, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_SHIN - 1, LIMB_DONE, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOOT - 1, LIMB_DONE, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_SHIN - 1, PLAYER_LIMB_LEFT_THIGH - 1, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOOT - 1, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_SHIN - 1, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOOT - 1, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
     {{0, 0, 0}, PLAYER_LIMB_HEAD - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_HAT - 1, PLAYER_LIMB_COLLAR - 1, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_LEFT_SHOULDER - 1, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOREARM - 1, PLAYER_LIMB_RIGHT_SHOULDER - 1, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_HAND - 1, LIMB_DONE, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOREARM - 1, PLAYER_LIMB_SHEATH - 1, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_HAND - 1, LIMB_DONE, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_TORSO - 1, {gDfCommand, gDfCommand}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gDfCommand, gDfCommand}},
+    {{0, 0, 0}, PLAYER_LIMB_HAT - 1, PLAYER_LIMB_COLLAR - 1, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_LEFT_SHOULDER - 1, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOREARM - 1, PLAYER_LIMB_RIGHT_SHOULDER - 1, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_HAND - 1, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOREARM - 1, PLAYER_LIMB_SHEATH - 1, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_HAND - 1, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_TORSO - 1, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
 };
 
 #define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = &formProxy->displayLists[proxyLimbName]

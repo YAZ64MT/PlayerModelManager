@@ -86,7 +86,7 @@ void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj, LimbToAlias limbsTo
         LimbToAlias *l2a = &limbsToAliases[i];
         int limbIdx = l2a->limb - 1;
         if (!limbs[limbIdx]->dLists[0]) {
-            gSPBranchList(&zobj[l2a->aliasTableIndex], gCallDfCommand);
+            gSPBranchList(&zobj[l2a->aliasTableIndex], gCallEmptyDisplayList);
         }
     }
 }
@@ -153,7 +153,7 @@ void setupZobjMmoHuman(Link_ModelInfo *modelInfo, u8 *zobj) {
     SET_MMO_MODEL(FPS_HOOKSHOT, HOOKSHOT);
     SET_MMO_MODEL(FPS_LFOREARM, LFOREARM);
     SET_MMO_MODEL(FPS_LHAND, LFIST);
-    modelInfo->models[LINK_DL_FPS_RFOREARM] = gDfCommand;
+    modelInfo->models[LINK_DL_FPS_RFOREARM] = gEmptyDisplayList;
     QSET_MMO_MODEL(FPS_RHAND);
 }
 
@@ -240,7 +240,7 @@ void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_OOTO_CHILD_MODEL(RFIST);
     QSET_OOTO_CHILD_MODEL(DEKU_STICK);
     QSET_OOTO_CHILD_MODEL(BOTTLE_GLASS);
-    modelInfo->models[LINK_DL_BOTTLE_CONTENTS] = gDfCommand;
+    modelInfo->models[LINK_DL_BOTTLE_CONTENTS] = gEmptyDisplayList;
     QSET_OOTO_CHILD_MODEL(SWORD_KOKIRI_SHEATH);
     QSET_OOTO_CHILD_MODEL(SWORD_KOKIRI_HILT);
     QSET_OOTO_CHILD_MODEL(SWORD_KOKIRI_BLADE);
@@ -248,7 +248,7 @@ void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_OOTO_CHILD_MODEL(OCARINA_TIME);
     SET_OOTO_CHILD_MODEL(FPS_LFOREARM, LFOREARM);
     SET_OOTO_CHILD_MODEL(FPS_LHAND, LFIST);
-    modelInfo->models[LINK_DL_FPS_RFOREARM] = gDfCommand;
+    modelInfo->models[LINK_DL_FPS_RFOREARM] = gEmptyDisplayList;
     QSET_OOTO_CHILD_MODEL(FPS_RHAND);
 }
 
@@ -318,7 +318,7 @@ void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_OOTO_ADULT_MODEL(BOW);
     QSET_OOTO_ADULT_MODEL(BOW_STRING);
     QSET_OOTO_ADULT_MODEL(BOTTLE_GLASS);
-    modelInfo->models[LINK_DL_BOTTLE_CONTENTS] = gDfCommand;
+    modelInfo->models[LINK_DL_BOTTLE_CONTENTS] = gEmptyDisplayList;
     QSET_OOTO_ADULT_MODEL(FPS_LFOREARM);
     QSET_OOTO_ADULT_MODEL(FPS_LHAND);
     QSET_OOTO_ADULT_MODEL(FPS_RFOREARM);
