@@ -262,7 +262,6 @@ typedef enum {
     LINK_DL_UNK34,
     LINK_DL_UNK35,
     LINK_DL_UNK36,
-    LINK_DL_UNK37,
     LINK_DL_MAX
 } Link_DisplayList;
 

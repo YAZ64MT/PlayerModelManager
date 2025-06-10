@@ -269,7 +269,6 @@ typedef enum {
     ZPM_DL_UNK34,
     ZPM_DL_UNK35,
     ZPM_DL_UNK36,
-    ZPM_DL_UNK37,
     ZPM_DL_MAX
 } ZPlayerModel_DisplayListId;
 
