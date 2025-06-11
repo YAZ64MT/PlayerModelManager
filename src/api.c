@@ -67,7 +67,7 @@ RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerPlayerModel(unsigned long 
         return 0;
     }
 
-    if (isStrValid("ZPlayerModel_registerPlayerModel", internalName, MAX_INTERNAL_NAME_LENGTH)) {
+    if (!isStrValid("ZPlayerModel_registerPlayerModel", internalName, MAX_INTERNAL_NAME_LENGTH)) {
         return 0;
     }
 
@@ -119,7 +119,7 @@ RECOMP_EXPORT bool ZPlayerModel_setDisplayName(ZPlayerModelHandle h, char *displ
 }
 
 RECOMP_EXPORT bool ZPlayerModel_setAuthor(ZPlayerModelHandle h, char *author) {
-    if (!isStrValid(ZPlayerModel_setAuthor, author, MAX_AUTHOR_NAME_LENGTH)) {
+    if (!isStrValid("ZPlayerModel_setAuthor", author, MAX_AUTHOR_NAME_LENGTH)) {
         return false;
     }
 
