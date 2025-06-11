@@ -60,8 +60,8 @@ bool isAdultAgePropsInitialized() {
     return gAdultLinkAgeProps.surfaceSfxIdOffset == 0x80;
 }
 
-RECOMP_HOOK_RETURN("Player_Init")
-void initAgeProps() {
+RECOMP_HOOK("Player_Init")
+void initAgeProps(Actor *thisx, PlayState *play) {
     if (!isAdultAgePropsInitialized()) {
         gVanillaHumanLinkAgeProps = sPlayerAgeProperties[PLAYER_FORM_HUMAN];
         initAdultLinkAgeProperties();
