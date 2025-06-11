@@ -4,13 +4,13 @@
 
 typedef unsigned long ZPlayerModelHandle;
 
-void *CMEM_loadFromDisk(const char* path);
-void CMEM_setCurrentEntry(CustomModelEntry *e);
-CustomModelEntry *CMEM_getCurrentEntry();
+void *CMEM_loadFromDisk(PlayerTransformation form, const char* path);
+void CMEM_setCurrentEntry(PlayerTransformation form, CustomModelEntry *entry);
+CustomModelEntry *CMEM_getCurrentEntry(PlayerTransformation form);
 CustomModelEntry **CMEM_getCombinedEntries(size_t *count);
-bool CMEM_tryApplyEntry(CustomModelEntry *newEntry, Link_FormProxy *proxy);
-void CMEM_refreshDiskEntries();
-void CMEM_removeModel(Link_FormProxy *proxy);
+bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry);
+void CMEM_refreshDiskEntries(PlayerTransformation form);
+void CMEM_removeModel(PlayerTransformation form);
 ZPlayerModelHandle CMEM_createMemoryHandle();
 CustomModelMemoryEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h);
 

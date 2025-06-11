@@ -5,6 +5,7 @@
 #include "playermodelmanager.h"
 
 typedef enum {
+    CUSTOM_MODEL_TYPE_NONE,
     CUSTOM_MODEL_TYPE_CHILD,
     CUSTOM_MODEL_TYPE_ADULT,
     CUSTOM_MODEL_TYPE_DEKU,
@@ -45,7 +46,7 @@ void CustomModelEntry_init(CustomModelEntry *entry);
 
 void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this);
 
-void CustomModelDiskEntry_init(CustomModelDiskEntry *this);
+void CustomModelDiskEntry_init(CustomModelDiskEntry *this, CustomModelType type);
 
 void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this);
 

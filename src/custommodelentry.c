@@ -67,7 +67,37 @@ bool applyCustomModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
 
     this->fileData = NULL;
 
-    this->fileData = CMEM_loadFromDisk(this->filePath);
+    PlayerTransformation form = PLAYER_FORM_HUMAN;
+
+    switch (this->modelEntry.type) {
+        case CUSTOM_MODEL_TYPE_ADULT:
+        case CUSTOM_MODEL_TYPE_CHILD:
+            form = PLAYER_FORM_HUMAN;
+            break;
+        
+        case CUSTOM_MODEL_TYPE_DEKU:
+            form = PLAYER_FORM_DEKU;
+            break;
+
+        case CUSTOM_MODEL_TYPE_GORON:
+            form = PLAYER_FORM_GORON;
+            break;
+
+        case CUSTOM_MODEL_TYPE_ZORA:
+            form = PLAYER_FORM_ZORA;
+            break;
+
+        case CUSTOM_MODEL_TYPE_FIERCE_DEITY:
+            form = PLAYER_FORM_FIERCE_DEITY;
+            break;
+
+        default:
+            // invalid form
+            return false;
+            break;
+    }
+
+    this->fileData = CMEM_loadFromDisk(form, this->filePath);
 
     if (!this->fileData) {
         return false;
@@ -104,7 +134,7 @@ void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this) {
     this->eyesTex = NULL;
 }
 
-void CustomModelDiskEntry_init(CustomModelDiskEntry *this) {
+void CustomModelDiskEntry_init(CustomModelDiskEntry *this, CustomModelType type) {
     CustomModelEntry_init(&this->modelEntry);
 
     this->fileData = NULL;
@@ -114,6 +144,7 @@ void CustomModelDiskEntry_init(CustomModelDiskEntry *this) {
     this->modelEntry.applyToModelInfo = applyCustomModelDiskEntry;
     this->modelEntry.onModelUnload = unloadCustomModelDiskEntry;
     this->modelEntry.onModelUnloadData = this;
+    this->modelEntry.type = type;
 }
 
 void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this) {

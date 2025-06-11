@@ -59,14 +59,14 @@ void setAuthor(const char* author) {
 }
 
 void applyRealEntry() {
-    CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+    CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, sRealEntry);
 }
 
 void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         Audio_PlaySfx(NA_SE_SY_DECIDE);
         sRealEntry = NULL;
-        CMEM_tryApplyEntry(NULL, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, NULL);
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
         applyRealEntry();
@@ -75,7 +75,7 @@ void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *dat
 
 void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, sRealEntry);
         recompui_hide_context(context);
         context_shown = false;
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
@@ -258,12 +258,12 @@ void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *da
 
     if (data->type == UI_EVENT_CLICK) {
         Audio_PlaySfx(NA_SE_SY_DECIDE);
-        CMEM_tryApplyEntry(entry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, entry);
         sRealEntry = entry;
     } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
         destroyAuthor();
         setAuthor(entry->authorName);
-        CMEM_tryApplyEntry(userdata, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, entry);
     }
 }
 
@@ -281,7 +281,7 @@ void destroyModelButtons() {
 void createModelButtons() {
     // MUST CALL INSIDE UI CONTEXT
 
-    CMEM_refreshDiskEntries();
+    CMEM_refreshDiskEntries(PLAYER_FORM_HUMAN);
 
     sButtonEntries.entries = CMEM_getCombinedEntries(&sButtonEntries.count);
 
@@ -366,7 +366,7 @@ RECOMP_HOOK("Play_UpdateMain")
 void on_play_update(PlayState *play) {
     if (checkButtonCombo(play)) {
         if (!context_shown) {
-            sRealEntry = CMEM_getCurrentEntry();
+            sRealEntry = CMEM_getCurrentEntry(PLAYER_FORM_HUMAN);
             recompui_show_context(context);
             context_shown = true;
         }

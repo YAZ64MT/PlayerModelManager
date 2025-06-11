@@ -8,6 +8,8 @@
 #include "libc/string.h"
 #include "custommodelentrymanager.h"
 #include "recompdata.h"
+#include "defines_mmo.h"
+#include "defines_ooto.h"
 
 #define ARRAY_GROWTH_FACTOR 3 / 2
 #define ARRAY_STARTING_SIZE 16
@@ -26,7 +28,7 @@ typedef struct {
 static CustomModelEntries sDiskEntries;
 static CustomModelEntries sMemoryEntries;
 
-static CustomModelEntry *sCurrentModelEntry;
+static CustomModelEntry *sCurrentModelEntries[PLAYER_FORM_MAX];
 
 static char *sZobjDir;
 
@@ -35,41 +37,41 @@ typedef struct {
     size_t capacity;
 } DiskEntryBuffer;
 
-static DiskEntryBuffer sDiskBuffer = {0};
+static DiskEntryBuffer sDiskBuffers[PLAYER_FORM_MAX] = {0};
 
-void increaseDiskBufferSizeifNeeded(size_t minSize) {
-    if (minSize > sDiskBuffer.capacity) {
-        if (sDiskBuffer.buffer) {
-            recomp_free(sDiskBuffer.buffer);
+void increaseDiskBufferSizeIfNeeded(PlayerTransformation form, size_t minSize) {
+    if (minSize > sDiskBuffers[form].capacity) {
+        if (sDiskBuffers[form].buffer) {
+            recomp_free(sDiskBuffers[form].buffer);
         }
 
-        sDiskBuffer.buffer = recomp_alloc(minSize);
-        sDiskBuffer.capacity = minSize;
+        sDiskBuffers[form].buffer = recomp_alloc(minSize);
+        sDiskBuffers[form].capacity = minSize;
     }
 }
 
-void *CMEM_loadFromDisk(const char *path) {
+void *CMEM_loadFromDisk(PlayerTransformation form, const char *path) {
     unsigned long fileSize = 0;
 
     QDFL_getFileSize(path, &fileSize);
 
-    increaseDiskBufferSizeifNeeded(fileSize);
+    increaseDiskBufferSizeIfNeeded(form, fileSize);
 
-    QDFL_Status s = QDFL_loadFileIntoBuffer(path, sDiskBuffer.buffer, sDiskBuffer.capacity);
+    QDFL_Status s = QDFL_loadFileIntoBuffer(path, sDiskBuffers[form].buffer, sDiskBuffers[form].capacity);
 
     if (s != QDFL_STATUS_OK) {
         return NULL;
     }
 
-    return sDiskBuffer.buffer;
+    return sDiskBuffers[form].buffer;
 }
 
-CustomModelEntry *CMEM_getCurrentEntry() {
-    return sCurrentModelEntry;
+CustomModelEntry *CMEM_getCurrentEntry(PlayerTransformation form) {
+    return sCurrentModelEntries[form];
 }
 
-void CMEM_setCurrentEntry(CustomModelEntry *e) {
-    sCurrentModelEntry = e;
+void CMEM_setCurrentEntry(PlayerTransformation form, CustomModelEntry *e) {
+    sCurrentModelEntries[form] = e;
 }
 
 void initCustomModelEntries(CustomModelEntries *cme) {
@@ -133,11 +135,12 @@ void clearDiskEntries() {
     sDiskEntries.count = 0;
 }
 
-bool CMEM_tryApplyEntry(CustomModelEntry *newEntry, Link_FormProxy *proxy) {
-    CustomModelEntry *currEntry = CMEM_getCurrentEntry();
+bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry) {
+    Link_FormProxy *proxy = &gLinkFormProxies[form];
+    CustomModelEntry *currEntry = CMEM_getCurrentEntry(form);
     if (newEntry != currEntry) {
         if (newEntry == NULL) {
-            CMEM_removeModel(proxy);
+            CMEM_removeModel(form);
             return true;
         }
 
@@ -150,7 +153,7 @@ bool CMEM_tryApplyEntry(CustomModelEntry *newEntry, Link_FormProxy *proxy) {
                 newEntry->onModelLoad(newEntry->onModelLoadData);
             }
 
-            CMEM_setCurrentEntry(newEntry);
+            CMEM_setCurrentEntry(form, newEntry);
 
             refreshFormProxy(proxy);
             refreshFaceTextures();
@@ -243,8 +246,8 @@ char *getBaseNameNoExt(const char *path) {
     return base;
 }
 
-void CMEM_refreshDiskEntries() {
-    CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
+void CMEM_refreshDiskEntries(PlayerTransformation form) {
+    CMEM_removeModel(form);
 
     clearDiskEntries();
 
@@ -252,7 +255,6 @@ void CMEM_refreshDiskEntries() {
     QDFL_Status err = QDFL_getNumDirEntries(sZobjDir, &numFiles);
 
     if (err == QDFL_STATUS_OK) {
-        size_t minSize = 0;
         for (size_t i = 0; i < numFiles; ++i) {
             char *path = NULL;
 
@@ -264,9 +266,29 @@ void CMEM_refreshDiskEntries() {
 
             QDFL_getFileSize(fullPath, &fileSize);
 
-            if (isValidZobj(CMEM_loadFromDisk(fullPath), fileSize)) {
+            if (isValidZobj(CMEM_loadFromDisk(form, fullPath), fileSize)) {
                 CustomModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
-                CustomModelDiskEntry_init(entry);
+
+                CustomModelType modelType = CUSTOM_MODEL_TYPE_NONE;
+
+                u8* data = sDiskBuffers[form].buffer;
+
+                switch (data[Z64O_FORM_BYTE]) {
+                    case MMO_FORM_BYTE_CHILD:
+                    case OOTO_FORM_BYTE_CHILD:
+                        modelType = CUSTOM_MODEL_TYPE_CHILD;
+                        break;
+
+                    case MMO_FORM_BYTE_ADULT:
+                    case OOTO_FORM_BYTE_ADULT:
+                        modelType = CUSTOM_MODEL_TYPE_ADULT;
+                        break;
+
+                    default:
+                        break;
+                }
+
+                CustomModelDiskEntry_init(entry, modelType);
                 entry->filePath = fullPath;
                 entry->modelEntry.internalName = path;
                 entry->modelEntry.displayName = getBaseNameNoExt(path);
@@ -279,10 +301,12 @@ void CMEM_refreshDiskEntries() {
     }
 }
 
-void CMEM_removeModel(Link_FormProxy *proxy) {
-    if (sCurrentModelEntry) {
-        sCurrentModelEntry->onModelUnload(sCurrentModelEntry->onModelUnloadData);
-        sCurrentModelEntry = NULL;
+void CMEM_removeModel(PlayerTransformation form) {
+    Link_FormProxy* proxy = &gLinkFormProxies[form];
+
+    if (sCurrentModelEntries[form]) {
+        sCurrentModelEntries[form]->onModelUnload(sCurrentModelEntries[form]->onModelUnloadData);
+        sCurrentModelEntries[form] = NULL;
 
         clearLinkModelInfo(&proxy->current);
 
