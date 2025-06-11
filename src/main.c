@@ -149,7 +149,6 @@ void refreshExternalDLs() {
 
 // initialize player models as blank display lists
 void initFormProxies() {
-    
     for (u8 i = 0; i < PLAYER_FORM_MAX; ++i) {
         Link_FormProxy *formProxy = &gLinkFormProxies[i];
 

@@ -55,7 +55,7 @@ void destroyAuthor() {
     modelAuthorPrefix = 0;
 }
 
-void setAuthor(const char* author) {
+void setAuthor(const char *author) {
     destroyAuthor();
     modelAuthorPrefix = recompui_create_label(context, row2, "Author(s): ", LABELSTYLE_NORMAL);
     modelAuthor = recompui_create_label(context, row2, author, LABELSTYLE_NORMAL);
@@ -85,8 +85,10 @@ void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data
         context_shown = false;
         if (sIsDiskSaveNeeded) {
             CMEM_saveCurrentEntry(PLAYER_FORM_HUMAN);
+            Audio_PlaySfx(NA_SE_SY_PIECE_OF_HEART);
+        } else {
+            Audio_PlaySfx(NA_SE_SY_DECIDE);
         }
-        Audio_PlaySfx(NA_SE_SY_DECIDE);
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
         applyRealEntry();
@@ -320,8 +322,7 @@ void refreshButtonEntryColors() {
         if (entry == sButtonEntries.entries[i]) {
             recompui_set_background_color(sButtonEntries.buttons[i], &sModelSelectedButtonColor.bgColor);
             recompui_set_border_color(sButtonEntries.buttons[i], &sModelSelectedButtonColor.borderColor);
-        }
-        else {
+        } else {
             recompui_set_background_color(sButtonEntries.buttons[i], &sPrimaryButtonColor.bgColor);
             recompui_set_border_color(sButtonEntries.buttons[i], &sPrimaryButtonColor.borderColor);
         }
@@ -455,5 +456,12 @@ RECOMP_CALLBACK(".", PlayerModelManager_internal_onFinishedRegisterModels)
 void populateFirstFileList() {
     recompui_open_context(context);
     refreshFileList();
+    recompui_close_context(context);
+}
+
+RECOMP_CALLBACK(".", PlayerModelManager_internal_onSavedModelsApplied)
+void refreshButtonsWhenSavedModelApplied() {
+    recompui_open_context(context);
+    refreshButtonEntryColors();
     recompui_close_context(context);
 }

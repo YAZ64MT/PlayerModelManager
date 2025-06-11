@@ -60,17 +60,20 @@ bool isAdultAgePropsInitialized() {
     return gAdultLinkAgeProps.surfaceSfxIdOffset == 0x80;
 }
 
-extern PlayerAnimationHeader *D_8085BE84[PLAYER_ANIMGROUP_MAX][PLAYER_ANIMTYPE_MAX];
-extern LinkAnimationHeader gPlayerAnim_clink_demo_doorA_link;
-extern LinkAnimationHeader gPlayerAnim_clink_demo_doorB_link;
-
-RECOMP_HOOK("Player_Update")
-void handleAgeProps_onPlayerUpdate(Actor *thisx, PlayState *play) {
+RECOMP_HOOK_RETURN("Player_Init")
+void initAgeProps() {
     if (!isAdultAgePropsInitialized()) {
         gVanillaHumanLinkAgeProps = sPlayerAgeProperties[PLAYER_FORM_HUMAN];
         initAdultLinkAgeProperties();
     }
+}
 
+extern PlayerAnimationHeader *D_8085BE84[PLAYER_ANIMGROUP_MAX][PLAYER_ANIMTYPE_MAX];
+extern LinkAnimationHeader gPlayerAnim_clink_demo_doorA_link;
+extern LinkAnimationHeader gPlayerAnim_clink_demo_doorB_link;
+
+RECOMP_CALLBACK("*", recomp_on_play_main)
+void handleAgePropsOnPlay(PlayState *play) {
     if (gIsAgePropertyRefreshRequested) {
         gIsAgePropertyRefreshRequested = false;
         if (IS_HUMAN_ADULT_LINK_MODEL) {
@@ -89,7 +92,7 @@ void handleAgeProps_onPlayerUpdate(Actor *thisx, PlayState *play) {
             }
         }
 
-        Player *player = (Player *)thisx;
+        Player *player = (Player *)GET_PLAYER(play);
 
         if (player->transformation == PLAYER_FORM_HUMAN) {
             player->ageProperties = &sPlayerAgeProperties[PLAYER_FORM_HUMAN];

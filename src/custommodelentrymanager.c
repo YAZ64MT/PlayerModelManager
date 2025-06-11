@@ -19,7 +19,6 @@ RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
 static U32MemoryHashmapHandle sHandleToMemoryEntry;
 static ZPlayerModelHandle sNextMemoryHandle = 1;
-static U32HashsetHandle sUnassignedMemoryHandles;
 
 typedef struct {
     void **entries;
@@ -138,7 +137,6 @@ void initEntryManager() {
     recomp_free(modFolderPath);
 
     sHandleToMemoryEntry = recomputil_create_u32_memory_hashmap(sizeof(CustomModelMemoryEntry));
-    sUnassignedMemoryHandles = recomputil_create_u32_hashset();
 }
 
 void pushMemoryEntry(PlayerTransformation form, CustomModelMemoryEntry *entry) {
@@ -398,19 +396,99 @@ CustomModelMemoryEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h) {
     return recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, h);
 }
 
+#define NUM_ELEMENTS_NEEDED_TO_STORE(n, size) (n / size + 1)
+
+// Encodes string as U32 array
+u32 *encodeStr(const char* str) {
+    size_t len = strlen(str);
+    size_t requiredNums = NUM_ELEMENTS_NEEDED_TO_STORE(len, sizeof(u32));
+
+    u32 *encodedStr;
+    size_t buffSize = sizeof(*encodedStr) * requiredNums;
+    encodedStr = recomp_alloc(buffSize);
+    Lib_MemSet(encodedStr, 0, buffSize);
+
+    unsigned currByte = 0;
+    u32 *currNum = encodedStr;
+
+    while (*str != '\0') {
+        u32 expandedChar = *str;
+        *currNum |= (expandedChar << currByte * 8);
+
+        currByte++;
+        if (currByte >= sizeof(u32)) {
+            currByte = 0;
+            currNum++;
+        }
+
+        str++;
+    }
+
+    return encodedStr;
+}
+
+// decodes string stored as U32 array with encodeStr
+char *decodeStr(u32 *encodedString, size_t encodedStrLen) {
+    char *result = recomp_alloc(encodedStrLen + 1);
+
+    result[encodedStrLen] = '\0';
+
+    unsigned currByte = 0;
+
+    for (size_t i = 0; i < encodedStrLen; ++i) {
+        result[i] = *encodedString >> (currByte * 8);
+
+        currByte++;
+        if (currByte >= sizeof(u32)) {
+            currByte = 0;
+            encodedString++;
+        }
+    }
+
+    return result;
+}
+
 void CMEM_saveCurrentEntry(PlayerTransformation form) {
     if (form == PLAYER_FORM_HUMAN) {
         KV_Global_Remove("zpm_saved_human_name");
         KV_Global_Remove("zpm_saved_human_name_length");
 
         if (sCurrentModelEntries[form]) {
-            char *n = sCurrentModelEntries[form]->internalName;
-            u32 nLen = strlen(sCurrentModelEntries[form]->internalName) + 1;
-            KV_Global_Set("zpm_saved_human_name", sCurrentModelEntries[form]->internalName, nLen);
-            KV_Global_Set_U32("zpm_saved_human_name_length", nLen);
-            recomp_printf("Saving Internal Name found: %s\n", n);
+            char *name = sCurrentModelEntries[form]->internalName;
+            u32 *encoded = encodeStr(name);
+            u32 len = strlen(sCurrentModelEntries[form]->internalName);
+            KV_Global_Set("zpm_saved_human_name", encoded, NUM_ELEMENTS_NEEDED_TO_STORE(len, sizeof(*encoded)) * sizeof(*encoded));
+            KV_Global_Set_U32("zpm_saved_human_name_length", len);
+            recomp_free(encoded);
         }
     }
+}
+
+RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onSavedModelsApplied());
+
+void loadSavedModels() {
+    if (KV_Global_Has("zpm_saved_human_name")) {
+        u32 nameLength = KV_Global_Get_U32("zpm_saved_human_name_length", 0);
+        if (nameLength > 0) {
+            // TODO: ASK PROXY IF STRINGS CAN BE STORED
+
+            size_t encodedSize = NUM_ELEMENTS_NEEDED_TO_STORE(nameLength, sizeof(u32)) * sizeof(u32);
+
+            void *encodedName = recomp_alloc(encodedSize);
+
+            if (KV_Global_Get("zpm_saved_human_name", encodedName, encodedSize)) {
+                char *decodedName = decodeStr(encodedName, nameLength);
+
+                applyByInternalName(PLAYER_FORM_HUMAN, decodedName);
+
+                recomp_free(decodedName);
+            }
+
+            recomp_free(encodedName);
+        }
+    }
+
+    PlayerModelManager_internal_onSavedModelsApplied();
 }
 
 RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyCMEM());
@@ -419,21 +497,9 @@ RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyUI)
 void initEntryManagerCallback() {
     initEntryManager();
     PlayerModelManager_internal_onReadyCMEM();
+}
 
-    if (KV_Global_Has("zpm_saved_human_name")) {
-        u32 nameLength = KV_Global_Get_U32("zpm_saved_human_name_length", 0);
-        if (nameLength > 0) {
-            // TODO: ASK PROXY IF STRINGS CAN BE STORED
-
-            char *name = recomp_alloc(nameLength);
-
-            KV_Global_Get("zpm_saved_human_name", name, nameLength);
-
-            applyByInternalName(PLAYER_FORM_HUMAN, name);
-
-            recomp_printf("Internal Name found: %s\n", name);
-
-            recomp_free(name);
-        }
-    }
+RECOMP_HOOK_RETURN("TitleSetup_SetupTitleScreen")
+void applySavedModelOnTitleScreen() {
+    loadSavedModels();
 }
