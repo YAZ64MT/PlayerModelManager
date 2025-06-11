@@ -8,6 +8,7 @@
 #include "model_common.h"
 
 void refreshFileList();
+void refreshButtonEntryColors();
 
 typedef struct {
     CustomModelEntry *modelEntry;
@@ -54,7 +55,7 @@ void destroyAuthor() {
 
 void setAuthor(const char* author) {
     destroyAuthor();
-    modelAuthorPrefix = recompui_create_label(context, row2, "Author(s):", LABELSTYLE_NORMAL);
+    modelAuthorPrefix = recompui_create_label(context, row2, "Author(s): ", LABELSTYLE_NORMAL);
     modelAuthor = recompui_create_label(context, row2, author, LABELSTYLE_NORMAL);
 }
 
@@ -67,6 +68,7 @@ void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *dat
         Audio_PlaySfx(NA_SE_SY_DECIDE);
         sRealEntry = NULL;
         CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, NULL);
+        refreshButtonEntryColors();
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
         applyRealEntry();
@@ -89,6 +91,7 @@ void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *da
         Audio_PlaySfx(NA_SE_SY_DECIDE);
         sRealEntry = NULL;
         refreshFileList();
+        refreshButtonEntryColors();
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
         applyRealEntry();
@@ -245,6 +248,56 @@ void on_init() {
 }
 
 typedef struct {
+    RecompuiColor borderColor;
+    RecompuiColor bgColor;
+} ButtonColor;
+
+static const ButtonColor sPrimaryButtonColor = {
+    .borderColor = {
+        .r = 185,
+        .g = 125,
+        .b = 242,
+        .a = 204,
+    },
+    .bgColor = {
+        .r = 185,
+        .g = 125,
+        .b = 242,
+        .a = 13,
+    },
+};
+
+static const ButtonColor sSecondaryButtonColor = {
+    .borderColor = {
+        .r = 23,
+        .g = 214,
+        .b = 232,
+        .a = 204,
+    },
+    .bgColor = {
+        .r = 23,
+        .g = 214,
+        .b = 232,
+        .a = 13,
+    },
+};
+
+static const ButtonColor sModelSelectedButtonColor = {
+    .borderColor = {
+        .r = 227,
+        .g = 151,
+        .b = 75,
+        .a = 204,
+    },
+    .bgColor = {
+        .r = 227,
+        .g = 151,
+        .b = 75,
+        .a = 13,
+    },
+};
+
+typedef struct {
     CustomModelEntry **entries;
     RecompuiResource *buttons;
     size_t count;
@@ -253,6 +306,20 @@ typedef struct {
 
 static ModelButtonEntries sButtonEntries;
 
+void refreshButtonEntryColors() {
+    void *entry = (void *)CMEM_getCurrentEntry(PLAYER_FORM_HUMAN);
+    for (size_t i = 0; i < sButtonEntries.count; ++i) {
+        if (entry == sButtonEntries.entries[i]) {
+            recompui_set_background_color(sButtonEntries.buttons[i], &sModelSelectedButtonColor.bgColor);
+            recompui_set_border_color(sButtonEntries.buttons[i], &sModelSelectedButtonColor.borderColor);
+        }
+        else {
+            recompui_set_background_color(sButtonEntries.buttons[i], &sPrimaryButtonColor.bgColor);
+            recompui_set_border_color(sButtonEntries.buttons[i], &sPrimaryButtonColor.borderColor);
+        }
+    }
+}
+
 void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     CustomModelEntry *entry = userdata;
 
@@ -260,6 +327,7 @@ void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *da
         Audio_PlaySfx(NA_SE_SY_DECIDE);
         CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, entry);
         sRealEntry = entry;
+        refreshButtonEntryColors();
     } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
         destroyAuthor();
         setAuthor(entry->authorName);
