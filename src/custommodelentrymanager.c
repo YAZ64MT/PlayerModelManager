@@ -10,6 +10,7 @@
 #include "recompdata.h"
 #include "defines_mmo.h"
 #include "defines_ooto.h"
+#include "proxymm_kv_api.h"
 
 #define ARRAY_GROWTH_FACTOR 3 / 2
 #define ARRAY_STARTING_SIZE 16
@@ -397,10 +398,42 @@ CustomModelMemoryEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h) {
     return recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, h);
 }
 
+void CMEM_saveCurrentEntry(PlayerTransformation form) {
+    if (form == PLAYER_FORM_HUMAN) {
+        KV_Global_Remove("zpm_saved_human_name");
+        KV_Global_Remove("zpm_saved_human_name_length");
+
+        if (sCurrentModelEntries[form]) {
+            char *n = sCurrentModelEntries[form]->internalName;
+            u32 nLen = strlen(sCurrentModelEntries[form]->internalName) + 1;
+            KV_Global_Set("zpm_saved_human_name", sCurrentModelEntries[form]->internalName, nLen);
+            KV_Global_Set_U32("zpm_saved_human_name_length", nLen);
+            recomp_printf("Saving Internal Name found: %s\n", n);
+        }
+    }
+}
+
 RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyCMEM());
 
 RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyUI)
 void initEntryManagerCallback() {
     initEntryManager();
     PlayerModelManager_internal_onReadyCMEM();
+
+    if (KV_Global_Has("zpm_saved_human_name")) {
+        u32 nameLength = KV_Global_Get_U32("zpm_saved_human_name_length", 0);
+        if (nameLength > 0) {
+            // TODO: ASK PROXY IF STRINGS CAN BE STORED
+
+            char *name = recomp_alloc(nameLength);
+
+            KV_Global_Get("zpm_saved_human_name", name, nameLength);
+
+            applyByInternalName(PLAYER_FORM_HUMAN, name);
+
+            recomp_printf("Internal Name found: %s\n", name);
+
+            recomp_free(name);
+        }
+    }
 }

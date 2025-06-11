@@ -13,5 +13,6 @@ void CMEM_refreshDiskEntries(PlayerTransformation form);
 void CMEM_removeModel(PlayerTransformation form);
 ZPlayerModelHandle CMEM_createMemoryHandle(PlayerTransformation form);
 CustomModelMemoryEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h);
+void CMEM_saveCurrentEntry(PlayerTransformation form);
 
 #endif

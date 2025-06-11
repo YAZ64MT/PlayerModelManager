@@ -44,6 +44,8 @@ RecompuiResource modelAuthor;
 
 static CustomModelEntry *sRealEntry = NULL;
 
+static bool sIsDiskSaveNeeded = false;
+
 void destroyAuthor() {
     if (modelAuthor) {
         recompui_destroy_element(row2, modelAuthor);
@@ -69,6 +71,7 @@ void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *dat
         sRealEntry = NULL;
         CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, NULL);
         refreshButtonEntryColors();
+        sIsDiskSaveNeeded = true;
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
         applyRealEntry();
@@ -80,6 +83,10 @@ void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data
         CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, sRealEntry);
         recompui_hide_context(context);
         context_shown = false;
+        if (sIsDiskSaveNeeded) {
+            CMEM_saveCurrentEntry(PLAYER_FORM_HUMAN);
+        }
+        Audio_PlaySfx(NA_SE_SY_DECIDE);
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
         applyRealEntry();
@@ -182,7 +189,7 @@ void on_init() {
     recompui_set_align_items(row1, ALIGN_ITEMS_FLEX_END);
     recompui_set_gap(row1, 16.0f, UNIT_DP);
 
-    buttonClose = recompui_create_button(context, row1, "Close", BUTTONSTYLE_SECONDARY);
+    buttonClose = recompui_create_button(context, row1, "Apply", BUTTONSTYLE_SECONDARY);
     recompui_set_text_align(buttonClose, TEXT_ALIGN_CENTER);
 
     // Bind the shared callback to the two buttons.
@@ -329,6 +336,7 @@ void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *da
         CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, entry);
         sRealEntry = entry;
         refreshButtonEntryColors();
+        sIsDiskSaveNeeded = true;
     } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
         destroyAuthor();
         setAuthor(entry->authorName);
@@ -435,6 +443,7 @@ RECOMP_HOOK("Play_UpdateMain")
 void on_play_update(PlayState *play) {
     if (checkButtonCombo(play)) {
         if (!context_shown) {
+            sIsDiskSaveNeeded = false;
             sRealEntry = CMEM_getCurrentEntry(PLAYER_FORM_HUMAN);
             recompui_show_context(context);
             context_shown = true;
