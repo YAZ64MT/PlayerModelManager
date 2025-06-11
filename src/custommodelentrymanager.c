@@ -136,6 +136,11 @@ void clearDiskEntries() {
 bool CMEM_tryApplyEntry(CustomModelEntry *newEntry, Link_FormProxy *proxy) {
     CustomModelEntry *currEntry = CMEM_getCurrentEntry();
     if (newEntry != currEntry) {
+        if (newEntry == NULL) {
+            CMEM_removeModel(proxy);
+            return true;
+        }
+
         if (newEntry->applyToModelInfo(newEntry, &proxy->current)) {
             if (currEntry && currEntry->onModelUnload) {
                 currEntry->onModelUnload(currEntry->onModelUnloadData);

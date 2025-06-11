@@ -59,18 +59,14 @@ void setAuthor(const char* author) {
 }
 
 void applyRealEntry() {
-    if (!sRealEntry) {
-        CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
-    } else {
-        CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
-    }
+    CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
 }
 
 void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         Audio_PlaySfx(NA_SE_SY_DECIDE);
         sRealEntry = NULL;
-        CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
+        CMEM_tryApplyEntry(NULL, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
         applyRealEntry();
@@ -79,12 +75,7 @@ void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *dat
 
 void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        if (!sRealEntry) {
-            CMEM_removeModel(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
-        } else {
-            CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
-        }
-
+        CMEM_tryApplyEntry(sRealEntry, &gLinkFormProxies[PLAYER_FORM_HUMAN]);
         recompui_hide_context(context);
         context_shown = false;
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
