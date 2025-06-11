@@ -8,7 +8,7 @@ typedef unsigned long ZPlayerModelHandle;
 
 // Used for keeping compatibility between versions
 // DO NOT EDIT
-#define ZPMM_API_VERSION 1UL
+#define ZPM_API_VERSION 1UL
 
 #define YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME "yazmt_mm_playermodelmanager"
 
@@ -292,30 +292,38 @@ typedef enum {
     ZPM_MATRIX_MAX,
 } ZPlayerModel_MatrixId;
 
-#define ZPLAYERMODEL_FLAG_MM_ADULT_FIX 0x01ULL
+typedef enum {
+    ZPM_MODEL_TYPE_NONE,
+    ZPM_MODEL_TYPE_CHILD,
+    ZPM_MODEL_TYPE_ADULT,
+    ZPM_MODEL_TYPE_DEKU,
+    ZPM_MODEL_TYPE_GORON,
+    ZPM_MODEL_TYPE_ZORA,
+    ZPM_MODEL_TYPE_FIERCE_DEITY
+} ZPlayerModel_ModelType;
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, ZPlayerModelHandle ZPlayerModel_registerModel(unsigned long apiVersion, char *internalName));
+#define ZPLAYERMODEL_REGISTER_PLAYER_MODEL(internalName, modelType) ZPlayerModel_registerPlayerModel(ZPM_API_VERSION, internalName, modelType)
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setDisplayName(ZPlayerModelHandle h, char *displayName));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, ZPlayerModelHandle ZPlayerModel_registerPlayerModel(unsigned long apiVersion, char *internalName, ZPlayerModel_ModelType modelType));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setFlags(ZPlayerModelHandle h, u64 flags));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool ZPlayerModel_setDisplayName(ZPlayerModelHandle h, char *displayName));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_clearFlags(ZPlayerModelHandle h, u64 flags));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool ZPlayerModel_setAuthor(ZPlayerModelHandle h, char *author));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_clearAllFlags(ZPlayerModelHandle h, u64 flags));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool ZPlayerModel_clearAllFlags(ZPlayerModelHandle h, u64 flags));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setDL(ZPlayerModelHandle h, ZPlayerModel_DisplayListId dlId, Gfx *dl));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool ZPlayerModel_setDL(ZPlayerModelHandle h, ZPlayerModel_DisplayListId dlId, Gfx *dl));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setMtx(ZPlayerModelHandle h, ZPlayerModel_MatrixId mtxId, Mtx *matrix));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool ZPlayerModel_setMtx(ZPlayerModelHandle h, ZPlayerModel_MatrixId mtxId, Mtx *matrix));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setLoadCallback(ZPlayerModelHandle h, void (*onModelLoad)(void *), void *userdata));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool ZPlayerModel_setLoadCallback(ZPlayerModelHandle h, void (*onModelLoad)(void *), void *userdata));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setUnloadCallback(ZPlayerModelHandle h, void (*onModelUnload)(void *), void *userdata));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool ZPlayerModel_setUnloadCallback(ZPlayerModelHandle h, void (*onModelUnload)(void *), void *userdata));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setEyesTextures(ZPlayerModelHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool ZPlayerModel_setEyesTextures(ZPlayerModelHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, void ZPlayerModel_setMouthTextures(ZPlayerModelHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]));
+RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool ZPlayerModel_setMouthTextures(ZPlayerModelHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]));
 
 #endif

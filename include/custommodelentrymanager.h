@@ -7,11 +7,11 @@ typedef unsigned long ZPlayerModelHandle;
 void *CMEM_loadFromDisk(PlayerTransformation form, const char* path);
 void CMEM_setCurrentEntry(PlayerTransformation form, CustomModelEntry *entry);
 CustomModelEntry *CMEM_getCurrentEntry(PlayerTransformation form);
-CustomModelEntry **CMEM_getCombinedEntries(size_t *count);
+CustomModelEntry **CMEM_getCombinedEntries(PlayerTransformation, size_t *count);
 bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry);
 void CMEM_refreshDiskEntries(PlayerTransformation form);
 void CMEM_removeModel(PlayerTransformation form);
-ZPlayerModelHandle CMEM_createMemoryHandle();
+ZPlayerModelHandle CMEM_createMemoryHandle(PlayerTransformation form);
 CustomModelMemoryEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h);
 
 #endif

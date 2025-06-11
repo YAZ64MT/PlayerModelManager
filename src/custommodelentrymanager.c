@@ -18,6 +18,7 @@ RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
 static U32MemoryHashmapHandle sHandleToMemoryEntry;
 static ZPlayerModelHandle sNextMemoryHandle = 1;
+static U32HashsetHandle sUnassignedMemoryHandles;
 
 typedef struct {
     void **entries;
@@ -25,8 +26,8 @@ typedef struct {
     size_t capacity;
 } CustomModelEntries;
 
-static CustomModelEntries sDiskEntries;
-static CustomModelEntries sMemoryEntries;
+static CustomModelEntries sDiskEntries[PLAYER_FORM_MAX];
+static CustomModelEntries sMemoryEntries[PLAYER_FORM_MAX];
 
 static CustomModelEntry *sCurrentModelEntries[PLAYER_FORM_MAX];
 
@@ -106,33 +107,36 @@ void pushEntry(CustomModelEntries *cme, void *entry) {
 }
 
 void initEntryManager() {
-    initCustomModelEntries(&sDiskEntries);
-    initCustomModelEntries(&sMemoryEntries);
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        initCustomModelEntries(&sDiskEntries[i]);
+        initCustomModelEntries(&sMemoryEntries[i]);
+    }
 
     unsigned char *modFolderPath = recomp_get_mod_folder_path();
     sZobjDir = QDFL_getCombinedPath(2, modFolderPath, "zobj");
     recomp_free(modFolderPath);
 
     sHandleToMemoryEntry = recomputil_create_u32_memory_hashmap(sizeof(CustomModelMemoryEntry));
+    sUnassignedMemoryHandles = recomputil_create_u32_hashset();
 }
 
-void pushMemoryEntry(CustomModelMemoryEntry *entry) {
-    pushEntry(&sMemoryEntries, entry);
+void pushMemoryEntry(PlayerTransformation form, CustomModelMemoryEntry *entry) {
+    pushEntry(&sMemoryEntries[form], entry);
 }
 
-void pushDiskEntry(CustomModelDiskEntry *entry) {
-    pushEntry(&sDiskEntries, entry);
+void pushDiskEntry(PlayerTransformation form, CustomModelDiskEntry *entry) {
+    pushEntry(&sDiskEntries[form], entry);
 }
 
-void clearDiskEntries() {
-    for (size_t i = 0; i < sDiskEntries.count; ++i) {
-        CustomModelDiskEntry *curr = sDiskEntries.entries[i];
+void clearDiskEntries(PlayerTransformation form) {
+    for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
+        CustomModelDiskEntry *curr = sDiskEntries[form].entries[i];
         CustomModelDiskEntry_freeMembers(curr);
         recomp_free(curr);
-        sDiskEntries.entries[i] = NULL;
+        sDiskEntries[form].entries[i] = NULL;
     }
 
-    sDiskEntries.count = 0;
+    sDiskEntries[form].count = 0;
 }
 
 bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry) {
@@ -167,8 +171,8 @@ bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry) {
     return false;
 }
 
-CustomModelEntry **CMEM_getCombinedEntries(size_t *count) {
-    size_t combinedLength = sDiskEntries.count + sMemoryEntries.count;
+CustomModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *count) {
+    size_t combinedLength = sDiskEntries[form].count + sMemoryEntries[form].count;
 
     if (combinedLength == 0) {
         return NULL;
@@ -176,12 +180,12 @@ CustomModelEntry **CMEM_getCombinedEntries(size_t *count) {
 
     CustomModelEntry **combined = recomp_alloc(sizeof(*combined) * combinedLength);
 
-    for (size_t i = 0; i < sMemoryEntries.count; ++i) {
-        combined[i] = sMemoryEntries.entries[i];
+    for (size_t i = 0; i < sMemoryEntries[form].count; ++i) {
+        combined[i] = sMemoryEntries[form].entries[i];
     }
 
-    for (size_t i = 0; i < sDiskEntries.count; ++i) {
-        combined[i + sMemoryEntries.count] = sDiskEntries.entries[i];
+    for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
+        combined[i + sMemoryEntries[form].count] = sDiskEntries[form].entries[i];
     }
 
     *count = combinedLength;
@@ -249,7 +253,7 @@ char *getBaseNameNoExt(const char *path) {
 void CMEM_refreshDiskEntries(PlayerTransformation form) {
     CMEM_removeModel(form);
 
-    clearDiskEntries();
+    clearDiskEntries(form);
 
     unsigned long numFiles;
     QDFL_Status err = QDFL_getNumDirEntries(sZobjDir, &numFiles);
@@ -257,43 +261,65 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
     if (err == QDFL_STATUS_OK) {
         for (size_t i = 0; i < numFiles; ++i) {
             char *path = NULL;
+            char *fullPath = NULL;
 
-            QDFL_getDirEntryNameByIndex(sZobjDir, i, &path);
+            bool isValid = QDFL_getDirEntryNameByIndex(sZobjDir, i, &path) == QDFL_STATUS_OK;
 
-            char *fullPath = QDFL_getCombinedPath(2, sZobjDir, path);
+            if (isValid) {
+                fullPath = QDFL_getCombinedPath(2, sZobjDir, path);
 
-            unsigned long fileSize = 0;
+                unsigned long fileSize = 0;
 
-            QDFL_getFileSize(fullPath, &fileSize);
+                QDFL_getFileSize(fullPath, &fileSize);
 
-            if (isValidZobj(CMEM_loadFromDisk(form, fullPath), fileSize)) {
-                CustomModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
+                isValid = isValidZobj(CMEM_loadFromDisk(form, fullPath), fileSize);
 
-                CustomModelType modelType = CUSTOM_MODEL_TYPE_NONE;
+                if (isValid) {
+                    CustomModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
 
-                u8* data = sDiskBuffers[form].buffer;
+                    CustomModelType modelType = CUSTOM_MODEL_TYPE_NONE;
 
-                switch (data[Z64O_FORM_BYTE]) {
-                    case MMO_FORM_BYTE_CHILD:
-                    case OOTO_FORM_BYTE_CHILD:
-                        modelType = CUSTOM_MODEL_TYPE_CHILD;
-                        break;
+                    u8 *data = sDiskBuffers[form].buffer;
 
-                    case MMO_FORM_BYTE_ADULT:
-                    case OOTO_FORM_BYTE_ADULT:
-                        modelType = CUSTOM_MODEL_TYPE_ADULT;
-                        break;
+                    switch (data[Z64O_FORM_BYTE]) {
+                        case MMO_FORM_BYTE_CHILD:
+                        case OOTO_FORM_BYTE_CHILD:
+                            if (form == PLAYER_FORM_HUMAN) {
+                                modelType = CUSTOM_MODEL_TYPE_CHILD;
+                            } else {
+                                isValid = false;
+                            }
 
-                    default:
-                        break;
+                            break;
+
+                        case MMO_FORM_BYTE_ADULT:
+                        case OOTO_FORM_BYTE_ADULT:
+                            if (form == PLAYER_FORM_HUMAN) {
+                                modelType = CUSTOM_MODEL_TYPE_ADULT;
+                            } else if (form == PLAYER_FORM_FIERCE_DEITY) {
+                                modelType = CUSTOM_MODEL_TYPE_FIERCE_DEITY;
+                            } else {
+                                isValid = false;
+                            }
+                            break;
+
+                        default:
+                            isValid = false;
+                            break;
+                    }
+
+                    if (isValid) {
+                        CustomModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
+                        CustomModelDiskEntry_init(entry, modelType);
+                        entry->filePath = fullPath;
+                        entry->modelEntry.internalName = path;
+                        entry->modelEntry.displayName = getBaseNameNoExt(path);
+                        pushDiskEntry(form, entry);
+                    }
                 }
+            }
 
-                CustomModelDiskEntry_init(entry, modelType);
-                entry->filePath = fullPath;
-                entry->modelEntry.internalName = path;
-                entry->modelEntry.displayName = getBaseNameNoExt(path);
-                pushDiskEntry(entry);
-            } else {
+            if (!isValid) {
                 recomp_free(path);
                 recomp_free(fullPath);
             }
@@ -317,7 +343,7 @@ void CMEM_removeModel(PlayerTransformation form) {
     }
 }
 
-ZPlayerModelHandle CMEM_createMemoryHandle() {
+ZPlayerModelHandle CMEM_createMemoryHandle(PlayerTransformation form) {
     ZPlayerModelHandle handle = sNextMemoryHandle;
 
     sNextMemoryHandle++;
@@ -328,7 +354,7 @@ ZPlayerModelHandle CMEM_createMemoryHandle() {
 
     CustomModelMemoryEntry_init(entry);
 
-    pushMemoryEntry(entry);
+    pushMemoryEntry(form, entry);
 
     return handle;
 }

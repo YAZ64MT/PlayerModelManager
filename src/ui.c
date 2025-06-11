@@ -283,7 +283,7 @@ void createModelButtons() {
 
     CMEM_refreshDiskEntries(PLAYER_FORM_HUMAN);
 
-    sButtonEntries.entries = CMEM_getCombinedEntries(&sButtonEntries.count);
+    sButtonEntries.entries = CMEM_getCombinedEntries(PLAYER_FORM_HUMAN, &sButtonEntries.count);
 
     if (sButtonEntries.count > sButtonEntries.capacity) {
         recomp_free(sButtonEntries.buttons);
