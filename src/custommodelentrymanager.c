@@ -455,6 +455,9 @@ void CMEM_saveCurrentEntry(PlayerTransformation form) {
 
         if (sCurrentModelEntries[form]) {
             char *name = sCurrentModelEntries[form]->internalName;
+            // We encode the string because KV seemed to mangle raw strings
+            // So, we pack the internal name into an array of 32 bit integers instead
+            // TODO: Look into a better way of storing strings to disk
             u32 *encoded = encodeStr(name);
             u32 len = strlen(sCurrentModelEntries[form]->internalName);
             KV_Global_Set("zpm_saved_human_name", encoded, NUM_ELEMENTS_NEEDED_TO_STORE(len, sizeof(*encoded)) * sizeof(*encoded));
