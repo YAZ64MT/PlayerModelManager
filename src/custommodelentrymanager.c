@@ -51,6 +51,26 @@ void increaseDiskBufferSizeIfNeeded(PlayerTransformation form, size_t minSize) {
     }
 }
 
+void applyByInternalName(PlayerTransformation form, const char *name) {
+    for (size_t i = 0; i < sMemoryEntries[form].count; ++i) {
+        CustomModelMemoryEntry *e = sMemoryEntries[form].entries[i];
+
+        if (strcmp(name, e->modelEntry.internalName) == 0) {
+            CMEM_tryApplyEntry(form, &e->modelEntry);
+            return;
+        }
+    }
+
+    for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
+        CustomModelDiskEntry *e = sDiskEntries[form].entries[i];
+
+        if (strcmp(name, e->modelEntry.internalName) == 0) {
+            CMEM_tryApplyEntry(form, &e->modelEntry);
+            return;
+        }
+    }
+}
+
 void *CMEM_loadFromDisk(PlayerTransformation form, const char *path) {
     unsigned long fileSize = 0;
 
@@ -251,6 +271,15 @@ char *getBaseNameNoExt(const char *path) {
 }
 
 void CMEM_refreshDiskEntries(PlayerTransformation form) {
+    CustomModelEntry *currentEntry = CMEM_getCurrentEntry(form);
+
+    char *entryName = NULL;
+
+    if (currentEntry) {
+        entryName = recomp_alloc(strlen(currentEntry->internalName) + 1);
+        strcpy(entryName, currentEntry->internalName);
+    }
+
     CMEM_removeModel(form);
 
     clearDiskEntries(form);
@@ -324,6 +353,11 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
                 recomp_free(fullPath);
             }
         }
+    }
+
+    if (entryName) {
+        applyByInternalName(form, entryName);
+        recomp_free(entryName);
     }
 }
 

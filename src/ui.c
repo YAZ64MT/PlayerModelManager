@@ -91,6 +91,7 @@ void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *da
         Audio_PlaySfx(NA_SE_SY_DECIDE);
         sRealEntry = NULL;
         refreshFileList();
+        sRealEntry = CMEM_getCurrentEntry(PLAYER_FORM_HUMAN);
         refreshButtonEntryColors();
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
