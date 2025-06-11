@@ -274,6 +274,8 @@ void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
 
     setupFaceTextures(modelInfo, zobj);
 
+    modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = (Mtx *)&zobj[OOTO_ADULT_MATRIX_SWORD_BACK];
+    modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = (Mtx *)&zobj[OOTO_ADULT_MATRIX_SWORD_BACK];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = (Mtx *)&zobj[OOTO_ADULT_MATRIX_SWORD_BACK];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = (Mtx *)&zobj[OOTO_ADULT_MATRIX_SHIELD_BACK];
     modelInfo->equipMtx[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = (Mtx *)&zobj[OOTO_ADULT_MATRIX_SHIELD_BACK];
