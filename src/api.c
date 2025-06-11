@@ -5,6 +5,43 @@
 #include "model_common.h"
 #include "defines_modelinfo.h"
 
+const size_t 
+    MAX_INTERNAL_NAME_LENGTH = 512,
+    MAX_AUTHOR_NAME_LENGTH = 128,
+    MAX_DISPLAY_NAME_LENGTH = 64;
+
+
+bool isStrTooLong(const char *s, size_t maxLen) {
+    size_t length = 0;
+
+    while (*s != '\0') {
+        length++;
+        s++;
+
+        if (length > maxLen) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool isStrValid(const char *callerName, const char *strToVerify, size_t maxLen) {
+    if (!strToVerify) {
+        recomp_printf("%s: String passed in was NULL! Aborting!\n", callerName);
+        return false;
+    }
+
+    bool isTooLong = isStrTooLong(strToVerify, maxLen);
+
+    if (isTooLong) {
+        recomp_printf("%s: String passed in was too long! Maximum length is %u!\n", callerName, maxLen);
+        return false;
+    }
+
+    return true;
+}
+
 static bool sIsAPILocked = true;
 
 CustomModelMemoryEntry *getEntryOrPrintErr(ZPlayerModelHandle h, const char *funcName) {
@@ -26,12 +63,11 @@ CustomModelMemoryEntry *getEntryOrPrintErr(ZPlayerModelHandle h, const char *fun
 
 RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerPlayerModel(unsigned long apiVersion, char *internalName, CustomModelType modelType) {
     if (sIsAPILocked) {
-        recomp_printf("PlayerModelManager: Models can only be registered during a ZPlayerModels_onRegisterModels callback.\n");
+        recomp_printf("ZPlayerModel_registerPlayerModel: Models can only be registered during a ZPlayerModels_onRegisterModels callback.\n");
         return 0;
     }
 
-    if (!internalName) {
-        recomp_printf("PlayerModelManager: Passed in NULL internal name to ZPlayerModel_registerModel.\n");
+    if (isStrValid("ZPlayerModel_registerPlayerModel", internalName, MAX_INTERNAL_NAME_LENGTH)) {
         return 0;
     }
 
@@ -44,7 +80,7 @@ RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerPlayerModel(unsigned long 
             break;
 
         default:
-            recomp_printf("PlayerModelManager: Passed in unsupported ZPlayerModel_ModelType to ZPlayerModel_registerModel.\n");
+            recomp_printf("ZPlayerModel_registerPlayerModel: Passed in unsupported ZPlayerModel_ModelType to ZPlayerModel_registerModel.\n");
             return 0;
             break;
     }
@@ -67,6 +103,10 @@ RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerPlayerModel(unsigned long 
 }
 
 RECOMP_EXPORT bool ZPlayerModel_setDisplayName(ZPlayerModelHandle h, char *displayName) {
+    if (!isStrValid("ZPlayerModel_setDisplayName", displayName, MAX_DISPLAY_NAME_LENGTH)) {
+        return 0;
+    }
+
     CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setDisplayName");
 
     if (!entry) {
@@ -79,11 +119,16 @@ RECOMP_EXPORT bool ZPlayerModel_setDisplayName(ZPlayerModelHandle h, char *displ
 }
 
 RECOMP_EXPORT bool ZPlayerModel_setAuthor(ZPlayerModelHandle h, char *author) {
+    if (!isStrValid(ZPlayerModel_setAuthor, author, MAX_AUTHOR_NAME_LENGTH)) {
+        return false;
+    }
+
     CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setAuthor");
 
     if (!entry) {
         return false;
     }
+
 
     entry->modelEntry.authorName = author;
 
