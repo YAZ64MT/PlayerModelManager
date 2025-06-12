@@ -298,6 +298,10 @@ typedef struct {
     char authorName[DISKENTRY_AUTHOR_NAME_FIELD_SIZE];
 } CustomModelDiskEntryEmbeddedInfo;
 
+bool isEmbeddedVersionSupported(CustomModelDiskEntryEmbeddedInfo *info) {
+    return info->embedVersion == 1;
+}
+
 CustomModelDiskEntryEmbeddedInfo* getEmbeddedInfo(void *zobj) {
     if (zobj == NULL) {
         return NULL;
@@ -311,7 +315,13 @@ CustomModelDiskEntryEmbeddedInfo* getEmbeddedInfo(void *zobj) {
         }
     }
 
-    return (void *)&data[DISKENTRY_MODEL_INFO_LOCATION];
+    CustomModelDiskEntryEmbeddedInfo *info = (void *)&data[DISKENTRY_MODEL_INFO_LOCATION];
+
+    if (!isEmbeddedVersionSupported(info)) {
+        return NULL;
+    }
+
+    return info;
 }
 
 char *getTruncatedStringCopy(const char s[], size_t maxLength) {
