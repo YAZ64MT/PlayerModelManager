@@ -65,8 +65,6 @@ bool applyCustomModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
         return false;
     }
 
-    this->fileData = NULL;
-
     PlayerTransformation form = PLAYER_FORM_HUMAN;
 
     switch (this->modelEntry.type) {

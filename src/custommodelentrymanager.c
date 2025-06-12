@@ -432,7 +432,6 @@ void CMEM_saveCurrentEntry(PlayerTransformation form) {
     KV_Global_Remove(key);
 
     if (sCurrentModelEntries[form]) {
-        char *name = sCurrentModelEntries[form]->internalName;
         strcpy(sSavedModelNames[form].internalName, sCurrentModelEntries[form]->internalName);
         KV_Global_Set(key, sSavedModelNames[form].internalName, INTERNAL_NAME_MAX_LENGTH);
     }
