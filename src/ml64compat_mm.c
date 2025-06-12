@@ -428,8 +428,8 @@ u64 gOotBottleGlassTex[] = {
 
 void remapSegmentPtrs() {
 
-#define OOT_HILITE_1_TEX 0x04000000
-#define OOT_OCARINA_OF_TIME_TEX 0x04001400
+#define OOT_GK_HILITE_1_TEX 0x04000000
+#define OOT_GK_OCARINA_OF_TIME_TEX 0x04001400
 #define OOT_GK_DEKU_STICK_TEX 0x04001A00
 #define OOT_GK_HYLIAN_SHIELD_TEX 0x04000400
 #define OOT_GK_BOTTLE_GLASS_TEX 0x04001800
@@ -440,10 +440,10 @@ void remapSegmentPtrs() {
 
     void *human = ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD);
 
-    PTR_GK_REMAP_SET(OOT_HILITE_1_TEX, gameplay_keep_Tex_00C830);
+    PTR_GK_REMAP_SET(OOT_GK_HILITE_1_TEX, gameplay_keep_Tex_00C830);
     PTR_GK_REMAP_SET(OOT_GK_DEKU_STICK_TEX, gDekuStickTex);
 
-    PTR_OBJ_REMAP_SET(human, OOT_OCARINA_OF_TIME_TEX, gLinkHumanOcarinaTex);
+    PTR_OBJ_REMAP_SET(human, OOT_GK_OCARINA_OF_TIME_TEX, gLinkHumanOcarinaTex);
 
     setSegmentPtrRemap(OOT_GK_HYLIAN_SHIELD_TEX, (u32)gOotHylianShieldTex);
     setSegmentPtrRemap(OOT_GK_BOTTLE_GLASS_TEX, (u32)gOotBottleGlassTex);
