@@ -12,6 +12,7 @@
 #include "defines_modelinfo.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "assets/objects/object_link_child/object_link_child.h"
+#include "libc/string.h"
 
 void setupFaceTextures(Link_ModelInfo *modelInfo, u8 *zobj) {
     for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
@@ -46,26 +47,26 @@ typedef struct {
     u32 aliasTableIndex;
 } LimbToAlias;
 
-#define DECLARE_Z64O_LIMB_ALIAS(aliasName, modName, sheathDL)                                            \
-    static LimbToAlias aliasName[] = {                                                         \
-        {.limb = PLAYER_LIMB_WAIST, .aliasTableIndex = modName##_LUT_DL_WAIST},                \
-        {.limb = PLAYER_LIMB_RIGHT_THIGH, .aliasTableIndex = modName##_LUT_DL_RTHIGH},         \
-        {.limb = PLAYER_LIMB_RIGHT_SHIN, .aliasTableIndex = modName##_LUT_DL_RSHIN},           \
-        {.limb = PLAYER_LIMB_RIGHT_FOOT, .aliasTableIndex = modName##_LUT_DL_RFOOT},           \
-        {.limb = PLAYER_LIMB_LEFT_THIGH, .aliasTableIndex = modName##_LUT_DL_LTHIGH},          \
-        {.limb = PLAYER_LIMB_LEFT_SHIN, .aliasTableIndex = modName##_LUT_DL_LSHIN},            \
-        {.limb = PLAYER_LIMB_LEFT_FOOT, .aliasTableIndex = modName##_LUT_DL_LFOOT},            \
-        {.limb = PLAYER_LIMB_HEAD, .aliasTableIndex = modName##_LUT_DL_HEAD},                  \
-        {.limb = PLAYER_LIMB_HAT, .aliasTableIndex = modName##_LUT_DL_HAT},                    \
-        {.limb = PLAYER_LIMB_COLLAR, .aliasTableIndex = modName##_LUT_DL_COLLAR},              \
-        {.limb = PLAYER_LIMB_LEFT_SHOULDER, .aliasTableIndex = modName##_LUT_DL_LSHOULDER},    \
-        {.limb = PLAYER_LIMB_LEFT_FOREARM, .aliasTableIndex = modName##_LUT_DL_LFOREARM},      \
-        {.limb = PLAYER_LIMB_LEFT_HAND, .aliasTableIndex = modName##_LUT_DL_LHAND},            \
-        {.limb = PLAYER_LIMB_RIGHT_SHOULDER, .aliasTableIndex = modName##_LUT_DL_RSHOULDER},   \
-        {.limb = PLAYER_LIMB_RIGHT_FOREARM, .aliasTableIndex = modName##_LUT_DL_RFOREARM},     \
-        {.limb = PLAYER_LIMB_RIGHT_HAND, .aliasTableIndex = modName##_LUT_DL_RHAND},           \
-        {.limb = PLAYER_LIMB_SHEATH, .aliasTableIndex = sheathDL}, \
-        {.limb = PLAYER_LIMB_TORSO, .aliasTableIndex = modName##_LUT_DL_TORSO},                \
+#define DECLARE_Z64O_LIMB_ALIAS(aliasName, modName, sheathDL)                                \
+    static LimbToAlias aliasName[] = {                                                       \
+        {.limb = PLAYER_LIMB_WAIST, .aliasTableIndex = modName##_LUT_DL_WAIST},              \
+        {.limb = PLAYER_LIMB_RIGHT_THIGH, .aliasTableIndex = modName##_LUT_DL_RTHIGH},       \
+        {.limb = PLAYER_LIMB_RIGHT_SHIN, .aliasTableIndex = modName##_LUT_DL_RSHIN},         \
+        {.limb = PLAYER_LIMB_RIGHT_FOOT, .aliasTableIndex = modName##_LUT_DL_RFOOT},         \
+        {.limb = PLAYER_LIMB_LEFT_THIGH, .aliasTableIndex = modName##_LUT_DL_LTHIGH},        \
+        {.limb = PLAYER_LIMB_LEFT_SHIN, .aliasTableIndex = modName##_LUT_DL_LSHIN},          \
+        {.limb = PLAYER_LIMB_LEFT_FOOT, .aliasTableIndex = modName##_LUT_DL_LFOOT},          \
+        {.limb = PLAYER_LIMB_HEAD, .aliasTableIndex = modName##_LUT_DL_HEAD},                \
+        {.limb = PLAYER_LIMB_HAT, .aliasTableIndex = modName##_LUT_DL_HAT},                  \
+        {.limb = PLAYER_LIMB_COLLAR, .aliasTableIndex = modName##_LUT_DL_COLLAR},            \
+        {.limb = PLAYER_LIMB_LEFT_SHOULDER, .aliasTableIndex = modName##_LUT_DL_LSHOULDER},  \
+        {.limb = PLAYER_LIMB_LEFT_FOREARM, .aliasTableIndex = modName##_LUT_DL_LFOREARM},    \
+        {.limb = PLAYER_LIMB_LEFT_HAND, .aliasTableIndex = modName##_LUT_DL_LHAND},          \
+        {.limb = PLAYER_LIMB_RIGHT_SHOULDER, .aliasTableIndex = modName##_LUT_DL_RSHOULDER}, \
+        {.limb = PLAYER_LIMB_RIGHT_FOREARM, .aliasTableIndex = modName##_LUT_DL_RFOREARM},   \
+        {.limb = PLAYER_LIMB_RIGHT_HAND, .aliasTableIndex = modName##_LUT_DL_RHAND},         \
+        {.limb = PLAYER_LIMB_SHEATH, .aliasTableIndex = sheathDL},                           \
+        {.limb = PLAYER_LIMB_TORSO, .aliasTableIndex = modName##_LUT_DL_TORSO},              \
     };
 
 DECLARE_Z64O_LIMB_ALIAS(sMMOLimbs, MMO, MMO_LUT_DL_SWORD_KOKIRI_SHEATH);
@@ -157,12 +158,81 @@ void setupZobjMmoHuman(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_MMO_MODEL(FPS_RHAND);
 }
 
+typedef struct {
+    u8 r;
+    u8 g;
+    u8 b;
+} TunicColor;
+
+static TunicColor sTunicColor = {
+    .r = 30,
+    .g = 105,
+    .b = 27,
+};
+
 void fixTunicColor(PlayState *play) {
-    OPEN_DISPS(play->state.gfxCtx);
+    if (recomp_get_config_u32("is_modify_tunic_color")) {
+        OPEN_DISPS(play->state.gfxCtx);
 
-    gDPSetEnvColor(POLY_OPA_DISP++, 30, 105, 27, 0);
+        gDPSetEnvColor(POLY_OPA_DISP++, sTunicColor.r, sTunicColor.g, sTunicColor.b, 0);
 
-    CLOSE_DISPS(play->state.gfxCtx);
+        CLOSE_DISPS(play->state.gfxCtx);
+    }
+}
+
+// Convert char to its numeric value
+// Returns 0xFF if invalid character
+u8 cToNum(char c) {
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    } else if (c >= 'a' && c <= 'f') {
+        return c - 'a' + 10;
+    } else if (c >= 'A' && c <= 'F') {
+        return c - 'A' + 10;
+    }
+    
+    return 0xFF;
+}
+
+u8 sToU8(const char *s) {
+    return (cToNum(s[0]) << 4) | cToNum(s[1]);
+}
+
+bool isValidHexString(const char* s) {
+    bool isValid = true;
+
+    size_t len = 0;
+
+    while (*s != '\0' && isValid) {
+        if (len > 6 || cToNum(*s) == 0xFF) {
+            isValid = false;
+        }
+        s++;
+        len++;
+    }
+
+    if (len < 6) {
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+RECOMP_HOOK("Player_Draw")
+void readTunicColor_on_Player_DrawGameplay(PlayState *play, Player *this, s32 lod, Gfx *cullDList, OverrideLimbDrawFlex overrideLimbDraw) {
+    if (recomp_get_config_u32("is_modify_tunic_color")) {
+        char *color = recomp_get_config_string("tunic_color");
+
+        if (color) {
+            if (isValidHexString(color)) {
+                sTunicColor.r = sToU8(color);
+                sTunicColor.g = sToU8(color + 2);
+                sTunicColor.b = sToU8(color + 4);
+            }
+        }
+
+        recomp_free_config_string(color);
+    }
 }
 
 RECOMP_HOOK("Player_OverrideLimbDrawGameplayDefault")

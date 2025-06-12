@@ -8,7 +8,7 @@
 id = "yazmt_mm_playermodelmanager"
 
 # Version of this mod.
-version = "0.0.9"
+version = "0.0.10"
 
 # The name that will show up for this mod in the mod menu. This should be human readable.
 display_name = "Player Model Manager"
@@ -19,7 +19,7 @@ This is a mod for Majora's Mask: Recompiled that allows Link's model to be swapp
 
 To load ModLoader64 zobjs, throw them in a zobj folder in your MM Recomp mods folder.
 
-Press L + A to open the model menu.
+To open the model menu, use the button combo you have configured. By default, it is L + A.
 
 This is a testing build. Please do not distribute it since several features need to be finalized.
 """
@@ -68,3 +68,57 @@ data_reference_syms_files = [ "Zelda64RecompSyms/mm.us.rev1.datasyms.toml", "Zel
 
 # Additional files to include in the mod.
 additional_files = [ "thumb.png" ]
+
+[[manifest.config_options]]
+id = "open_menu_buttons"
+name = "Open Menu Button Combo"
+description = """
+Set the combination of buttons to open the model selection menu.
+
+NONE:
+Selection menu opening disabled.
+
+L + R:
+Map Button + Shield Button
+
+L + A:
+Map Button + Action Button
+"""
+type = "Enum"
+options = [ "NONE", "L + R", "L + A" ]
+default = "L + A"
+
+[[manifest.config_options]]
+id = "live_preview"
+name = "Preview Models"
+description = """
+Enable or disable the model preview.
+
+With this feature ON, the model will be shown when you hover over it.
+
+With this feature OFF, the model will not be shown unless you explicitly press on it.
+"""
+type = "Enum"
+options = [ "OFF", "ON" ]
+default = "OFF"
+
+[[manifest.config_options]]
+id = "is_modify_tunic_color"
+name = "Set Tunic Color"
+description = """
+Some models may have a colorable tunic.
+
+If they do, this option is necessary to render the tunic properly in Majora's Mask.
+
+This option may conflict with other tunic color mods, so feel free to disable it.
+"""
+type = "Enum"
+options = [ "OFF", "ON" ]
+default = "ON"
+
+[[manifest.config_options]]
+id = "tunic_color"
+name = "Tunic Color"
+description = "Hex string color value of tunic.\n\nDoes nothing if 'Set Tunic Color' is disabled.\n\nDefault: 1E691B"
+type = "String"
+default = "1E691B"
