@@ -314,6 +314,26 @@ CustomModelDiskEntryEmbeddedInfo* getEmbeddedInfo(void *zobj) {
     return (void *)&data[DISKENTRY_MODEL_INFO_LOCATION];
 }
 
+char *getTruncatedStringCopy(const char s[], size_t maxLength) {
+    size_t length = 0;
+
+    char *p = s;
+    while (*p != '\0' && length < maxLength) {
+        length++;
+        p++;
+    }
+
+    char *sCopy = recomp_alloc(length + 1);
+
+    sCopy[length] = '\0';
+
+    for (size_t i = 0; i < length; ++i) {
+        sCopy[i] = s[i];
+    }
+
+    return sCopy;
+}
+
 void CMEM_refreshDiskEntries(PlayerTransformation form) {
     CustomModelEntry *currentEntry = CMEM_getCurrentEntry(form);
 
@@ -391,29 +411,14 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
                         CustomModelDiskEntryEmbeddedInfo *embed = getEmbeddedInfo(zobj);
 
                         if (embed) {
-                            entry->modelEntry.internalName = recomp_alloc(strlen(embed->internalName) + 1);
-                            strcpy(entry->modelEntry.internalName, embed->internalName);
+                            entry->modelEntry.internalName = getTruncatedStringCopy(embed->internalName, sizeof(embed->internalName) - 1);
 
-                            entry->modelEntry.displayName = recomp_alloc(strlen(embed->displayName) + 1);
-                            strcpy(entry->modelEntry.displayName, embed->displayName);
+                            entry->modelEntry.displayName = getTruncatedStringCopy(embed->displayName, sizeof(embed->displayName) - 1);
 
-                            entry->modelEntry.authorName = recomp_alloc(strlen(embed->authorName) + 1);
-                            strcpy(entry->modelEntry.authorName, embed->authorName);
-
-                            recomp_free(path);
+                            entry->modelEntry.authorName = getTruncatedStringCopy(embed->authorName, sizeof(embed->authorName) - 1);
                         }
                         else {
-                            // truncate internal name if too long
-                            size_t pathSize = 0;
-                            while (path[pathSize] != '\0' && pathSize <= INTERNAL_NAME_MAX_LENGTH) {
-                                pathSize++;
-                            }
-
-                            if (pathSize >= INTERNAL_NAME_MAX_LENGTH) {
-                                path[INTERNAL_NAME_MAX_LENGTH] = '\0';
-                            }
-
-                            entry->modelEntry.internalName = path;
+                            entry->modelEntry.internalName = getTruncatedStringCopy(path, INTERNAL_NAME_MAX_LENGTH);
                             entry->modelEntry.displayName = getBaseNameNoExt(path);
                         }
 
@@ -422,9 +427,12 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
                 }
             }
 
+            recomp_free(path);
+            path = NULL;
+
             if (!isValid) {
-                recomp_free(path);
                 recomp_free(fullPath);
+                fullPath = NULL;
             }
         }
     }
