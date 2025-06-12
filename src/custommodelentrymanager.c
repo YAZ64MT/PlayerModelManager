@@ -38,6 +38,21 @@ typedef struct {
     size_t capacity;
 } DiskEntryBuffer;
 
+#define SAVED_INTERNAL_NAME_BUFFER_SIZE (INTERNAL_NAME_MAX_LENGTH + 1)
+
+typedef struct {
+    const char *key;
+    char internalName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
+} SavedModelName;
+
+static SavedModelName sSavedModelNames[PLAYER_FORM_MAX] = {
+    {.key = "zpm_saved_fierce_deity_name"},
+    {.key = "zpm_saved_goron_name"},
+    {.key = "zpm_saved_zora_name"},
+    {.key = "zpm_saved_deku_name"},
+    {.key = "zpm_saved_human_name"},
+};
+
 static DiskEntryBuffer sDiskBuffers[PLAYER_FORM_MAX] = {0};
 
 void increaseDiskBufferSizeIfNeeded(PlayerTransformation form, size_t minSize) {
@@ -340,6 +355,17 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
                         CustomModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
                         CustomModelDiskEntry_init(entry, modelType);
                         entry->filePath = fullPath;
+
+                        // truncate internal name if too long
+                        size_t pathSize = 0;
+                        while (path[pathSize] != '\0' && pathSize <= INTERNAL_NAME_MAX_LENGTH) {
+                            pathSize++;
+                        }
+
+                        if (pathSize >= INTERNAL_NAME_MAX_LENGTH) {
+                            path[INTERNAL_NAME_MAX_LENGTH] = '\0';
+                        }
+
                         entry->modelEntry.internalName = path;
                         entry->modelEntry.displayName = getBaseNameNoExt(path);
                         pushDiskEntry(form, entry);
@@ -361,7 +387,7 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
 }
 
 void CMEM_removeModel(PlayerTransformation form) {
-    Link_FormProxy* proxy = &gLinkFormProxies[form];
+    Link_FormProxy *proxy = &gLinkFormProxies[form];
 
     if (sCurrentModelEntries[form]) {
         sCurrentModelEntries[form]->onModelUnload(sCurrentModelEntries[form]->onModelUnloadData);
@@ -396,98 +422,30 @@ CustomModelMemoryEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h) {
     return recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, h);
 }
 
-#define NUM_ELEMENTS_NEEDED_TO_STORE(n, size) (n / size + 1)
-
-// Encodes string as U32 array
-u32 *encodeStr(const char* str) {
-    size_t len = strlen(str);
-    size_t requiredNums = NUM_ELEMENTS_NEEDED_TO_STORE(len, sizeof(u32));
-
-    u32 *encodedStr;
-    size_t buffSize = sizeof(*encodedStr) * requiredNums;
-    encodedStr = recomp_alloc(buffSize);
-    Lib_MemSet(encodedStr, 0, buffSize);
-
-    unsigned currByte = 0;
-    u32 *currNum = encodedStr;
-
-    while (*str != '\0') {
-        u32 expandedChar = *str;
-        *currNum |= (expandedChar << currByte * 8);
-
-        currByte++;
-        if (currByte >= sizeof(u32)) {
-            currByte = 0;
-            currNum++;
-        }
-
-        str++;
-    }
-
-    return encodedStr;
-}
-
-// decodes string stored as U32 array with encodeStr
-char *decodeStr(u32 *encodedString, size_t encodedStrLen) {
-    char *result = recomp_alloc(encodedStrLen + 1);
-
-    result[encodedStrLen] = '\0';
-
-    unsigned currByte = 0;
-
-    for (size_t i = 0; i < encodedStrLen; ++i) {
-        result[i] = *encodedString >> (currByte * 8);
-
-        currByte++;
-        if (currByte >= sizeof(u32)) {
-            currByte = 0;
-            encodedString++;
-        }
-    }
-
-    return result;
-}
-
 void CMEM_saveCurrentEntry(PlayerTransformation form) {
-    if (form == PLAYER_FORM_HUMAN) {
-        KV_Global_Remove("zpm_saved_human_name");
-        KV_Global_Remove("zpm_saved_human_name_length");
+    if (form > PLAYER_FORM_MAX || form < 0) {
+        return;
+    }
 
-        if (sCurrentModelEntries[form]) {
-            char *name = sCurrentModelEntries[form]->internalName;
-            // We encode the string because KV seemed to mangle raw strings
-            // So, we pack the internal name into an array of 32 bit integers instead
-            // TODO: Look into a better way of storing strings to disk
-            u32 *encoded = encodeStr(name);
-            u32 len = strlen(sCurrentModelEntries[form]->internalName);
-            KV_Global_Set("zpm_saved_human_name", encoded, NUM_ELEMENTS_NEEDED_TO_STORE(len, sizeof(*encoded)) * sizeof(*encoded));
-            KV_Global_Set_U32("zpm_saved_human_name_length", len);
-            recomp_free(encoded);
-        }
+    const char *key = sSavedModelNames[form].key;
+
+    KV_Global_Remove(key);
+
+    if (sCurrentModelEntries[form]) {
+        char *name = sCurrentModelEntries[form]->internalName;
+        strcpy(sSavedModelNames[form].internalName, sCurrentModelEntries[form]->internalName);
+        KV_Global_Set(key, sSavedModelNames[form].internalName, INTERNAL_NAME_MAX_LENGTH);
     }
 }
 
 RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onSavedModelsApplied());
 
 void loadSavedModels() {
-    if (KV_Global_Has("zpm_saved_human_name")) {
-        u32 nameLength = KV_Global_Get_U32("zpm_saved_human_name_length", 0);
-        if (nameLength > 0) {
-            // TODO: ASK PROXY IF STRINGS CAN BE STORED
+    static char retrievedName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
 
-            size_t encodedSize = NUM_ELEMENTS_NEEDED_TO_STORE(nameLength, sizeof(u32)) * sizeof(u32);
-
-            void *encodedName = recomp_alloc(encodedSize);
-
-            if (KV_Global_Get("zpm_saved_human_name", encodedName, encodedSize)) {
-                char *decodedName = decodeStr(encodedName, nameLength);
-
-                applyByInternalName(PLAYER_FORM_HUMAN, decodedName);
-
-                recomp_free(decodedName);
-            }
-
-            recomp_free(encodedName);
+    if (KV_Global_Has(sSavedModelNames[PLAYER_FORM_HUMAN].key)) {
+        if (KV_Global_Get(sSavedModelNames[PLAYER_FORM_HUMAN].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
+            applyByInternalName(PLAYER_FORM_HUMAN, retrievedName);
         }
     }
 

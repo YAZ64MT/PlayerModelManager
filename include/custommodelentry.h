@@ -4,6 +4,9 @@
 #include "global.h"
 #include "playermodelmanager.h"
 
+// This is the max file name length for most Linux distros and MacOS
+#define INTERNAL_NAME_MAX_LENGTH 255
+
 typedef enum {
     CUSTOM_MODEL_TYPE_NONE,
     CUSTOM_MODEL_TYPE_CHILD,

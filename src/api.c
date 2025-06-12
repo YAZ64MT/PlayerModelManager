@@ -6,7 +6,7 @@
 #include "defines_modelinfo.h"
 
 const size_t 
-    MAX_INTERNAL_NAME_LENGTH = 256,
+    MAX_INTERNAL_NAME_LENGTH = INTERNAL_NAME_MAX_LENGTH,
     MAX_AUTHOR_NAME_LENGTH = 128,
     MAX_DISPLAY_NAME_LENGTH = 64;
 
