@@ -46,6 +46,8 @@ static CustomModelEntry *sRealEntry = NULL;
 
 static bool sIsDiskSaveNeeded = false;
 
+static bool sIsLivePreviewEnabled = false;
+
 void destroyAuthor() {
     if (modelAuthor) {
         recompui_destroy_element(row2, modelAuthor);
@@ -74,7 +76,10 @@ void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *dat
         sIsDiskSaveNeeded = true;
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
-        applyRealEntry();
+
+        if (sIsLivePreviewEnabled) {
+            applyRealEntry();
+        }
     }
 }
 
@@ -91,7 +96,10 @@ void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data
         }
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
-        applyRealEntry();
+
+        if (sIsLivePreviewEnabled) {
+            applyRealEntry();
+        }
     }
 }
 
@@ -104,7 +112,10 @@ void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *da
         refreshButtonEntryColors();
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
-        applyRealEntry();
+        
+        if (sIsLivePreviewEnabled) {
+            applyRealEntry();
+        }
     }
 }
 
@@ -341,7 +352,10 @@ void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *da
     } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
         destroyAuthor();
         setAuthor(entry->authorName);
-        CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, entry);
+
+        if (sIsLivePreviewEnabled) {
+            CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, entry);
+        }
     }
 }
 
@@ -433,22 +447,48 @@ void refreshFileList() {
     createModelButtons();
 }
 
-bool checkButtonCombo(PlayState *play) {
+typedef enum {
+    MODCFG_BUTTON_COMBO_NONE,
+    MODCFG_BUTTON_COMBO_LR,
+    MODCFG_BUTTON_COMBO_LA,
+} ModConfig_ButtonCombo;
+
+bool isOpenMenuComboPressed(PlayState *play) {
     Input *input = CONTROLLER1(&play->state);
-    return (CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_A)) ||
-           (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_A));
+
+    switch (recomp_get_config_u32("open_menu_buttons")) {
+        case MODCFG_BUTTON_COMBO_LR:
+            return (CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_R)) ||
+                   (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_R));
+            break;
+
+        case MODCFG_BUTTON_COMBO_LA:
+            return (CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_A)) ||
+                   (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_A));
+            break;
+
+        default:
+            break;
+    }
+
+    return false;
+}
+
+void openModelMenu() {
+    if (!context_shown) {
+        sIsDiskSaveNeeded = false;
+        sIsLivePreviewEnabled = recomp_get_config_u32("is_live_preview_enabled");
+        sRealEntry = CMEM_getCurrentEntry(PLAYER_FORM_HUMAN);
+        recompui_show_context(context);
+        context_shown = true;
+    }
 }
 
 // Hook Play_UpdateMain to check if the L button is pressed and show this mod's UI if so.
 RECOMP_HOOK("Play_UpdateMain")
 void on_play_update(PlayState *play) {
-    if (checkButtonCombo(play)) {
-        if (!context_shown) {
-            sIsDiskSaveNeeded = false;
-            sRealEntry = CMEM_getCurrentEntry(PLAYER_FORM_HUMAN);
-            recompui_show_context(context);
-            context_shown = true;
-        }
+    if (isOpenMenuComboPressed(play)) {
+        openModelMenu();
     }
 }
 
