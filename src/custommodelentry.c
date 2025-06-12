@@ -6,12 +6,10 @@
 #include "playermodelmanager_utils.h"
 #include "custommodelentrymanager.h"
 
-char DEFAULT_AUTHOR[] = "N/A";
-
 void CustomModelEntry_init(CustomModelEntry *this) {
     this->displayName = NULL;
     this->internalName = NULL;
-    this->authorName = DEFAULT_AUTHOR;
+    this->authorName = NULL;
     this->flags = 0;
     this->onModelLoad = NULL;
     this->onModelLoadData = NULL;
@@ -163,5 +161,10 @@ void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this) {
     if (entry->internalName) {
         recomp_free(entry->internalName);
         entry->internalName = NULL;
+    }
+
+    if (entry->authorName) {
+        recomp_free(entry->authorName);
+        entry->authorName = NULL;
     }
 }

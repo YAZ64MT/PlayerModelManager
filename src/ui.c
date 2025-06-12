@@ -58,6 +58,10 @@ void destroyAuthor() {
 }
 
 void setAuthor(const char *author) {
+    if (!author) {
+        author = "N/A";
+    }
+    
     destroyAuthor();
     modelAuthorPrefix = recompui_create_label(context, row2, "Author(s): ", LABELSTYLE_NORMAL);
     modelAuthor = recompui_create_label(context, row2, author, LABELSTYLE_NORMAL);

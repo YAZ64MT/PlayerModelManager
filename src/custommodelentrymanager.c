@@ -284,6 +284,36 @@ char *getBaseNameNoExt(const char *path) {
     return base;
 }
 
+const char DISKENTRY_MODEL_INFO_HEADER[] = "PLAYERMODELINFO";
+#define DISKENTRY_INTERNAL_NAME_FIELD_SIZE 64
+#define DISKENTRY_DISPLAY_NAME_FIELD_SIZE 32
+#define DISKENTRY_AUTHOR_NAME_FIELD_SIZE 64
+#define DISKENTRY_MODEL_INFO_LOCATION 0x5500
+
+typedef struct {
+    char header[sizeof(DISKENTRY_MODEL_INFO_HEADER) - 1];
+    char embedVersion;
+    char internalName[DISKENTRY_INTERNAL_NAME_FIELD_SIZE];
+    char displayName[DISKENTRY_DISPLAY_NAME_FIELD_SIZE];
+    char authorName[DISKENTRY_AUTHOR_NAME_FIELD_SIZE];
+} CustomModelDiskEntryEmbeddedInfo;
+
+CustomModelDiskEntryEmbeddedInfo* getEmbeddedInfo(void *zobj) {
+    if (zobj == NULL) {
+        return NULL;
+    }
+
+    char *data = zobj;
+
+    for (size_t i = 0; i < sizeof(DISKENTRY_MODEL_INFO_HEADER) - 1; ++i) {
+        if (data[DISKENTRY_MODEL_INFO_LOCATION + i] != DISKENTRY_MODEL_INFO_HEADER[i]) {
+            return NULL;
+        }
+    }
+
+    return (void *)&data[DISKENTRY_MODEL_INFO_LOCATION];
+}
+
 void CMEM_refreshDiskEntries(PlayerTransformation form) {
     CustomModelEntry *currentEntry = CMEM_getCurrentEntry(form);
 
@@ -315,7 +345,9 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
 
                 QDFL_getFileSize(fullPath, &fileSize);
 
-                isValid = isValidZobj(CMEM_loadFromDisk(form, fullPath), fileSize);
+                void *zobj = CMEM_loadFromDisk(form, fullPath);
+
+                isValid = isValidZobj(zobj, fileSize);
 
                 if (isValid) {
                     CustomModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
@@ -356,18 +388,35 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
                         CustomModelDiskEntry_init(entry, modelType);
                         entry->filePath = fullPath;
 
-                        // truncate internal name if too long
-                        size_t pathSize = 0;
-                        while (path[pathSize] != '\0' && pathSize <= INTERNAL_NAME_MAX_LENGTH) {
-                            pathSize++;
+                        CustomModelDiskEntryEmbeddedInfo *embed = getEmbeddedInfo(zobj);
+
+                        if (embed) {
+                            entry->modelEntry.internalName = recomp_alloc(strlen(embed->internalName) + 1);
+                            strcpy(entry->modelEntry.internalName, embed->internalName);
+
+                            entry->modelEntry.displayName = recomp_alloc(strlen(embed->displayName) + 1);
+                            strcpy(entry->modelEntry.displayName, embed->displayName);
+
+                            entry->modelEntry.authorName = recomp_alloc(strlen(embed->authorName) + 1);
+                            strcpy(entry->modelEntry.authorName, embed->authorName);
+
+                            recomp_free(path);
+                        }
+                        else {
+                            // truncate internal name if too long
+                            size_t pathSize = 0;
+                            while (path[pathSize] != '\0' && pathSize <= INTERNAL_NAME_MAX_LENGTH) {
+                                pathSize++;
+                            }
+
+                            if (pathSize >= INTERNAL_NAME_MAX_LENGTH) {
+                                path[INTERNAL_NAME_MAX_LENGTH] = '\0';
+                            }
+
+                            entry->modelEntry.internalName = path;
+                            entry->modelEntry.displayName = getBaseNameNoExt(path);
                         }
 
-                        if (pathSize >= INTERNAL_NAME_MAX_LENGTH) {
-                            path[INTERNAL_NAME_MAX_LENGTH] = '\0';
-                        }
-
-                        entry->modelEntry.internalName = path;
-                        entry->modelEntry.displayName = getBaseNameNoExt(path);
                         pushDiskEntry(form, entry);
                     }
                 }
