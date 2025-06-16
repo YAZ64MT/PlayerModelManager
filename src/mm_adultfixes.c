@@ -5,6 +5,9 @@
 #include "model_common.h"
 #include "mm_adultfixes.h"
 #include "defines_modelinfo.h"
+#include "overlays/actors/ovl_En_Rd/z_en_rd.h"
+#include "overlays/actors/ovl_En_Railgibud/z_en_railgibud.h"
+#include "overlays/actors/ovl_En_Talk_Gibud/z_en_talk_gibud.h"
 
 Player *gPlayer;
 PlayerTransformation gPlayerTransformation;
@@ -123,7 +126,7 @@ void return_Player_GetHeight(void) {
 bool gPushedMatrixBremen = false;
 
 RECOMP_HOOK("Player_Draw")
-void fixAdultBrement_on_Player_Draw(Actor *thisx, PlayState *play) {
+void fixAdultBremen_on_Player_Draw(Actor *thisx, PlayState *play) {
     if (IS_HUMAN_ADULT_LINK_MODEL) {
         Player *this = (Player *)thisx;
 
@@ -139,7 +142,7 @@ void fixAdultBrement_on_Player_Draw(Actor *thisx, PlayState *play) {
 }
 
 RECOMP_HOOK_RETURN("Player_Draw")
-void fixAdultBrement_on_return_Player_Draw(Actor *thisx, PlayState *play) {
+void fixAdultBremen_on_return_Player_Draw(Actor *thisx, PlayState *play) {
     if (IS_HUMAN_ADULT_LINK_MODEL) {
         if (gPushedMatrixBremen) {
             Matrix_Pop();
@@ -216,3 +219,56 @@ void return_Player_PostLimbDrawGameplay(void) {
     gPushedMaskMatrix = false;
 }
 */
+
+static PlayerTransformation sRealPlayerFormGrab;
+
+RECOMP_HOOK("EnRd_Grab") 
+void fixEnemyHeight_on_EnRd_Grab(EnRd *this, PlayState *play) {
+    Player *p = GET_PLAYER(play);
+    sRealPlayerFormGrab = GET_PLAYER_FORM;
+
+    if (IS_HUMAN_ADULT_LINK_MODEL && sRealPlayerFormGrab == PLAYER_FORM_HUMAN) {
+        gSaveContext.save.playerForm = PLAYER_FORM_ZORA;
+    }
+}
+
+RECOMP_HOOK_RETURN("EnRd_Grab")
+void fixEnemyHeight_on_return_EnRd_Grab() {
+    gSaveContext.save.playerForm = sRealPlayerFormGrab;
+}
+
+// Music Box Gibdo height fix
+static PlayerTransformation sRealPlayerFormIdealPosMusicBox;
+
+RECOMP_HOOK("EnRailgibud_MoveToIdealGrabPositionAndRotation")
+void fixEnemyHeight_on_EnRailgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
+    Player *p = GET_PLAYER(play);
+    sRealPlayerFormIdealPosMusicBox = GET_PLAYER_FORM;
+
+    if (IS_HUMAN_ADULT_LINK_MODEL && sRealPlayerFormIdealPosMusicBox == PLAYER_FORM_HUMAN) {
+        gSaveContext.save.playerForm = PLAYER_FORM_ZORA;
+    }
+}
+
+RECOMP_HOOK_RETURN("EnRailgibud_MoveToIdealGrabPositionAndRotation")
+void fixEnemyHeight_on_return_EnRailgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
+    gSaveContext.save.playerForm = sRealPlayerFormIdealPosMusicBox;
+}
+
+// Talking Redead/Gibdo height fix
+static PlayerTransformation sRealPlayerFormIdealPosTalk;
+
+RECOMP_HOOK("EnTalkGibud_MoveToIdealGrabPositionAndRotation")
+void fixEnemyHeight_on_EnTalkgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
+    Player *p = GET_PLAYER(play);
+    sRealPlayerFormIdealPosTalk = GET_PLAYER_FORM;
+
+    if (IS_HUMAN_ADULT_LINK_MODEL && sRealPlayerFormIdealPosTalk == PLAYER_FORM_HUMAN) {
+        gSaveContext.save.playerForm = PLAYER_FORM_ZORA;
+    }
+}
+
+RECOMP_HOOK_RETURN("EnTalkGibud_MoveToIdealGrabPositionAndRotation")
+void fixEnemyHeight_on_return_EnTalkgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
+    gSaveContext.save.playerForm = sRealPlayerFormIdealPosTalk;
+}
