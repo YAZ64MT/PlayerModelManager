@@ -166,13 +166,13 @@ void initFormProxies() {
         }
 
         // uncomment these when all forms supported
-        // refreshFormProxy(formProxy);
+        // requestRefreshFormProxy(i);
         // changeFormPtrsToProxy(i);
     }
 
     // Only human is supported for now
     setupVanillaHuman();
-    refreshFormProxy(&gLinkFormProxies[PLAYER_FORM_HUMAN]);
+    requestRefreshFormProxy(PLAYER_FORM_HUMAN);
     changeFormPtrsToProxy(PLAYER_FORM_HUMAN);
     repointHumanEquipmentModelsToProxy(PLAYER_FORM_HUMAN);
 

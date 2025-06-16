@@ -193,7 +193,7 @@ bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry) {
 
             CMEM_setCurrentEntry(form, newEntry);
 
-            refreshFormProxy(proxy);
+            requestRefreshFormProxy(form);
             refreshFaceTextures();
 
             gIsAgePropertyRefreshRequested = true;
@@ -462,7 +462,7 @@ void CMEM_removeModel(PlayerTransformation form) {
 
         clearLinkModelInfo(&proxy->current);
 
-        refreshFormProxy(proxy);
+        requestRefreshFormProxy(form);
         refreshFaceTextures();
 
         gIsAgePropertyRefreshRequested = true;

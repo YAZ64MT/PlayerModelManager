@@ -416,3 +416,19 @@ void refreshFormProxy(Link_FormProxy *formProxy) {
     refreshProxyDls(formProxy);
     refreshProxyMatrixes(formProxy);
 }
+
+static bool sIsFormProxyRefreshRequested[PLAYER_FORM_MAX];
+
+void requestRefreshFormProxy(PlayerTransformation form) {
+    sIsFormProxyRefreshRequested[form] = true;
+}
+
+RECOMP_CALLBACK("*", recomp_on_play_main)
+void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        if (sIsFormProxyRefreshRequested[i]) {
+            refreshFormProxy(&gLinkFormProxies[i]);
+            sIsFormProxyRefreshRequested[i] = false;
+        }
+    }
+}
