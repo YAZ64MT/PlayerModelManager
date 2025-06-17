@@ -361,4 +361,5 @@ void setupVanillaHuman() {
 
     // whole sword
     models[LINK_DL_SWORD_GREATFAIRY] = getHumanDL(gLinkHumanGreatFairysSwordDL);
+    models[LINK_DL_SWORD4_HILT] = gEmptyDisplayList;
 }
