@@ -109,7 +109,15 @@ CustomModelMemoryEntry *getEntryOrPrintErrLocked(ZPlayerModelHandle h, const cha
     return getEntryOrPrintErr(h, funcName);
 }
 
+#define CURRENT_API_VERSION 1UL
+
 RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerPlayerModel(unsigned long apiVersion, char *internalName, CustomModelType modelType) {
+
+    if (apiVersion > CURRENT_API_VERSION) {
+        recomp_printf("ZPlayerModel_registerPlayerModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
+        return 0;
+    }
+    
     if (sIsAPILocked) {
         recomp_printf("ZPlayerModel_registerPlayerModel: Models can only be registered during a ZPlayerModels_onRegisterModels callback.\n");
         return 0;
