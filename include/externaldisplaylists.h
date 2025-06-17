@@ -9,5 +9,8 @@ extern ZModelReplacerHandle gProxyDekuStick;
 extern ZModelReplacerHandle gProxyBowString;
 extern ZModelReplacerHandle gProxyBowArrow;
 extern ZModelReplacerHandle gProxyBowArrowLowPoly;
+extern ZModelReplacerHandle gProxyHookshotChain;
+extern ZModelReplacerHandle gProxyHookshotHook;
+extern ZModelReplacerHandle gProxyHookshotReticle;
 
 #endif

@@ -339,6 +339,7 @@ void setupVanillaHuman() {
     models[LINK_DL_HOOKSHOT] = getHumanDL(gLinkHumanHookshotDL);
     models[LINK_DL_HOOKSHOT_CHAIN] = getGameplayKeepDL(gHookshotChainDL);
     models[LINK_DL_HOOKSHOT_RETICLE] = getGameplayKeepDL(gHookshotReticleDL);
+    models[LINK_DL_HOOKSHOT_HOOK] = getHumanDL(object_link_child_DL_01D960);
 
     // First Person
     models[LINK_DL_FPS_LFOREARM] = getHumanDL(gLinkHumanLeftForearmDL);
