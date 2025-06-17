@@ -10,40 +10,9 @@
 #include "modelreplacer_api.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "externaldisplaylists.h"
+#include "externs_z_player_lib.h"
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
-
-extern Gfx *gPlayerRightHandOpenDLs[2 * PLAYER_FORM_MAX];
-extern Gfx *gPlayerRightHandClosedDLs[2 * PLAYER_FORM_MAX];
-extern Gfx *gPlayerRightHandBowDLs[2 * PLAYER_FORM_MAX];
-extern Gfx *gPlayerRightHandInstrumentDLs[2 * PLAYER_FORM_MAX];
-extern Gfx *gPlayerRightHandHookshotDLs[2 * PLAYER_FORM_MAX];
-extern Gfx *gPlayerHandHoldingShields[];
-
-extern Gfx *gPlayerLeftHandOpenDLs[2 * PLAYER_FORM_MAX];
-extern Gfx *gPlayerLeftHandClosedDLs[2 * PLAYER_FORM_MAX];
-extern Gfx *gPlayerLeftHandTwoHandSwordDLs[2 * PLAYER_FORM_MAX];
-extern Gfx *gPlayerLeftHandOneHandSwordDLs[2 * PLAYER_FORM_MAX];
-extern Gfx *gPlayerLeftHandBottleDLs[2 * PLAYER_FORM_MAX];
-extern Gfx *gPlayerWaistDLs[2 * PLAYER_FORM_MAX];
-
-extern Gfx *sPlayerFirstPersonLeftHandDLs[PLAYER_FORM_MAX];
-extern Gfx *sPlayerFirstPersonLeftForearmDLs[PLAYER_FORM_MAX];
-extern Gfx *sPlayerFirstPersonRightShoulderDLs[PLAYER_FORM_MAX];
-extern Gfx *sPlayerFirstPersonRightHandDLs[PLAYER_FORM_MAX];
-extern Gfx *sPlayerFirstPersonRightHandHookshotDLs[PLAYER_FORM_MAX];
-
-extern Gfx *gPlayerRightHandBowDLs[2 * PLAYER_FORM_MAX];
-
-extern Gfx *D_801C018C[];
-
-extern Gfx *gPlayerSheathedSwords[];
-extern Gfx *gPlayerSwordSheaths[];
-extern Gfx *gPlayerShields[];
-extern Gfx *gPlayerHandHoldingShields[];
-
-extern TexturePtr sPlayerEyesTextures[];
-extern TexturePtr sPlayerMouthTextures[];
 
 Link_FormProxy gLinkFormProxies[PLAYER_FORM_MAX];
 
@@ -84,15 +53,19 @@ void changeFormPtrsToProxy(PlayerTransformation playerForm) {
     gPlayerWaistDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_WAIST];
 }
 
-void repointHumanEquipmentModelsToProxy(PlayerTransformation playerForm) {
+static Gfx **sPlayerHandHoldingSwords = D_801C018C;
+
+static Gfx **sPlayerMasks = D_801C0B20;
+
+void repointHumanModelsToProxy(PlayerTransformation playerForm) {
     Link_FormProxy *formProxy = &gLinkFormProxies[playerForm];
 
-    D_801C018C[0] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
-    D_801C018C[1] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
-    D_801C018C[2] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
-    D_801C018C[3] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
-    D_801C018C[4] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_GILDED];
-    D_801C018C[5] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_GILDED];
+    sPlayerHandHoldingSwords[0] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    sPlayerHandHoldingSwords[1] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    sPlayerHandHoldingSwords[2] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
+    sPlayerHandHoldingSwords[3] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
+    sPlayerHandHoldingSwords[4] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_GILDED];
+    sPlayerHandHoldingSwords[5] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_GILDED];
 
     gPlayerShields[0] = &formProxy->displayLists[LINK_DL_SHIELD_HERO_BACK];
     gPlayerShields[1] = &formProxy->displayLists[LINK_DL_SHIELD_HERO_BACK];
@@ -180,7 +153,7 @@ void initFormProxies() {
     setupVanillaHuman();
     requestRefreshFormProxy(PLAYER_FORM_HUMAN);
     changeFormPtrsToProxy(PLAYER_FORM_HUMAN);
-    repointHumanEquipmentModelsToProxy(PLAYER_FORM_HUMAN);
+    repointHumanModelsToProxy(PLAYER_FORM_HUMAN);
 
     refreshFaceTextures();
 }
