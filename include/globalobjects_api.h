@@ -49,7 +49,7 @@ RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void *ZGlobalObj_getGlobalObjec
 // Returns true if there is an object that starts at the given address, and the object id is written to out.
 //
 // Returns false if there is no object ID associated with the given vrom address and leaves out unmodified.
-RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, bool ZGlobalObj_getObjectIdFromVrom(uintptr_t vromStart, unsigned long *out));
+RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, bool ZGlobalObj_getObjectIdFromVrom(uintptr_t vromStart, ObjectId *out));
 
 // Gets the global object associated with a given vrom address.
 RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void *ZGlobalObj_getGlobalObjectFromVrom(uintptr_t vromStart));
