@@ -270,9 +270,11 @@ void setupVanillaHuman() {
         formProxy->vanilla.mouthTextures[i] = mouthTex[i];
     }
 
-    loadVanillaSkeletonTransforms(&formProxy->vanilla, OBJECT_LINK_CHILD, gLinkHumanSkelLimbs);
-
     void *human = ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD);
+
+    ZGlobalObj_globalizeLodLimbSkeleton(human, &gLinkHumanSkel);
+
+    formProxy->vanilla.skeleton = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);
 
     Mtx **equipMatrixes = formProxy->vanilla.equipMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx);

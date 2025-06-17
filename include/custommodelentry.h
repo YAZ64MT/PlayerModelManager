@@ -19,7 +19,6 @@ typedef enum {
 
 typedef struct CustomModelEntry {
     CustomModelType type;
-    u64 flags;
     char *displayName;
     char *internalName;
     char *authorName;
@@ -28,6 +27,7 @@ typedef struct CustomModelEntry {
     void *onModelLoadData;
     void (*onModelUnload)(void *userdata);
     void *onModelUnloadData;
+    u64 flags;
 } CustomModelEntry;
 
 typedef struct {

@@ -296,31 +296,26 @@ void refreshProxyMatrixes(Link_FormProxy *formProxy) {
 }
 
 void refreshProxySkeleton(Link_FormProxy *formProxy) {
+    FlexSkeletonHeader *skel = formProxy->current.skeleton;
 
-    Vec3s *limbTrans = formProxy->current.limbTranslations;
-
-    // while, technically, there *could* be a custom model where all bones are at (0,0,0)
-    // but in practice this doesn't happen, so all transforms being at (0,0,0) will be 
-    // treated as no custom skeleton
-    bool isCustomSkeleton = false;
-    for (u32 i = 0; !isCustomSkeleton && i < PLAYER_LIMB_COUNT; ++i) {
-        isCustomSkeleton = limbTrans[i].x != 0 || limbTrans[i].y != 0 || limbTrans[i].z != 0;
+    if (!skel) {
+        skel = formProxy->vanilla.skeleton;
     }
 
-    if (!isCustomSkeleton) {
-        limbTrans = formProxy->vanilla.limbTranslations;
-    }
+    if (skel) {
+        for (int i = 0; i < PLAYER_LIMB_COUNT; ++i) {
+            StandardLimb *limb = skel->sh.segment[i];
+            formProxy->skeleton.limbs[i].child = limb->child;
+            formProxy->skeleton.limbs[i].sibling = limb->sibling;
+            formProxy->skeleton.limbs[i].jointPos = limb->jointPos;
+        }
 
-    for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
-        Vec3s *infoTrans = &limbTrans[i];
-        Vec3s *proxyTrans = &formProxy->skeleton.limbs[i].jointPos;
-        formProxy->skeleton.limbs[i].jointPos = limbTrans[i];
+        formProxy->skeleton.flexSkeleton.dListCount = skel->dListCount;
     }
-    
 }
 
 void initFormProxyMatrixes(Link_FormProxy *formProxy) {
-    for (u32 i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
+    for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
         formProxy->mtxDisplayLists[i] = recomp_alloc(sizeof(Gfx) * 2);
 
         gSPMatrix(&formProxy->mtxDisplayLists[i][0], &gZeroMtx, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
@@ -386,23 +381,6 @@ void initFormProxySkeleton(Link_FormProxy *formProxy) {
     SET_LIMB_DL(PLAYER_LIMB_TORSO, LINK_DL_TORSO);
 
     flex->sh.segment = (void **)skel->limbPtrs;
-}
-
-void loadVanillaSkeletonTransforms(Link_ModelInfo *modelInfo, ObjectId objectId, void **limbs) {
-    size_t size = gObjectTable[objectId].vromEnd - gObjectTable[objectId].vromStart;
-
-    void *vanillaObj = recomp_alloc(size);
-
-    DmaMgr_RequestSync(vanillaObj, gObjectTable[objectId].vromStart, size);
-
-    LodLimb **realLimbsPtr = (LodLimb **)(SEGMENT_OFFSET(limbs) + (u32)vanillaObj);
-
-    for (u32 i = 0; i < PLAYER_LIMB_COUNT; ++i) {
-        LodLimb *realLimb = (LodLimb *)(SEGMENT_OFFSET(realLimbsPtr[i]) + (u32)vanillaObj);
-        modelInfo->limbTranslations[i] = realLimb->jointPos;
-    }
-
-    recomp_free(vanillaObj);
 }
 
 void initFormProxy(Link_FormProxy *formProxy) {

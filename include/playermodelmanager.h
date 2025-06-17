@@ -398,7 +398,7 @@ typedef struct {
     Mtx *equipMtx[LINK_EQUIP_MATRIX_MAX];
     TexturePtr eyesTextures[PLAYER_EYES_MAX];
     TexturePtr mouthTextures[PLAYER_MOUTH_MAX];
-    Vec3s limbTranslations[PLAYER_LIMB_COUNT];
+    FlexSkeletonHeader *skeleton;
 } Link_ModelInfo;
 
 typedef struct {

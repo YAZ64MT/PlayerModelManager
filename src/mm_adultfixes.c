@@ -9,8 +9,6 @@
 #include "overlays/actors/ovl_En_Railgibud/z_en_railgibud.h"
 #include "overlays/actors/ovl_En_Talk_Gibud/z_en_talk_gibud.h"
 
-Player *gPlayer;
-PlayerTransformation gPlayerTransformation;
 PlayState *gPlayState;
 s32 gLimbIndex;
 Gfx **gFirstPersonDList;
@@ -108,10 +106,13 @@ void refreshAgeProps_on_Object_LoadAll() {
     gIsAgePropertyRefreshRequested = true;
 }
 
+static Player *sPlayerFromHeight;
+static PlayerTransformation sRealPlayerFormHeight;
+
 RECOMP_HOOK("Player_GetHeight")
 void on_Player_GetHeight(Player *player) {
-    gPlayer = player;
-    gPlayerTransformation = player->transformation;
+    sPlayerFromHeight = player;
+    sRealPlayerFormHeight = player->transformation;
     if (player->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL) {
         player->transformation = PLAYER_FORM_ZORA;
     }
@@ -119,7 +120,7 @@ void on_Player_GetHeight(Player *player) {
 
 RECOMP_HOOK_RETURN("Player_GetHeight")
 void return_Player_GetHeight(void) {
-    gPlayer->transformation = gPlayerTransformation;
+    sPlayerFromHeight->transformation = sRealPlayerFormHeight;
 }
 
 #define ADULT_LINK_BREMEN_HEIGHT_MODIFIER 1250.0f

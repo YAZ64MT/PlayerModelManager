@@ -16,6 +16,5 @@ void matchFaceTexturesToProxy(Link_FormProxy *formProxy);
 void refreshFaceTextures();
 void initFormProxy(Link_FormProxy *formProxy);
 void requestRefreshFormProxy(PlayerTransformation form);
-void loadVanillaSkeletonTransforms(Link_ModelInfo *modelInfo, ObjectId objectId, void **limbs);
 
 #endif

@@ -78,18 +78,19 @@ void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj, LimbToAlias limbsTo
 
     ZGlobalObj_globalizeLodLimbSkeleton(zobj, flexHeader);
 
-    LodLimb **limbs = (LodLimb **)flexHeader->sh.segment;
-    for (int i = 0; i < PLAYER_LIMB_COUNT; ++i) {
-        modelInfo->limbTranslations[i] = limbs[i]->jointPos;
-    }
-
     for (size_t i = 0; i < ARRAY_COUNT(sMMOLimbs); ++i) {
         LimbToAlias *l2a = &limbsToAliases[i];
+
         int limbIdx = l2a->limb - 1;
-        if (!limbs[limbIdx]->dLists[0]) {
+        
+        LodLimb *limb = flexHeader->sh.segment[limbIdx];
+        
+        if (!limb->dLists[0]) {
             gSPBranchList(&zobj[l2a->aliasTableIndex], gCallEmptyDisplayList);
         }
     }
+
+    modelInfo->skeleton = flexHeader;
 }
 
 #define SET_MODEL(dest, src) modelInfo->models[dest] = (Gfx *)&zobj[src]
