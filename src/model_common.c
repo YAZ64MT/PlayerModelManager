@@ -222,23 +222,31 @@ void setDlToShims(Link_FormProxy *formProxy) {
     PROXY_TO_SHIM(FPS_RHAND_HOOKSHOT);
 }
 
+Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
+    Gfx* dl = NULL;
+
+    dl = formProxy->current.models[target];
+
+    if (!dl) {
+        dl = formProxy->vanilla.models[target];
+    }
+
+    return dl;
+}
+
 void refreshProxyDls(Link_FormProxy *formProxy) {
     Gfx *dls = formProxy->displayLists;
     Link_ModelInfo *current = &formProxy->current;
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        gSPBranchList(&dls[i], gCallEmptyDisplayList);
+        gSPBranchList(&dls[i], gEmptyDL);
     }
 
     setDlToShims(formProxy);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        Gfx *dl = current->models[i];
-
-        if (!dl) {
-            dl = vanilla->models[i];
-        }
+        Gfx *dl = getFormProxyDL(formProxy, i);
 
         if (dl) {
             gSPBranchList(&dls[i], dl);

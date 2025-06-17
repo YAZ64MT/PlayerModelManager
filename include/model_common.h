@@ -16,5 +16,6 @@ void matchFaceTexturesToProxy(Link_FormProxy *formProxy);
 void refreshFaceTextures();
 void initFormProxy(Link_FormProxy *formProxy);
 void requestRefreshFormProxy(PlayerTransformation form);
+Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target);
 
 #endif
