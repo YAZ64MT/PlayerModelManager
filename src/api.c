@@ -111,19 +111,19 @@ CustomModelMemoryEntry *getEntryOrPrintErrLocked(ZPlayerModelHandle h, const cha
 
 #define CURRENT_API_VERSION 1UL
 
-RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerPlayerModel(unsigned long apiVersion, char *internalName, CustomModelType modelType) {
+RECOMP_EXPORT ZPlayerModelHandle ZPlayerModelManager_registerPlayerModel(unsigned long apiVersion, char *internalName, CustomModelType modelType) {
 
     if (apiVersion > CURRENT_API_VERSION) {
-        recomp_printf("ZPlayerModel_registerPlayerModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
+        recomp_printf("ZPlayerModelManager_registerPlayerModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
         return 0;
     }
     
     if (sIsAPILocked) {
-        recomp_printf("ZPlayerModel_registerPlayerModel: Models can only be registered during a ZPlayerModels_onRegisterModels callback.\n");
+        recomp_printf("ZPlayerModelManager_registerPlayerModel: Models can only be registered during a ZPlayerModels_onRegisterModels callback.\n");
         return 0;
     }
 
-    if (!isStrValid("ZPlayerModel_registerPlayerModel", internalName, MAX_INTERNAL_NAME_LENGTH)) {
+    if (!isStrValid("ZPlayerModelManager_registerPlayerModel", internalName, MAX_INTERNAL_NAME_LENGTH)) {
         return 0;
     }
 
@@ -136,14 +136,14 @@ RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerPlayerModel(unsigned long 
             break;
 
         default:
-            recomp_printf("ZPlayerModel_registerPlayerModel: Passed in unsupported ZPlayerModel_ModelType to ZPlayerModel_registerModel.\n");
+            recomp_printf("ZPlayerModelManager_registerPlayerModel: Passed in unsupported ZPlayerModelManager_ModelType to ZPlayerModelManager_registerModel.\n");
             return 0;
             break;
     }
 
     ZPlayerModelHandle h = CMEM_createMemoryHandle(form);
 
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModel_registerModel");
+    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_registerModel");
 
     if (!entry) {
         return 0;
@@ -158,12 +158,12 @@ RECOMP_EXPORT ZPlayerModelHandle ZPlayerModel_registerPlayerModel(unsigned long 
     return h;
 }
 
-RECOMP_EXPORT bool ZPlayerModel_setDisplayName(ZPlayerModelHandle h, char *displayName) {
-    if (!isStrValid("ZPlayerModel_setDisplayName", displayName, MAX_DISPLAY_NAME_LENGTH)) {
+RECOMP_EXPORT bool ZPlayerModelManager_setDisplayName(ZPlayerModelHandle h, char *displayName) {
+    if (!isStrValid("ZPlayerModelManager_setDisplayName", displayName, MAX_DISPLAY_NAME_LENGTH)) {
         return 0;
     }
 
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModel_setDisplayName");
+    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_setDisplayName");
 
     if (!entry) {
         return false;
@@ -174,12 +174,12 @@ RECOMP_EXPORT bool ZPlayerModel_setDisplayName(ZPlayerModelHandle h, char *displ
     return true;
 }
 
-RECOMP_EXPORT bool ZPlayerModel_setAuthor(ZPlayerModelHandle h, char *author) {
-    if (!isStrValid("ZPlayerModel_setAuthor", author, MAX_AUTHOR_NAME_LENGTH)) {
+RECOMP_EXPORT bool ZPlayerModelManager_setAuthor(ZPlayerModelHandle h, char *author) {
+    if (!isStrValid("ZPlayerModelManager_setAuthor", author, MAX_AUTHOR_NAME_LENGTH)) {
         return false;
     }
 
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModel_setAuthor");
+    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_setAuthor");
 
     if (!entry) {
         return false;
@@ -190,8 +190,8 @@ RECOMP_EXPORT bool ZPlayerModel_setAuthor(ZPlayerModelHandle h, char *author) {
     return true;
 }
 
-RECOMP_EXPORT bool ZPlayerModel_setFlags(ZPlayerModelHandle h, u64 flags) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModel_setFlags");
+RECOMP_EXPORT bool ZPlayerModelManager_setFlags(ZPlayerModelHandle h, u64 flags) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_setFlags");
 
     if (!entry) {
         return false;
@@ -202,8 +202,8 @@ RECOMP_EXPORT bool ZPlayerModel_setFlags(ZPlayerModelHandle h, u64 flags) {
     return true;
 }
 
-RECOMP_EXPORT bool ZPlayerModel_clearFlags(ZPlayerModelHandle h, u64 flags) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModel_clearFlags");
+RECOMP_EXPORT bool ZPlayerModelManager_clearFlags(ZPlayerModelHandle h, u64 flags) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_clearFlags");
 
     if (!entry) {
         return false;
@@ -214,8 +214,8 @@ RECOMP_EXPORT bool ZPlayerModel_clearFlags(ZPlayerModelHandle h, u64 flags) {
     return true;
 }
 
-RECOMP_EXPORT bool ZPlayerModel_clearAllFlags(ZPlayerModelHandle h, u64 flags) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModel_clearAllFlags");
+RECOMP_EXPORT bool ZPlayerModelManager_clearAllFlags(ZPlayerModelHandle h, u64 flags) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_clearAllFlags");
 
     if (!entry) {
         return false;
@@ -226,13 +226,13 @@ RECOMP_EXPORT bool ZPlayerModel_clearAllFlags(ZPlayerModelHandle h, u64 flags) {
     return true;
 }
 
-RECOMP_EXPORT bool ZPlayerModel_setDL(ZPlayerModelHandle h, Link_DisplayList dlId, Gfx *dl) {
+RECOMP_EXPORT bool ZPlayerModelManager_setDL(ZPlayerModelHandle h, Link_DisplayList dlId, Gfx *dl) {
     if (dlId >= LINK_DL_MAX || dlId < 0) {
-        recomp_printf("PlayerModelManager: Invalid display list ID passed in to ZPlayerModel_setDL.\n");
+        recomp_printf("PlayerModelManager: Invalid display list ID passed in to ZPlayerModelManager_setDL.\n");
         return false;
     }
 
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_registerModel");
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModelManager_registerModel");
 
     if (!entry) {
         return false;
@@ -245,13 +245,13 @@ RECOMP_EXPORT bool ZPlayerModel_setDL(ZPlayerModelHandle h, Link_DisplayList dlI
     return true;
 }
 
-RECOMP_EXPORT bool ZPlayerModel_setMtx(ZPlayerModelHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix) {
+RECOMP_EXPORT bool ZPlayerModelManager_setMtx(ZPlayerModelHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix) {
     if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
-        recomp_printf("PlayerModelManager: Invalid matrix ID passed in to ZPlayerModel_setMtx.\n");
+        recomp_printf("PlayerModelManager: Invalid matrix ID passed in to ZPlayerModelManager_setMtx.\n");
         return false;
     }
 
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setMtx");
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModelManager_setMtx");
 
     if (!entry) {
         return false;
@@ -264,8 +264,8 @@ RECOMP_EXPORT bool ZPlayerModel_setMtx(ZPlayerModelHandle h, Link_EquipmentMatri
     return true;
 }
 
-RECOMP_EXPORT bool ZPlayerModel_setLoadCallback(ZPlayerModelHandle h, void (*onModelLoad)(void *), void *userdata) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModel_setLoadCallback");
+RECOMP_EXPORT bool ZPlayerModelManager_setLoadCallback(ZPlayerModelHandle h, void (*onModelLoad)(void *), void *userdata) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_setLoadCallback");
 
     if (!entry) {
         return false;
@@ -277,8 +277,8 @@ RECOMP_EXPORT bool ZPlayerModel_setLoadCallback(ZPlayerModelHandle h, void (*onM
     return true;
 }
 
-RECOMP_EXPORT bool ZPlayerModel_setUnloadCallback(ZPlayerModelHandle h, void (*onModelUnload)(void *), void *userdata) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModel_setUnloadCallback");
+RECOMP_EXPORT bool ZPlayerModelManager_setUnloadCallback(ZPlayerModelHandle h, void (*onModelUnload)(void *), void *userdata) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_setUnloadCallback");
 
     if (!entry) {
         return false;
@@ -294,8 +294,8 @@ RECOMP_EXPORT bool ZPlayerModel_setUnloadCallback(ZPlayerModelHandle h, void (*o
     if (!entry->displayListPtrs[entryDL]) \
     entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gCallEmptyDisplayList
 
-RECOMP_EXPORT bool ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setSkeleton");
+RECOMP_EXPORT bool ZPlayerModelManager_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModelManager_setSkeleton");
 
     if (!entry) {
         return false;
@@ -333,8 +333,8 @@ RECOMP_EXPORT bool ZPlayerModel_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHe
 
 #undef GET_LIMB_DL
 
-RECOMP_EXPORT bool ZPlayerModel_setEyesTextures(ZPlayerModelHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModel_setEyesTextures");
+RECOMP_EXPORT bool ZPlayerModelManager_setEyesTextures(ZPlayerModelHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_setEyesTextures");
 
     if (!entry) {
         return false;
@@ -349,8 +349,8 @@ RECOMP_EXPORT bool ZPlayerModel_setEyesTextures(ZPlayerModelHandle h, TexturePtr
     return true;
 }
 
-RECOMP_EXPORT bool ZPlayerModel_setMouthTextures(ZPlayerModelHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModel_setMouthTextures");
+RECOMP_EXPORT bool ZPlayerModelManager_setMouthTextures(ZPlayerModelHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModelManager_setMouthTextures");
 
     if (!entry) {
         return false;
@@ -365,14 +365,28 @@ RECOMP_EXPORT bool ZPlayerModel_setMouthTextures(ZPlayerModelHandle h, TexturePt
     return true;
 }
 
-RECOMP_DECLARE_EVENT(ZPlayerModels_onRegisterModels());
+RECOMP_EXPORT Gfx *ZPlayerModelManager_getDL(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dl) {
+    if (apiVersion > CURRENT_API_VERSION) {
+        recomp_printf("ZPlayerModelManager_getDL: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
+        return NULL;
+    }
+
+    // TODO: remove this check when all forms supported
+    if (form != PLAYER_FORM_HUMAN) {
+        return NULL;
+    }
+
+    return &gLinkFormProxies[form].displayLists[dl];
+}
+
+RECOMP_DECLARE_EVENT(ZPlayerModelManager_onRegisterModels());
 
 RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onFinishedRegisterModels());
 
 RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyCMEM)
 void doRegisterModels() {
     sIsAPILocked = false;
-    ZPlayerModels_onRegisterModels();
+    ZPlayerModelManager_onRegisterModels();
     sIsAPILocked = true;
     PlayerModelManager_internal_onFinishedRegisterModels();
 }
