@@ -6,7 +6,7 @@
 #include "globalobjects_api.h"
 
 Gfx *getDekuDL(Gfx *dl) {
-    return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_ZORA, dl);
+    return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_NUTS, dl);
 }
 
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)
