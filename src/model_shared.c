@@ -1,3 +1,4 @@
+#include "modding.h"
 #include "global.h"
 #include "globalobjects_api.h"
 #include "modelreplacer_api.h"
