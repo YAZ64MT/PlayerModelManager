@@ -10,7 +10,7 @@ Gfx *getDekuDL(Gfx *dl) {
 }
 
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)
-void setupVanillaZora() {
+void setupVanillaDeku() {
     Link_FormProxy *formProxy = &gLinkFormProxies[PLAYER_FORM_DEKU];
 
     TexturePtr eyesTex[PLAYER_EYES_MAX];
