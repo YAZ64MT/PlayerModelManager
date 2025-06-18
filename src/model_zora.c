@@ -4,9 +4,7 @@
 #include "model_common.h"
 #include "globalobjects_api.h"
 
-Gfx *getZoraDL(Gfx *dl) {
-    return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_ZORA, dl);
-}
+Gfx *getZoraDL(Gfx *dl);
 
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)
 void setupVanillaZora() {
