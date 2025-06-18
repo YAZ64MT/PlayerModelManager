@@ -37,7 +37,7 @@ void repointZobjDls(u8 *zobj, u32 start, u32 end) {
     u32 current = start;
 
     while (current < end) {
-        ZGlobalObj_globalizeSegmentedDL(zobj, (Gfx *)SEGMENT_ADDR(0x06, current));
+        GlobalObjects_globalizeSegmentedDL(zobj, (Gfx *)SEGMENT_ADDR(0x06, current));
         current += 8;
     }
 }
@@ -76,7 +76,7 @@ DECLARE_Z64O_LIMB_ALIAS(sOoTOAdultLimbs, OOTO_ADULT, OOTO_ADULT_LUT_DL_SWORD_MAS
 void handleZobjSkeleton(Link_ModelInfo *modelInfo, u8 *zobj, LimbToAlias limbsToAliases[]) {
     FlexSkeletonHeader *flexHeader = SEGMENTED_TO_GLOBAL_PTR(zobj, readU32(zobj, Z64O_SKELETON_HEADER_POINTER));
 
-    ZGlobalObj_globalizeLodLimbSkeleton(zobj, flexHeader);
+    GlobalObjects_globalizeLodLimbSkeleton(zobj, flexHeader);
 
     for (size_t i = 0; i < ARRAY_COUNT(sMMOLimbs); ++i) {
         LimbToAlias *l2a = &limbsToAliases[i];
@@ -448,9 +448,9 @@ void remapSegmentPtrs() {
 #define PTR_OBJ_REMAP_SET(obj, key, val) setSegmentPtrRemap(key, (u32)SEGMENTED_TO_GLOBAL_PTR(obj, val))
 #define PTR_GK_REMAP_SET(key, val) PTR_OBJ_REMAP_SET(gk, key, val);
 
-    void *gk = ZGlobalObj_getGlobalObject(GAMEPLAY_KEEP);
+    void *gk = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
 
-    void *human = ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD);
+    void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
 
     PTR_GK_REMAP_SET(OOT_GK_HILITE_1_TEX, gameplay_keep_Tex_00C830);
     PTR_GK_REMAP_SET(OOT_GK_DEKU_STICK_TEX, gDekuStickTex);

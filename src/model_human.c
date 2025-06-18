@@ -236,15 +236,15 @@ Gfx gLinkHumanFirstPersonArmDL[] = {
 };
 
 Gfx *getHumanDL(Gfx *dl) {
-    return ZGlobalObj_getGlobalGfxPtr(OBJECT_LINK_CHILD, dl);
+    return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, dl);
 }
 
 Mtx *getHumanMtx(Mtx *mtx) {
-    return (Mtx *)((uintptr_t)ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD) + SEGMENT_OFFSET(mtx));
+    return (Mtx *)((uintptr_t)GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD) + SEGMENT_OFFSET(mtx));
 }
 
 Gfx *getGameplayKeepDL(Gfx *dl) {
-    return ZGlobalObj_getGlobalGfxPtr(GAMEPLAY_KEEP, dl);
+    return GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, dl);
 }
 
 void setupVanillaHuman() {
@@ -271,9 +271,9 @@ void setupVanillaHuman() {
         formProxy->vanilla.mouthTextures[i] = mouthTex[i];
     }
 
-    void *human = ZGlobalObj_getGlobalObject(OBJECT_LINK_CHILD);
+    void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
 
-    ZGlobalObj_globalizeLodLimbSkeleton(human, &gLinkHumanSkel);
+    GlobalObjects_globalizeLodLimbSkeleton(human, &gLinkHumanSkel);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);
 
@@ -316,11 +316,11 @@ void setupVanillaHuman() {
     // shields
     models[LINK_DL_SHIELD_HERO] = getHumanDL(gLinkHumanHerosShieldDL);
     models[LINK_DL_SHIELD_MIRROR] = getHumanDL(gLinkHumanMirrorShieldDL);
-    models[LINK_DL_SHIELD3_RAY] = ZGlobalObj_getGlobalGfxPtr(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0);
+    models[LINK_DL_SHIELD3_RAY] = GlobalObjects_getGlobalGfxPtr(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0);
 
     // items
     models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL; // not in Link obj
-    ZGlobalObj_rebaseDL(human, gLinkHumanOcarinaDL, 0x06); // repoint vertices, textures, etc. to static link obj
+    GlobalObjects_rebaseDL(human, gLinkHumanOcarinaDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
     models[LINK_DL_DEKU_STICK] = getGameplayKeepDL(gDekuStickDL);
     models[LINK_DL_BOW] = getHumanDL(gLinkHumanBowDL);
@@ -337,10 +337,10 @@ void setupVanillaHuman() {
     models[LINK_DL_FPS_RFOREARM] = gEmptyDisplayList;
 
     models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArmDL; // not in Link obj
-    ZGlobalObj_rebaseDL(human, gLinkHumanFirstPersonArmDL, 0x06); // repoint vertices, textures, etc. to static link obj
+    GlobalObjects_rebaseDL(human, gLinkHumanFirstPersonArmDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
     models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL; // not in Link obj
-    ZGlobalObj_rebaseDL(human, gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
+    GlobalObjects_rebaseDL(human, gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
     // masks
     models[LINK_DL_MASK_DEKU] = getGameplayKeepDL(gDekuMaskDL);

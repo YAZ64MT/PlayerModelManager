@@ -3,15 +3,15 @@
 
 #include "modelreplacer_api.h"
 
-extern ZModelReplacerHandle gProxyBottleGlass;
-extern ZModelReplacerHandle gProxyBottleContents;
-extern ZModelReplacerHandle gProxyDekuStick;
-extern ZModelReplacerHandle gProxyBowString;
-extern ZModelReplacerHandle gProxyBowArrow;
-extern ZModelReplacerHandle gProxyBowArrowLowPoly;
-extern ZModelReplacerHandle gProxyHookshotChain;
-extern ZModelReplacerHandle gProxyHookshotHook;
-extern ZModelReplacerHandle gProxyHookshotReticle;
-extern ZModelReplacerHandle gProxyMirrorShieldRay;
+extern ModelReplacerHandle gProxyBottleGlass;
+extern ModelReplacerHandle gProxyBottleContents;
+extern ModelReplacerHandle gProxyDekuStick;
+extern ModelReplacerHandle gProxyBowString;
+extern ModelReplacerHandle gProxyBowArrow;
+extern ModelReplacerHandle gProxyBowArrowLowPoly;
+extern ModelReplacerHandle gProxyHookshotChain;
+extern ModelReplacerHandle gProxyHookshotHook;
+extern ModelReplacerHandle gProxyHookshotReticle;
+extern ModelReplacerHandle gProxyMirrorShieldRay;
 
 #endif

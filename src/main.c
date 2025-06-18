@@ -146,29 +146,29 @@ void initSharedDLs() {
 void addProxyExternalDLs() {
     Link_FormProxy *humanProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
-    ZModelReplacer_setReplacerModel(gProxyBottleGlass, &humanProxy->displayLists[LINK_DL_BOTTLE_GLASS]);
-    ZModelReplacer_setReplacerModel(gProxyBottleContents, &humanProxy->displayLists[LINK_DL_BOTTLE_CONTENTS]);
-    ZModelReplacer_setReplacerModel(gProxyDekuStick, &humanProxy->displayLists[LINK_DL_DEKU_STICK]);
-    ZModelReplacer_setReplacerModel(gProxyBowString, &humanProxy->displayLists[LINK_DL_BOW_STRING]);
-    ZModelReplacer_setReplacerModel(gProxyBowArrow, &humanProxy->displayLists[LINK_DL_BOW_ARROW]);
-    ZModelReplacer_setReplacerModel(gProxyBowArrowLowPoly, &humanProxy->displayLists[LINK_DL_BOW_ARROW]);
-    ZModelReplacer_setReplacerModel(gProxyHookshotChain, &humanProxy->displayLists[LINK_DL_HOOKSHOT_CHAIN]);
-    ZModelReplacer_setReplacerModel(gProxyHookshotHook, &humanProxy->displayLists[LINK_DL_HOOKSHOT_HOOK]);
-    ZModelReplacer_setReplacerModel(gProxyHookshotReticle, &humanProxy->displayLists[LINK_DL_HOOKSHOT_RETICLE]);
-    ZModelReplacer_setReplacerModel(gProxyMirrorShieldRay, &humanProxy->displayLists[LINK_DL_SHIELD3_RAY]);
+    ModelReplacer_setReplacerModel(gProxyBottleGlass, &humanProxy->displayLists[LINK_DL_BOTTLE_GLASS]);
+    ModelReplacer_setReplacerModel(gProxyBottleContents, &humanProxy->displayLists[LINK_DL_BOTTLE_CONTENTS]);
+    ModelReplacer_setReplacerModel(gProxyDekuStick, &humanProxy->displayLists[LINK_DL_DEKU_STICK]);
+    ModelReplacer_setReplacerModel(gProxyBowString, &humanProxy->displayLists[LINK_DL_BOW_STRING]);
+    ModelReplacer_setReplacerModel(gProxyBowArrow, &humanProxy->displayLists[LINK_DL_BOW_ARROW]);
+    ModelReplacer_setReplacerModel(gProxyBowArrowLowPoly, &humanProxy->displayLists[LINK_DL_BOW_ARROW]);
+    ModelReplacer_setReplacerModel(gProxyHookshotChain, &humanProxy->displayLists[LINK_DL_HOOKSHOT_CHAIN]);
+    ModelReplacer_setReplacerModel(gProxyHookshotHook, &humanProxy->displayLists[LINK_DL_HOOKSHOT_HOOK]);
+    ModelReplacer_setReplacerModel(gProxyHookshotReticle, &humanProxy->displayLists[LINK_DL_HOOKSHOT_RETICLE]);
+    ModelReplacer_setReplacerModel(gProxyMirrorShieldRay, &humanProxy->displayLists[LINK_DL_SHIELD3_RAY]);
 }
 
 void removeProxyExternalDLs() {
-    ZModelReplacer_setReplacerModel(gProxyBottleGlass, NULL);
-    ZModelReplacer_setReplacerModel(gProxyBottleContents, NULL);
-    ZModelReplacer_setReplacerModel(gProxyDekuStick, NULL);
-    ZModelReplacer_setReplacerModel(gProxyBowString, NULL);
-    ZModelReplacer_setReplacerModel(gProxyBowArrow, NULL);
-    ZModelReplacer_setReplacerModel(gProxyBowArrowLowPoly, NULL);
-    ZModelReplacer_setReplacerModel(gProxyHookshotChain, NULL);
-    ZModelReplacer_setReplacerModel(gProxyHookshotHook, NULL);
-    ZModelReplacer_setReplacerModel(gProxyHookshotReticle, NULL);
-    ZModelReplacer_setReplacerModel(gProxyMirrorShieldRay, NULL);
+    ModelReplacer_setReplacerModel(gProxyBottleGlass, NULL);
+    ModelReplacer_setReplacerModel(gProxyBottleContents, NULL);
+    ModelReplacer_setReplacerModel(gProxyDekuStick, NULL);
+    ModelReplacer_setReplacerModel(gProxyBowString, NULL);
+    ModelReplacer_setReplacerModel(gProxyBowArrow, NULL);
+    ModelReplacer_setReplacerModel(gProxyBowArrowLowPoly, NULL);
+    ModelReplacer_setReplacerModel(gProxyHookshotChain, NULL);
+    ModelReplacer_setReplacerModel(gProxyHookshotHook, NULL);
+    ModelReplacer_setReplacerModel(gProxyHookshotReticle, NULL);
+    ModelReplacer_setReplacerModel(gProxyMirrorShieldRay, NULL);
 }
 
 void refreshExternalDLs() {
@@ -224,7 +224,7 @@ void refreshDLs_on_return_PlayerInit() {
 
 RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
 
-ZMODELREPLACER_CALLBACK_ON_READY
+MODEL_REPLACER_CALLBACK_ON_READY
 void onModelReplacerReady() {
     initFormProxies();
     _internal_onReadyFormProxies();
