@@ -171,6 +171,8 @@ void refreshExternalDLs() {
     }
 }
 
+RECOMP_DECLARE_EVENT(_internal_setupVanillaModels());
+
 // initialize player models as blank display lists
 void initFormProxies() {
     for (u8 i = 0; i < PLAYER_FORM_MAX; ++i) {
@@ -189,14 +191,14 @@ void initFormProxies() {
             formProxy->vanilla.mouthTextures[j] = sPlayerMouthTextures[j];
         }
 
+        requestRefreshFormProxy(i);
         // uncomment these when all forms supported
-        // requestRefreshFormProxy(i);
         // changeFormPtrsToProxy(i);
     }
 
+    _internal_setupVanillaModels();
+
     // Only human is supported for now
-    setupVanillaHuman();
-    requestRefreshFormProxy(PLAYER_FORM_HUMAN);
     changeFormPtrsToProxy(PLAYER_FORM_HUMAN);
     repointHumanModelsToProxy();
 
