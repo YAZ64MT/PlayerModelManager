@@ -113,21 +113,21 @@ void setupVanillaHuman() {
     TexturePtr eyesTex[PLAYER_EYES_MAX];
     TexturePtr mouthTex[PLAYER_MOUTH_MAX];
 
-    for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
+    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
         eyesTex[i] = formProxy->vanilla.eyesTextures[i];
     }
 
-    for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
         mouthTex[i] = formProxy->vanilla.mouthTextures[i];
     }
 
     clearLinkModelInfo(&formProxy->vanilla);
 
-    for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
+    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
         formProxy->vanilla.eyesTextures[i] = eyesTex[i];
     }
 
-    for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
         formProxy->vanilla.mouthTextures[i] = mouthTex[i];
     }
 
