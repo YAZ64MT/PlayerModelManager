@@ -3,6 +3,7 @@
 #include "modelreplacer_api.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "assets/objects/object_link_child/object_link_child.h"
+#include "assets/objects/object_mir_ray/object_mir_ray.h"
 
 ZModelReplacerHandle gProxyBottleGlass;
 ZModelReplacerHandle gProxyBottleContents;
@@ -13,6 +14,7 @@ ZModelReplacerHandle gProxyBowArrowLowPoly;
 ZModelReplacerHandle gProxyHookshotChain;
 ZModelReplacerHandle gProxyHookshotHook;
 ZModelReplacerHandle gProxyHookshotReticle;
+ZModelReplacerHandle gProxyMirrorShieldRay;
 
 ZMODELREPLACER_CALLBACK_REGISTER_REPLACERS
 void setupExternalReplacements() {
@@ -25,4 +27,5 @@ void setupExternalReplacements() {
     gProxyHookshotChain = ZModelReplacer_registerReplacer(GAMEPLAY_KEEP, gHookshotChainDL, NULL);
     gProxyHookshotHook = ZModelReplacer_registerReplacer(OBJECT_LINK_CHILD, object_link_child_DL_01D960, NULL);
     gProxyHookshotReticle = ZModelReplacer_registerReplacer(GAMEPLAY_KEEP, gHookshotReticleDL, NULL);
+    gProxyMirrorShieldRay = ZModelReplacer_registerReplacer(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0, NULL);
 }

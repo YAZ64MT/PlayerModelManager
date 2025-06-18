@@ -4,6 +4,7 @@
 #include "recompconfig.h"
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
+#include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "playermodelmanager_mm.h"
 #include "playermodelmanager_utils.h"
 #include "model_common.h"
@@ -327,6 +328,7 @@ void setupVanillaHuman() {
     // shields
     models[LINK_DL_SHIELD_HERO] = getHumanDL(gLinkHumanHerosShieldDL);
     models[LINK_DL_SHIELD_MIRROR] = getHumanDL(gLinkHumanMirrorShieldDL);
+    models[LINK_DL_SHIELD3_RAY] = ZGlobalObj_getGlobalGfxPtr(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0);
 
     // items
     models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL; // not in Link obj

@@ -12,5 +12,6 @@ extern ZModelReplacerHandle gProxyBowArrowLowPoly;
 extern ZModelReplacerHandle gProxyHookshotChain;
 extern ZModelReplacerHandle gProxyHookshotHook;
 extern ZModelReplacerHandle gProxyHookshotReticle;
+extern ZModelReplacerHandle gProxyMirrorShieldRay;
 
 #endif

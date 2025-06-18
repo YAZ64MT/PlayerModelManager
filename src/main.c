@@ -155,6 +155,7 @@ void addProxyExternalDLs() {
     ZModelReplacer_setReplacerModel(gProxyHookshotChain, &humanProxy->displayLists[LINK_DL_HOOKSHOT_CHAIN]);
     ZModelReplacer_setReplacerModel(gProxyHookshotHook, &humanProxy->displayLists[LINK_DL_HOOKSHOT_HOOK]);
     ZModelReplacer_setReplacerModel(gProxyHookshotReticle, &humanProxy->displayLists[LINK_DL_HOOKSHOT_RETICLE]);
+    ZModelReplacer_setReplacerModel(gProxyMirrorShieldRay, &humanProxy->displayLists[LINK_DL_SHIELD3_RAY]);
 }
 
 void removeProxyExternalDLs() {
@@ -167,6 +168,7 @@ void removeProxyExternalDLs() {
     ZModelReplacer_setReplacerModel(gProxyHookshotChain, NULL);
     ZModelReplacer_setReplacerModel(gProxyHookshotHook, NULL);
     ZModelReplacer_setReplacerModel(gProxyHookshotReticle, NULL);
+    ZModelReplacer_setReplacerModel(gProxyMirrorShieldRay, NULL);
 }
 
 void refreshExternalDLs() {
