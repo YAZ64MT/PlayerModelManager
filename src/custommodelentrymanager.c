@@ -288,6 +288,20 @@ const char DISKENTRY_MODEL_INFO_HEADER[] = "PLAYERMODELINFO";
 #define DISKENTRY_DISPLAY_NAME_FIELD_SIZE 32
 #define DISKENTRY_AUTHOR_NAME_FIELD_SIZE 64
 #define DISKENTRY_MODEL_INFO_LOCATION 0x5500
+#define DISKENTRY_NUM_MATRIXES 8
+
+typedef struct {
+    f32 x;
+    f32 y;
+    f32 z;
+    bool isUsed;
+} EmbeddedMatrixType;
+
+typedef struct {
+    EmbeddedMatrixType translation;
+    EmbeddedMatrixType rotation;
+    EmbeddedMatrixType scale;
+} EmbeddedMatrix;
 
 typedef struct {
     char header[sizeof(DISKENTRY_MODEL_INFO_HEADER) - 1];
@@ -295,13 +309,14 @@ typedef struct {
     char internalName[DISKENTRY_INTERNAL_NAME_FIELD_SIZE];
     char displayName[DISKENTRY_DISPLAY_NAME_FIELD_SIZE];
     char authorName[DISKENTRY_AUTHOR_NAME_FIELD_SIZE];
+
 } CustomModelDiskEntryEmbeddedInfo;
 
 bool isEmbeddedVersionSupported(CustomModelDiskEntryEmbeddedInfo *info) {
-    return info->embedVersion == 1;
+    return info->embedVersion <= 2;
 }
 
-CustomModelDiskEntryEmbeddedInfo* getEmbeddedInfo(void *zobj) {
+CustomModelDiskEntryEmbeddedInfo *getEmbeddedInfo(void *zobj) {
     if (zobj == NULL) {
         return NULL;
     }
@@ -343,25 +358,30 @@ char *getTruncatedStringCopy(const char s[], size_t maxLength) {
     return sCopy;
 }
 
-void CMEM_refreshDiskEntries(PlayerTransformation form) {
-    CustomModelEntry *currentEntry = CMEM_getCurrentEntry(form);
-
-    char *entryName = NULL;
-
-    if (currentEntry) {
-        entryName = recomp_alloc(strlen(currentEntry->internalName) + 1);
-        strcpy(entryName, currentEntry->internalName);
-    }
-
-    CMEM_removeModel(form);
-
-    clearDiskEntries(form);
-
+void CMEM_refreshDiskEntries() {
     unsigned long numFiles;
     QDFL_Status err = QDFL_getNumDirEntries(sZobjDir, &numFiles);
 
     if (err == QDFL_STATUS_OK) {
-        for (size_t i = 0; i < numFiles; ++i) {
+        char *entryNames[PLAYER_FORM_MAX];
+
+        for (int form = 0; form < PLAYER_FORM_MAX; ++form) {
+
+            CustomModelEntry *currentEntry = CMEM_getCurrentEntry(form);
+
+            if (currentEntry) {
+                entryNames[form] = recomp_alloc(strlen(currentEntry->internalName) + 1);
+                strcpy(entryNames[form], currentEntry->internalName);
+            } else {
+                entryNames[form] = NULL;
+            }
+
+            CMEM_removeModel(form);
+
+            clearDiskEntries(form);
+        }
+
+        for (unsigned long i = 0; i < numFiles; ++i) {
             char *path = NULL;
             char *fullPath = NULL;
 
@@ -374,7 +394,8 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
 
                 QDFL_getFileSize(fullPath, &fileSize);
 
-                void *zobj = CMEM_loadFromDisk(form, fullPath);
+                // any buffer will do here, so we will default to human
+                void *zobj = CMEM_loadFromDisk(PLAYER_FORM_HUMAN, fullPath);
 
                 isValid = isValidZobj(zobj, fileSize);
 
@@ -383,28 +404,16 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
 
                     CustomModelType modelType = CUSTOM_MODEL_TYPE_NONE;
 
-                    u8 *data = sDiskBuffers[form].buffer;
+                    u8 *data = sDiskBuffers[PLAYER_FORM_HUMAN].buffer;
+
+                    PlayerTransformation form;
 
                     switch (data[Z64O_FORM_BYTE]) {
                         case MMO_FORM_BYTE_CHILD:
                         case OOTO_FORM_BYTE_CHILD:
-                            if (form == PLAYER_FORM_HUMAN) {
-                                modelType = CUSTOM_MODEL_TYPE_CHILD;
-                            } else {
-                                isValid = false;
-                            }
-
-                            break;
-
                         case MMO_FORM_BYTE_ADULT:
                         case OOTO_FORM_BYTE_ADULT:
-                            if (form == PLAYER_FORM_HUMAN) {
-                                modelType = CUSTOM_MODEL_TYPE_ADULT;
-                            } else if (form == PLAYER_FORM_FIERCE_DEITY) {
-                                modelType = CUSTOM_MODEL_TYPE_FIERCE_DEITY;
-                            } else {
-                                isValid = false;
-                            }
+                            form = PLAYER_FORM_HUMAN;
                             break;
 
                         default:
@@ -425,8 +434,7 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
                             entry->modelEntry.displayName = getTruncatedStringCopy(embed->displayName, sizeof(embed->displayName) - 1);
 
                             entry->modelEntry.authorName = getTruncatedStringCopy(embed->authorName, sizeof(embed->authorName) - 1);
-                        }
-                        else {
+                        } else {
                             entry->modelEntry.internalName = getTruncatedStringCopy(path, INTERNAL_NAME_MAX_LENGTH);
                             entry->modelEntry.displayName = getBaseNameNoExt(path);
                         }
@@ -444,11 +452,13 @@ void CMEM_refreshDiskEntries(PlayerTransformation form) {
                 fullPath = NULL;
             }
         }
-    }
 
-    if (entryName) {
-        applyByInternalName(form, entryName);
-        recomp_free(entryName);
+        for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+            if (entryNames[i]) {
+                applyByInternalName(i, entryNames[i]);
+                recomp_free(entryNames[i]);
+            }
+        }
     }
 }
 
@@ -460,11 +470,42 @@ void CMEM_removeModel(PlayerTransformation form) {
         sCurrentModelEntries[form] = NULL;
 
         clearLinkModelInfo(&proxy->current);
-        
+
         _internal_onModelApplied(form);
 
         gIsAgePropertyRefreshRequested = true;
     }
+}
+
+PlayerTransformation getFormFromModelType(CustomModelType t) {
+    switch (t) {
+        case CUSTOM_MODEL_TYPE_CHILD:
+        case CUSTOM_MODEL_TYPE_ADULT:
+            return PLAYER_FORM_HUMAN;
+            break;
+
+        case CUSTOM_MODEL_TYPE_DEKU:
+            return PLAYER_FORM_DEKU;
+            break;
+
+        case CUSTOM_MODEL_TYPE_GORON:
+            return PLAYER_FORM_GORON;
+            break;
+
+        case CUSTOM_MODEL_TYPE_ZORA:
+            return PLAYER_FORM_ZORA;
+            break;
+
+        case CUSTOM_MODEL_TYPE_FIERCE_DEITY:
+            return PLAYER_FORM_FIERCE_DEITY;
+            break;
+
+        default:
+            recomp_printf("PlayerModelManager: Unknown player form passed into getPlayerFormFromType\n");
+            break;
+    }
+
+    return 0;
 }
 
 ZPlayerModelHandle CMEM_createMemoryHandle(PlayerTransformation form) {

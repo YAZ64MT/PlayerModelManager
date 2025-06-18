@@ -10,46 +10,15 @@ const size_t
     MAX_AUTHOR_NAME_LENGTH = 128,
     MAX_DISPLAY_NAME_LENGTH = 64;
 
-PlayerTransformation getPlayerFormFromModelType(CustomModelType t) {
-    switch (t) {
-        case CUSTOM_MODEL_TYPE_CHILD:
-        case CUSTOM_MODEL_TYPE_ADULT:
-            return PLAYER_FORM_HUMAN;
-            break;
-        
-        case CUSTOM_MODEL_TYPE_DEKU:
-            return PLAYER_FORM_DEKU;
-            break;
-
-        case CUSTOM_MODEL_TYPE_GORON:
-            return PLAYER_FORM_GORON;
-            break;
-
-        case CUSTOM_MODEL_TYPE_ZORA:
-            return PLAYER_FORM_ZORA;
-            break;
-
-        case CUSTOM_MODEL_TYPE_FIERCE_DEITY:
-            return PLAYER_FORM_FIERCE_DEITY;
-            break;
-
-        default:
-            recomp_printf("PlayerModelManager: Unknown player form passed into getPlayerFormFromType\n");
-            break;
-    }
-
-    return 0;
-}
-
 bool isEntryLoaded(CustomModelMemoryEntry *entry) {
     return entry &&
            entry->modelEntry.type != CUSTOM_MODEL_TYPE_NONE &&
-           CMEM_getCurrentEntry(getPlayerFormFromModelType(entry->modelEntry.type)) == (void *)entry;
+           CMEM_getCurrentEntry(getFormFromModelType(entry->modelEntry.type)) == (void *)entry;
 }
 
 void refreshProxyIfEntryLoaded(CustomModelMemoryEntry *entry) {
     if (isEntryLoaded(entry)) {
-        requestRefreshFormProxy(getPlayerFormFromModelType(entry->modelEntry.type));
+        requestRefreshFormProxy(getFormFromModelType(entry->modelEntry.type));
     }
 }
 
@@ -342,7 +311,7 @@ RECOMP_EXPORT bool ZPlayerModelManager_setEyesTextures(ZPlayerModelHandle h, Tex
 
     entry->eyesTex = eyesTextures;
 
-    if (isEntryLoaded(entry) && GET_PLAYER_FORM == getPlayerFormFromModelType(entry->modelEntry.type)) {
+    if (isEntryLoaded(entry) && GET_PLAYER_FORM == getFormFromModelType(entry->modelEntry.type)) {
         refreshFaceTextures();
     }
 
@@ -358,7 +327,7 @@ RECOMP_EXPORT bool ZPlayerModelManager_setMouthTextures(ZPlayerModelHandle h, Te
 
     entry->mouthTex = mouthTextures;
 
-    if (isEntryLoaded(entry) && GET_PLAYER_FORM == getPlayerFormFromModelType(entry->modelEntry.type)) {
+    if (isEntryLoaded(entry) && GET_PLAYER_FORM == getFormFromModelType(entry->modelEntry.type)) {
         refreshFaceTextures();
     }
 

@@ -20,6 +20,10 @@ RecompuiResource root;
 RecompuiResource container;
 RecompuiResource row1;
 RecompuiResource row2;
+RecompuiResource rowCategory;
+RecompuiResource buttonCategoryNext;
+RecompuiResource buttonCategoryPrev;
+RecompuiResource labelCategory;
 RecompuiResource buttonClose;
 RecompuiResource buttonRemoveModel;
 RecompuiResource buttonRefreshFiles;
@@ -37,51 +41,61 @@ RecompuiResource labelradio;
 bool context_shown = false;
 bool showing_bow = false;
 
-RecompuiResource modelListContainer;
-RecompuiResource uiTitle;
-RecompuiResource modelAuthorPrefix;
-RecompuiResource modelAuthor;
+RecompuiResource containerModelList;
+RecompuiResource labelUiTitle;
+RecompuiResource labellabelModelAuthorPrefix;
+RecompuiResource labelModelAuthor;
 
-static CustomModelEntry *sRealEntry = NULL;
+static CustomModelEntry *sRealEntries[PLAYER_FORM_MAX];
 
 static bool sIsDiskSaveNeeded = false;
 
 static bool sIsLivePreviewEnabled = false;
 
+static PlayerTransformation sCurrentSelectedForm = PLAYER_FORM_HUMAN;
+
+PlayerTransformation getSelectedForm() {
+    return sCurrentSelectedForm;
+}
+
+bool shouldLivePreview() {
+    return sIsLivePreviewEnabled && getSelectedForm() == GET_PLAYER_FORM;
+}
+
 void destroyAuthor() {
-    if (modelAuthor) {
-        recompui_destroy_element(row2, modelAuthor);
-        recompui_destroy_element(row2, modelAuthorPrefix);
+    if (labelModelAuthor) {
+        recompui_destroy_element(row2, labelModelAuthor);
+        recompui_destroy_element(row2, labellabelModelAuthorPrefix);
     }
-    modelAuthor = 0;
-    modelAuthorPrefix = 0;
+    labelModelAuthor = 0;
+    labellabelModelAuthorPrefix = 0;
 }
 
 void setAuthor(const char *author) {
     if (!author) {
         author = "N/A";
     }
-    
+
     destroyAuthor();
-    modelAuthorPrefix = recompui_create_label(context, row2, "Author(s): ", LABELSTYLE_NORMAL);
-    modelAuthor = recompui_create_label(context, row2, author, LABELSTYLE_NORMAL);
+    labellabelModelAuthorPrefix = recompui_create_label(context, row2, "Author(s): ", LABELSTYLE_NORMAL);
+    labelModelAuthor = recompui_create_label(context, row2, author, LABELSTYLE_NORMAL);
 }
 
 void applyRealEntry() {
-    CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, sRealEntry);
+    CMEM_tryApplyEntry(getSelectedForm(), sRealEntries[getSelectedForm()]);
 }
 
 void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         Audio_PlaySfx(NA_SE_SY_DECIDE);
-        sRealEntry = NULL;
-        CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, NULL);
+        sRealEntries[getSelectedForm()] = NULL;
+        CMEM_tryApplyEntry(getSelectedForm(), NULL);
         refreshButtonEntryColors();
         sIsDiskSaveNeeded = true;
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
 
-        if (sIsLivePreviewEnabled) {
+        if (shouldLivePreview()) {
             applyRealEntry();
         }
     }
@@ -89,11 +103,13 @@ void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *dat
 
 void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, sRealEntry);
+        applyRealEntry();
         recompui_hide_context(context);
         context_shown = false;
         if (sIsDiskSaveNeeded) {
-            CMEM_saveCurrentEntry(PLAYER_FORM_HUMAN);
+            for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+                CMEM_saveCurrentEntry(i);
+            }
             Audio_PlaySfx(NA_SE_SY_PIECE_OF_HEART);
         } else {
             Audio_PlaySfx(NA_SE_SY_DECIDE);
@@ -101,7 +117,7 @@ void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
 
-        if (sIsLivePreviewEnabled) {
+        if (shouldLivePreview()) {
             applyRealEntry();
         }
     }
@@ -110,17 +126,50 @@ void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data
 void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         Audio_PlaySfx(NA_SE_SY_DECIDE);
-        sRealEntry = NULL;
+        sRealEntries[getSelectedForm()] = NULL;
         refreshFileList();
-        sRealEntry = CMEM_getCurrentEntry(PLAYER_FORM_HUMAN);
+        sRealEntries[getSelectedForm()] = CMEM_getCurrentEntry(getSelectedForm());
         refreshButtonEntryColors();
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
-        
-        if (sIsLivePreviewEnabled) {
+
+        if (shouldLivePreview()) {
             applyRealEntry();
         }
     }
+}
+
+static bool sIsCategoryRowExist = false;
+
+void refreshCategoryRow() {
+    if (sIsCategoryRowExist) {
+        recompui_destroy_element(container, rowCategory);
+        recompui_destroy_element(rowCategory, buttonCategoryPrev);
+        recompui_destroy_element(rowCategory, buttonCategoryNext);
+    }
+
+    buttonCategoryPrev = recompui_create_button(context, rowCategory, "◀", BUTTONSTYLE_SECONDARY);
+    labelCategory = recompui_create_label(context, rowCategory, "Model Category", LABELSTYLE_LARGE);
+    buttonCategoryNext = recompui_create_button(context, rowCategory, "▶", BUTTONSTYLE_SECONDARY);
+
+    recompui_set_nav(buttonClose, NAVDIRECTION_RIGHT, buttonRefreshFiles);
+    recompui_set_nav(buttonClose, NAVDIRECTION_DOWN, buttonCategoryPrev);
+
+    recompui_set_nav(buttonRemoveModel, NAVDIRECTION_UP, buttonCategoryPrev);
+    recompui_set_nav(buttonRemoveModel, NAVDIRECTION_LEFT, buttonCategoryNext);
+
+    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_LEFT, buttonRefreshFiles);
+    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_DOWN, buttonRemoveModel);
+    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_UP, buttonClose);
+
+    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_DOWN, buttonCategoryNext);
+    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_RIGHT, buttonCategoryPrev);
+
+    recompui_set_nav(buttonCategoryNext, NAVDIRECTION_DOWN, buttonRemoveModel);
+    recompui_set_nav(buttonCategoryNext, NAVDIRECTION_UP, buttonRefreshFiles);
+    recompui_set_nav(buttonCategoryNext, NAVDIRECTION_RIGHT, buttonRemoveModel);
+
+    sIsCategoryRowExist = true;
 }
 
 RECOMP_DECLARE_EVENT(_internal_onReadyUI());
@@ -206,6 +255,16 @@ void on_init() {
     recompui_set_align_items(row1, ALIGN_ITEMS_FLEX_END);
     recompui_set_gap(row1, 16.0f, UNIT_DP);
 
+    rowCategory = recompui_create_element(context, container);
+    recompui_set_flex_basis(rowCategory, 100.0f, UNIT_DP);
+    recompui_set_flex_grow(rowCategory, 0);
+    recompui_set_flex_shrink(rowCategory, 0);
+    recompui_set_display(rowCategory, DISPLAY_FLEX);
+    recompui_set_flex_direction(rowCategory, FLEX_DIRECTION_ROW);
+    recompui_set_justify_content(rowCategory, JUSTIFY_CONTENT_FLEX_START);
+    recompui_set_align_items(rowCategory, ALIGN_ITEMS_FLEX_END);
+    recompui_set_gap(rowCategory, 16.0f, UNIT_DP);
+
     buttonClose = recompui_create_button(context, row1, "Apply", BUTTONSTYLE_SECONDARY);
     recompui_set_text_align(buttonClose, TEXT_ALIGN_CENTER);
 
@@ -226,17 +285,17 @@ void on_init() {
     */
 
     // set up scrolling container for models
-    modelListContainer = recompui_create_element(context, container);
-    recompui_set_flex_basis(modelListContainer, 100.0f, UNIT_DP);
-    recompui_set_flex_grow(modelListContainer, 1.0f);
-    recompui_set_flex_shrink(modelListContainer, 0.0f);
-    recompui_set_display(modelListContainer, DISPLAY_FLEX);
-    recompui_set_flex_direction(modelListContainer, FLEX_DIRECTION_COLUMN);
-    recompui_set_justify_content(modelListContainer, JUSTIFY_CONTENT_FLEX_START);
-    recompui_set_align_items(modelListContainer, ALIGN_ITEMS_FLEX_START);
-    recompui_set_gap(modelListContainer, 16.0f, UNIT_DP);
-    recompui_set_overflow_y(modelListContainer, OVERFLOW_SCROLL);
-    recompui_set_overflow_x(modelListContainer, OVERFLOW_HIDDEN);
+    containerModelList = recompui_create_element(context, container);
+    recompui_set_flex_basis(containerModelList, 100.0f, UNIT_DP);
+    recompui_set_flex_grow(containerModelList, 1.0f);
+    recompui_set_flex_shrink(containerModelList, 0.0f);
+    recompui_set_display(containerModelList, DISPLAY_FLEX);
+    recompui_set_flex_direction(containerModelList, FLEX_DIRECTION_COLUMN);
+    recompui_set_justify_content(containerModelList, JUSTIFY_CONTENT_FLEX_START);
+    recompui_set_align_items(containerModelList, ALIGN_ITEMS_FLEX_START);
+    recompui_set_gap(containerModelList, 16.0f, UNIT_DP);
+    recompui_set_overflow_y(containerModelList, OVERFLOW_SCROLL);
+    recompui_set_overflow_x(containerModelList, OVERFLOW_HIDDEN);
 
     row2 = recompui_create_element(context, container);
     recompui_set_flex_basis(row2, 100.0f, UNIT_DP);
@@ -249,21 +308,18 @@ void on_init() {
     recompui_set_gap(row2, 0.0f, UNIT_DP);
 
     // set up and hook up remove model button to close button and vice versa
-    buttonRemoveModel = recompui_create_button(context, modelListContainer, "Remove Model", BUTTONSTYLE_SECONDARY);
+    buttonRemoveModel = recompui_create_button(context, containerModelList, "Remove Model", BUTTONSTYLE_SECONDARY);
     recompui_set_flex_shrink(buttonRemoveModel, 0);
-    recompui_set_nav(buttonClose, NAVDIRECTION_DOWN, buttonRemoveModel);
-    recompui_set_nav(buttonRemoveModel, NAVDIRECTION_UP, buttonClose);
-    recompui_set_nav(buttonRemoveModel, NAVDIRECTION_LEFT, buttonClose);
     recompui_register_callback(buttonRemoveModel, removeButtonPressed, NULL);
     recompui_set_width(buttonRemoveModel, 100.0f, UNIT_PERCENT);
     recompui_set_text_align(buttonRemoveModel, TEXT_ALIGN_CENTER);
 
     buttonRefreshFiles = recompui_create_button(context, row1, "Refresh File List", BUTTONSTYLE_SECONDARY);
     recompui_set_text_align(buttonRefreshFiles, TEXT_ALIGN_CENTER);
-    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_DOWN, buttonRemoveModel);
-    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_RIGHT, buttonRemoveModel);
     recompui_register_callback(buttonRefreshFiles, refreshButtonPressed, NULL);
     recompui_set_text_align(buttonRefreshFiles, TEXT_ALIGN_CENTER);
+
+    refreshCategoryRow();
 
     recompui_close_context(context);
 
@@ -332,7 +388,7 @@ typedef struct {
 static ModelButtonEntries sButtonEntries;
 
 void refreshButtonEntryColors() {
-    void *entry = (void *)CMEM_getCurrentEntry(PLAYER_FORM_HUMAN);
+    void *entry = (void *)CMEM_getCurrentEntry(getSelectedForm());
     for (size_t i = 0; i < sButtonEntries.count; ++i) {
         if (entry == sButtonEntries.entries[i]) {
             recompui_set_background_color(sButtonEntries.buttons[i], &sModelSelectedButtonColor.bgColor);
@@ -347,18 +403,20 @@ void refreshButtonEntryColors() {
 void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     CustomModelEntry *entry = userdata;
 
-    if (data->type == UI_EVENT_CLICK) {
-        Audio_PlaySfx(NA_SE_SY_DECIDE);
-        CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, entry);
-        sRealEntry = entry;
-        refreshButtonEntryColors();
-        sIsDiskSaveNeeded = true;
-    } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
-        destroyAuthor();
-        setAuthor(entry->authorName);
+    if (entry->type != CUSTOM_MODEL_TYPE_NONE) {
+        if (data->type == UI_EVENT_CLICK) {
+            Audio_PlaySfx(NA_SE_SY_DECIDE);
+            CMEM_tryApplyEntry(getFormFromModelType(entry->type), entry);
+            sRealEntries[getSelectedForm()] = entry;
+            refreshButtonEntryColors();
+            sIsDiskSaveNeeded = true;
+        } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
+            destroyAuthor();
+            setAuthor(entry->authorName);
 
-        if (sIsLivePreviewEnabled) {
-            CMEM_tryApplyEntry(PLAYER_FORM_HUMAN, entry);
+            if (shouldLivePreview()) {
+                CMEM_tryApplyEntry(getFormFromModelType(entry->type), entry);
+            }
         }
     }
 }
@@ -369,7 +427,7 @@ void destroyModelButtons() {
         sButtonEntries.entries = NULL;
 
         for (size_t i = 0; i < sButtonEntries.count; ++i) {
-            recompui_destroy_element(modelListContainer, sButtonEntries.buttons[i]);
+            recompui_destroy_element(containerModelList, sButtonEntries.buttons[i]);
         }
     }
 }
@@ -377,9 +435,7 @@ void destroyModelButtons() {
 void createModelButtons() {
     // MUST CALL INSIDE UI CONTEXT
 
-    CMEM_refreshDiskEntries(PLAYER_FORM_HUMAN);
-
-    sButtonEntries.entries = CMEM_getCombinedEntries(PLAYER_FORM_HUMAN, &sButtonEntries.count);
+    sButtonEntries.entries = CMEM_getCombinedEntries(getSelectedForm(), &sButtonEntries.count);
 
     if (sButtonEntries.count > sButtonEntries.capacity) {
         recomp_free(sButtonEntries.buttons);
@@ -393,7 +449,7 @@ void createModelButtons() {
             name = sButtonEntries.entries[i]->internalName;
         }
 
-        RecompuiResource button = recompui_create_button(context, modelListContainer, name, BUTTONSTYLE_PRIMARY);
+        RecompuiResource button = recompui_create_button(context, containerModelList, name, BUTTONSTYLE_PRIMARY);
 
         recompui_set_text_align(button, TEXT_ALIGN_CENTER);
 
@@ -416,9 +472,9 @@ void createModelButtons() {
         recompui_set_nav(buttonRemoveModel, NAVDIRECTION_DOWN, buttonFirst);
 
         recompui_set_nav(buttonFirst, NAVDIRECTION_UP, buttonRemoveModel);
-        recompui_set_nav(buttonFirst, NAVDIRECTION_LEFT, buttonClose);
+        recompui_set_nav(buttonFirst, NAVDIRECTION_LEFT, buttonRemoveModel);
 
-        recompui_set_nav(buttonLast, NAVDIRECTION_LEFT, buttonClose);
+        recompui_set_nav(buttonLast, NAVDIRECTION_LEFT, buttonRemoveModel);
 
         if (sButtonEntries.count > 1) {
             recompui_set_nav(buttonFirst, NAVDIRECTION_DOWN, sButtonEntries.buttons[1]);
@@ -430,12 +486,12 @@ void createModelButtons() {
                 RecompuiResource button = sButtonEntries.buttons[i];
                 recompui_set_nav(button, NAVDIRECTION_UP, sButtonEntries.buttons[i - 1]);
                 recompui_set_nav(button, NAVDIRECTION_DOWN, sButtonEntries.buttons[i + 1]);
-                recompui_set_nav(button, NAVDIRECTION_LEFT, buttonClose);
+                recompui_set_nav(button, NAVDIRECTION_LEFT, buttonRemoveModel);
                 recompui_set_nav(button, NAVDIRECTION_RIGHT, buttonLast);
             }
         }
 
-        recompui_set_nav(buttonLast, NAVDIRECTION_DOWN, buttonRemoveModel);
+        recompui_set_nav(buttonLast, NAVDIRECTION_DOWN, buttonClose);
         recompui_set_nav_none(buttonLast, NAVDIRECTION_RIGHT);
     } else {
         recompui_set_nav(buttonClose, NAVDIRECTION_UP, buttonRemoveModel);
@@ -448,6 +504,7 @@ void createModelButtons() {
 void refreshFileList() {
     // MUST CALL INSIDE UI CONTEXT
     destroyModelButtons();
+    CMEM_refreshDiskEntries(getSelectedForm());
     createModelButtons();
 }
 
@@ -482,7 +539,9 @@ void openModelMenu() {
     if (!context_shown) {
         sIsDiskSaveNeeded = false;
         sIsLivePreviewEnabled = recomp_get_config_u32("is_live_preview_enabled");
-        sRealEntry = CMEM_getCurrentEntry(PLAYER_FORM_HUMAN);
+        for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+            sRealEntries[i] = CMEM_getCurrentEntry(i);
+        }
         recompui_show_context(context);
         context_shown = true;
     }
