@@ -223,7 +223,7 @@ void setDlToShims(Link_FormProxy *formProxy) {
 }
 
 Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
-    Gfx* dl = NULL;
+    Gfx *dl = NULL;
 
     dl = formProxy->current.models[target];
 
@@ -355,9 +355,9 @@ LodLimb skeletonBase[PLAYER_LIMB_COUNT] = {
     {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
 };
 
+void initFormProxySkeleton(Link_FormProxy *formProxy) {
 #define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = &formProxy->displayLists[proxyLimbName]
 
-void initFormProxySkeleton(Link_FormProxy *formProxy) {
     Link_SkeletonProxy *skel = &formProxy->skeleton;
     FlexSkeletonHeader *flex = &skel->flexSkeleton;
     flex->dListCount = 18;
@@ -389,12 +389,45 @@ void initFormProxySkeleton(Link_FormProxy *formProxy) {
     SET_LIMB_DL(PLAYER_LIMB_TORSO, LINK_DL_TORSO);
 
     flex->sh.segment = (void **)skel->limbPtrs;
+
+#undef SET_LIMB_DL
 }
 
 void initFormProxy(Link_FormProxy *formProxy) {
     initFormProxySkeleton(formProxy);
     initFormProxyMatrixes(formProxy);
     initFormProxyShims(formProxy);
+}
+
+void setSkeletonDLsOnModelInfo(Link_ModelInfo *info, FlexSkeletonHeader *skel) {
+
+#define SET_LIMB_DL(pLimb, dl) \
+    if (!info->models[dl])     \
+    info->models[dl] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gCallEmptyDisplayList
+
+    if (skel) {
+        LodLimb **limbs = (LodLimb **)skel->sh.segment;
+        SET_LIMB_DL(PLAYER_LIMB_WAIST, LINK_DL_WAIST);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_THIGH, LINK_DL_RTHIGH);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHIN, LINK_DL_RSHIN);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOOT, LINK_DL_RFOOT);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_THIGH, LINK_DL_LTHIGH);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_SHIN, LINK_DL_LSHIN);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_FOOT, LINK_DL_LFOOT);
+        SET_LIMB_DL(PLAYER_LIMB_HEAD, LINK_DL_HEAD);
+        SET_LIMB_DL(PLAYER_LIMB_HAT, LINK_DL_HAT);
+        SET_LIMB_DL(PLAYER_LIMB_COLLAR, LINK_DL_COLLAR);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_SHOULDER, LINK_DL_LSHOULDER);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_FOREARM, LINK_DL_LFOREARM);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_HAND, LINK_DL_LHAND);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHOULDER, LINK_DL_RSHOULDER);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOREARM, LINK_DL_RFOREARM);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_HAND, LINK_DL_RHAND);
+        SET_LIMB_DL(PLAYER_LIMB_SHEATH, LINK_DL_SHEATH_NONE);
+        SET_LIMB_DL(PLAYER_LIMB_TORSO, LINK_DL_TORSO);
+    }
+
+#undef SET_LIMB_DL
 }
 
 void refreshFormProxy(Link_FormProxy *formProxy) {

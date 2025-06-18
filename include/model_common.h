@@ -17,5 +17,6 @@ void refreshFaceTextures();
 void initFormProxy(Link_FormProxy *formProxy);
 void requestRefreshFormProxy(PlayerTransformation form);
 Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target);
+void setSkeletonDLsOnModelInfo(Link_ModelInfo *info, FlexSkeletonHeader *skel);
 
 #endif

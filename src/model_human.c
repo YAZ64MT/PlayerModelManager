@@ -275,7 +275,9 @@ void setupVanillaHuman() {
 
     ZGlobalObj_globalizeLodLimbSkeleton(human, &gLinkHumanSkel);
 
-    formProxy->vanilla.skeleton = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);
+    FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);
+
+    formProxy->vanilla.skeleton = skel;
 
     Mtx **equipMatrixes = formProxy->vanilla.equipMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx);
@@ -287,21 +289,7 @@ void setupVanillaHuman() {
     Gfx **models = formProxy->vanilla.models;
 
     // limbs
-    models[LINK_DL_WAIST] = getHumanDL(gLinkHumanWaistDL);
-    models[LINK_DL_RTHIGH] = getHumanDL(gLinkHumanRightThighDL);
-    models[LINK_DL_RSHIN] = getHumanDL(gLinkHumanRightShinDL);
-    models[LINK_DL_RFOOT] = getHumanDL(gLinkHumanRightFootDL);
-    models[LINK_DL_LTHIGH] = getHumanDL(gLinkHumanLeftThighDL);
-    models[LINK_DL_LSHIN] = getHumanDL(gLinkHumanLeftShinDL);
-    models[LINK_DL_LFOOT] = getHumanDL(gLinkHumanLeftFootDL);
-    models[LINK_DL_HEAD] = getHumanDL(gLinkHumanHeadDL);
-    models[LINK_DL_HAT] = getHumanDL(gLinkHumanHatDL);
-    models[LINK_DL_COLLAR] = getHumanDL(gLinkHumanCollarDL);
-    models[LINK_DL_LSHOULDER] = getHumanDL(gLinkHumanLeftShoulderDL);
-    models[LINK_DL_LFOREARM] = getHumanDL(gLinkHumanLeftForearmDL);
-    models[LINK_DL_RSHOULDER] = getHumanDL(gLinkHumanRightShoulderDL);
-    models[LINK_DL_RFOREARM] = getHumanDL(gLinkHumanRightForearmDL);
-    models[LINK_DL_TORSO] = getHumanDL(gLinkHumanTorsoDL);
+    setSkeletonDLsOnModelInfo(&formProxy->vanilla, skel);
 
     // hands
     models[LINK_DL_LHAND] = getHumanDL(gLinkHumanLeftHandOpenDL);
