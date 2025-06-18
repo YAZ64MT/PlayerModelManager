@@ -1,9 +1,6 @@
 #include "modding.h"
 #include "global.h"
-#include "recomputils.h"
-#include "recompconfig.h"
 #include "assets/objects/object_link_child/object_link_child.h"
-#include "playermodelmanager_mm.h"
 #include "playermodelmanager_utils.h"
 #include "model_common.h"
 #include "globalobjects_api.h"
@@ -109,6 +106,7 @@ Gfx gLinkHumanFirstPersonArmDL[] = {
 
 Gfx *getHumanDL(Gfx *dl);
 
+RECOMP_CALLBACK(".", _internal_setupVanillaModels)
 void setupVanillaHuman() {
     Link_FormProxy *formProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
