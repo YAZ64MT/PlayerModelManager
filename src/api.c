@@ -331,7 +331,7 @@ RECOMP_EXPORT bool ZPlayerModelManager_setSkeleton(ZPlayerModelHandle h, FlexSke
     return true;
 }
 
-#undef GET_LIMB_DL
+#undef SET_LIMB_DL
 
 RECOMP_EXPORT bool ZPlayerModelManager_setEyesTextures(ZPlayerModelHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]) {
     CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_setEyesTextures");
@@ -381,12 +381,12 @@ RECOMP_EXPORT Gfx *ZPlayerModelManager_getDL(unsigned long apiVersion, PlayerTra
 
 RECOMP_DECLARE_EVENT(ZPlayerModelManager_onRegisterModels());
 
-RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onFinishedRegisterModels());
+RECOMP_DECLARE_EVENT(_internal_onFinishedRegisterModels());
 
-RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyCMEM)
+RECOMP_CALLBACK(".", _internal_onReadyCMEM)
 void doRegisterModels() {
     sIsAPILocked = false;
     ZPlayerModelManager_onRegisterModels();
     sIsAPILocked = true;
-    PlayerModelManager_internal_onFinishedRegisterModels();
+    _internal_onFinishedRegisterModels();
 }

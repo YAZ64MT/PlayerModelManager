@@ -114,8 +114,8 @@ void refreshSharedDL(Link_FormProxy *current, Link_FormProxy *fallback, Link_Dis
     gSPBranchList(&sSharedDLs[shared], dl);
 }
 
-void refreshHumanModels(PlayerTransformation form) {
-    Link_FormProxy *current = &gLinkFormProxies[form];
+void refreshHumanModels() {
+    Link_FormProxy *current = &GET_PLAYER_FORM_PROXY;
     Link_FormProxy *human = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
     gSPBranchList(&sSharedDLs[SHARED_DL_LFIST_SWORD_KOKIRI], &current->displayLists[LINK_DL_LFIST_SWORD_KOKIRI]);
@@ -217,15 +217,26 @@ void refreshDLs_on_return_PlayerInit() {
 
     refreshExternalDLs();
 
-    refreshHumanModels(GET_PLAYER_FORM);
+    refreshHumanModels();
 
     gIsAgePropertyRefreshRequested = true;
 }
 
-RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyFormProxies());
+RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
 
 ZMODELREPLACER_CALLBACK_ON_READY
 void onModelReplacerReady() {
     initFormProxies();
-    PlayerModelManager_internal_onReadyFormProxies();
+    _internal_onReadyFormProxies();
+}
+
+RECOMP_CALLBACK(".", _internal_onModelApplied)
+void refreshSharedModelsOnModelApply(PlayerTransformation form) {
+    requestRefreshFormProxy(form);
+    gIsAgePropertyRefreshRequested = true;
+
+    if (form == GET_PLAYER_FORM) {
+        refreshHumanModels();
+        refreshFaceTextures();
+    }
 }

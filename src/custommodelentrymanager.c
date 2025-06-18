@@ -173,6 +173,8 @@ void clearDiskEntries(PlayerTransformation form) {
     sDiskEntries[form].count = 0;
 }
 
+RECOMP_DECLARE_EVENT(_internal_onModelApplied(PlayerTransformation form));
+
 bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry) {
     Link_FormProxy *proxy = &gLinkFormProxies[form];
     CustomModelEntry *currEntry = CMEM_getCurrentEntry(form);
@@ -193,10 +195,7 @@ bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry) {
 
             CMEM_setCurrentEntry(form, newEntry);
 
-            requestRefreshFormProxy(form);
-            refreshFaceTextures();
-
-            gIsAgePropertyRefreshRequested = true;
+            _internal_onModelApplied(form);
 
             return true;
         }
@@ -461,9 +460,8 @@ void CMEM_removeModel(PlayerTransformation form) {
         sCurrentModelEntries[form] = NULL;
 
         clearLinkModelInfo(&proxy->current);
-
-        requestRefreshFormProxy(form);
-        refreshFaceTextures();
+        
+        _internal_onModelApplied(form);
 
         gIsAgePropertyRefreshRequested = true;
     }
@@ -504,7 +502,7 @@ void CMEM_saveCurrentEntry(PlayerTransformation form) {
     }
 }
 
-RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onSavedModelsApplied());
+RECOMP_DECLARE_EVENT(_internal_onSavedModelsApplied());
 
 void loadSavedModels() {
     static char retrievedName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
@@ -515,15 +513,15 @@ void loadSavedModels() {
         }
     }
 
-    PlayerModelManager_internal_onSavedModelsApplied();
+    _internal_onSavedModelsApplied();
 }
 
-RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyCMEM());
+RECOMP_DECLARE_EVENT(_internal_onReadyCMEM());
 
-RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyUI)
+RECOMP_CALLBACK(".", _internal_onReadyUI)
 void initEntryManagerCallback() {
     initEntryManager();
-    PlayerModelManager_internal_onReadyCMEM();
+    _internal_onReadyCMEM();
 }
 
 RECOMP_HOOK_RETURN("TitleSetup_SetupTitleScreen")

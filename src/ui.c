@@ -123,7 +123,7 @@ void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *da
     }
 }
 
-RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyUI());
+RECOMP_DECLARE_EVENT(_internal_onReadyUI());
 
 RECOMP_CALLBACK("*", recomp_on_init)
 void on_init() {
@@ -269,7 +269,7 @@ void on_init() {
 
     context_shown = false;
 
-    PlayerModelManager_internal_onReadyUI();
+    _internal_onReadyUI();
 }
 
 typedef struct {
@@ -496,14 +496,14 @@ void on_play_update(PlayState *play) {
     }
 }
 
-RECOMP_CALLBACK(".", PlayerModelManager_internal_onFinishedRegisterModels)
+RECOMP_CALLBACK(".", _internal_onFinishedRegisterModels)
 void populateFirstFileList() {
     recompui_open_context(context);
     refreshFileList();
     recompui_close_context(context);
 }
 
-RECOMP_CALLBACK(".", PlayerModelManager_internal_onSavedModelsApplied)
+RECOMP_CALLBACK(".", _internal_onSavedModelsApplied)
 void refreshButtonsWhenSavedModelApplied() {
     recompui_open_context(context);
     refreshButtonEntryColors();

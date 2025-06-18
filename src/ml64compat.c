@@ -122,10 +122,10 @@ void initSegmentPtrsRemap() {
     gSegmentPointersRemap = recomputil_create_u32_value_hashmap();
 }
 
-RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyML64CompatBase());
+RECOMP_DECLARE_EVENT(_internal_onReadyML64CompatBase());
 
-RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyFormProxies)
+RECOMP_CALLBACK(".", _internal_onReadyFormProxies)
 void initML64CompatBase_onReadyFormProxies() {
     initSegmentPtrsRemap();
-    PlayerModelManager_internal_onReadyML64CompatBase();
+    _internal_onReadyML64CompatBase();
 }

@@ -461,13 +461,13 @@ void remapSegmentPtrs() {
     setSegmentPtrRemap(OOT_GK_BOTTLE_GLASS_TEX, (u32)gOotBottleGlassTex);
 }
 
-RECOMP_DECLARE_EVENT(PlayerModelManager_internal_onReadyML64Compat());
+RECOMP_DECLARE_EVENT(_internal_onReadyML64Compat());
 
-RECOMP_CALLBACK(".", PlayerModelManager_internal_onReadyML64CompatBase)
+RECOMP_CALLBACK(".", _internal_onReadyML64CompatBase)
 void initML64CompatMM_onReadyML64CompatBase() {
     remapSegmentPtrs();
 
     guPosition(&sHookshotMatrix, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
 
-    PlayerModelManager_internal_onReadyML64Compat();
+    _internal_onReadyML64Compat();
 }
