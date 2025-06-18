@@ -24,8 +24,8 @@ RECOMP_HOOK_RETURN("Player_OverrideLimbDrawGameplayFirstPerson")
 void addFPSrightForearm_on_return_OverrideLimbDrawFirstPerson() {
     // TODO: SUPPORT OTHER FORMS
     if (gLimbIndex == PLAYER_LIMB_RIGHT_FOREARM) {
-        Link_FormProxy *p = &GET_PLAYER_FORM_PROXY;
-        if (p->current.models[LINK_DL_FPS_RFOREARM] || p->vanilla.models[LINK_DL_FPS_RFOREARM]) {
+        Link_FormProxy *p = GET_PLAYER_FORM_PROXY;
+        if (getFormProxyDL(p, LINK_DL_FPS_RFOREARM)) {
             *gFirstPersonDList = &p->displayLists[LINK_DL_FPS_RFOREARM];
         }
     }

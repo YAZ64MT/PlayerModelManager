@@ -3,138 +3,10 @@
 #include "recomputils.h"
 #include "recompconfig.h"
 #include "assets/objects/object_link_child/object_link_child.h"
-#include "assets/objects/gameplay_keep/gameplay_keep.h"
-#include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "playermodelmanager_mm.h"
 #include "playermodelmanager_utils.h"
 #include "model_common.h"
 #include "globalobjects_api.h"
-
-// handless ocarina
-Gfx gLinkHumanOcarinaDL[] = {
-    gsDPPipeSync(),
-    gsDPSetTextureLUT(G_TT_RGBA16),
-    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
-    gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, 1, COMBINED, 0, PRIMITIVE, 0, 0, 0, 0, COMBINED),
-    gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2),
-    gsSPClearGeometryMode(G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR),
-    gsSPSetGeometryMode(G_CULL_BACK | G_FOG | G_LIGHTING),
-    gsDPSetPrimColor(0, 0, 255, 255, 255, 255),
-    gsDPPipeSync(),
-    gsDPSetTextureLUT(G_TT_NONE),
-    gsDPLoadTextureBlock(gLinkHumanOcarinaTex, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 16, 0, G_TX_NOMIRROR | G_TX_CLAMP,
-                         G_TX_NOMIRROR | G_TX_CLAMP, 5, 4, G_TX_NOLOD, G_TX_NOLOD),
-    gsSPVertex(&object_link_childVtx_00E858[53], 23, 0),
-    gsSP2Triangles(0, 1, 2, 0, 0, 2, 3, 0),
-    gsSP2Triangles(4, 3, 2, 0, 4, 2, 1, 0),
-    gsSP2Triangles(5, 6, 7, 0, 8, 9, 10, 0),
-    gsSP2Triangles(10, 6, 8, 0, 5, 8, 6, 0),
-    gsSP2Triangles(11, 9, 0, 0, 10, 9, 11, 0),
-    gsSP2Triangles(12, 1, 13, 0, 11, 3, 14, 0),
-    gsSP2Triangles(11, 0, 3, 0, 0, 9, 1, 0),
-    gsSP2Triangles(12, 4, 1, 0, 1, 9, 8, 0),
-    gsSP2Triangles(1, 8, 5, 0, 14, 10, 11, 0),
-    gsSP2Triangles(1, 5, 13, 0, 15, 13, 5, 0),
-    gsSP2Triangles(15, 5, 7, 0, 7, 14, 15, 0),
-    gsSP2Triangles(10, 14, 6, 0, 6, 14, 7, 0),
-    gsSP2Triangles(12, 13, 16, 0, 12, 16, 17, 0),
-    gsSP2Triangles(17, 18, 15, 0, 15, 16, 13, 0),
-    gsSP2Triangles(17, 15, 14, 0, 17, 14, 19, 0),
-    gsSP2Triangles(14, 20, 21, 0, 14, 21, 19, 0),
-    gsSP2Triangles(4, 20, 3, 0, 3, 20, 14, 0),
-    gsSP2Triangles(12, 17, 19, 0, 12, 19, 22, 0),
-    gsSP2Triangles(12, 22, 4, 0, 21, 20, 4, 0),
-    gsSPEndDisplayList(),
-};
-
-// handless first person hookshot
-Gfx gLinkHumanFirstPersonHookshotDL[] = {
-    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
-    gsDPPipeSync(),
-    gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, TEXEL0, PRIMITIVE, 0, COMBINED, 0, 0, 0, 0, COMBINED),
-    gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2),
-    gsDPPipeSync(),
-    gsDPSetTextureLUT(G_TT_RGBA16),
-    gsDPLoadTLUT_pal256(object_link_child_TLUT_018A40),
-    gsDPLoadTextureBlock(object_link_child_Tex_01B380, G_IM_FMT_CI, G_IM_SIZ_8b, 16, 16, 0, G_TX_MIRROR | G_TX_CLAMP,
-                         G_TX_NOMIRROR | G_TX_WRAP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
-    gsDPSetPrimColor(0, 0x80, 255, 255, 255, 255),
-    gsSPLoadGeometryMode(G_ZBUFFER | G_SHADE | G_CULL_BACK | G_FOG | G_LIGHTING | G_SHADING_SMOOTH),
-    gsSPVertex(&object_link_childVtx_010538[452], 32, 0),
-    gsSP2Triangles(0, 1, 2, 0, 0, 3, 1, 0),
-    gsSP2Triangles(2, 4, 5, 0, 2, 5, 0, 0),
-    gsSP2Triangles(6, 3, 0, 0, 7, 8, 9, 0),
-    gsSP2Triangles(10, 9, 11, 0, 10, 7, 9, 0),
-    gsSP2Triangles(12, 13, 14, 0, 15, 12, 14, 0),
-    gsSP2Triangles(15, 16, 12, 0, 17, 18, 19, 0),
-    gsSP2Triangles(10, 17, 19, 0, 10, 20, 17, 0),
-    gsSP2Triangles(21, 22, 23, 0, 24, 23, 25, 0),
-    gsSP2Triangles(26, 27, 28, 0, 29, 28, 30, 0),
-    gsSPVertex(&object_link_childVtx_010538[483], 31, 0),
-    gsSP2Triangles(0, 1, 2, 0, 3, 0, 2, 0),
-    gsSP2Triangles(3, 4, 0, 0, 5, 6, 7, 0),
-    gsSP2Triangles(5, 7, 2, 0, 8, 5, 2, 0),
-    gsSP2Triangles(9, 10, 11, 0, 12, 9, 11, 0),
-    gsSP2Triangles(12, 13, 9, 0, 14, 15, 16, 0),
-    gsSP2Triangles(17, 18, 19, 0, 14, 17, 19, 0),
-    gsSP2Triangles(19, 20, 14, 0, 20, 15, 14, 0),
-    gsSP2Triangles(21, 22, 23, 0, 24, 21, 25, 0),
-    gsSP2Triangles(26, 27, 28, 0, 29, 26, 30, 0),
-    gsDPPipeSync(),
-    gsDPLoadTLUT_pal256(object_link_child_TLUT_018A40),
-    gsDPLoadTextureBlock(object_link_child_Tex_01A280, G_IM_FMT_CI, G_IM_SIZ_8b, 16, 16, 0, G_TX_MIRROR | G_TX_CLAMP,
-                         G_TX_MIRROR | G_TX_CLAMP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
-    gsSPVertex(&object_link_childVtx_010538[514], 18, 0),
-    gsSP2Triangles(0, 1, 2, 0, 3, 1, 0, 0),
-    gsSP2Triangles(4, 5, 3, 0, 6, 0, 2, 0),
-    gsSP2Triangles(3, 0, 4, 0, 2, 7, 6, 0),
-    gsSP2Triangles(8, 9, 10, 0, 10, 9, 11, 0),
-    gsSP2Triangles(12, 13, 14, 0, 15, 13, 12, 0),
-    gsSP2Triangles(4, 16, 17, 0, 17, 5, 4, 0),
-    gsSP2Triangles(6, 17, 16, 0, 6, 7, 17, 0),
-    gsDPPipeSync(),
-    gsDPLoadTLUT_pal256(object_link_child_TLUT_018A40),
-    gsDPLoadTextureBlock(object_link_child_Tex_019A80, G_IM_FMT_CI, G_IM_SIZ_8b, 32, 64, 0, G_TX_MIRROR | G_TX_CLAMP,
-                         G_TX_MIRROR | G_TX_CLAMP, 5, 6, G_TX_NOLOD, G_TX_NOLOD),
-    gsSPVertex(&object_link_childVtx_010538[532], 32, 0),
-    gsSP2Triangles(0, 1, 2, 0, 0, 3, 1, 0),
-    gsSP2Triangles(4, 5, 6, 0, 6, 5, 7, 0),
-    gsSP2Triangles(8, 9, 10, 0, 11, 12, 0, 0),
-    gsSP2Triangles(13, 14, 15, 0, 15, 8, 10, 0),
-    gsSP2Triangles(0, 13, 11, 0, 4, 16, 17, 0),
-    gsSP2Triangles(10, 13, 15, 0, 18, 19, 20, 0),
-    gsSP2Triangles(13, 10, 11, 0, 7, 21, 17, 0),
-    gsSP2Triangles(17, 20, 19, 0, 22, 23, 24, 0),
-    gsSP2Triangles(17, 16, 7, 0, 25, 22, 16, 0),
-    gsSP2Triangles(25, 26, 22, 0, 24, 16, 22, 0),
-    gsSP2Triangles(27, 21, 28, 0, 24, 7, 16, 0),
-    gsSP2Triangles(6, 26, 25, 0, 24, 23, 6, 0),
-    gsSP2Triangles(6, 7, 24, 0, 23, 29, 6, 0),
-    gsSP2Triangles(25, 4, 6, 0, 6, 29, 26, 0),
-    gsSP1Triangle(30, 27, 31, 0),
-    gsSPVertex(&object_link_childVtx_010538[564], 32, 0),
-    gsSP2Triangles(0, 1, 2, 0, 2, 3, 4, 0),
-    gsSP2Triangles(5, 6, 7, 0, 8, 6, 5, 0),
-    gsSP2Triangles(8, 9, 6, 0, 0, 2, 4, 0),
-    gsSP2Triangles(10, 11, 12, 0, 0, 13, 1, 0),
-    gsSP2Triangles(0, 14, 13, 0, 15, 4, 16, 0),
-    gsSP2Triangles(17, 18, 3, 0, 4, 15, 0, 0),
-    gsSP2Triangles(18, 19, 3, 0, 16, 4, 20, 0),
-    gsSP2Triangles(3, 21, 22, 0, 15, 11, 23, 0),
-    gsSP2Triangles(16, 11, 15, 0, 22, 20, 3, 0),
-    gsSP2Triangles(20, 22, 23, 0, 20, 24, 16, 0),
-    gsSP2Triangles(25, 26, 27, 0, 22, 28, 0, 0),
-    gsSP1Triangle(29, 30, 31, 0),
-    gsSPVertex(&object_link_childVtx_010538[596], 11, 0),
-    gsSP2Triangles(0, 1, 2, 0, 3, 4, 5, 0),
-    gsSP2Triangles(3, 0, 4, 0, 4, 6, 7, 0),
-    gsSP2Triangles(4, 2, 6, 0, 8, 4, 7, 0),
-    gsSP2Triangles(8, 5, 4, 0, 7, 9, 10, 0),
-    gsSP1Triangle(7, 6, 9, 0),
-    gsDPPipeSync(),
-    gsDPLoadTLUT_pal256(object_link_child_TLUT_018A40),
-    gsSPEndDisplayList(),
-};
 
 // first person arm
 Gfx gLinkHumanFirstPersonArmDL[] = {
@@ -235,17 +107,7 @@ Gfx gLinkHumanFirstPersonArmDL[] = {
     gsSPEndDisplayList(),
 };
 
-Gfx *getHumanDL(Gfx *dl) {
-    return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, dl);
-}
-
-Mtx *getHumanMtx(Mtx *mtx) {
-    return (Mtx *)((uintptr_t)GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD) + SEGMENT_OFFSET(mtx));
-}
-
-Gfx *getGameplayKeepDL(Gfx *dl) {
-    return GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, dl);
-}
+Gfx *getHumanDL(Gfx *dl);
 
 void setupVanillaHuman() {
     Link_FormProxy *formProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
@@ -279,13 +141,6 @@ void setupVanillaHuman() {
 
     formProxy->vanilla.skeleton = skel;
 
-    Mtx **equipMatrixes = formProxy->vanilla.equipMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx);
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = getHumanMtx(&gLinkHumanSheathedRazorSwordMtx);
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx);
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = getHumanMtx(&gLinkHumanHerosShieldMtx);
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = getHumanMtx(&gLinkHumanMirrorShieldMtx);
-
     Gfx **models = formProxy->vanilla.models;
 
     // limbs
@@ -298,39 +153,6 @@ void setupVanillaHuman() {
     models[LINK_DL_RHAND] = getHumanDL(gLinkHumanRightHandOpenDL);
     models[LINK_DL_RFIST] = getHumanDL(gLinkHumanRightHandClosedDL);
 
-    // sword sheathes
-    models[LINK_DL_SWORD_KOKIRI_SHEATH] = getHumanDL(gLinkHumanKokiriSwordSheathDL);
-    models[LINK_DL_SWORD_RAZOR_SHEATH] = getHumanDL(gLinkHumanRazorSwordSheathDL);
-    models[LINK_DL_SWORD_GILDED_SHEATH] = getHumanDL(gLinkHumanGildedSwordSheathDL);
-
-    // sword hilts
-    models[LINK_DL_SWORD_KOKIRI_HILT] = getGameplayKeepDL(gKokiriSwordHandleDL);
-    models[LINK_DL_SWORD_RAZOR_HILT] = getGameplayKeepDL(gRazorSwordHandleDL);
-    models[LINK_DL_SWORD_GILDED_HILT] = getHumanDL(gLinkHumanGildedSwordHandleDL);
-
-    // sword blades
-    models[LINK_DL_SWORD_KOKIRI_BLADE] = getGameplayKeepDL(gKokiriSwordBladeDL);
-    models[LINK_DL_SWORD_RAZOR_BLADE] = getGameplayKeepDL(gRazorSwordBladeDL);
-    models[LINK_DL_SWORD_GILDED_BLADE] = getHumanDL(gLinkHumanGildedSwordBladeDL);
-
-    // shields
-    models[LINK_DL_SHIELD_HERO] = getHumanDL(gLinkHumanHerosShieldDL);
-    models[LINK_DL_SHIELD_MIRROR] = getHumanDL(gLinkHumanMirrorShieldDL);
-    models[LINK_DL_SHIELD3_RAY] = GlobalObjects_getGlobalGfxPtr(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0);
-
-    // items
-    models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL; // not in Link obj
-    GlobalObjects_rebaseDL(human, gLinkHumanOcarinaDL, 0x06); // repoint vertices, textures, etc. to static link obj
-
-    models[LINK_DL_DEKU_STICK] = getGameplayKeepDL(gDekuStickDL);
-    models[LINK_DL_BOW] = getHumanDL(gLinkHumanBowDL);
-    models[LINK_DL_BOW_STRING] = getHumanDL(object_link_child_DL_017818);
-    models[LINK_DL_BOW_ARROW] = getGameplayKeepDL(gameplay_keep_DL_013FF0);
-    models[LINK_DL_HOOKSHOT] = getHumanDL(gLinkHumanHookshotDL);
-    models[LINK_DL_HOOKSHOT_CHAIN] = getGameplayKeepDL(gHookshotChainDL);
-    models[LINK_DL_HOOKSHOT_RETICLE] = getGameplayKeepDL(gHookshotReticleDL);
-    models[LINK_DL_HOOKSHOT_HOOK] = getHumanDL(object_link_child_DL_01D960);
-
     // First Person
     models[LINK_DL_FPS_LFOREARM] = getHumanDL(gLinkHumanLeftForearmDL);
     models[LINK_DL_FPS_LHAND] = getHumanDL(gLinkHumanLeftHandClosedDL);
@@ -338,21 +160,4 @@ void setupVanillaHuman() {
 
     models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArmDL; // not in Link obj
     GlobalObjects_rebaseDL(human, gLinkHumanFirstPersonArmDL, 0x06); // repoint vertices, textures, etc. to static link obj
-
-    models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL; // not in Link obj
-    GlobalObjects_rebaseDL(human, gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
-
-    // masks
-    models[LINK_DL_MASK_DEKU] = getGameplayKeepDL(gDekuMaskDL);
-    models[LINK_DL_MASK_GORON] = getGameplayKeepDL(gGoronMaskDL);
-    models[LINK_DL_MASK_ZORA] = getGameplayKeepDL(gZoraMaskDL);
-    models[LINK_DL_MASK_FIERCE_DEITY] = getGameplayKeepDL(gFierceDeityMaskDL);
-
-    // bottles
-    models[LINK_DL_BOTTLE_CONTENTS] = getGameplayKeepDL(gBottleContentsDL);
-    models[LINK_DL_BOTTLE_GLASS] = getGameplayKeepDL(gBottleGlassDL);
-
-    // whole sword
-    models[LINK_DL_SWORD_GREATFAIRY] = getHumanDL(gLinkHumanGreatFairysSwordDL);
-    models[LINK_DL_SWORD4_HILT] = gEmptyDisplayList;
 }

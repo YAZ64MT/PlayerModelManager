@@ -7,6 +7,7 @@
 #include "z64animation.h"
 #include "model_common.h"
 #include "z64object.h"
+#include "model_shared.h"
 
 bool gIsAgePropertyRefreshRequested = false;
 
@@ -231,6 +232,10 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
         dl = formProxy->vanilla.models[target];
     }
 
+    if (!dl) {
+        dl = gSharedDisplayLists[target];
+    }
+
     return dl;
 }
 
@@ -283,7 +288,7 @@ void matchFaceTexturesToProxy(Link_FormProxy *formProxy) {
 }
 
 void refreshFaceTextures() {
-    matchFaceTexturesToProxy(&GET_PLAYER_FORM_PROXY);
+    matchFaceTexturesToProxy(GET_PLAYER_FORM_PROXY);
 }
 
 void refreshProxyMatrixes(Link_FormProxy *formProxy) {
@@ -295,6 +300,10 @@ void refreshProxyMatrixes(Link_FormProxy *formProxy) {
 
         if (!matrix) {
             matrix = vanilla->equipMtx[i];
+        }
+
+        if (!matrix) {
+            matrix = gSharedMatrixes[i];
         }
 
         if (matrix) {
