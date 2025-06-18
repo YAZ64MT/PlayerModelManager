@@ -206,12 +206,6 @@ void initSharedDLs() {
     models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;    // not in Link obj
     GlobalObjects_rebaseDL(human, gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
-    // masks
-    models[LINK_DL_MASK_DEKU] = getGameplayKeepDL(gDekuMaskDL);
-    models[LINK_DL_MASK_GORON] = getGameplayKeepDL(gGoronMaskDL);
-    models[LINK_DL_MASK_ZORA] = getGameplayKeepDL(gZoraMaskDL);
-    models[LINK_DL_MASK_FIERCE_DEITY] = getGameplayKeepDL(gFierceDeityMaskDL);
-
     // bottles
     models[LINK_DL_BOTTLE_CONTENTS] = getGameplayKeepDL(gBottleContentsDL);
     models[LINK_DL_BOTTLE_GLASS] = getGameplayKeepDL(gBottleGlassDL);
