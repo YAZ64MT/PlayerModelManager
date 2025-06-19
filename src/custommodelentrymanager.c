@@ -208,6 +208,7 @@ CustomModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *co
     size_t combinedLength = sDiskEntries[form].count + sMemoryEntries[form].count;
 
     if (combinedLength == 0) {
+        *count = 0;
         return NULL;
     }
 
