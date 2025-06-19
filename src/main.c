@@ -192,14 +192,11 @@ void initFormProxies() {
         }
 
         requestRefreshFormProxy(i);
-        // uncomment these when all forms supported
-        // changeFormPtrsToProxy(i);
+        changeFormPtrsToProxy(i);
     }
 
     _internal_setupVanillaModels();
 
-    // Only human is supported for now
-    changeFormPtrsToProxy(PLAYER_FORM_HUMAN);
     repointHumanModelsToProxy();
 
     refreshFaceTextures();

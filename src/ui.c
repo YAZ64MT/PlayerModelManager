@@ -123,12 +123,24 @@ void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data
     }
 }
 
+void clearRealEntries() {
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        sRealEntries[i] = NULL;
+    }
+}
+
+void fillRealEntries() {
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        sRealEntries[i] = CMEM_getCurrentEntry(i);
+    }
+}
+
 void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
         Audio_PlaySfx(NA_SE_SY_DECIDE);
-        sRealEntries[getSelectedForm()] = NULL;
+        clearRealEntries();
         refreshFileList();
-        sRealEntries[getSelectedForm()] = CMEM_getCurrentEntry(getSelectedForm());
+        fillRealEntries();
         refreshButtonEntryColors();
     } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
         destroyAuthor();
@@ -139,37 +151,52 @@ void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *da
     }
 }
 
+void destroyModelButtons();
+void createModelButtons();
+void refreshButtonEntryColors();
+
+static bool sTrue = true;
+static bool sFalse = false;
+
 static bool sIsCategoryRowExist = false;
 
-void refreshCategoryRow() {
+static const char *sCategoryNames[] = {
+    "Fierce Deity",
+    "Goron",
+    "Zora",
+    "Deku",
+    "Human",
+};
+
+void refreshCategoryName() {
     if (sIsCategoryRowExist) {
-        recompui_destroy_element(container, rowCategory);
-        recompui_destroy_element(rowCategory, buttonCategoryPrev);
-        recompui_destroy_element(rowCategory, buttonCategoryNext);
+        recompui_destroy_element(rowCategory, labelCategory);
     }
 
-    buttonCategoryPrev = recompui_create_button(context, rowCategory, "◀", BUTTONSTYLE_SECONDARY);
-    labelCategory = recompui_create_label(context, rowCategory, "Model Category", LABELSTYLE_LARGE);
-    buttonCategoryNext = recompui_create_button(context, rowCategory, "▶", BUTTONSTYLE_SECONDARY);
-
-    recompui_set_nav(buttonClose, NAVDIRECTION_RIGHT, buttonRefreshFiles);
-    recompui_set_nav(buttonClose, NAVDIRECTION_DOWN, buttonCategoryPrev);
-
-    recompui_set_nav(buttonRemoveModel, NAVDIRECTION_UP, buttonCategoryPrev);
-    recompui_set_nav(buttonRemoveModel, NAVDIRECTION_LEFT, buttonCategoryNext);
-
-    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_LEFT, buttonRefreshFiles);
-    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_DOWN, buttonRemoveModel);
-    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_UP, buttonClose);
-
-    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_DOWN, buttonCategoryNext);
-    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_RIGHT, buttonCategoryPrev);
-
-    recompui_set_nav(buttonCategoryNext, NAVDIRECTION_DOWN, buttonRemoveModel);
-    recompui_set_nav(buttonCategoryNext, NAVDIRECTION_UP, buttonRefreshFiles);
-    recompui_set_nav(buttonCategoryNext, NAVDIRECTION_RIGHT, buttonRemoveModel);
+    labelCategory = recompui_create_label(context, rowCategory, sCategoryNames[sCurrentSelectedForm], LABELSTYLE_LARGE);
 
     sIsCategoryRowExist = true;
+}
+
+void changeCategoryButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        Audio_PlaySfx(NA_SE_SY_DECIDE);
+
+        bool *isNextButton = userdata;
+
+        if (*isNextButton) {
+            sCurrentSelectedForm++;
+        } else {
+            sCurrentSelectedForm--;
+        }
+
+        sCurrentSelectedForm %= PLAYER_FORM_MAX;
+
+        destroyModelButtons();
+        createModelButtons();
+        refreshButtonEntryColors();
+        refreshCategoryName();
+    }
 }
 
 RECOMP_DECLARE_EVENT(_internal_onReadyUI());
@@ -319,7 +346,30 @@ void on_init() {
     recompui_register_callback(buttonRefreshFiles, refreshButtonPressed, NULL);
     recompui_set_text_align(buttonRefreshFiles, TEXT_ALIGN_CENTER);
 
-    refreshCategoryRow();
+    buttonCategoryPrev = recompui_create_button(context, rowCategory, "◀", BUTTONSTYLE_SECONDARY);
+    buttonCategoryNext = recompui_create_button(context, rowCategory, "▶", BUTTONSTYLE_SECONDARY);
+
+    recompui_register_callback(buttonCategoryPrev, changeCategoryButtonPressed, &sFalse);
+    recompui_register_callback(buttonCategoryNext, changeCategoryButtonPressed, &sTrue);
+
+    recompui_set_nav(buttonClose, NAVDIRECTION_RIGHT, buttonRefreshFiles);
+    recompui_set_nav(buttonClose, NAVDIRECTION_DOWN, buttonCategoryPrev);
+
+    recompui_set_nav(buttonRemoveModel, NAVDIRECTION_UP, buttonCategoryPrev);
+    recompui_set_nav(buttonRemoveModel, NAVDIRECTION_LEFT, buttonCategoryNext);
+
+    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_LEFT, buttonRefreshFiles);
+    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_DOWN, buttonRemoveModel);
+    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_UP, buttonClose);
+
+    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_DOWN, buttonCategoryNext);
+    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_RIGHT, buttonCategoryPrev);
+
+    recompui_set_nav(buttonCategoryNext, NAVDIRECTION_DOWN, buttonRemoveModel);
+    recompui_set_nav(buttonCategoryNext, NAVDIRECTION_UP, buttonRefreshFiles);
+    recompui_set_nav(buttonCategoryNext, NAVDIRECTION_RIGHT, buttonRemoveModel);
+
+    refreshCategoryName();
 
     recompui_close_context(context);
 
@@ -495,7 +545,6 @@ void createModelButtons() {
         recompui_set_nav_none(buttonLast, NAVDIRECTION_RIGHT);
     } else {
         recompui_set_nav(buttonClose, NAVDIRECTION_UP, buttonRemoveModel);
-        recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_UP, buttonRemoveModel);
         recompui_set_nav_none(buttonRemoveModel, NAVDIRECTION_RIGHT);
         recompui_set_nav(buttonRemoveModel, NAVDIRECTION_DOWN, buttonClose);
     }
@@ -504,7 +553,7 @@ void createModelButtons() {
 void refreshFileList() {
     // MUST CALL INSIDE UI CONTEXT
     destroyModelButtons();
-    CMEM_refreshDiskEntries(getSelectedForm());
+    CMEM_refreshDiskEntries();
     createModelButtons();
 }
 
@@ -539,9 +588,7 @@ void openModelMenu() {
     if (!context_shown) {
         sIsDiskSaveNeeded = false;
         sIsLivePreviewEnabled = recomp_get_config_u32("is_live_preview_enabled");
-        for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-            sRealEntries[i] = CMEM_getCurrentEntry(i);
-        }
+        fillRealEntries();
         recompui_show_context(context);
         context_shown = true;
     }

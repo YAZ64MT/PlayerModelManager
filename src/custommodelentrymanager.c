@@ -366,20 +366,20 @@ void CMEM_refreshDiskEntries() {
     if (err == QDFL_STATUS_OK) {
         char *entryNames[PLAYER_FORM_MAX];
 
-        for (int form = 0; form < PLAYER_FORM_MAX; ++form) {
+        for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
 
-            CustomModelEntry *currentEntry = CMEM_getCurrentEntry(form);
+            CustomModelEntry *currentEntry = CMEM_getCurrentEntry(i);
 
             if (currentEntry) {
-                entryNames[form] = recomp_alloc(strlen(currentEntry->internalName) + 1);
-                strcpy(entryNames[form], currentEntry->internalName);
+                entryNames[i] = recomp_alloc(strlen(currentEntry->internalName) + 1);
+                strcpy(entryNames[i], currentEntry->internalName);
             } else {
-                entryNames[form] = NULL;
+                entryNames[i] = NULL;
             }
 
-            CMEM_removeModel(form);
+            CMEM_removeModel(i);
 
-            clearDiskEntries(form);
+            clearDiskEntries(i);
         }
 
         for (unsigned long i = 0; i < numFiles; ++i) {
@@ -412,8 +412,13 @@ void CMEM_refreshDiskEntries() {
                     switch (data[Z64O_FORM_BYTE]) {
                         case MMO_FORM_BYTE_CHILD:
                         case OOTO_FORM_BYTE_CHILD:
+                            modelType = CUSTOM_MODEL_TYPE_CHILD;
+                            form = PLAYER_FORM_HUMAN;
+                            break;
+
                         case MMO_FORM_BYTE_ADULT:
                         case OOTO_FORM_BYTE_ADULT:
+                            modelType = CUSTOM_MODEL_TYPE_ADULT;
                             form = PLAYER_FORM_HUMAN;
                             break;
 
@@ -549,9 +554,11 @@ RECOMP_DECLARE_EVENT(_internal_onSavedModelsApplied());
 void loadSavedModels() {
     static char retrievedName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
 
-    if (KV_Global_Has(sSavedModelNames[PLAYER_FORM_HUMAN].key)) {
-        if (KV_Global_Get(sSavedModelNames[PLAYER_FORM_HUMAN].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
-            applyByInternalName(PLAYER_FORM_HUMAN, retrievedName);
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        if (KV_Global_Has(sSavedModelNames[i].key)) {
+            if (KV_Global_Get(sSavedModelNames[i].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
+                applyByInternalName(i, retrievedName);
+            }
         }
     }
 
