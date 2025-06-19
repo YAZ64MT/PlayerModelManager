@@ -51,6 +51,7 @@ void setupVanillaGoron() {
     models[LINK_DL_LHAND] = getGoronDL(gLinkGoronLeftHandOpenDL);
     models[LINK_DL_LFIST] = getGoronDL(gLinkGoronLeftHandClosedDL);
     models[LINK_DL_LHAND_BOTTLE] = getGoronDL(gLinkGoronLeftHandHoldBottleDL);
+    models[LINK_DL_LHAND_GUITAR] = getGoronDL(gLinkGoronLeftHandOpenDL);
     models[LINK_DL_RHAND] = getGoronDL(gLinkGoronRightHandOpenDL);
     models[LINK_DL_RFIST] = getGoronDL(gLinkGoronRightHandClosedDL);
 

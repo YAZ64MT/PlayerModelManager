@@ -13,5 +13,8 @@ extern ModelReplacerHandle gProxyHookshotChain;
 extern ModelReplacerHandle gProxyHookshotHook;
 extern ModelReplacerHandle gProxyHookshotReticle;
 extern ModelReplacerHandle gProxyMirrorShieldRay;
+extern ModelReplacerHandle gProxyZoraLHand;
+extern ModelReplacerHandle gProxyZoraRHand;
+extern ModelReplacerHandle gProxyZoraLHandGuitar;
 
 #endif

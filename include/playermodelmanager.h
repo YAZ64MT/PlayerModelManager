@@ -26,6 +26,7 @@ typedef enum {
     LINK_DL_TORSO,
     LINK_DL_LFIST,
     LINK_DL_LHAND_BOTTLE,
+    LINK_DL_LHAND_GUITAR,
     LINK_DL_RFIST,
     LINK_DL_SWORD1_SHEATH,
     LINK_DL_SWORD2_SHEATH,
@@ -108,13 +109,6 @@ typedef enum {
     LINK_DL_BOOT_RIRON,
     LINK_DL_BOOT_LHOVER,
     LINK_DL_BOOT_RHOVER,
-
-    // This should be in sync with the end of ZPlayerModelManager_DisplayListId
-    // in playermodelmanager_api.h
-    //
-    // To preserve compatibility between versions, do not change the ordering of DLs before this point.
-    LINK_DL_API_END,
-
     LINK_DL_DEKU_GUARD,
     LINK_DL_PIPE_MOUTH,
     LINK_DL_PIPE_RIGHT,
@@ -153,6 +147,13 @@ typedef enum {
     LINK_DL_MAGIC_BARRIER,
     LINK_DL_GUITAR,
     LINK_DL_PEDESTAL_SWORD,
+
+    // This should be in sync with the end of ZPlayerModelManager_DisplayListId
+    // in playermodelmanager_api.h
+    //
+    // To preserve compatibility between versions, do not change the ordering of DLs before this point.
+    LINK_DL_API_END,
+
     LINK_DL_SWORD1,
     LINK_DL_SWORD2,
     LINK_DL_SWORD3,
@@ -222,7 +223,6 @@ typedef enum {
     LINK_DL_RFIST_HOOKSHOT,
     LINK_DL_RHAND_OCARINA_FAIRY,
     LINK_DL_RHAND_OCARINA_TIME,
-    LINK_DL_LHAND_GUITAR,
     LINK_DL_FPS_RHAND_BOW,
     LINK_DL_FPS_RHAND_SLINGSHOT,
     LINK_DL_FPS_RHAND_HOOKSHOT,

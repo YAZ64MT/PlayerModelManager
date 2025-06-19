@@ -35,4 +35,8 @@ extern TexturePtr sPlayerMouthTextures[];
 
 extern Gfx *D_801C0B20[]; // Masks
 
+extern Gfx *D_801C0AB4[]; // Zora fin DLs
+
+extern Gfx *D_801C0ABC[]; // Zora fin (swim) DLs
+
 #endif

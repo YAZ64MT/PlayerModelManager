@@ -51,6 +51,7 @@ void setupVanillaDeku() {
     models[LINK_DL_LHAND] = getDekuDL(gLinkDekuLeftHandDL);
     models[LINK_DL_LFIST] = getDekuDL(gLinkDekuLeftHandDL);
     models[LINK_DL_LHAND_BOTTLE] = getDekuDL(gLinkDekuLeftHandDL);
+    models[LINK_DL_LHAND_GUITAR] = getDekuDL(gLinkDekuLeftHandDL);
     models[LINK_DL_RHAND] = getDekuDL(gLinkDekuRightHandDL);
     models[LINK_DL_RFIST] = getDekuDL(gLinkDekuRightHandDL);
 

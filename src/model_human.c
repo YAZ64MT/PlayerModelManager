@@ -148,6 +148,7 @@ void setupVanillaHuman() {
     models[LINK_DL_LHAND] = getHumanDL(gLinkHumanLeftHandOpenDL);
     models[LINK_DL_LFIST] = getHumanDL(gLinkHumanLeftHandClosedDL);
     models[LINK_DL_LHAND_BOTTLE] = getHumanDL(gLinkHumanLeftHandHoldBottleDL);
+    models[LINK_DL_LHAND_GUITAR] = getHumanDL(gLinkHumanLeftHandOpenDL);
     models[LINK_DL_RHAND] = getHumanDL(gLinkHumanRightHandOpenDL);
     models[LINK_DL_RFIST] = getHumanDL(gLinkHumanRightHandClosedDL);
 

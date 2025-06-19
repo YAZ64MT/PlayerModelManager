@@ -201,7 +201,6 @@ void initSharedDLs() {
     models[LINK_DL_HOOKSHOT_CHAIN] = getGameplayKeepDL(gHookshotChainDL);
     models[LINK_DL_HOOKSHOT_RETICLE] = getGameplayKeepDL(gHookshotReticleDL);
     models[LINK_DL_HOOKSHOT_HOOK] = getHumanDL(object_link_child_DL_01D960);
-    models[LINK_DL_GUITAR] = getZoraDL(object_link_zora_DL_00E2A0);
 
     // First Person
     models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;    // not in Link obj
@@ -246,6 +245,15 @@ void initSharedDLs() {
     SET_MASK_DL(LINK_DL_MASK_DEKU_SCREAM, GAMEPLAY_KEEP, object_mask_nuts_DL_001D90);
 
 #undef SET_MASK_DL
+
+    // Zora DLs
+    models[LINK_DL_LFIN] = getZoraDL(object_link_zora_DL_00CC38);
+    models[LINK_DL_LFIN_SWIM] = getZoraDL(object_link_zora_DL_010868);
+    models[LINK_DL_RFIN] = getZoraDL(object_link_zora_DL_00CDA0);
+    models[LINK_DL_RFIN_SWIM] = getZoraDL(object_link_zora_DL_010978);
+    models[LINK_DL_GUITAR] = getZoraDL(object_link_zora_DL_00E2A0);
+    models[LINK_DL_FIN_SHIELD] = getZoraDL(object_link_zora_DL_0110A8);
+    models[LINK_DL_MAGIC_BARRIER] = getZoraDL(object_link_zora_DL_011760);
 }
 
 RECOMP_CALLBACK(".", _internal_onReadyFormProxies)

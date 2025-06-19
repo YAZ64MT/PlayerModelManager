@@ -48,6 +48,7 @@ void setupVanillaZora() {
     models[LINK_DL_LHAND] = getZoraDL(gLinkZoraLeftHandOpenDL);
     models[LINK_DL_LFIST] = getZoraDL(gLinkZoraLeftHandClosedDL);
     models[LINK_DL_LHAND_BOTTLE] = getZoraDL(gLinkZoraLeftHandHoldBottleDL);
+    models[LINK_DL_LHAND_GUITAR] = getZoraDL(object_link_zora_DL_00E088);
     models[LINK_DL_RHAND] = getZoraDL(gLinkZoraRightHandOpenDL);
     models[LINK_DL_RFIST] = getZoraDL(gLinkZoraRightHandClosedDL);
 

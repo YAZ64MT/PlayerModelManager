@@ -30,10 +30,20 @@ typedef enum {
     SHARED_DL_SWORD_KOKIRI_SHEATH,
     SHARED_DL_SWORD_RAZOR_SHEATH,
     SHARED_DL_SWORD_GILDED_SHEATH,
+    SHARED_DL_LFIN,
+    SHARED_DL_LFIN_SWIM,
+    SHARED_DL_RFIN,
+    SHARED_DL_RFIN_SWIM,
     SHARED_DL_MAX
 } SharedDisplayList;
 
 static Gfx sSharedDLs[SHARED_DL_MAX];
+
+void initSharedDisplayLists() {
+    for (int i = 0; i < SHARED_DL_MAX; ++i) {
+        gSPBranchList(&sSharedDLs[i], gEmptyDL);
+    }
+}
 
 void changeFormPtrsToProxy(PlayerTransformation playerForm) {
     Link_FormProxy *formProxy = &gLinkFormProxies[playerForm];
@@ -76,7 +86,11 @@ static Gfx **sPlayerHandHoldingSwords = D_801C018C;
 
 static Gfx **sPlayerMasks = D_801C0B20;
 
-void repointHumanModelsToProxy() {
+static Gfx **sPlayerFins = D_801C0AB4;
+
+static Gfx **sPlayerSwimFins = D_801C0ABC;
+
+void repointSharedModelsToProxy() {
     sPlayerHandHoldingSwords[0] = &sSharedDLs[SHARED_DL_LFIST_SWORD_KOKIRI];
     sPlayerHandHoldingSwords[1] = &sSharedDLs[SHARED_DL_LFIST_SWORD_KOKIRI];
     sPlayerHandHoldingSwords[2] = &sSharedDLs[SHARED_DL_LFIST_SWORD_RAZOR];
@@ -107,6 +121,12 @@ void repointHumanModelsToProxy() {
     gPlayerSwordSheaths[3] = &sSharedDLs[SHARED_DL_SWORD_RAZOR_SHEATH];
     gPlayerSwordSheaths[4] = &sSharedDLs[SHARED_DL_SWORD_GILDED_SHEATH];
     gPlayerSwordSheaths[5] = &sSharedDLs[SHARED_DL_SWORD_GILDED_SHEATH];
+
+    sPlayerFins[0] = &sSharedDLs[SHARED_DL_LFIN];
+    sPlayerFins[1] = &sSharedDLs[SHARED_DL_RFIN];
+
+    sPlayerSwimFins[0] = &sSharedDLs[SHARED_DL_LFIN_SWIM];
+    sPlayerSwimFins[1] = &sSharedDLs[SHARED_DL_RFIN_SWIM];
 }
 
 void refreshSharedDL(Link_FormProxy *current, Link_FormProxy *fallback, Link_DisplayList test, Link_DisplayList target, SharedDisplayList shared) {
@@ -115,26 +135,31 @@ void refreshSharedDL(Link_FormProxy *current, Link_FormProxy *fallback, Link_Dis
 }
 
 void refreshHumanModels() {
-    Link_FormProxy *current = GET_PLAYER_FORM_PROXY;
+    Link_FormProxy *currProxy = GET_PLAYER_FORM_PROXY;
     Link_FormProxy *human = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
-    gSPBranchList(&sSharedDLs[SHARED_DL_LFIST_SWORD_KOKIRI], &current->displayLists[LINK_DL_LFIST_SWORD_KOKIRI]);
-    gSPBranchList(&sSharedDLs[SHARED_DL_LFIST_SWORD_RAZOR], &current->displayLists[LINK_DL_LFIST_SWORD_RAZOR]);
-    gSPBranchList(&sSharedDLs[SHARED_DL_LFIST_SWORD_GILDED], &current->displayLists[LINK_DL_LFIST_SWORD_GILDED]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_LFIST_SWORD_KOKIRI], &currProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_LFIST_SWORD_RAZOR], &currProxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_LFIST_SWORD_GILDED], &currProxy->displayLists[LINK_DL_LFIST_SWORD_GILDED]);
 
-    gSPBranchList(&sSharedDLs[SHARED_DL_SHIELD_HERO_BACK], &current->displayLists[LINK_DL_SHIELD_HERO_BACK]);
-    gSPBranchList(&sSharedDLs[SHARED_DL_SHIELD_MIRROR_BACK], &current->displayLists[LINK_DL_SHIELD_MIRROR_BACK]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_SHIELD_HERO_BACK], &currProxy->displayLists[LINK_DL_SHIELD_HERO_BACK]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_SHIELD_MIRROR_BACK], &currProxy->displayLists[LINK_DL_SHIELD_MIRROR_BACK]);
 
-    gSPBranchList(&sSharedDLs[SHARED_DL_RFIST_SHIELD_HERO], &current->displayLists[LINK_DL_RFIST_SHIELD_HERO]);
-    gSPBranchList(&sSharedDLs[SHARED_DL_RFIST_SHIELD_MIRROR], &current->displayLists[LINK_DL_RFIST_SHIELD_MIRROR]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_RFIST_SHIELD_HERO], &currProxy->displayLists[LINK_DL_RFIST_SHIELD_HERO]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_RFIST_SHIELD_MIRROR], &currProxy->displayLists[LINK_DL_RFIST_SHIELD_MIRROR]);
 
-    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_KOKIRI_SHEATHED], &current->displayLists[LINK_DL_SWORD_KOKIRI_SHEATHED]);
-    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_RAZOR_SHEATHED], &current->displayLists[LINK_DL_SWORD_RAZOR_SHEATHED]);
-    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_GILDED_SHEATHED], &current->displayLists[LINK_DL_SWORD_GILDED_SHEATHED]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_KOKIRI_SHEATHED], &currProxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATHED]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_RAZOR_SHEATHED], &currProxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATHED]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_GILDED_SHEATHED], &currProxy->displayLists[LINK_DL_SWORD_GILDED_SHEATHED]);
 
-    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_KOKIRI_SHEATH], &current->displayLists[LINK_DL_SWORD_KOKIRI_SHEATH]);
-    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_RAZOR_SHEATH], &current->displayLists[LINK_DL_SWORD_RAZOR_SHEATH]);
-    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_GILDED_SHEATH], &current->displayLists[LINK_DL_SWORD_GILDED_SHEATH]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_KOKIRI_SHEATH], &currProxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATH]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_RAZOR_SHEATH], &currProxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATH]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_SWORD_GILDED_SHEATH], &currProxy->displayLists[LINK_DL_SWORD_GILDED_SHEATH]);
+
+    gSPBranchList(&sSharedDLs[SHARED_DL_LFIN], &currProxy->displayLists[LINK_DL_LFIN]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_RFIN], &currProxy->displayLists[LINK_DL_RFIN]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_LFIN_SWIM], &currProxy->displayLists[LINK_DL_LFIN_SWIM]);
+    gSPBranchList(&sSharedDLs[SHARED_DL_RFIN_SWIM], &currProxy->displayLists[LINK_DL_RFIN_SWIM]);
 }
 
 void addProxyExternalDLs(Link_FormProxy *proxy) {
@@ -148,27 +173,13 @@ void addProxyExternalDLs(Link_FormProxy *proxy) {
     ModelReplacer_setReplacerModel(gProxyHookshotHook, &proxy->displayLists[LINK_DL_HOOKSHOT_HOOK]);
     ModelReplacer_setReplacerModel(gProxyHookshotReticle, &proxy->displayLists[LINK_DL_HOOKSHOT_RETICLE]);
     ModelReplacer_setReplacerModel(gProxyMirrorShieldRay, &proxy->displayLists[LINK_DL_SHIELD3_RAY]);
-}
-
-void removeProxyExternalDLs() {
-    ModelReplacer_setReplacerModel(gProxyBottleGlass, NULL);
-    ModelReplacer_setReplacerModel(gProxyBottleContents, NULL);
-    ModelReplacer_setReplacerModel(gProxyDekuStick, NULL);
-    ModelReplacer_setReplacerModel(gProxyBowString, NULL);
-    ModelReplacer_setReplacerModel(gProxyBowArrow, NULL);
-    ModelReplacer_setReplacerModel(gProxyBowArrowLowPoly, NULL);
-    ModelReplacer_setReplacerModel(gProxyHookshotChain, NULL);
-    ModelReplacer_setReplacerModel(gProxyHookshotHook, NULL);
-    ModelReplacer_setReplacerModel(gProxyHookshotReticle, NULL);
-    ModelReplacer_setReplacerModel(gProxyMirrorShieldRay, NULL);
+    ModelReplacer_setReplacerModel(gProxyZoraLHand, &proxy->displayLists[LINK_DL_LHAND]);
+    ModelReplacer_setReplacerModel(gProxyZoraLHandGuitar, &proxy->displayLists[LINK_DL_LHAND_GUITAR]);
+    ModelReplacer_setReplacerModel(gProxyZoraRHand, &proxy->displayLists[LINK_DL_RHAND]);
 }
 
 void refreshExternalDLs() {
-    if (GET_PLAYER_FORM == PLAYER_FORM_HUMAN) {
-        addProxyExternalDLs(GET_PLAYER_FORM_PROXY);
-    } else {
-        removeProxyExternalDLs();
-    }
+    addProxyExternalDLs(GET_PLAYER_FORM_PROXY);
 }
 
 RECOMP_DECLARE_EVENT(_internal_setupVanillaModels());
@@ -197,7 +208,7 @@ void initFormProxies() {
 
     _internal_setupVanillaModels();
 
-    repointHumanModelsToProxy();
+    repointSharedModelsToProxy();
 
     refreshFaceTextures();
 }
@@ -217,6 +228,7 @@ RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
 
 MODEL_REPLACER_CALLBACK_ON_READY
 void onModelReplacerReady() {
+    initSharedDisplayLists();
     initFormProxies();
     _internal_onReadyFormProxies();
 }
