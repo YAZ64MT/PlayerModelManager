@@ -309,7 +309,7 @@ void refreshProxyDLs(Link_FormProxy *formProxy) {
     }
 
     // first person hookshot workaround
-    Gfx *listenerDL = getListenerDL(formProxy->form, LINK_DL_HOOKSHOT);
+    Gfx *listenerDL = getListenerDL(formProxy, LINK_DL_HOOKSHOT);
     if (listenerDL) {
         gSPBranchList(&dls[LINK_DL_FPS_HOOKSHOT], listenerDL);
     }
