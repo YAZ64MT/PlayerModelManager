@@ -26,7 +26,24 @@ Gfx gPopModelViewMtx[] = {
     gsSPEndDisplayList(),
 };
 
+static Gfx sSetBilerpDL[] = {
+    gsDPSetTextureFilter(G_TF_BILERP),
+    gsSPEndDisplayList(),
+};
+
 Mtx gZeroMtx = {0};
+
+void initFormProxyShims(Link_FormProxy *formProxy) {
+
+    Gfx *dls = formProxy->displayLists;
+    Gfx **mtxDls = formProxy->mtxDisplayLists;
+    Gfx **shims = formProxy->shimDisplayListPtrs;
+
+    // init by pointing all to DF command
+    for (u32 i = 0; i < LINK_SHIMDL_MAX; ++i) {
+        shims[i] = recomp_alloc(sizeof(Gfx));
+        gSPBranchList(shims[i], gEmptyDisplayList);
+    }
 
 #define SHIM_ITEM_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item] = createShimDisplayList(2, &dls[LINK_DL_##hand], &dls[LINK_DL_##item])
 #define SHIM_ITEM_LFIST(item) SHIM_ITEM_HAND(LFIST, item)
@@ -42,18 +59,6 @@ Mtx gZeroMtx = {0};
 #define SHIM_SWORD(swordNum) shims[LINK_SHIMDL_SWORD##swordNum] = createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_HILT], &dls[LINK_DL_SWORD##swordNum##_BLADE])
 #define SHIM_SWORD_LFIST(swordNum) SHIM_ITEM_LFIST(SWORD##swordNum)
 #define SHIM_SHIELD_RFIST(shieldNum) SHIM_ITEM_RFIST(SHIELD##shieldNum)
-
-void initFormProxyShims(Link_FormProxy *formProxy) {
-
-    Gfx *dls = formProxy->displayLists;
-    Gfx **mtxDls = formProxy->mtxDisplayLists;
-    Gfx **shims = formProxy->shimDisplayListPtrs;
-
-    // init by pointing all to DF command
-    for (u32 i = 0; i < LINK_SHIMDL_MAX; ++i) {
-        shims[i] = recomp_alloc(sizeof(Gfx));
-        gSPBranchList(shims[i], gEmptyDisplayList);
-    }
 
     SHIM_SWORD(1);
     SHIM_SWORD(2);
@@ -150,11 +155,27 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     shims[LINK_SHIMDL_FPS_RHAND_HOOKSHOT] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_FPS_HOOKSHOT]);
 
     shims[LINK_SHIMDL_SHIELD1_ODD] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD1_ODD], &dls[LINK_DL_SHIELD1], gPopModelViewMtx);
+
+#undef SHIM_ITEM_HAND
+#undef SHIM_ITEM_LFIST
+#undef SHIM_ITEM_RFIST
+#undef SHIM_ITEM_LHAND
+#undef SHIM_ITEM_RHAND
+#undef SHIM_HILT_BACK
+#undef SHIM_SWORD_SHEATHED
+#undef SHIM_SHIELD_BACK
+#undef SHIM_SWORD_SHIELD_UNSHEATHED
+#undef SHIM_SWORD_SHIELD_SHEATH
+#undef SHIM_SWORD_SHIELD_SHEATHED
+#undef SHIM_SWORD
+#undef SHIM_SWORD_LFIST
+#undef SHIM_SHIELD_RFIST
 }
 
-#define PROXY_TO_SHIM(dlName) gSPBranchList(&formProxy->displayLists[LINK_DL_##dlName], formProxy->shimDisplayListPtrs[LINK_SHIMDL_##dlName])
-
 void setDlToShims(Link_FormProxy *formProxy) {
+
+#define PROXY_TO_SHIM(dlName) gSPDisplayList(&formProxy->wrappedDisplayLists[LINK_DL_##dlName].displayList[WRAPPED_DL_DRAW], formProxy->shimDisplayListPtrs[LINK_SHIMDL_##dlName])
+
     PROXY_TO_SHIM(SWORD1);
     PROXY_TO_SHIM(SWORD2);
     PROXY_TO_SHIM(SWORD3);
@@ -249,6 +270,8 @@ void setDlToShims(Link_FormProxy *formProxy) {
     PROXY_TO_SHIM(FPS_RHAND_BOW);
     PROXY_TO_SHIM(FPS_RHAND_SLINGSHOT);
     PROXY_TO_SHIM(FPS_RHAND_HOOKSHOT);
+
+#undef PROXY_TO_SHIM
 }
 
 Gfx *getListenerDL(Link_FormProxy *formProxy, Link_DisplayList target) {
@@ -290,12 +313,12 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
 }
 
 void refreshProxyDLs(Link_FormProxy *formProxy) {
-    Gfx *dls = formProxy->displayLists;
+    WrappedDisplayList *wDLs = formProxy->wrappedDisplayLists;
     Link_ModelInfo *current = &formProxy->current;
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        gSPBranchList(&dls[i], gEmptyDL);
+        gSPDisplayList(&wDLs[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
     }
 
     setDlToShims(formProxy);
@@ -304,14 +327,14 @@ void refreshProxyDLs(Link_FormProxy *formProxy) {
         Gfx *dl = getFormProxyDL(formProxy, i);
 
         if (dl) {
-            gSPBranchList(&dls[i], dl);
+            gSPDisplayList(&wDLs[i].displayList[WRAPPED_DL_DRAW], dl);
         }
     }
 
     // first person hookshot workaround
     Gfx *listenerDL = getListenerDL(formProxy, LINK_DL_HOOKSHOT);
     if (listenerDL) {
-        gSPBranchList(&dls[LINK_DL_FPS_HOOKSHOT], listenerDL);
+        gSPDisplayList(&wDLs[LINK_DL_FPS_HOOKSHOT].displayList[WRAPPED_DL_DRAW], listenerDL);
     }
 }
 
@@ -458,10 +481,26 @@ void initFormProxySkeleton(Link_FormProxy *formProxy) {
 #undef SET_LIMB_DL
 }
 
+void initFormProxyWrappers(Link_FormProxy *formProxy) {
+    for (int i = 0; i < LINK_DL_MAX; ++i) {
+        gSPDisplayList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_PREDRAW], gEmptyDL);
+        gSPDisplayList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
+        gSPBranchList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_POSTDRAW], sSetBilerpDL);
+    }
+}
+
+void initFormProxyDLs(Link_FormProxy *formProxy) {
+    for (int i = 0; i < LINK_DL_MAX; ++i) {
+        gSPBranchList(&formProxy->displayLists[i], formProxy->wrappedDisplayLists[i].displayList);
+    }
+}
+
 void initFormProxy(Link_FormProxy *formProxy, PlayerTransformation form) {
     initFormProxySkeleton(formProxy);
     initFormProxyMatrixes(formProxy);
     initFormProxyShims(formProxy);
+    initFormProxyWrappers(formProxy);
+    initFormProxyDLs(formProxy);
     formProxy->form = form;
 }
 

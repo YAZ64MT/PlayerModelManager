@@ -398,6 +398,14 @@ typedef struct {
 } Link_SkeletonProxy;
 
 typedef struct {
+    Gfx displayList[3];
+} WrappedDisplayList;
+
+#define WRAPPED_DL_PREDRAW 0
+#define WRAPPED_DL_DRAW 1
+#define WRAPPED_DL_POSTDRAW 2
+
+typedef struct {
     PlayerTransformation form;
     Link_ModelInfo current;
     Link_ModelInfo vanilla;
@@ -405,6 +413,7 @@ typedef struct {
     Gfx *shimDisplayListPtrs[LINK_SHIMDL_MAX];
     Gfx *mtxDisplayLists[LINK_EQUIP_MATRIX_MAX];
     Gfx displayLists[LINK_DL_MAX];
+    WrappedDisplayList wrappedDisplayLists[LINK_DL_MAX];
 } Link_FormProxy;
 
 #endif
