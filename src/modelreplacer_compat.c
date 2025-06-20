@@ -128,7 +128,7 @@ void initModelReplacerCompat() {
 
 RECOMP_DECLARE_EVENT(_internal_onReadyModelReplacerCompat())
 
-MODEL_REPLACER_CALLBACK_ON_READY
+RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, onBeforeRegisterReplacers)
 void initReplacerCompat_on_event() {
     initModelReplacerCompat();
     _internal_onReadyModelReplacerCompat();
