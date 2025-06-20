@@ -79,7 +79,7 @@ void MRC_setupListenerDL(ObjectId id, Gfx *vanillaDL, PlayerTransformation form,
 
 RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, onModelChange)
 void updateListenerDLs_on_onModelChange(ObjectId id, Gfx *vanillaDL, Gfx *newDL) {
-    if (recomputil_u32_memory_hashmap_contains(sExcludedDisplayLists, (uintptr_t)newDL)) {
+    if (recomputil_u32_hashset_contains(sExcludedDisplayLists, (uintptr_t)newDL)) {
         return;
     }
 
