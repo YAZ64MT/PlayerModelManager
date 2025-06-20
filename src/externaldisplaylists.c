@@ -6,6 +6,14 @@
 #include "assets/objects/object_link_zora/object_link_zora.h"
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 
+Gfx gPlayerLibDLs[PLAYERLIB_DL_MAX];
+
+void initPlayerLibDLs() {
+    for (int i = 0; i < PLAYERLIB_DL_MAX; ++i) {
+        gSPBranchList(&gPlayerLibDLs[i], gEmptyDL);
+    }
+}
+
 ModelReplacerHandle gProxyBottleGlass;
 ModelReplacerHandle gProxyBottleContents;
 ModelReplacerHandle gProxyDekuStick;
@@ -22,6 +30,8 @@ ModelReplacerHandle gProxyZoraLHandGuitar;
 
 MODEL_REPLACER_CALLBACK_ON_REGISTER_REPLACERS
 void setupExternalReplacements() {
+    initPlayerLibDLs();
+
     gProxyBottleGlass = ModelReplacer_registerReplacer(GAMEPLAY_KEEP, gBottleGlassDL, NULL);
     gProxyBottleContents = ModelReplacer_registerReplacer(GAMEPLAY_KEEP, gBottleContentsDL, NULL);
     gProxyDekuStick = ModelReplacer_registerReplacer(GAMEPLAY_KEEP, gDekuStickDL, NULL);

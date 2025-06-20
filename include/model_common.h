@@ -14,7 +14,7 @@ extern bool gIsAgePropertyRefreshRequested;
 
 void matchFaceTexturesToProxy(Link_FormProxy *formProxy);
 void refreshFaceTextures();
-void initFormProxy(Link_FormProxy *formProxy);
+void initFormProxy(Link_FormProxy *formProxy, PlayerTransformation form);
 void requestRefreshFormProxy(PlayerTransformation form);
 Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target);
 void setSkeletonDLsOnModelInfo(Link_ModelInfo *info, FlexSkeletonHeader *skel);

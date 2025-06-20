@@ -8,6 +8,8 @@
 #include "model_common.h"
 #include "z64object.h"
 #include "model_shared.h"
+#include "globalobjects_api.h"
+#include "modelreplacer_compat.h"
 
 bool gIsAgePropertyRefreshRequested = false;
 
@@ -249,10 +251,32 @@ void setDlToShims(Link_FormProxy *formProxy) {
     PROXY_TO_SHIM(FPS_RHAND_HOOKSHOT);
 }
 
-Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
-    Gfx *dl = NULL;
+Gfx *getListenerDL(Link_FormProxy *formProxy, Link_DisplayList target) {
+    MRC_ListenerInfo *listener = MRC_getListenerFromFormAndDL(formProxy->form, target);
 
-    dl = formProxy->current.models[target];
+    if (listener) {
+        Gfx *maybeReplacedDL = NULL;
+
+        if (listener->form == MRC_PLAYER_FORM_EVERY) {
+            maybeReplacedDL = gSharedDisplayLists[target];
+        } else {
+            maybeReplacedDL = gLinkFormProxies[formProxy->form].vanilla.models[target];
+        }
+
+        if (maybeReplacedDL != GlobalObjects_getGlobalGfxPtr(listener->objId, listener->vanillaDL)) {
+            return maybeReplacedDL;
+        }
+    }
+
+    return NULL;
+}
+
+Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
+    Gfx *dl = getListenerDL(formProxy, target);
+
+    if (!dl) {
+        dl = formProxy->current.models[target];
+    }
 
     if (!dl) {
         dl = formProxy->vanilla.models[target];
@@ -265,7 +289,7 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
     return dl;
 }
 
-void refreshProxyDls(Link_FormProxy *formProxy) {
+void refreshProxyDLs(Link_FormProxy *formProxy) {
     Gfx *dls = formProxy->displayLists;
     Link_ModelInfo *current = &formProxy->current;
     Link_ModelInfo *vanilla = &formProxy->vanilla;
@@ -282,6 +306,12 @@ void refreshProxyDls(Link_FormProxy *formProxy) {
         if (dl) {
             gSPBranchList(&dls[i], dl);
         }
+    }
+
+    // first person hookshot workaround
+    Gfx *listenerDL = getListenerDL(formProxy->form, LINK_DL_HOOKSHOT);
+    if (listenerDL) {
+        gSPBranchList(&dls[LINK_DL_FPS_HOOKSHOT], listenerDL);
     }
 }
 
@@ -428,10 +458,11 @@ void initFormProxySkeleton(Link_FormProxy *formProxy) {
 #undef SET_LIMB_DL
 }
 
-void initFormProxy(Link_FormProxy *formProxy) {
+void initFormProxy(Link_FormProxy *formProxy, PlayerTransformation form) {
     initFormProxySkeleton(formProxy);
     initFormProxyMatrixes(formProxy);
     initFormProxyShims(formProxy);
+    formProxy->form = form;
 }
 
 void setSkeletonDLsOnModelInfo(Link_ModelInfo *info, FlexSkeletonHeader *skel) {
@@ -467,7 +498,7 @@ void setSkeletonDLsOnModelInfo(Link_ModelInfo *info, FlexSkeletonHeader *skel) {
 
 void refreshFormProxy(Link_FormProxy *formProxy) {
     refreshProxySkeleton(formProxy);
-    refreshProxyDls(formProxy);
+    refreshProxyDLs(formProxy);
     refreshProxyMatrixes(formProxy);
 }
 

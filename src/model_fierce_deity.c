@@ -60,8 +60,4 @@ void setupVanillaFierceDeity() {
     models[LINK_DL_FPS_LHAND] = getFierceDeityDL(gLinkFierceDeityLeftHandDL);
     models[LINK_DL_FPS_RFOREARM] = getFierceDeityDL(gLinkFierceDeityRightForearmDL);
     models[LINK_DL_FPS_RHAND] = getFierceDeityDL(gLinkFierceDeityRightHandDL);
-
-    // Sword
-    models[LINK_DL_SWORD4_BLADE] = getFierceDeityDL(gLinkFierceDeitySwordDL);
-    models[LINK_DL_SWORD4_HILT] = gEmptyDL;
 }

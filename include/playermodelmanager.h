@@ -398,6 +398,7 @@ typedef struct {
 } Link_SkeletonProxy;
 
 typedef struct {
+    PlayerTransformation form;
     Link_ModelInfo current;
     Link_ModelInfo vanilla;
     Link_SkeletonProxy skeleton;

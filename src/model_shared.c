@@ -1,15 +1,18 @@
 #include "modding.h"
 #include "global.h"
+#include "recompdata.h"
 #include "globalobjects_api.h"
 #include "modelreplacer_api.h"
 #include "playermodelmanager.h"
 #include "playermodelmanager_mm.h"
 #include "playermodelmanager_utils.h"
+#include "assets/objects/object_link_boy/object_link_boy.h"
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "assets/objects/object_link_zora/object_link_zora.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "maskdls.h"
+#include "modelreplacer_compat.h"
 
 // handless ocarina
 Gfx gLinkHumanOcarinaDL[] = {
@@ -157,6 +160,10 @@ Gfx *getGameplayKeepDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, dl);
 }
 
+void setupSharedListenerDL(ObjectId id, Gfx *vanillaDL, Link_DisplayList linkDLId) {
+    MRC_setupListenerDL(id, vanillaDL, MRC_PLAYER_FORM_EVERY, linkDLId);
+}
+
 void initSharedDLs() {
     Mtx **equipMatrixes = gSharedMatrixes;
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx);
@@ -168,24 +175,25 @@ void initSharedDLs() {
     Gfx **models = gSharedDisplayLists;
 
     // sword sheathes
-    models[LINK_DL_SWORD_KOKIRI_SHEATH] = getHumanDL(gLinkHumanKokiriSwordSheathDL);
-    models[LINK_DL_SWORD_RAZOR_SHEATH] = getHumanDL(gLinkHumanRazorSwordSheathDL);
-    models[LINK_DL_SWORD_GILDED_SHEATH] = getHumanDL(gLinkHumanGildedSwordSheathDL);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanKokiriSwordSheathDL, LINK_DL_SWORD_KOKIRI_SHEATH);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanRazorSwordSheathDL, LINK_DL_SWORD_RAZOR_SHEATH);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL, LINK_DL_SWORD_GILDED_SHEATH);
 
+    
     // sword hilts
-    models[LINK_DL_SWORD_KOKIRI_HILT] = getGameplayKeepDL(gKokiriSwordHandleDL);
-    models[LINK_DL_SWORD_RAZOR_HILT] = getGameplayKeepDL(gRazorSwordHandleDL);
-    models[LINK_DL_SWORD_GILDED_HILT] = getHumanDL(gLinkHumanGildedSwordHandleDL);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL, LINK_DL_SWORD_KOKIRI_HILT);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gRazorSwordHandleDL, LINK_DL_SWORD_KOKIRI_HILT);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordHandleDL, LINK_DL_SWORD_GILDED_HILT);
 
     // sword blades
-    models[LINK_DL_SWORD_KOKIRI_BLADE] = getGameplayKeepDL(gKokiriSwordBladeDL);
-    models[LINK_DL_SWORD_RAZOR_BLADE] = getGameplayKeepDL(gRazorSwordBladeDL);
-    models[LINK_DL_SWORD_GILDED_BLADE] = getHumanDL(gLinkHumanGildedSwordBladeDL);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL, LINK_DL_SWORD_KOKIRI_BLADE);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gRazorSwordBladeDL, LINK_DL_SWORD_RAZOR_BLADE);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordBladeDL, LINK_DL_SWORD_GILDED_BLADE);
 
     // shields
-    models[LINK_DL_SHIELD_HERO] = getHumanDL(gLinkHumanHerosShieldDL);
-    models[LINK_DL_SHIELD_MIRROR] = getHumanDL(gLinkHumanMirrorShieldDL);
-    models[LINK_DL_SHIELD_MIRROR_RAY] = GlobalObjects_getGlobalGfxPtr(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanHerosShieldDL, LINK_DL_SHIELD_HERO);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanMirrorShieldDL, LINK_DL_SHIELD_MIRROR);
+    setupSharedListenerDL(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0, LINK_DL_SHIELD_MIRROR_RAY);
 
     void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
 
@@ -193,28 +201,29 @@ void initSharedDLs() {
     models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL;    // not in Link obj
     GlobalObjects_rebaseDL(human, gLinkHumanOcarinaDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
-    models[LINK_DL_DEKU_STICK] = getGameplayKeepDL(gDekuStickDL);
-    models[LINK_DL_BOW] = getHumanDL(gLinkHumanBowDL);
-    models[LINK_DL_BOW_STRING] = getHumanDL(object_link_child_DL_017818);
-    models[LINK_DL_BOW_ARROW] = getGameplayKeepDL(gameplay_keep_DL_013FF0);
-    models[LINK_DL_HOOKSHOT] = getHumanDL(gLinkHumanHookshotDL);
-    models[LINK_DL_HOOKSHOT_CHAIN] = getGameplayKeepDL(gHookshotChainDL);
-    models[LINK_DL_HOOKSHOT_RETICLE] = getGameplayKeepDL(gHookshotReticleDL);
-    models[LINK_DL_HOOKSHOT_HOOK] = getHumanDL(object_link_child_DL_01D960);
+    
+    setupSharedListenerDL(GAMEPLAY_KEEP, gDekuStickDL, LINK_DL_DEKU_STICK);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanBowDL, LINK_DL_BOW);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_017818, LINK_DL_BOW_STRING);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0, LINK_DL_BOW_ARROW);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanHookshotDL, LINK_DL_HOOKSHOT);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gHookshotChainDL, LINK_DL_HOOKSHOT_CHAIN);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gHookshotReticleDL, LINK_DL_HOOKSHOT_RETICLE);
+    setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_01D960, LINK_DL_HOOKSHOT_HOOK);
 
     // First Person
     models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;    // not in Link obj
     GlobalObjects_rebaseDL(human, gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
     // bottles
-    models[LINK_DL_BOTTLE_CONTENTS] = getGameplayKeepDL(gBottleContentsDL);
-    models[LINK_DL_BOTTLE_GLASS] = getGameplayKeepDL(gBottleGlassDL);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gBottleContentsDL, LINK_DL_BOTTLE_CONTENTS);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gBottleGlassDL, LINK_DL_BOTTLE_GLASS);
 
     // whole sword
-    models[LINK_DL_SWORD4_BLADE] = getHumanDL(gLinkHumanGreatFairysSwordDL);
-    models[LINK_DL_SWORD4_HILT] = gEmptyDL;
+    setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
+    models[LINK_DL_SWORD_GREAT_FAIRY_HILT] = gEmptyDL;
 
-#define SET_MASK_DL(linkDL, objectId, maskDL) (models[linkDL] = GlobalObjects_getGlobalGfxPtr(objectId, maskDL))
+#define SET_MASK_DL(linkDL, objectId, maskDL) (setupSharedListenerDL(objectId, maskDL, linkDL))
 
     SET_MASK_DL(LINK_DL_MASK_TRUTH, OBJECT_MASK_TRUTH, object_mask_truth_DL_0001A0);
     SET_MASK_DL(LINK_DL_MASK_KAFEIS_MASK, OBJECT_MASK_KERFAY, gKafeisMaskDL);
@@ -247,13 +256,17 @@ void initSharedDLs() {
 #undef SET_MASK_DL
 
     // Zora DLs
-    models[LINK_DL_LFIN] = getZoraDL(object_link_zora_DL_00CC38);
-    models[LINK_DL_LFIN_SWIM] = getZoraDL(object_link_zora_DL_010868);
-    models[LINK_DL_RFIN] = getZoraDL(object_link_zora_DL_00CDA0);
-    models[LINK_DL_RFIN_SWIM] = getZoraDL(object_link_zora_DL_010978);
-    models[LINK_DL_GUITAR] = getZoraDL(object_link_zora_DL_00E2A0);
-    models[LINK_DL_FIN_SHIELD] = getZoraDL(object_link_zora_DL_0110A8);
-    models[LINK_DL_MAGIC_BARRIER] = getZoraDL(object_link_zora_DL_011760);
+    setupSharedListenerDL(OBJECT_LINK_ZORA, object_link_zora_DL_00CC38, LINK_DL_LFIN);
+    setupSharedListenerDL(OBJECT_LINK_ZORA, object_link_zora_DL_010868, LINK_DL_LFIN_SWIM);
+    setupSharedListenerDL(OBJECT_LINK_ZORA, object_link_zora_DL_00CDA0, LINK_DL_RFIN);
+    setupSharedListenerDL(OBJECT_LINK_ZORA, object_link_zora_DL_010978, LINK_DL_RFIN_SWIM);
+    setupSharedListenerDL(OBJECT_LINK_ZORA, object_link_zora_DL_00E2A0, LINK_DL_GUITAR);
+    setupSharedListenerDL(OBJECT_LINK_ZORA, object_link_zora_DL_0110A8, LINK_DL_FIN_SHIELD);
+    setupSharedListenerDL(OBJECT_LINK_ZORA, object_link_zora_DL_011760, LINK_DL_MAGIC_BARRIER);
+
+    // Fierce Deity DLs
+    setupSharedListenerDL(OBJECT_LINK_BOY, gLinkFierceDeitySwordDL, LINK_DL_SWORD_FIERCE_DEITY_BLADE);
+    models[LINK_DL_SWORD_FIERCE_DEITY_HILT] = gEmptyDL;
 }
 
 RECOMP_CALLBACK(".", _internal_onReadyFormProxies)
