@@ -9,6 +9,7 @@
 #include "assets/objects/object_link_boy/object_link_boy.h"
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "assets/objects/object_link_zora/object_link_zora.h"
+#include "assets/objects/object_link_nuts/object_link_nuts.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "maskdls.h"
@@ -265,6 +266,14 @@ void initSharedDLs() {
     // Fierce Deity DLs
     setupSharedListenerDL(OBJECT_LINK_BOY, gLinkFierceDeitySwordDL, LINK_DL_SWORD_FIERCE_DEITY_BLADE);
     models[LINK_DL_SWORD_FIERCE_DEITY_HILT] = gEmptyDL;
+
+    // Deku DLs
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007390, LINK_DL_PIPE_MOUTH);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007548, LINK_DL_PIPE_RIGHT);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_0076A0, LINK_DL_PIPE_UP);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_0077D0, LINK_DL_PIPE_DOWN);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007900, LINK_DL_PIPE_LEFT);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007A28, LINK_DL_PIPE_A);
 }
 
 RECOMP_CALLBACK(".", _internal_onReadyFormProxies)

@@ -186,11 +186,21 @@ void changeCategoryButtonPressed(RecompuiResource resource, const RecompuiEventD
 
         if (*isNextButton) {
             sCurrentSelectedForm++;
+
+            while(sCurrentSelectedForm >= PLAYER_FORM_MAX) {
+                sCurrentSelectedForm -= PLAYER_FORM_MAX;
+            }
         } else {
             sCurrentSelectedForm--;
+
+            while ((signed)sCurrentSelectedForm < 0) {
+                sCurrentSelectedForm += PLAYER_FORM_MAX;
+            }
         }
 
-        sCurrentSelectedForm %= PLAYER_FORM_MAX;
+        sCurrentSelectedForm = (sCurrentSelectedForm % PLAYER_FORM_MAX + PLAYER_FORM_MAX) % PLAYER_FORM_MAX;
+
+        recomp_printf("sCurrentSelectedForm: %d\n", sCurrentSelectedForm);
 
         destroyModelButtons();
         createModelButtons();
