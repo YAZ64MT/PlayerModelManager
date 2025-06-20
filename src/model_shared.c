@@ -179,7 +179,6 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanRazorSwordSheathDL, LINK_DL_SWORD_RAZOR_SHEATH);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL, LINK_DL_SWORD_GILDED_SHEATH);
 
-    
     // sword hilts
     setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL, LINK_DL_SWORD_KOKIRI_HILT);
     setupSharedListenerDL(GAMEPLAY_KEEP, gRazorSwordHandleDL, LINK_DL_SWORD_KOKIRI_HILT);
@@ -198,10 +197,9 @@ void initSharedDLs() {
     void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
 
     // items
-    models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL;    // not in Link obj
+    models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL;       // not in Link obj
     GlobalObjects_rebaseDL(human, gLinkHumanOcarinaDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
-    
     setupSharedListenerDL(GAMEPLAY_KEEP, gDekuStickDL, LINK_DL_DEKU_STICK);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanBowDL, LINK_DL_BOW);
     setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_017818, LINK_DL_BOW_STRING);
@@ -212,7 +210,7 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_01D960, LINK_DL_HOOKSHOT_HOOK);
 
     // First Person
-    models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;    // not in Link obj
+    models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;       // not in Link obj
     GlobalObjects_rebaseDL(human, gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
     // bottles
