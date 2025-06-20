@@ -274,6 +274,18 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_0077D0, LINK_DL_PIPE_DOWN);
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007900, LINK_DL_PIPE_LEFT);
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007A28, LINK_DL_PIPE_A);
+
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008660, LINK_DL_STEM_RIGHT);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008760, LINK_DL_STEM_LEFT);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_0089F0, LINK_DL_FLOWER_CENTER_CLOSED);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008BA0, LINK_DL_FLOWER_CENTER_OPEN);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008AB8, LINK_DL_CENTER_FLOWER_PROPELLER_OPEN);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008908, LINK_DL_PETAL_PROPELLER_CLOSED);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008860, LINK_DL_PETAL_PARTICLE);
+
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_009AB8, LINK_DL_PAD_WOOD);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_009C48, LINK_DL_PAD_GRASS);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_009DB8, LINK_DL_PAD_OPENING);
 }
 
 RECOMP_CALLBACK(".", _internal_onReadyFormProxies)
