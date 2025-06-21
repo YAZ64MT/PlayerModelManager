@@ -69,7 +69,7 @@ CustomModelMemoryEntry *getEntryOrPrintErrLocked(PlayerModelHandle h, const char
     if (sIsAPILocked) {
         recomp_printf(
             "PlayerModelManager: %s called while API locked. "
-            "Please only call these functions during a ZPlayerModels_onRegisterModels callback.\n",
+            "Please only call these functions during a onRegisterModels callback.\n",
             funcName);
 
         return NULL;
@@ -88,7 +88,7 @@ RECOMP_EXPORT PlayerModelHandle PlayerModelManager_registerPlayerModel(unsigned 
     }
 
     if (sIsAPILocked) {
-        recomp_printf("PlayerModelManager_registerPlayerModel: Models can only be registered during a ZPlayerModels_onRegisterModels callback.\n");
+        recomp_printf("PlayerModelManager_registerPlayerModel: Models can only be registered during a onRegisterModels callback.\n");
         return 0;
     }
 
