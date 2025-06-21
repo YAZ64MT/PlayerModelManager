@@ -2,6 +2,7 @@
 #define __EXTERNAL_DISPLAY_LISTS_H__
 
 #include "modelreplacer_api.h"
+#include "playermodelmanager.h"
 
 typedef enum {
     PLAYERLIB_DL_LFIST_SWORD_KOKIRI,
@@ -21,23 +22,20 @@ typedef enum {
     PLAYERLIB_DL_LFIN_SWIM,
     PLAYERLIB_DL_RFIN,
     PLAYERLIB_DL_RFIN_SWIM,
+    PLAYERLIB_DL_PAD_WOOD,
+    PLAYERLIB_DL_PAD_GRASS,
+    PLAYERLIB_DL_PAD_OPENING,
+    PLAYERLIB_DL_PIPE_MOUTH,
+    PLAYERLIB_DL_PIPE_RIGHT,
+    PLAYERLIB_DL_PIPE_UP,
+    PLAYERLIB_DL_PIPE_DOWN,
+    PLAYERLIB_DL_PIPE_LEFT,
+    PLAYERLIB_DL_PIPE_A,
     PLAYERLIB_DL_MAX
 } PlayerLibDisplayList;
 
 extern Gfx gPlayerLibDLs[];
 
-extern ModelReplacerHandle gProxyBottleGlass;
-extern ModelReplacerHandle gProxyBottleContents;
-extern ModelReplacerHandle gProxyDekuStick;
-extern ModelReplacerHandle gProxyBowString;
-extern ModelReplacerHandle gProxyBowArrow;
-extern ModelReplacerHandle gProxyBowArrowLowPoly;
-extern ModelReplacerHandle gProxyHookshotChain;
-extern ModelReplacerHandle gProxyHookshotHook;
-extern ModelReplacerHandle gProxyHookshotReticle;
-extern ModelReplacerHandle gProxyMirrorShieldRay;
-extern ModelReplacerHandle gProxyZoraLHand;
-extern ModelReplacerHandle gProxyZoraRHand;
-extern ModelReplacerHandle gProxyZoraLHandGuitar;
+void refreshExternalDLs(Link_FormProxy *proxy);
 
 #endif

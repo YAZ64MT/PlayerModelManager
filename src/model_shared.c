@@ -15,43 +15,6 @@
 #include "maskdls.h"
 #include "modelreplacer_compat.h"
 
-// handless ocarina
-Gfx gLinkHumanOcarinaDL[] = {
-    gsDPPipeSync(),
-    gsDPSetTextureLUT(G_TT_RGBA16),
-    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
-    gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, 1, COMBINED, 0, PRIMITIVE, 0, 0, 0, 0, COMBINED),
-    gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2),
-    gsSPClearGeometryMode(G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR),
-    gsSPSetGeometryMode(G_CULL_BACK | G_FOG | G_LIGHTING),
-    gsDPSetPrimColor(0, 0, 255, 255, 255, 255),
-    gsDPPipeSync(),
-    gsDPSetTextureLUT(G_TT_NONE),
-    gsDPLoadTextureBlock(gLinkHumanOcarinaTex, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 16, 0, G_TX_NOMIRROR | G_TX_CLAMP,
-                         G_TX_NOMIRROR | G_TX_CLAMP, 5, 4, G_TX_NOLOD, G_TX_NOLOD),
-    gsSPVertex(&object_link_childVtx_00E858[53], 23, 0),
-    gsSP2Triangles(0, 1, 2, 0, 0, 2, 3, 0),
-    gsSP2Triangles(4, 3, 2, 0, 4, 2, 1, 0),
-    gsSP2Triangles(5, 6, 7, 0, 8, 9, 10, 0),
-    gsSP2Triangles(10, 6, 8, 0, 5, 8, 6, 0),
-    gsSP2Triangles(11, 9, 0, 0, 10, 9, 11, 0),
-    gsSP2Triangles(12, 1, 13, 0, 11, 3, 14, 0),
-    gsSP2Triangles(11, 0, 3, 0, 0, 9, 1, 0),
-    gsSP2Triangles(12, 4, 1, 0, 1, 9, 8, 0),
-    gsSP2Triangles(1, 8, 5, 0, 14, 10, 11, 0),
-    gsSP2Triangles(1, 5, 13, 0, 15, 13, 5, 0),
-    gsSP2Triangles(15, 5, 7, 0, 7, 14, 15, 0),
-    gsSP2Triangles(10, 14, 6, 0, 6, 14, 7, 0),
-    gsSP2Triangles(12, 13, 16, 0, 12, 16, 17, 0),
-    gsSP2Triangles(17, 18, 15, 0, 15, 16, 13, 0),
-    gsSP2Triangles(17, 15, 14, 0, 17, 14, 19, 0),
-    gsSP2Triangles(14, 20, 21, 0, 14, 21, 19, 0),
-    gsSP2Triangles(4, 20, 3, 0, 3, 20, 14, 0),
-    gsSP2Triangles(12, 17, 19, 0, 12, 19, 22, 0),
-    gsSP2Triangles(12, 22, 4, 0, 21, 20, 4, 0),
-    gsSPEndDisplayList(),
-};
-
 // handless first person hookshot
 Gfx gLinkHumanFirstPersonHookshotDL[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
@@ -195,12 +158,6 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanMirrorShieldDL, LINK_DL_SHIELD_MIRROR);
     setupSharedListenerDL(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0, LINK_DL_SHIELD_MIRROR_RAY);
 
-    void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
-
-    // items
-    models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL;       // not in Link obj
-    GlobalObjects_rebaseDL(human, gLinkHumanOcarinaDL, 0x06); // repoint vertices, textures, etc. to static link obj
-
     setupSharedListenerDL(GAMEPLAY_KEEP, gDekuStickDL, LINK_DL_DEKU_STICK);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanBowDL, LINK_DL_BOW);
     setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_017818, LINK_DL_BOW_STRING);
@@ -212,7 +169,7 @@ void initSharedDLs() {
 
     // First Person
     models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;       // not in Link obj
-    GlobalObjects_rebaseDL(human, gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
+    GlobalObjects_rebaseDL(GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD), gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
     // bottles
     setupSharedListenerDL(GAMEPLAY_KEEP, gBottleContentsDL, LINK_DL_BOTTLE_CONTENTS);
@@ -279,13 +236,15 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008760, LINK_DL_STEM_LEFT);
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_0089F0, LINK_DL_FLOWER_CENTER_CLOSED);
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008BA0, LINK_DL_FLOWER_CENTER_OPEN);
-    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008AB8, LINK_DL_CENTER_FLOWER_PROPELLER_OPEN);
-    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008908, LINK_DL_PETAL_PROPELLER_CLOSED);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008AB8, LINK_DL_FLOWER_PROPELLER_OPEN);
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008908, LINK_DL_FLOWER_PROPELLER_CLOSED);
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_008860, LINK_DL_PETAL_PARTICLE);
 
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_009AB8, LINK_DL_PAD_WOOD);
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_009C48, LINK_DL_PAD_GRASS);
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_009DB8, LINK_DL_PAD_OPENING);
+
+    setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_00A348, LINK_DL_DEKU_GUARD);
 }
 
 RECOMP_CALLBACK(".", _internal_onReadyFormProxies)

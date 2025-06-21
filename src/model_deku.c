@@ -34,11 +34,11 @@ void setupVanillaDeku() {
         formProxy->vanilla.mouthTextures[i] = mouthTex[i];
     }
 
-    void *zora = GlobalObjects_getGlobalObject(OBJECT_LINK_ZORA);
+    void *deku = GlobalObjects_getGlobalObject(OBJECT_LINK_NUTS);
 
-    GlobalObjects_globalizeLodLimbSkeleton(zora, &gLinkDekuSkel);
+    GlobalObjects_globalizeLodLimbSkeleton(deku, &gLinkDekuSkel);
 
-    FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(zora, &gLinkDekuSkel);
+    FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(deku, &gLinkDekuSkel);
 
     formProxy->vanilla.skeleton = skel;
 

@@ -5,6 +5,43 @@
 #include "model_common.h"
 #include "globalobjects_api.h"
 
+// handless ocarina
+Gfx gLinkHumanOcarinaDL[] = {
+    gsDPPipeSync(),
+    gsDPSetTextureLUT(G_TT_RGBA16),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, 1, COMBINED, 0, PRIMITIVE, 0, 0, 0, 0, COMBINED),
+    gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2),
+    gsSPClearGeometryMode(G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR),
+    gsSPSetGeometryMode(G_CULL_BACK | G_FOG | G_LIGHTING),
+    gsDPSetPrimColor(0, 0, 255, 255, 255, 255),
+    gsDPPipeSync(),
+    gsDPSetTextureLUT(G_TT_NONE),
+    gsDPLoadTextureBlock(gLinkHumanOcarinaTex, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 16, 0, G_TX_NOMIRROR | G_TX_CLAMP,
+                         G_TX_NOMIRROR | G_TX_CLAMP, 5, 4, G_TX_NOLOD, G_TX_NOLOD),
+    gsSPVertex(&object_link_childVtx_00E858[53], 23, 0),
+    gsSP2Triangles(0, 1, 2, 0, 0, 2, 3, 0),
+    gsSP2Triangles(4, 3, 2, 0, 4, 2, 1, 0),
+    gsSP2Triangles(5, 6, 7, 0, 8, 9, 10, 0),
+    gsSP2Triangles(10, 6, 8, 0, 5, 8, 6, 0),
+    gsSP2Triangles(11, 9, 0, 0, 10, 9, 11, 0),
+    gsSP2Triangles(12, 1, 13, 0, 11, 3, 14, 0),
+    gsSP2Triangles(11, 0, 3, 0, 0, 9, 1, 0),
+    gsSP2Triangles(12, 4, 1, 0, 1, 9, 8, 0),
+    gsSP2Triangles(1, 8, 5, 0, 14, 10, 11, 0),
+    gsSP2Triangles(1, 5, 13, 0, 15, 13, 5, 0),
+    gsSP2Triangles(15, 5, 7, 0, 7, 14, 15, 0),
+    gsSP2Triangles(10, 14, 6, 0, 6, 14, 7, 0),
+    gsSP2Triangles(12, 13, 16, 0, 12, 16, 17, 0),
+    gsSP2Triangles(17, 18, 15, 0, 15, 16, 13, 0),
+    gsSP2Triangles(17, 15, 14, 0, 17, 14, 19, 0),
+    gsSP2Triangles(14, 20, 21, 0, 14, 21, 19, 0),
+    gsSP2Triangles(4, 20, 3, 0, 3, 20, 14, 0),
+    gsSP2Triangles(12, 17, 19, 0, 12, 19, 22, 0),
+    gsSP2Triangles(12, 22, 4, 0, 21, 20, 4, 0),
+    gsSPEndDisplayList(),
+};
+
 // first person arm
 Gfx gLinkHumanFirstPersonArmDL[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
@@ -159,4 +196,8 @@ void setupVanillaHuman() {
 
     models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArmDL; // not in Link obj
     GlobalObjects_rebaseDL(human, gLinkHumanFirstPersonArmDL, 0x06); // repoint vertices, textures, etc. to static link obj
+
+    // items
+    models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL;       // not in Link obj
+    GlobalObjects_rebaseDL(human, gLinkHumanOcarinaDL, 0x06); // repoint vertices, textures, etc. to static link obj
 }
