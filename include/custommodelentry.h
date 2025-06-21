@@ -41,6 +41,7 @@ typedef struct {
     Gfx *displayListPtrs[LINK_DL_MAX];
     Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
     FlexSkeletonHeader *skel;
+    FlexSkeletonHeader *shieldingSkel;
     TexturePtr *eyesTex;
     TexturePtr *mouthTex;
 } CustomModelMemoryEntry;

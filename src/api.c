@@ -86,7 +86,7 @@ RECOMP_EXPORT ZPlayerModelHandle ZPlayerModelManager_registerPlayerModel(unsigne
         recomp_printf("ZPlayerModelManager_registerPlayerModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
         return 0;
     }
-    
+
     if (sIsAPILocked) {
         recomp_printf("ZPlayerModelManager_registerPlayerModel: Models can only be registered during a ZPlayerModels_onRegisterModels callback.\n");
         return 0;
@@ -261,7 +261,7 @@ RECOMP_EXPORT bool ZPlayerModelManager_setUnloadCallback(ZPlayerModelHandle h, v
 
 #define SET_LIMB_DL(pLimb, entryDL)       \
     if (!entry->displayListPtrs[entryDL]) \
-    entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gCallEmptyDisplayList
+    entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gCallEmptyDisplayList
 
 RECOMP_EXPORT bool ZPlayerModelManager_setSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel) {
     CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModelManager_setSkeleton");
@@ -273,7 +273,7 @@ RECOMP_EXPORT bool ZPlayerModelManager_setSkeleton(ZPlayerModelHandle h, FlexSke
     entry->skel = skel;
 
     if (skel) {
-        LodLimb **limbs = (LodLimb **)skel->sh.segment;
+        StandardLimb **limbs = (LodLimb **)skel->sh.segment;
 
         SET_LIMB_DL(PLAYER_LIMB_WAIST, LINK_DL_WAIST);
         SET_LIMB_DL(PLAYER_LIMB_RIGHT_THIGH, LINK_DL_RTHIGH);
@@ -301,6 +301,37 @@ RECOMP_EXPORT bool ZPlayerModelManager_setSkeleton(ZPlayerModelHandle h, FlexSke
 }
 
 #undef SET_LIMB_DL
+
+RECOMP_EXPORT bool ZPlayerModelManager_setShieldingSkeleton(ZPlayerModelHandle h, FlexSkeletonHeader *skel) {
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "ZPlayerModelManager_setShieldingSkeleton");
+
+    if (!entry) {
+        return false;
+    }
+
+    entry->shieldingSkel = skel;
+
+    if (skel) {
+        if (skel->sh.limbCount != PLAYER_BODY_SHIELD_LIMB_COUNT) {
+            recomp_printf("Skeleton with incorrect limb count passed in to ZPlayerModelManager_setShieldingSkeleton");
+            return false;
+        }
+
+        StandardLimb **limbs = (StandardLimb **)skel->sh.segment;
+
+#define SET_SHIELDING_LIMB_DL(pLimb, entryDL) \
+    if (!entry->displayListPtrs[entryDL])     \
+    entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gCallEmptyDisplayList
+
+        SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_BODY, LINK_DL_BODY_SHIELD_BODY);
+        SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_HEAD, LINK_DL_BODY_SHIELD_HEAD);
+        SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_ARMS_AND_LEGS, LINK_DL_BODY_SHIELD_ARMS_AND_LEGS);
+    }
+
+#undef SET_SHIELDING_LIMB_DL
+
+    return true;
+}
 
 RECOMP_EXPORT bool ZPlayerModelManager_setEyesTextures(ZPlayerModelHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]) {
     CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "ZPlayerModelManager_setEyesTextures");

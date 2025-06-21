@@ -47,6 +47,8 @@ bool applyCustomModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
         }
     }
 
+    modelInfo->shieldingSkeleton = this->shieldingSkel;
+
     return true;
 }
 

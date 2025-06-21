@@ -397,6 +397,15 @@ typedef struct {
     FlexSkeletonHeader *shieldingSkeleton;
 } Link_ModelInfo;
 
+typedef enum {
+    /* 0x00 */ LINK_BODY_SHIELD_LIMB_NONE,
+    /* 0x01 */ LINK_BODY_SHIELD_LIMB_ROOT,
+    /* 0x02 */ LINK_BODY_SHIELD_LIMB_BODY,
+    /* 0x03 */ LINK_BODY_SHIELD_LIMB_HEAD,
+    /* 0x04 */ LINK_BODY_SHIELD_LIMB_ARMS_AND_LEGS,
+    /* 0x05 */ LINK_BODY_SHIELD_LIMB_MAX
+} LinkShieldingLimb;
+
 typedef struct {
     FlexSkeletonHeader flexSkeleton;
     StandardLimb *limbPtrs[PLAYER_BODY_SHIELD_LIMB_COUNT];
