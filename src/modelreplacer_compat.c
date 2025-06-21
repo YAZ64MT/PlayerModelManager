@@ -106,7 +106,8 @@ void updateListenerDLs_on_onModelChange(ObjectId id, Gfx *vanillaDL, Gfx *newDL)
     }
 }
 
-void initModelReplacerCompat() {
+RECOMP_CALLBACK(".", _internal_initHashObjects)
+void initModelReplacerHashObjects() {
     sObjectIdToVanillaDLToListenerMapMap = recomputil_create_u32_value_hashmap();
 
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
@@ -130,6 +131,5 @@ RECOMP_DECLARE_EVENT(_internal_onReadyModelReplacerCompat())
 
 RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, onBeforeRegisterReplacers)
 void initReplacerCompat_on_event() {
-    initModelReplacerCompat();
     _internal_onReadyModelReplacerCompat();
 }

@@ -150,8 +150,6 @@ void initEntryManager() {
     unsigned char *modFolderPath = recomp_get_mod_folder_path();
     sZobjDir = QDFL_getCombinedPath(2, modFolderPath, "zobj");
     recomp_free(modFolderPath);
-
-    sHandleToMemoryEntry = recomputil_create_u32_memory_hashmap(sizeof(CustomModelMemoryEntry));
 }
 
 void pushMemoryEntry(PlayerTransformation form, CustomModelMemoryEntry *entry) {
@@ -576,4 +574,9 @@ void initEntryManagerCallback() {
 RECOMP_HOOK_RETURN("TitleSetup_SetupTitleScreen")
 void applySavedModelOnTitleScreen() {
     loadSavedModels();
+}
+
+RECOMP_CALLBACK(".", _internal_initHashObjects)
+void initCMEMHash() {
+    sHandleToMemoryEntry = recomputil_create_u32_memory_hashmap(sizeof(CustomModelMemoryEntry));
 }

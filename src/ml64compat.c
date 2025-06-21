@@ -17,15 +17,15 @@ void OotoFixHeaderSkelPtr(void *obj) {
 
     if (readU32(zobj, Z64O_SKELETON_HEADER_POINTER) == 0xFFFFFFFF) {
         switch (zobj[Z64O_FORM_BYTE]) {
-        case OOTO_FORM_BYTE_CHILD:
-            writeU32(zobj, Z64O_SKELETON_HEADER_POINTER, OOTO_CHILD_SKEL_PTR);
-            break;
+            case OOTO_FORM_BYTE_CHILD:
+                writeU32(zobj, Z64O_SKELETON_HEADER_POINTER, OOTO_CHILD_SKEL_PTR);
+                break;
 
-        case OOTO_FORM_BYTE_ADULT:
-            writeU32(zobj, Z64O_SKELETON_HEADER_POINTER, OOTO_ADULT_SKEL_PTR);
+            case OOTO_FORM_BYTE_ADULT:
+                writeU32(zobj, Z64O_SKELETON_HEADER_POINTER, OOTO_ADULT_SKEL_PTR);
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 }
@@ -44,7 +44,7 @@ void OotoFixChildLeftShoulder(void *obj) {
 
             u32 lShoulderLimbPtr = SEGMENT_OFFSET(readU32(zobj, firstLimbPtr + (PLAYER_LIMB_LEFT_SHOULDER - 1) * sizeof(u32)));
 
-            LodLimb* limb = (LodLimb *)&zobj[lShoulderLimbPtr];
+            LodLimb *limb = (LodLimb *)&zobj[lShoulderLimbPtr];
 
             writeU32(zobj, OOTO_CHILD_LUT_DL_LSHOULDER + 4, (u32)limb->dLists[0]);
         }
@@ -117,15 +117,14 @@ void applySegmentPtrRemaps(void *obj, Gfx *dl) {
 void setSegmentPtrRemap(u32 key, u32 value) {
     recomputil_u32_value_hashmap_insert(gSegmentPointersRemap, key, value);
 }
-
-void initSegmentPtrsRemap() {
-    gSegmentPointersRemap = recomputil_create_u32_value_hashmap();
-}
-
 RECOMP_DECLARE_EVENT(_internal_onReadyML64CompatBase());
 
 RECOMP_CALLBACK(".", _internal_onReadyFormProxies)
 void initML64CompatBase_onReadyFormProxies() {
-    initSegmentPtrsRemap();
     _internal_onReadyML64CompatBase();
+}
+
+RECOMP_CALLBACK(".", _internal_initHashObjects)
+void initSegmentPtrsRemap() {
+    gSegmentPointersRemap = recomputil_create_u32_value_hashmap();
 }

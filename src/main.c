@@ -208,3 +208,10 @@ void refreshSharedModelsOnModelApply(PlayerTransformation form) {
         refreshFaceTextures();
     }
 }
+
+RECOMP_DECLARE_EVENT(_internal_initHashObjects());
+
+RECOMP_CALLBACK("*", recomp_on_init)
+void initHashObjects_on_recomp_on_init() {
+    _internal_initHashObjects();
+}
