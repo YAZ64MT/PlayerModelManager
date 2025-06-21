@@ -33,6 +33,9 @@ void DynU32Arr_clear(DynamicU32Array *dArr) {
 
 void DynU32Arr_destroyMembers(DynamicU32Array *dArr) {
     recomp_free(dArr->data);
+    dArr->capacity = 0;
+    dArr->count = 0;
+    dArr->data = NULL;
 }
 
 void DynU32Arr_push(DynamicU32Array *dArr, u32 value) {
