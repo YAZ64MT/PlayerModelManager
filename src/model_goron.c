@@ -38,9 +38,13 @@ void setupVanillaGoron() {
 
     GlobalObjects_globalizeLodLimbSkeleton(goron, &gLinkGoronSkel);
 
+    GlobalObjects_globalizeStandardLimbSkeleton(goron, &gLinkGoronShieldingSkel);
+
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(goron, &gLinkGoronSkel);
 
     formProxy->vanilla.skeleton = skel;
+
+    formProxy->vanilla.shieldingSkeleton = SEGMENTED_TO_GLOBAL_PTR(goron, &gLinkGoronShieldingSkel);
 
     Gfx **models = formProxy->vanilla.models;
 
@@ -60,4 +64,30 @@ void setupVanillaGoron() {
     models[LINK_DL_FPS_LHAND] = getGoronDL(gLinkGoronLeftHandClosedDL);
     models[LINK_DL_FPS_RFOREARM] = getGoronDL(gLinkGoronRightForearmDL);
     models[LINK_DL_FPS_RHAND] = getGoronDL(gLinkGoronRightHandClosedDL);
+}
+
+static FlexSkeletonHeader *sShieldingGoronSkel = NULL;
+
+RECOMP_HOOK("SkelAnime_InitFlex")
+void patchSecondGoronSkel_on_SkelAnime_InitFlex(PlayState *play, SkelAnime *skelAnime, FlexSkeletonHeader *skeletonHeaderSeg, AnimationHeader *animation, Vec3s *jointTable, Vec3s *morphTable, s32 limbCount) {
+    sShieldingGoronSkel = NULL;
+    
+    if (skeletonHeaderSeg == &gLinkGoronShieldingSkel) {
+        FlexSkeletonHeader *skel = Lib_SegmentedToVirtual(skeletonHeaderSeg);
+    }
+}
+
+RECOMP_HOOK_RETURN("SkelAnime_InitFlex")
+void patchSecondGoronSkel_on_return_SkelAnime_InitFlex() {
+    if (sShieldingGoronSkel) {
+        Link_ShieldingSkeletonProxy *skelProxy = &gLinkFormProxies[PLAYER_FORM_GORON].shieldingSkeleton;
+
+        if (skelProxy) {
+            sShieldingGoronSkel->sh.segment = skelProxy->flexSkeleton.sh.segment;
+            sShieldingGoronSkel->sh.limbCount = skelProxy->flexSkeleton.sh.limbCount;
+            sShieldingGoronSkel->dListCount = skelProxy->flexSkeleton.dListCount;
+        }
+    }
+    
+    sShieldingGoronSkel = NULL;
 }

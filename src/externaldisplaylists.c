@@ -6,6 +6,7 @@
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "assets/objects/object_link_zora/object_link_zora.h"
 #include "assets/objects/object_link_nuts/object_link_nuts.h"
+#include "assets/objects/object_link_goron/object_link_goron.h"
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 
 Gfx gPlayerLibDLs[PLAYERLIB_DL_MAX];
@@ -56,6 +57,21 @@ static ModelReplacement sModelReplacements[] = {
     DECLARE_REPLACEMENT(OBJECT_LINK_NUTS, object_link_nuts_DL_00A348, DEKU_GUARD),
     DECLARE_REPLACEMENT(OBJECT_LINK_NUTS, gLinkDekuOpenFlowerDL, CENTER_FLOWER_PROPELLER_OPEN),
     DECLARE_REPLACEMENT(OBJECT_LINK_NUTS, gLinkDekuClosedFlowerDL, CENTER_FLOWER_PROPELLER_CLOSED),
+
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_00FC18, DRUM_STRAP),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_00FCF0, DRUM_UP),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_00FF18, DRUM_LEFT),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_010140, DRUM_RIGHT),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_010368, DRUM_DOWN),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_010590, DRUM_A),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, gLinkGoronCurledDL, CURLED),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_00C540, SPIKES),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_0127B0, INIT_FIRE),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_0134D0, FIRE_ROLL),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, gLinkGoronGoronPunchEffectDL, FIRE_PUNCH),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_017180, BODY_SHIELD_BODY),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_017620, BODY_SHIELD_HEAD),
+    DECLARE_REPLACEMENT(OBJECT_LINK_GORON, object_link_goron_DL_016A88, BODY_SHIELD_ARMS_AND_LEGS),
 };
 
 #undef DECLARE_REPLACEMENT

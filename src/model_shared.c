@@ -10,6 +10,7 @@
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "assets/objects/object_link_zora/object_link_zora.h"
 #include "assets/objects/object_link_nuts/object_link_nuts.h"
+#include "assets/objects/object_link_goron/object_link_goron.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "maskdls.h"
@@ -245,6 +246,25 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_009DB8, LINK_DL_PAD_OPENING);
 
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_00A348, LINK_DL_DEKU_GUARD);
+
+    // Goron Link
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_00FC18, LINK_DL_DRUM_STRAP);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_00FCF0, LINK_DL_DRUM_UP);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_00FF18, LINK_DL_DRUM_LEFT);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_010140, LINK_DL_DRUM_RIGHT);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_010368, LINK_DL_DRUM_DOWN);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_010590, LINK_DL_DRUM_A);
+
+    setupSharedListenerDL(OBJECT_LINK_GORON, gLinkGoronCurledDL, LINK_DL_CURLED);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_00C540, LINK_DL_SPIKES);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_0127B0, LINK_DL_INIT_FIRE);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_0134D0, LINK_DL_FIRE_ROLL);
+    setupSharedListenerDL(OBJECT_LINK_GORON, gLinkGoronGoronPunchEffectDL, LINK_DL_FIRE_PUNCH);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_017180, LINK_DL_BODY_SHIELD_BODY);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_017620, LINK_DL_BODY_SHIELD_HEAD);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_016A88, LINK_DL_BODY_SHIELD_ARMS_AND_LEGS);
+
+    // TODO: FINISH IMPLEMENTING GORON LINK
 }
 
 RECOMP_CALLBACK(".", _internal_onReadyFormProxies)

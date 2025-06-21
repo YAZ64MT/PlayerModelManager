@@ -136,8 +136,9 @@ typedef enum {
     LINK_DL_DRUM_RIGHT,
     LINK_DL_DRUM_DOWN,
     LINK_DL_DRUM_A,
-    LINK_DL_SHIELD_PRONE,
-    LINK_DL_BODY_SHIELD,
+    LINK_DL_BODY_SHIELD_HEAD,
+    LINK_DL_BODY_SHIELD_BODY,
+    LINK_DL_BODY_SHIELD_ARMS_AND_LEGS,
     LINK_DL_CURLED,
     LINK_DL_SPIKES,
     LINK_DL_INIT_FIRE,
@@ -384,6 +385,7 @@ typedef enum {
 } Link_EquipmentMatrix;
 
 #define PLAYER_LIMB_COUNT 21
+#define PLAYER_BODY_SHIELD_LIMB_COUNT 4
 
 typedef struct {
     u64 flags;
@@ -392,7 +394,14 @@ typedef struct {
     TexturePtr eyesTextures[PLAYER_EYES_MAX];
     TexturePtr mouthTextures[PLAYER_MOUTH_MAX];
     FlexSkeletonHeader *skeleton;
+    FlexSkeletonHeader *shieldingSkeleton;
 } Link_ModelInfo;
+
+typedef struct {
+    FlexSkeletonHeader flexSkeleton;
+    StandardLimb *limbPtrs[PLAYER_BODY_SHIELD_LIMB_COUNT];
+    StandardLimb limbs[PLAYER_BODY_SHIELD_LIMB_COUNT];
+} Link_ShieldingSkeletonProxy;
 
 typedef struct {
     FlexSkeletonHeader flexSkeleton;
@@ -413,6 +422,7 @@ typedef struct {
     Link_ModelInfo current;
     Link_ModelInfo vanilla;
     Link_SkeletonProxy skeleton;
+    Link_ShieldingSkeletonProxy shieldingSkeleton;
     Gfx *shimDisplayListPtrs[LINK_SHIMDL_MAX];
     Gfx *mtxDisplayLists[LINK_EQUIP_MATRIX_MAX];
     Gfx displayLists[LINK_DL_MAX];
