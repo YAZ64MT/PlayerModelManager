@@ -4,6 +4,7 @@
 #include "recompconfig.h"
 #include "playermodelmanager.h"
 #include "playermodelmanager_utils.h"
+#include "playermodelmanager_mm.h"
 #include "z64animation.h"
 #include "model_common.h"
 #include "z64object.h"
@@ -336,9 +337,21 @@ void refreshProxyDLs(Link_FormProxy *formProxy) {
     }
 
     // first person hookshot workaround
-    Gfx *listenerDL = getListenerDL(formProxy, LINK_DL_HOOKSHOT);
-    if (listenerDL) {
-        gSPDisplayList(&wDLs[LINK_DL_FPS_HOOKSHOT].displayList[WRAPPED_DL_DRAW], listenerDL);
+    Gfx *listenerHookDL = getListenerDL(formProxy, LINK_DL_HOOKSHOT);
+    if (listenerHookDL) {
+        gSPDisplayList(&wDLs[LINK_DL_FPS_HOOKSHOT].displayList[WRAPPED_DL_DRAW], listenerHookDL);
+    }
+
+    // disable hilt for Great Fairy Sword if replaced
+    Gfx* listenerGFSwordDL = getListenerDL(formProxy, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
+    if (listenerGFSwordDL) {
+        gSPDisplayList(&wDLs[LINK_DL_SWORD_GREAT_FAIRY_HILT].displayList[WRAPPED_DL_DRAW], gEmptyDL);
+    }
+
+    // disable hilt for Fierce Deity's Sword if replaced
+    Gfx *listenerFDSwordDL = getListenerDL(formProxy, LINK_DL_SWORD_FIERCE_DEITY_BLADE);
+    if (listenerFDSwordDL) {
+        gSPDisplayList(&wDLs[LINK_DL_SWORD_GREAT_FAIRY_HILT].displayList[WRAPPED_DL_DRAW], gEmptyDL);
     }
 }
 
