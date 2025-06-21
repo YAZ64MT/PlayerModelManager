@@ -18,7 +18,7 @@
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
 static U32MemoryHashmapHandle sHandleToMemoryEntry;
-static ZPlayerModelHandle sNextMemoryHandle = 1;
+static PlayerModelHandle sNextMemoryHandle = 1;
 
 typedef struct {
     void **entries;
@@ -514,8 +514,8 @@ PlayerTransformation getFormFromModelType(CustomModelType t) {
     return 0;
 }
 
-ZPlayerModelHandle CMEM_createMemoryHandle(PlayerTransformation form) {
-    ZPlayerModelHandle handle = sNextMemoryHandle;
+PlayerModelHandle CMEM_createMemoryHandle(PlayerTransformation form) {
+    PlayerModelHandle handle = sNextMemoryHandle;
 
     sNextMemoryHandle++;
 
@@ -530,7 +530,7 @@ ZPlayerModelHandle CMEM_createMemoryHandle(PlayerTransformation form) {
     return handle;
 }
 
-CustomModelMemoryEntry *CMEM_getMemoryEntry(ZPlayerModelHandle h) {
+CustomModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelHandle h) {
     return recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, h);
 }
 
