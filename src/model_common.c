@@ -2,6 +2,7 @@
 #include "global.h"
 #include "recomputils.h"
 #include "recompconfig.h"
+#include "recompdata.h"
 #include "playermodelmanager.h"
 #include "playermodelmanager_utils.h"
 #include "playermodelmanager_mm.h"
@@ -11,6 +12,7 @@
 #include "model_shared.h"
 #include "globalobjects_api.h"
 #include "modelreplacer_compat.h"
+#include "dynu32array.h"
 
 bool gIsAgePropertyRefreshRequested = false;
 
@@ -602,18 +604,31 @@ void refreshFormProxy(Link_FormProxy *formProxy) {
     refreshProxyMatrixes(formProxy);
 }
 
-static bool sIsFormProxyRefreshRequested[PLAYER_FORM_MAX];
+static DynamicU32Array sFormProxyRefreshRequestQueue;
+static U32HashsetHandle sFormProxyRefreshRequestSet;
 
-void requestRefreshFormProxy(PlayerTransformation form) {
-    sIsFormProxyRefreshRequested[form] = true;
+bool sIsFormProxyRefreshRequested[PLAYER_FORM_MAX];
+
+void requestRefreshFormProxy(Link_FormProxy *formProxy) {
+    uintptr_t fp = (uintptr_t)formProxy;
+    if (recomputil_u32_hashset_insert(sFormProxyRefreshRequestSet, fp)) {
+        DynU32Arr_push(&sFormProxyRefreshRequestQueue, fp);
+    }
 }
 
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        if (sIsFormProxyRefreshRequested[i]) {
-            refreshFormProxy(&gLinkFormProxies[i]);
-            sIsFormProxyRefreshRequested[i] = false;
-        }
+    for (size_t i = 0; i < sFormProxyRefreshRequestQueue.count; ++i) {
+        uintptr_t fp = sFormProxyRefreshRequestQueue.data[i];
+
+        refreshFormProxy((Link_FormProxy *)fp);
+        recomputil_u32_hashset_erase(sFormProxyRefreshRequestSet, fp);
     }
+
+    DynU32Arr_clear(&sFormProxyRefreshRequestQueue);
+}
+
+RECOMP_CALLBACK(".", _internal_initHashObjects)
+void initModelCommonHashObjs() {
+    sFormProxyRefreshRequestSet = recomputil_create_u32_hashset();
 }
