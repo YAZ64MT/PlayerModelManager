@@ -52,10 +52,18 @@ static bool sIsDiskSaveNeeded = false;
 
 static bool sIsLivePreviewEnabled = false;
 
-static PlayerTransformation sCurrentSelectedForm = PLAYER_FORM_HUMAN;
+static PlayerTransformation sSelectionOrder[] = {
+    PLAYER_FORM_HUMAN,
+    PLAYER_FORM_DEKU,
+    PLAYER_FORM_GORON,
+    PLAYER_FORM_ZORA,
+    PLAYER_FORM_FIERCE_DEITY,
+};
+
+static PlayerTransformation sCurrentMenuIndex = 0;
 
 PlayerTransformation getSelectedForm() {
-    return sCurrentSelectedForm;
+    return sSelectionOrder[sCurrentMenuIndex];
 }
 
 bool shouldLivePreview() {
@@ -173,7 +181,7 @@ void refreshCategoryName() {
         recompui_destroy_element(rowCategory, labelCategory);
     }
 
-    labelCategory = recompui_create_label(context, rowCategory, sCategoryNames[sCurrentSelectedForm], LABELSTYLE_LARGE);
+    labelCategory = recompui_create_label(context, rowCategory, sCategoryNames[getSelectedForm()], LABELSTYLE_LARGE);
 
     sIsCategoryRowExist = true;
 }
@@ -185,22 +193,20 @@ void changeCategoryButtonPressed(RecompuiResource resource, const RecompuiEventD
         bool *isNextButton = userdata;
 
         if (*isNextButton) {
-            sCurrentSelectedForm++;
+            sCurrentMenuIndex++;
 
-            while(sCurrentSelectedForm >= PLAYER_FORM_MAX) {
-                sCurrentSelectedForm -= PLAYER_FORM_MAX;
+            while(sCurrentMenuIndex >= ARRAY_COUNT(sSelectionOrder)) {
+                sCurrentMenuIndex -= ARRAY_COUNT(sSelectionOrder);
             }
         } else {
-            sCurrentSelectedForm--;
+            sCurrentMenuIndex--;
 
-            while ((signed)sCurrentSelectedForm < 0) {
-                sCurrentSelectedForm += PLAYER_FORM_MAX;
+            while ((signed)sCurrentMenuIndex < 0) {
+                sCurrentMenuIndex += ARRAY_COUNT(sSelectionOrder);
             }
         }
 
-        sCurrentSelectedForm = (sCurrentSelectedForm % PLAYER_FORM_MAX + PLAYER_FORM_MAX) % PLAYER_FORM_MAX;
-
-        recomp_printf("sCurrentSelectedForm: %d\n", sCurrentSelectedForm);
+        sCurrentMenuIndex = (sCurrentMenuIndex % ARRAY_COUNT(sSelectionOrder) + ARRAY_COUNT(sSelectionOrder)) % ARRAY_COUNT(sSelectionOrder);
 
         destroyModelButtons();
         createModelButtons();
