@@ -21,6 +21,7 @@ extern Gfx object_mask_skj_DL_0009F0[];      // PLAYER_MASK_CAPTAIN
 extern Gfx object_mask_stone_DL_000820[];    // PLAYER_MASK_STONE
 extern Gfx object_mask_bree_DL_0003C0[];     // PLAYER_MASK_BREMEN
 extern Gfx object_mask_bakuretu_DL_0005C0[]; // PLAYER_MASK_BLAST
+extern Gfx object_mask_bakuretu_DL_000440[];
 extern Gfx object_mask_bu_san_DL_000710[];   // PLAYER_MASK_SCENTS
 extern Gfx object_mask_kyojin_DL_000380[];   // PLAYER_MASK_GIANT
 extern Gfx gFierceDeityMaskDL[];             // PLAYER_MASK_FIERCE_DEITY
