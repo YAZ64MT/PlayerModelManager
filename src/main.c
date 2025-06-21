@@ -8,7 +8,7 @@
 #include "mm_adultfixes.h"
 #include "playermodelmanager_utils.h"
 #include "modelreplacer_api.h"
-#include "externaldisplaylists.h"
+#include "modelreplacements.h"
 #include "externs_z_player_lib.h"
 #include "model_shared.h"
 

@@ -8,7 +8,7 @@
 #include "modelreplacer_api.h"
 #include "model_shared.h"
 #include "model_common.h"
-#include "externaldisplaylists.h"
+#include "modelreplacements.h"
 
 static U32ValueHashmapHandle sObjectIdToVanillaDLToListenerMapMap;
 static U32ValueHashmapHandle sLinkDLEntryToListeners[PLAYER_FORM_MAX];

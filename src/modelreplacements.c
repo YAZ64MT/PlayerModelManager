@@ -1,5 +1,5 @@
 #include "global.h"
-#include "externaldisplaylists.h"
+#include "modelreplacements.h"
 #include "modelreplacer_api.h"
 #include "playermodelmanager.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
