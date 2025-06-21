@@ -94,13 +94,13 @@ void updateListenerDLs_on_onModelChange(ObjectId id, Gfx *vanillaDL, Gfx *newDL)
                 gSharedDisplayLists[linkDLId] = newDL;
 
                 for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-                    requestRefreshFormProxy(i);
+                    requestRefreshFormProxyDL(&gLinkFormProxies[i], linkDLId);
                 }
             }
         } else {
             if (gLinkFormProxies[form].vanilla.models[linkDLId] != newDL) {
                 gLinkFormProxies[form].vanilla.models[linkDLId] = newDL;
-                requestRefreshFormProxy(form);
+                requestRefreshFormProxyDL(&gLinkFormProxies[form], linkDLId);
             }
         }
     }

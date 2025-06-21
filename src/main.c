@@ -168,7 +168,7 @@ void initFormProxies() {
             formProxy->vanilla.mouthTextures[j] = sPlayerMouthTextures[j];
         }
 
-        requestRefreshFormProxy(i);
+        requestRefreshFormProxy(&gLinkFormProxies[i]);
         changeFormPtrsToProxy(i);
     }
 
@@ -200,7 +200,7 @@ void initFormProxies_on_event() {
 
 RECOMP_CALLBACK(".", _internal_onModelApplied)
 void refreshSharedModelsOnModelApply(PlayerTransformation form) {
-    requestRefreshFormProxy(form);
+    requestRefreshFormProxy(&gLinkFormProxies[form]);
     gIsAgePropertyRefreshRequested = true;
 
     if (form == GET_PLAYER_FORM) {

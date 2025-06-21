@@ -18,7 +18,7 @@ bool isEntryLoaded(CustomModelMemoryEntry *entry) {
 
 void refreshProxyIfEntryLoaded(CustomModelMemoryEntry *entry) {
     if (isEntryLoaded(entry)) {
-        requestRefreshFormProxy(getFormFromModelType(entry->modelEntry.type));
+        requestRefreshFormProxy(&gLinkFormProxies[getFormFromModelType(entry->modelEntry.type)]);
     }
 }
 

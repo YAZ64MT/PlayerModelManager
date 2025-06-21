@@ -4,7 +4,7 @@
 #define DEFAULT_CAPACITY 16
 #define NEXT_CAPACITY(current) ((current == 0) ? DEFAULT_CAPACITY : (current * 3 / 2))
 
-void resize(DynamicU32Array *dArr, size_t newSize) {
+void resizeDynU32Arr(DynamicU32Array *dArr, size_t newSize) {
     if (newSize > 0) {
         u32 *newData = recomp_alloc(sizeof(*newData) * newSize);
 
@@ -42,7 +42,7 @@ void DynU32Arr_push(DynamicU32Array *dArr, u32 value) {
     size_t newCount = dArr->count + 1;
 
     if (newCount > dArr->capacity) {
-        resize(dArr, NEXT_CAPACITY(dArr->capacity));
+        resizeDynU32Arr(dArr, NEXT_CAPACITY(dArr->capacity));
     }
 
     dArr->data[dArr->count] = value;

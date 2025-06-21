@@ -319,6 +319,14 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
     return dl;
 }
 
+void refreshProxySingleDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
+    Gfx *dl = getFormProxyDL(formProxy, linkDLId);
+
+    if (dl) {
+        gSPDisplayList(&formProxy->wrappedDisplayLists[linkDLId].displayList[WRAPPED_DL_DRAW], dl);
+    }
+}
+
 void refreshProxyDLs(Link_FormProxy *formProxy) {
     WrappedDisplayList *wDLs = formProxy->wrappedDisplayLists;
     Link_ModelInfo *current = &formProxy->current;
@@ -604,31 +612,88 @@ void refreshFormProxy(Link_FormProxy *formProxy) {
     refreshProxyMatrixes(formProxy);
 }
 
-static DynamicU32Array sFormProxyRefreshRequestQueue;
-static U32HashsetHandle sFormProxyRefreshRequestSet;
+typedef struct {
+    DynamicU32Array dArr;
+    U32HashsetHandle set;
+} U32ArraySet;
+
+bool tryPushArraySet(U32ArraySet *arrSet, u32 value) {
+    if (recomputil_u32_hashset_insert(arrSet->set, value)) {
+        DynU32Arr_push(&arrSet->dArr, value);
+        return true;
+    }
+
+    return false;
+}
+
+static U32ArraySet sFormProxyFullRefreshRequests;
+
+static U32MemoryHashmapHandle sFormProxyDLRefreshRequests;
+static U32ArraySet sFormProxyDLRefreshRequestsForms;
 
 bool sIsFormProxyRefreshRequested[PLAYER_FORM_MAX];
 
 void requestRefreshFormProxy(Link_FormProxy *formProxy) {
+    tryPushArraySet(&sFormProxyFullRefreshRequests, (uintptr_t)formProxy);
+}
+
+void requestRefreshFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
+    U32ArraySet *requests = NULL;
     uintptr_t fp = (uintptr_t)formProxy;
-    if (recomputil_u32_hashset_insert(sFormProxyRefreshRequestSet, fp)) {
-        DynU32Arr_push(&sFormProxyRefreshRequestQueue, fp);
+
+    if (recomputil_u32_memory_hashmap_create(sFormProxyDLRefreshRequests, fp)) {
+        requests = recomputil_u32_memory_hashmap_get(sFormProxyDLRefreshRequests, fp);
+        requests->set = recomputil_create_u32_hashset();
+    }
+
+    if (!requests) {
+        requests = recomputil_u32_memory_hashmap_get(sFormProxyDLRefreshRequests, fp);
+    }
+
+    if (requests) {
+        tryPushArraySet(requests, linkDLId);
+        tryPushArraySet(&sFormProxyDLRefreshRequestsForms, fp);
     }
 }
 
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
-    for (size_t i = 0; i < sFormProxyRefreshRequestQueue.count; ++i) {
-        uintptr_t fp = sFormProxyRefreshRequestQueue.data[i];
+    for (size_t i = 0; i < sFormProxyFullRefreshRequests.dArr.count; ++i) {
+        uintptr_t fp = sFormProxyFullRefreshRequests.dArr.data[i];
 
         refreshFormProxy((Link_FormProxy *)fp);
-        recomputil_u32_hashset_erase(sFormProxyRefreshRequestSet, fp);
+
+        recomputil_u32_hashset_erase(sFormProxyFullRefreshRequests.set, fp);
     }
 
-    DynU32Arr_clear(&sFormProxyRefreshRequestQueue);
+    DynU32Arr_clear(&sFormProxyFullRefreshRequests.dArr);
+
+    // Handle single display lists
+    for (size_t i = 0; i < sFormProxyDLRefreshRequestsForms.dArr.count; ++i) {
+        uintptr_t fp = sFormProxyDLRefreshRequestsForms.dArr.data[i];
+
+        recomp_printf("formProxy: 0x%X\n", fp);
+        U32ArraySet *requests = recomputil_u32_memory_hashmap_get(sFormProxyDLRefreshRequests, fp);
+
+        if (requests) {
+            for (size_t j = 0; j < requests->dArr.count; ++j) {
+                recomp_printf("data: %d\n", requests->dArr.data[j]);
+                refreshProxySingleDL((Link_FormProxy *)fp, requests->dArr.data[j]);
+            }
+
+            DynU32Arr_clear(&requests->dArr);
+
+            // recomputil_destroy_u32_hashset(requests->set);
+            // recomputil_u32_memory_hashmap_erase(sFormProxyDLRefreshRequests, fp);
+        }
+    }
+
+    DynU32Arr_clear(&sFormProxyDLRefreshRequestsForms.dArr);
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initModelCommonHashObjs() {
-    sFormProxyRefreshRequestSet = recomputil_create_u32_hashset();
+    sFormProxyFullRefreshRequests.set = recomputil_create_u32_hashset();
+    sFormProxyDLRefreshRequests = recomputil_create_u32_memory_hashmap(sizeof(U32ArraySet));
+    sFormProxyDLRefreshRequestsForms.set = recomputil_create_u32_hashset();
 }

@@ -229,7 +229,7 @@ bool isValidZobj(void *data, size_t size) {
     bool isValid = data != NULL && size >= 0x5800;
 
     if (isValid) {
-        const char ML64_HEADER[] = "MODLOADER64";
+        static const char ML64_HEADER[] = "MODLOADER64";
 
         isValid = true;
 
