@@ -699,6 +699,15 @@ bool tryPushArraySet(U32ArraySet *arrSet, u32 value) {
     return false;
 }
 
+void clearArraySet(U32ArraySet *arrSet) {
+    for (size_t i = 0; i < arrSet->dArr.count; ++i) {
+        recomputil_u32_hashset_erase(arrSet->set, arrSet->dArr.data[i]);
+    }
+
+    DynU32Arr_clear(&arrSet->dArr);
+
+}
+
 static U32ArraySet sFormProxyFullRefreshRequests;
 
 static U32MemoryHashmapHandle sFormProxyDLRefreshRequests;
@@ -733,11 +742,9 @@ void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
         uintptr_t fp = sFormProxyFullRefreshRequests.dArr.data[i];
 
         refreshFormProxy((Link_FormProxy *)fp);
-
-        recomputil_u32_hashset_erase(sFormProxyFullRefreshRequests.set, fp);
     }
 
-    DynU32Arr_clear(&sFormProxyFullRefreshRequests.dArr);
+    clearArraySet(&sFormProxyFullRefreshRequests);
 
     // Handle single display lists
     for (size_t i = 0; i < sFormProxyDLRefreshRequestsForms.dArr.count; ++i) {
@@ -750,14 +757,14 @@ void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
                 refreshProxySingleDL((Link_FormProxy *)fp, requests->dArr.data[j]);
             }
 
-            DynU32Arr_clear(&requests->dArr);
+            clearArraySet(requests);
 
             // recomputil_destroy_u32_hashset(requests->set);
             // recomputil_u32_memory_hashmap_erase(sFormProxyDLRefreshRequests, fp);
         }
     }
 
-    DynU32Arr_clear(&sFormProxyDLRefreshRequestsForms.dArr);
+    clearArraySet(&sFormProxyDLRefreshRequestsForms);
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
