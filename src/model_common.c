@@ -157,7 +157,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     shims[LINK_SHIMDL_FPS_RHAND_HOOKSHOT] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_FPS_HOOKSHOT]);
 
     shims[LINK_SHIMDL_SHIELD1_ODD] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD1_ODD], &dls[LINK_DL_SHIELD1], gPopModelViewMtx);
-    
+
     shims[LINK_SHIMDL_CENTER_FLOWER_PROPELLER_CLOSED] = createShimDisplayList(2, &dls[LINK_DL_FLOWER_PROPELLER_CLOSED], &dls[LINK_DL_FLOWER_CENTER_CLOSED]);
     shims[LINK_SHIMDL_CENTER_FLOWER_PROPELLER_OPEN] = createShimDisplayList(2, &dls[LINK_DL_FLOWER_PROPELLER_OPEN], &dls[LINK_DL_FLOWER_CENTER_OPEN]);
 
@@ -319,11 +319,71 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
     return dl;
 }
 
+void overrideFormDL(Link_FormProxy *formProxy, PlayerTransformation overrideForm, Link_DisplayList dlId) {
+    if (formProxy->form != overrideForm && !getListenerDL(formProxy, dlId)) {
+        if (gLinkFormProxies[overrideForm].current.models[dlId]) {
+            gSPDisplayList(&formProxy->wrappedDisplayLists[dlId].displayList[WRAPPED_DL_DRAW], &gLinkFormProxies[overrideForm].displayLists[dlId]);
+        }
+    }
+}
+
 void refreshProxySingleDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
     Gfx *dl = getFormProxyDL(formProxy, linkDLId);
 
     if (dl) {
         gSPDisplayList(&formProxy->wrappedDisplayLists[linkDLId].displayList[WRAPPED_DL_DRAW], dl);
+    }
+
+    switch (linkDLId) {
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN:
+            overrideFormDL(formProxy, PLAYER_FORM_HUMAN, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN);
+            break;
+
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU:
+            overrideFormDL(formProxy, PLAYER_FORM_DEKU, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU);
+            break;
+
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON:
+            overrideFormDL(formProxy, PLAYER_FORM_GORON, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON);
+            break;
+
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA:
+            overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA);
+
+        case LINK_DL_MASK_DEKU:
+            overrideFormDL(formProxy, PLAYER_FORM_DEKU, LINK_DL_MASK_DEKU);
+            break;
+
+        case LINK_DL_MASK_GORON:
+            overrideFormDL(formProxy, PLAYER_FORM_GORON, LINK_DL_MASK_GORON);
+            break;
+
+        case LINK_DL_MASK_ZORA:
+            overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_MASK_ZORA);
+            break;
+
+        case LINK_DL_MASK_FIERCE_DEITY:
+            overrideFormDL(formProxy, PLAYER_FORM_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY);
+            break;
+
+        case LINK_DL_MASK_DEKU_SCREAM:
+            overrideFormDL(formProxy, PLAYER_FORM_DEKU, LINK_DL_MASK_DEKU_SCREAM);
+            break;
+
+        case LINK_DL_MASK_GORON_SCREAM:
+            overrideFormDL(formProxy, PLAYER_FORM_GORON, LINK_DL_MASK_GORON_SCREAM);
+            break;
+
+        case LINK_DL_MASK_ZORA_SCREAM:
+            overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_MASK_ZORA_SCREAM);
+            break;
+
+        case LINK_DL_MASK_FIERCE_DEITY_SCREAM:
+            overrideFormDL(formProxy, PLAYER_FORM_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY_SCREAM);
+            break;
+
+        default:
+            break;
     }
 }
 
@@ -353,7 +413,7 @@ void refreshProxyDLs(Link_FormProxy *formProxy) {
     }
 
     // disable hilt for Great Fairy Sword if replaced
-    Gfx* listenerGFSwordDL = getListenerDL(formProxy, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
+    Gfx *listenerGFSwordDL = getListenerDL(formProxy, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
     if (listenerGFSwordDL) {
         gSPDisplayList(&wDLs[LINK_DL_SWORD_GREAT_FAIRY_HILT].displayList[WRAPPED_DL_DRAW], gEmptyDL);
     }
@@ -363,6 +423,21 @@ void refreshProxyDLs(Link_FormProxy *formProxy) {
     if (listenerFDSwordDL) {
         gSPDisplayList(&wDLs[LINK_DL_SWORD_GREAT_FAIRY_HILT].displayList[WRAPPED_DL_DRAW], gEmptyDL);
     }
+
+    overrideFormDL(formProxy, PLAYER_FORM_HUMAN, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN);
+    overrideFormDL(formProxy, PLAYER_FORM_DEKU, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU);
+    overrideFormDL(formProxy, PLAYER_FORM_GORON, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON);
+    overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA);
+
+    overrideFormDL(formProxy, PLAYER_FORM_DEKU, LINK_DL_MASK_DEKU);
+    overrideFormDL(formProxy, PLAYER_FORM_GORON, LINK_DL_MASK_GORON);
+    overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_MASK_ZORA);
+    overrideFormDL(formProxy, PLAYER_FORM_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY);
+
+    overrideFormDL(formProxy, PLAYER_FORM_DEKU, LINK_DL_MASK_DEKU_SCREAM);
+    overrideFormDL(formProxy, PLAYER_FORM_GORON, LINK_DL_MASK_GORON_SCREAM);
+    overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_MASK_ZORA_SCREAM);
+    overrideFormDL(formProxy, PLAYER_FORM_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY_SCREAM);
 }
 
 extern TexturePtr sPlayerEyesTextures[];
