@@ -179,15 +179,17 @@ void initFormProxies() {
     refreshFaceTextures();
 }
 
-RECOMP_HOOK_RETURN("Player_Init")
-void refreshDLs_on_return_PlayerInit() {
-    refreshFaceTextures();
+RECOMP_HOOK("Player_Init")
+void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
+    if ((Player *)thisx == GET_PLAYER(play)) {
+        refreshFaceTextures();
 
-    refreshExternalDLs(GET_PLAYER_FORM_PROXY);
+        refreshExternalDLs(GET_PLAYER_FORM_PROXY);
 
-    refreshSharedModels();
+        refreshSharedModels();
 
-    gIsAgePropertyRefreshRequested = true;
+        gIsAgePropertyRefreshRequested = true;
+    }
 }
 
 RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());

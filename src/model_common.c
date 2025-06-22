@@ -320,10 +320,8 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
 }
 
 void overrideFormDL(Link_FormProxy *formProxy, PlayerTransformation overrideForm, Link_DisplayList dlId) {
-    if (formProxy->form != overrideForm && !getListenerDL(formProxy, dlId)) {
-        if (gLinkFormProxies[overrideForm].current.models[dlId]) {
-            gSPDisplayList(&formProxy->wrappedDisplayLists[dlId].displayList[WRAPPED_DL_DRAW], &gLinkFormProxies[overrideForm].displayLists[dlId]);
-        }
+    if (formProxy->form != overrideForm) {
+        gSPDisplayList(&formProxy->wrappedDisplayLists[dlId].displayList[WRAPPED_DL_DRAW], &gLinkFormProxies[overrideForm].displayLists[dlId]);
     }
 }
 
