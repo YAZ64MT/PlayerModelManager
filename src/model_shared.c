@@ -264,8 +264,6 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_017180, LINK_DL_BODY_SHIELD_BODY);
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_017620, LINK_DL_BODY_SHIELD_HEAD);
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_016A88, LINK_DL_BODY_SHIELD_ARMS_AND_LEGS);
-
-    // TODO: FINISH IMPLEMENTING GORON LINK
 }
 
 RECOMP_CALLBACK(".", _internal_onReadyFormProxies)
