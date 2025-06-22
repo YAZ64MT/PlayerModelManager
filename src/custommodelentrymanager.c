@@ -11,6 +11,7 @@
 #include "defines_mmo.h"
 #include "defines_ooto.h"
 #include "proxymm_kv_api.h"
+#include "playermodelmanager_api.h"
 
 #define ARRAY_GROWTH_FACTOR 3 / 2
 #define ARRAY_STARTING_SIZE 16
@@ -18,7 +19,7 @@
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
 static U32MemoryHashmapHandle sHandleToMemoryEntry;
-static PlayerModelHandle sNextMemoryHandle = 1;
+static PlayerModelManagerFormHandle sNextMemoryHandle = 1;
 
 typedef struct {
     void **entries;
@@ -29,7 +30,7 @@ typedef struct {
 static CustomModelEntries sDiskEntries[PLAYER_FORM_MAX];
 static CustomModelEntries sMemoryEntries[PLAYER_FORM_MAX];
 
-static CustomModelEntry *sCurrentModelEntries[PLAYER_FORM_MAX];
+static FormModelEntry *sCurrentModelEntries[PLAYER_FORM_MAX];
 
 static char *sZobjDir;
 
@@ -102,11 +103,11 @@ void *CMEM_loadFromDisk(PlayerTransformation form, const char *path) {
     return sDiskBuffers[form].buffer;
 }
 
-CustomModelEntry *CMEM_getCurrentEntry(PlayerTransformation form) {
+FormModelEntry *CMEM_getCurrentEntry(PlayerTransformation form) {
     return sCurrentModelEntries[form];
 }
 
-void CMEM_setCurrentEntry(PlayerTransformation form, CustomModelEntry *e) {
+void CMEM_setCurrentEntry(PlayerTransformation form, FormModelEntry *e) {
     sCurrentModelEntries[form] = e;
 }
 
@@ -173,9 +174,9 @@ void clearDiskEntries(PlayerTransformation form) {
 
 RECOMP_DECLARE_EVENT(_internal_onModelApplied(PlayerTransformation form));
 
-bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry) {
+bool CMEM_tryApplyEntry(PlayerTransformation form, FormModelEntry *newEntry) {
     Link_FormProxy *proxy = &gLinkFormProxies[form];
-    CustomModelEntry *currEntry = CMEM_getCurrentEntry(form);
+    FormModelEntry *currEntry = CMEM_getCurrentEntry(form);
     if (newEntry != currEntry) {
         if (newEntry == NULL) {
             CMEM_removeModel(form);
@@ -183,17 +184,17 @@ bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry) {
         }
 
         if (newEntry->applyToModelInfo(newEntry, &proxy->current)) {
-            if (currEntry && currEntry->onModelUnload) {
-                currEntry->onModelUnload(currEntry->onModelUnloadData);
-            }
-
-            if (newEntry->onModelLoad) {
-                newEntry->onModelLoad(newEntry->onModelLoadData);
+            if (currEntry && currEntry->callback) {
+                currEntry->callback(currEntry->handle, PMM_EVENT_MODEL_REMOVED, currEntry->callbackData);
             }
 
             CMEM_setCurrentEntry(form, newEntry);
 
             _internal_onModelApplied(form);
+
+            if (newEntry->callback) {
+                newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, newEntry->callbackData);
+            }
 
             return true;
         }
@@ -202,7 +203,7 @@ bool CMEM_tryApplyEntry(PlayerTransformation form, CustomModelEntry *newEntry) {
     return false;
 }
 
-CustomModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *count) {
+FormModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *count) {
     size_t combinedLength = sDiskEntries[form].count + sMemoryEntries[form].count;
 
     if (combinedLength == 0) {
@@ -210,7 +211,7 @@ CustomModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *co
         return NULL;
     }
 
-    CustomModelEntry **combined = recomp_alloc(sizeof(*combined) * combinedLength);
+    FormModelEntry **combined = recomp_alloc(sizeof(*combined) * combinedLength);
 
     for (size_t i = 0; i < sMemoryEntries[form].count; ++i) {
         combined[i] = sMemoryEntries[form].entries[i];
@@ -366,7 +367,7 @@ void CMEM_refreshDiskEntries() {
 
         for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
 
-            CustomModelEntry *currentEntry = CMEM_getCurrentEntry(i);
+            FormModelEntry *currentEntry = CMEM_getCurrentEntry(i);
 
             if (currentEntry) {
                 entryNames[i] = recomp_alloc(strlen(currentEntry->internalName) + 1);
@@ -401,7 +402,7 @@ void CMEM_refreshDiskEntries() {
                 if (isValid) {
                     CustomModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
 
-                    CustomModelType modelType = CUSTOM_MODEL_TYPE_NONE;
+                    FormModelType modelType = PMM_FORM_MODEL_TYPE_NONE;
 
                     u8 *data = sDiskBuffers[PLAYER_FORM_HUMAN].buffer;
 
@@ -410,13 +411,13 @@ void CMEM_refreshDiskEntries() {
                     switch (data[Z64O_FORM_BYTE]) {
                         case MMO_FORM_BYTE_CHILD:
                         case OOTO_FORM_BYTE_CHILD:
-                            modelType = CUSTOM_MODEL_TYPE_CHILD;
+                            modelType = PMM_FORM_MODEL_TYPE_CHILD;
                             form = PLAYER_FORM_HUMAN;
                             break;
 
                         case MMO_FORM_BYTE_ADULT:
                         case OOTO_FORM_BYTE_ADULT:
-                            modelType = CUSTOM_MODEL_TYPE_ADULT;
+                            modelType = PMM_FORM_MODEL_TYPE_ADULT;
                             form = PLAYER_FORM_HUMAN;
                             break;
 
@@ -469,8 +470,13 @@ void CMEM_refreshDiskEntries() {
 void CMEM_removeModel(PlayerTransformation form) {
     Link_FormProxy *proxy = &gLinkFormProxies[form];
 
-    if (sCurrentModelEntries[form]) {
-        sCurrentModelEntries[form]->onModelUnload(sCurrentModelEntries[form]->onModelUnloadData);
+    FormModelEntry *currentEntry = sCurrentModelEntries[form];
+
+    if (currentEntry) {
+        if (currentEntry->callback) {
+            currentEntry->callback(currentEntry->handle, PMM_EVENT_MODEL_REMOVED, currentEntry->callbackData);
+        }
+
         sCurrentModelEntries[form] = NULL;
 
         clearLinkModelInfo(&proxy->current);
@@ -481,26 +487,26 @@ void CMEM_removeModel(PlayerTransformation form) {
     }
 }
 
-PlayerTransformation getFormFromModelType(CustomModelType t) {
+PlayerTransformation getFormFromModelType(FormModelType t) {
     switch (t) {
-        case CUSTOM_MODEL_TYPE_CHILD:
-        case CUSTOM_MODEL_TYPE_ADULT:
+        case PMM_FORM_MODEL_TYPE_CHILD:
+        case PMM_FORM_MODEL_TYPE_ADULT:
             return PLAYER_FORM_HUMAN;
             break;
 
-        case CUSTOM_MODEL_TYPE_DEKU:
+        case PMM_FORM_MODEL_TYPE_DEKU:
             return PLAYER_FORM_DEKU;
             break;
 
-        case CUSTOM_MODEL_TYPE_GORON:
+        case PMM_FORM_MODEL_TYPE_GORON:
             return PLAYER_FORM_GORON;
             break;
 
-        case CUSTOM_MODEL_TYPE_ZORA:
+        case PMM_FORM_MODEL_TYPE_ZORA:
             return PLAYER_FORM_ZORA;
             break;
 
-        case CUSTOM_MODEL_TYPE_FIERCE_DEITY:
+        case PMM_FORM_MODEL_TYPE_FIERCE_DEITY:
             return PLAYER_FORM_FIERCE_DEITY;
             break;
 
@@ -512,8 +518,8 @@ PlayerTransformation getFormFromModelType(CustomModelType t) {
     return 0;
 }
 
-PlayerModelHandle CMEM_createMemoryHandle(PlayerTransformation form) {
-    PlayerModelHandle handle = sNextMemoryHandle;
+PlayerModelManagerFormHandle CMEM_createMemoryHandle(PlayerTransformation form) {
+    PlayerModelManagerFormHandle handle = sNextMemoryHandle;
 
     sNextMemoryHandle++;
 
@@ -523,12 +529,14 @@ PlayerModelHandle CMEM_createMemoryHandle(PlayerTransformation form) {
 
     CustomModelMemoryEntry_init(entry);
 
+    entry->modelEntry.handle = handle;
+
     pushMemoryEntry(form, entry);
 
     return handle;
 }
 
-CustomModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelHandle h) {
+CustomModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerFormHandle h) {
     return recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, h);
 }
 

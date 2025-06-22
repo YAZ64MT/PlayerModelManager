@@ -3,41 +3,33 @@
 
 #include "global.h"
 #include "playermodelmanager.h"
+#include "playermodelmanager_api.h"
 
 // This is the max file name length for most Linux distros and MacOS
 #define INTERNAL_NAME_MAX_LENGTH 255
 
-typedef enum {
-    CUSTOM_MODEL_TYPE_NONE,
-    CUSTOM_MODEL_TYPE_CHILD,
-    CUSTOM_MODEL_TYPE_ADULT,
-    CUSTOM_MODEL_TYPE_DEKU,
-    CUSTOM_MODEL_TYPE_GORON,
-    CUSTOM_MODEL_TYPE_ZORA,
-    CUSTOM_MODEL_TYPE_FIERCE_DEITY
-} CustomModelType;
+typedef PlayerModelManager_FormModelType FormModelType;
 
-typedef struct CustomModelEntry {
-    CustomModelType type;
+typedef struct FormModelEntry {
+    FormModelType type;
     char *displayName;
     char *internalName;
     char *authorName;
     bool (*applyToModelInfo)(void *this, Link_ModelInfo *modelInfo);
-    void (*onModelLoad)(void *userdata);
-    void *onModelLoadData;
-    void (*onModelUnload)(void *userdata);
-    void *onModelUnloadData;
+    PlayerModelManagerEventHandler* callback;
+    void *callbackData;
+    PlayerModelManagerFormHandle handle;
     u64 flags;
-} CustomModelEntry;
+} FormModelEntry;
 
 typedef struct {
-    CustomModelEntry modelEntry;
+    FormModelEntry modelEntry;
     char *filePath;
     void *fileData;
 } CustomModelDiskEntry;
 
 typedef struct {
-    CustomModelEntry modelEntry;
+    FormModelEntry modelEntry;
     Gfx *displayListPtrs[LINK_DL_MAX];
     Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
     FlexSkeletonHeader *skel;
@@ -46,11 +38,11 @@ typedef struct {
     TexturePtr *mouthTex;
 } CustomModelMemoryEntry;
 
-void CustomModelEntry_init(CustomModelEntry *entry);
+void FormModelEntry_init(FormModelEntry *entry);
 
 void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this);
 
-void CustomModelDiskEntry_init(CustomModelDiskEntry *this, CustomModelType type);
+void CustomModelDiskEntry_init(CustomModelDiskEntry *this, FormModelType type);
 
 void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this);
 

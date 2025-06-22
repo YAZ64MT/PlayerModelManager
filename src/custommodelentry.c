@@ -6,15 +6,14 @@
 #include "playermodelmanager_utils.h"
 #include "custommodelentrymanager.h"
 
-void CustomModelEntry_init(CustomModelEntry *this) {
+void FormModelEntry_init(FormModelEntry *this) {
     this->displayName = NULL;
     this->internalName = NULL;
     this->authorName = NULL;
     this->flags = 0;
-    this->onModelLoad = NULL;
-    this->onModelLoadData = NULL;
-    this->onModelUnload = NULL;
-    this->onModelUnloadData = NULL;
+    this->callback = NULL;
+    this->callbackData = NULL;
+    this->handle = 0;
     this->applyToModelInfo = NULL;
 }
 
@@ -62,24 +61,24 @@ bool applyCustomModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
     PlayerTransformation form = PLAYER_FORM_HUMAN;
 
     switch (this->modelEntry.type) {
-        case CUSTOM_MODEL_TYPE_ADULT:
-        case CUSTOM_MODEL_TYPE_CHILD:
+        case PMM_FORM_MODEL_TYPE_ADULT:
+        case PMM_FORM_MODEL_TYPE_CHILD:
             form = PLAYER_FORM_HUMAN;
             break;
         
-        case CUSTOM_MODEL_TYPE_DEKU:
+        case PMM_FORM_MODEL_TYPE_DEKU:
             form = PLAYER_FORM_DEKU;
             break;
 
-        case CUSTOM_MODEL_TYPE_GORON:
+        case PMM_FORM_MODEL_TYPE_GORON:
             form = PLAYER_FORM_GORON;
             break;
 
-        case CUSTOM_MODEL_TYPE_ZORA:
+        case PMM_FORM_MODEL_TYPE_ZORA:
             form = PLAYER_FORM_ZORA;
             break;
 
-        case CUSTOM_MODEL_TYPE_FIERCE_DEITY:
+        case PMM_FORM_MODEL_TYPE_FIERCE_DEITY:
             form = PLAYER_FORM_FIERCE_DEITY;
             break;
 
@@ -100,14 +99,16 @@ bool applyCustomModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
-void unloadCustomModelDiskEntry(void *userdata) {
-    CustomModelDiskEntry *this = userdata;
+void customModelDiskEntryCallback(PlayerModelManagerFormHandle h, PlayerModelManager_ModelEvent evt, void *userdata) {
+    if (evt == PMM_EVENT_MODEL_REMOVED) {
+        CustomModelDiskEntry *this = userdata;
 
-    this->fileData = NULL;
+        this->fileData = NULL;
+    }
 }
 
 void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this) {
-    CustomModelEntry_init(&this->modelEntry);
+    FormModelEntry_init(&this->modelEntry);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         this->displayListPtrs[i] = NULL;
@@ -126,16 +127,16 @@ void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this) {
     this->eyesTex = NULL;
 }
 
-void CustomModelDiskEntry_init(CustomModelDiskEntry *this, CustomModelType type) {
-    CustomModelEntry_init(&this->modelEntry);
+void CustomModelDiskEntry_init(CustomModelDiskEntry *this, FormModelType type) {
+    FormModelEntry_init(&this->modelEntry);
 
     this->fileData = NULL;
 
     this->filePath = NULL;
 
     this->modelEntry.applyToModelInfo = applyCustomModelDiskEntry;
-    this->modelEntry.onModelUnload = unloadCustomModelDiskEntry;
-    this->modelEntry.onModelUnloadData = this;
+    this->modelEntry.callback = customModelDiskEntryCallback;
+    this->modelEntry.callbackData = this;
     this->modelEntry.type = type;
 }
 
@@ -147,7 +148,7 @@ void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this) {
         this->filePath = NULL;
     }
 
-    CustomModelEntry *entry = &this->modelEntry;
+    FormModelEntry *entry = &this->modelEntry;
 
     if (entry->displayName) {
         recomp_free(entry->displayName);

@@ -4,13 +4,13 @@
 #include "global.h"
 #include "modding.h"
 
-typedef unsigned long PlayerModelManagerHandle;
+typedef unsigned long PlayerModelManagerFormHandle;
 
 // Used for keeping compatibility between versions
 // DO NOT EDIT
 #define PMM_API_VERSION 1UL
 
-#define YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME "yazmt_mm_playermodelmanager"
+#define YAZMT_PMM_MOD_NAME "yazmt_mm_playermodelmanager"
 
 typedef enum {
     PMM_DL_WAIST,
@@ -206,14 +206,24 @@ typedef enum {
 #define PMM_MTX_SHIELD_MIRROR_BACK PMM_MTX_SHIELD3_BACK
 
 typedef enum {
-    PMM_MODEL_TYPE_NONE,
-    PMM_MODEL_TYPE_CHILD,
-    PMM_MODEL_TYPE_ADULT,
-    PMM_MODEL_TYPE_DEKU,
-    PMM_MODEL_TYPE_GORON,
-    PMM_MODEL_TYPE_ZORA,
-    PMM_MODEL_TYPE_FIERCE_DEITY
-} PlayerModelManager_ModelType;
+    PMM_FORM_MODEL_TYPE_NONE,
+    PMM_FORM_MODEL_TYPE_CHILD,
+    PMM_FORM_MODEL_TYPE_ADULT,
+    PMM_FORM_MODEL_TYPE_DEKU,
+    PMM_FORM_MODEL_TYPE_GORON,
+    PMM_FORM_MODEL_TYPE_ZORA,
+    PMM_FORM_MODEL_TYPE_FIERCE_DEITY,
+    PMM_FORM_MODEL_TYPE_MAX
+} PlayerModelManager_FormModelType;
+
+typedef enum {
+    PMM_EVENT_MODEL_APPLIED,
+    PMM_EVENT_MODEL_REMOVED,
+} PlayerModelManager_ModelEvent;
+
+typedef void PlayerModelManagerEventHandler(PlayerModelManagerFormHandle handle, PlayerModelManager_ModelEvent event, void *userdata);
+
+#ifndef YAZMT_PMM_NO_API_IMPORTS
 
 // Registers a new player model and returns a handle to it.
 //
@@ -222,41 +232,43 @@ typedef enum {
 // Choose a unique string identifier. It will not show up in the menu if you set a display name, so it need not be human readable.
 // There is a maximum length of 255 characters.
 //
-// Choose a model type from the PlayerModelManager_ModelType enum. For now, only PMM_MODEL_TYPE_CHILD and PMM_MODEL_TYPE_ADULT are supported.
+// Choose a model type from the PlayerModelManager_FormModelType enum. For now, only PMM_FORM_MODEL_TYPE_CHILD and PMM_FORM_MODEL_TYPE_ADULT are supported.
 //
 // This function can only be used during the PlayerModelManager_onRegisterModels event. Otherwise, an invalid handle will be returned.
-#define PLAYERMODELMANAGER_REGISTER_PLAYER_MODEL(internalName, modelType) PlayerModelManager_registerPlayerModel(PMM_API_VERSION, id, modelType)
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, PlayerModelManagerHandle PlayerModelManager_registerPlayerModel(unsigned long apiVersion, char *id, PlayerModelManager_ModelType modelType));
+#define PLAYERMODELMANAGER_REGISTER_FORM_MODEL(internalName, modelType) PlayerModelManager_registerFormModel(PMM_API_VERSION, id, modelType)
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, char *id, PlayerModelManager_FormModelType modelType));
 
 // Sets the name that will appear in the menu for the passed in model handle.
 //
 // Limited to 64 characters.
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool PlayerModelManager_setDisplayName(PlayerModelManagerHandle h, char *displayName));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandle h, char *displayName));
 
 // Sets the name that will appear in the author field of the menu.
 //
 // Limited to 128 characters.
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool PlayerModelManager_setAuthor(PlayerModelManagerHandle h, char *author));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, char *author));
 
-// 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool PlayerModelManager_setDL(PlayerModelManagerHandle h, PlayerModelManager_DisplayListId dlId, Gfx *dl));
+// Set a display list on the model. The ID can be obtained from PlayerModelManager_DisplayListId
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDL(PlayerModelManagerFormHandle h, PlayerModelManager_DisplayListId dlId, Gfx *dl));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool PlayerModelManager_setMtx(PlayerModelManagerHandle h, PlayerModelManager_MatrixId mtxId, Mtx *matrix));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMtx(PlayerModelManagerFormHandle h, PlayerModelManager_MatrixId mtxId, Mtx *matrix));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool PlayerModelManager_setLoadCallback(PlayerModelManagerHandle h, void (*onModelLoad)(void *), void *userdata));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setCallback(PlayerModelManagerFormHandle h, PlayerModelManagerEventHandler *callback, void *userdata));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool PlayerModelManager_setUnloadCallback(PlayerModelManagerHandle h, void (*onModelUnload)(void *), void *userdata));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setSkeleton(PlayerModelManagerFormHandle h, FlexSkeletonHeader *skel));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setEyesTextures(PlayerModelManagerFormHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool PlayerModelManager_setEyesTextures(PlayerModelManagerHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMouthTextures(PlayerModelManagerFormHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getDL(unsigned long apiVersion, PlayerTransformation form, PlayerModelManager_DisplayListId dl));
 
-RECOMP_IMPORT(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, Gfx *PlayerModelManager_getDL(unsigned long apiVersion, PlayerTransformation form, PlayerModelManager_DisplayListId dl));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isApplied(PlayerModelManagerFormHandle h));
 
 #define PLAYERMODELMANAGER_GET_FORM_DISPLAY_LIST(form, displayListId) PlayerModelManager_getDL(PMM_API_VERSION, form, displayListId)
 
-#define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_Z64_PLAYER_MODEL_MANAGER_MOD_NAME, onRegisterModels)
+#define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
+
+#endif
 
 #endif

@@ -12,7 +12,8 @@
             "defines": [
                 "F3DEX_GBI_2",
                 "_LANGUAGE_C",
-                "MIPS"
+                "MIPS",
+                "YAZMT_PMM_NO_API_IMPORTS"
             ],
             "compilerPath": "clang",
             "cStandard": "c99",

@@ -672,12 +672,10 @@ void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
     for (size_t i = 0; i < sFormProxyDLRefreshRequestsForms.dArr.count; ++i) {
         uintptr_t fp = sFormProxyDLRefreshRequestsForms.dArr.data[i];
 
-        recomp_printf("formProxy: 0x%X\n", fp);
         U32ArraySet *requests = recomputil_u32_memory_hashmap_get(sFormProxyDLRefreshRequests, fp);
 
         if (requests) {
             for (size_t j = 0; j < requests->dArr.count; ++j) {
-                recomp_printf("data: %d\n", requests->dArr.data[j]);
                 refreshProxySingleDL((Link_FormProxy *)fp, requests->dArr.data[j]);
             }
 

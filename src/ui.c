@@ -11,7 +11,7 @@ void refreshFileList();
 void refreshButtonEntryColors();
 
 typedef struct {
-    CustomModelEntry *modelEntry;
+    FormModelEntry *modelEntry;
     RecompuiResource button;
 } ListEntry;
 
@@ -46,7 +46,7 @@ RecompuiResource labelUiTitle;
 RecompuiResource labellabelModelAuthorPrefix;
 RecompuiResource labelModelAuthor;
 
-static CustomModelEntry *sRealEntries[PLAYER_FORM_MAX];
+static FormModelEntry *sRealEntries[PLAYER_FORM_MAX];
 
 static bool sIsDiskSaveNeeded = false;
 
@@ -445,7 +445,7 @@ static const ButtonColor sModelSelectedButtonColor = {
 };
 
 typedef struct {
-    CustomModelEntry **entries;
+    FormModelEntry **entries;
     RecompuiResource *buttons;
     size_t count;
     size_t capacity;
@@ -467,9 +467,9 @@ void refreshButtonEntryColors() {
 }
 
 void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
-    CustomModelEntry *entry = userdata;
+    FormModelEntry *entry = userdata;
 
-    if (entry->type != CUSTOM_MODEL_TYPE_NONE) {
+    if (entry->type != PMM_FORM_MODEL_TYPE_NONE) {
         if (data->type == UI_EVENT_CLICK) {
             Audio_PlaySfx(NA_SE_SY_DECIDE);
             CMEM_tryApplyEntry(getFormFromModelType(entry->type), entry);
