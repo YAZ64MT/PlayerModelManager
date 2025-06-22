@@ -25,7 +25,7 @@ typedef struct {
     Link_DisplayList linkDLId;
 } ModelReplacement;
 
-#define DECLARE_REPLACEMENT(objectId, vanillaDispList, linkDL) {.handle = 0, .vanillaDL = vanillaDispList,.objId = objectId, .linkDLId = LINK_DL_##linkDL}
+#define DECLARE_REPLACEMENT(objectId, vanillaDispList, linkDL) {.handle = 0, .vanillaDL = vanillaDispList, .objId = objectId, .linkDLId = LINK_DL_##linkDL}
 
 static ModelReplacement sModelReplacements[] = {
     DECLARE_REPLACEMENT(GAMEPLAY_KEEP, gBottleGlassDL, BOTTLE_GLASS),
@@ -102,11 +102,17 @@ static ModelReplacement sModelReplacements[] = {
     DECLARE_REPLACEMENT(GAMEPLAY_KEEP, object_mask_goron_DL_0014A0, MASK_GORON_SCREAM),
     DECLARE_REPLACEMENT(GAMEPLAY_KEEP, object_mask_zora_DL_000DB0, MASK_ZORA_SCREAM),
     DECLARE_REPLACEMENT(GAMEPLAY_KEEP, object_mask_nuts_DL_001D90, MASK_DEKU_SCREAM),
+
+    DECLARE_REPLACEMENT(GAMEPLAY_KEEP, gElegyShellHumanDL, ELEGY_OF_EMPTINESS_STATUE_HUMAN),
+    DECLARE_REPLACEMENT(GAMEPLAY_KEEP, gElegyShellDekuDL, ELEGY_OF_EMPTINESS_STATUE_DEKU),
+    DECLARE_REPLACEMENT(GAMEPLAY_KEEP, gElegyShellGoronDL, ELEGY_OF_EMPTINESS_STATUE_GORON),
+    DECLARE_REPLACEMENT(GAMEPLAY_KEEP, gElegyShellZoraDL, ELEGY_OF_EMPTINESS_STATUE_ZORA),
+
 };
 
 #undef DECLARE_REPLACEMENT
 
-MODEL_REPLACER_CALLBACK_ON_REGISTER_REPLACERS 
+MODEL_REPLACER_CALLBACK_ON_REGISTER_REPLACERS
 void setupCodeReplacements() {
     initPlayerLibDLs();
 
