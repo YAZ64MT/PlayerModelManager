@@ -264,6 +264,12 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_017180, LINK_DL_BODY_SHIELD_BODY);
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_017620, LINK_DL_BODY_SHIELD_HEAD);
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_016A88, LINK_DL_BODY_SHIELD_ARMS_AND_LEGS);
+
+    // Elegy of Emptiness Statues
+    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellHumanDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellDekuDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellGoronDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellZoraDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA);
 }
 
 RECOMP_CALLBACK(".", _internal_onReadyFormProxies)
