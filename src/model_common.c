@@ -704,8 +704,6 @@ static U32ArraySet sFormProxyFullRefreshRequests;
 static U32MemoryHashmapHandle sFormProxyDLRefreshRequests;
 static U32ArraySet sFormProxyDLRefreshRequestsForms;
 
-bool sIsFormProxyRefreshRequested[PLAYER_FORM_MAX];
-
 void requestRefreshFormProxy(Link_FormProxy *formProxy) {
     tryPushArraySet(&sFormProxyFullRefreshRequests, (uintptr_t)formProxy);
 }
