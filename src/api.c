@@ -23,6 +23,12 @@ void refreshProxyIfEntryLoaded(CustomModelMemoryEntry *entry) {
     }
 }
 
+void refreshProxyDLIfEntryLoaded(CustomModelMemoryEntry *entry, Link_DisplayList dlId) {
+    if (isEntryLoaded(entry)) {
+        requestRefreshFormProxyDL(&gLinkFormProxies[getFormFromModelType(entry->modelEntry.type)], dlId);
+    }
+}
+
 bool isStrTooLong(const char *s, size_t maxLen) {
     size_t length = 0;
 
@@ -201,7 +207,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDL(PlayerModelManagerFormHandle h, Link
 
     entry->displayListPtrs[dlId] = dl;
 
-    refreshProxyIfEntryLoaded(entry);
+    refreshProxyDLIfEntryLoaded(entry, dlId);
 
     return true;
 }
