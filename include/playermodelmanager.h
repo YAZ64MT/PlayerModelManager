@@ -28,6 +28,14 @@ typedef enum {
     LINK_DL_LHAND_BOTTLE,
     LINK_DL_LHAND_GUITAR,
     LINK_DL_RFIST,
+
+    // Swords:
+    //      1: Kokiri Sword
+    //      2: Razor Sword
+    //      3: Master Sword / Gilded Sword
+    //      4: Giant's Knife / Biggoron Sword / Fierce Deity's Sword
+    //      5: Great Fairy Sword
+
     LINK_DL_SWORD1_SHEATH,
     LINK_DL_SWORD2_SHEATH,
     LINK_DL_SWORD3_SHEATH,
@@ -45,10 +53,10 @@ typedef enum {
     LINK_DL_SWORD4_BLADE_BROKEN,
     LINK_DL_SWORD4_BLADE_FRAGMENT,
     LINK_DL_SWORD5_BLADE,
-    LINK_DL_SHIELD1,
-    LINK_DL_SHIELD2,
-    LINK_DL_SHIELD3,
-    LINK_DL_SHIELD3_RAY,
+    LINK_DL_SHIELD1,     // Deku Shield
+    LINK_DL_SHIELD2,     // Hylian Shield / Hero's Shield
+    LINK_DL_SHIELD3,     // Mirror Shield
+    LINK_DL_SHIELD3_RAY, // Mirror Shield Projection
     LINK_DL_BOTTLE_GLASS,
     LINK_DL_BOTTLE_CONTENTS,
     LINK_DL_OCARINA_FAIRY,
@@ -74,14 +82,14 @@ typedef enum {
     LINK_DL_MASK_TRUTH,
     LINK_DL_MASK_KAFEIS_MASK,
     LINK_DL_MASK_ALL_NIGHT,
-    LINK_DL_MASK_BUNNY,
+    LINK_DL_MASK_BUNNY, // May look odd due to animation
     LINK_DL_MASK_KEATON,
     LINK_DL_MASK_GARO,
     LINK_DL_MASK_ROMANI,
     LINK_DL_MASK_CIRCUS_LEADER,
     LINK_DL_MASK_COUPLE,
     LINK_DL_MASK_POSTMAN,
-    LINK_DL_MASK_GREAT_FAIRY,
+    LINK_DL_MASK_GREAT_FAIRY, // May look odd due to animation
     LINK_DL_MASK_GIBDO,
     LINK_DL_MASK_DON_GERO,
     LINK_DL_MASK_KAMARO,
