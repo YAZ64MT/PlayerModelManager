@@ -109,10 +109,6 @@ Gfx *gSharedDisplayLists[LINK_DL_MAX];
 
 Mtx *gSharedMatrixes[LINK_EQUIP_MATRIX_MAX];
 
-Gfx *getZoraDL(Gfx *dl) {
-    return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_ZORA, dl);
-}
-
 Mtx *getHumanMtx(Mtx *mtx) {
     return (Mtx *)((uintptr_t)GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD) + SEGMENT_OFFSET(mtx));
 }
