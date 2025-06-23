@@ -6,6 +6,9 @@
 #include "defines_modelinfo.h"
 #include "playermodelmanager_api.h"
 
+#define ENTRY_FORM(entry) (getFormFromModelType(entry->modelEntry.type))
+#define ENTRY_LOADED_PROXY(entry) (isEntryLoaded(entry) ? &gLinkFormProxies[ENTRY_FORM(entry)] : NULL)
+
 const size_t
     MAX_INTERNAL_NAME_LENGTH = INTERNAL_NAME_MAX_LENGTH,
     MAX_AUTHOR_NAME_LENGTH = 128,
@@ -14,18 +17,61 @@ const size_t
 bool isEntryLoaded(CustomModelMemoryEntry *entry) {
     return entry &&
            entry->modelEntry.type != PMM_FORM_MODEL_TYPE_NONE &&
-           CMEM_getCurrentEntry(getFormFromModelType(entry->modelEntry.type)) == (void *)entry;
+           CMEM_getCurrentEntry(ENTRY_FORM(entry)) == (void *)entry;
 }
 
 void refreshProxyIfEntryLoaded(CustomModelMemoryEntry *entry) {
-    if (isEntryLoaded(entry)) {
-        requestRefreshFormProxy(&gLinkFormProxies[getFormFromModelType(entry->modelEntry.type)]);
+    Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
+
+    if (fp) {
+        CMEM_reapplyEntry(ENTRY_FORM(entry));
+        requestRefreshFormProxy(fp);
     }
 }
 
 void refreshProxyDLIfEntryLoaded(CustomModelMemoryEntry *entry, Link_DisplayList dlId) {
-    if (isEntryLoaded(entry)) {
-        requestRefreshFormProxyDL(&gLinkFormProxies[getFormFromModelType(entry->modelEntry.type)], dlId);
+    Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
+
+    if (fp) {
+        fp->current.models[dlId] = entry->displayListPtrs[dlId];
+        requestRefreshFormProxyDL(&gLinkFormProxies[ENTRY_FORM(entry)], dlId);
+    }
+}
+
+void refreshProxyMtxIfEntryLoaded(CustomModelMemoryEntry *entry, Link_EquipmentMatrix mtxId) {
+    Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
+
+    if (fp) {
+        fp->current.equipMtx[mtxId] = entry->matrixPtrs[mtxId];
+        requestRefreshFormProxyMtx(&gLinkFormProxies[getFormFromModelType(entry->modelEntry.type)], mtxId);
+    }
+}
+
+void refreshProxyEyesTexturesIfEntryLoaded(CustomModelMemoryEntry *entry) {
+    Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
+
+    if (fp) {
+        for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
+            fp->current.eyesTextures[i] = entry->eyesTex[i];
+        }
+
+        if (fp->form == GET_PLAYER_FORM) {
+            requestRefreshFaceTextures();
+        }
+    }
+}
+
+void refreshProxyMouthTexturesIfEntryLoaded(CustomModelMemoryEntry *entry) {
+    Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
+
+    if (fp) {
+        for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+            fp->current.mouthTextures[i] = entry->mouthTex[i];
+        }
+
+        if (fp->form == GET_PLAYER_FORM) {
+            requestRefreshFaceTextures();
+        }
     }
 }
 
@@ -226,7 +272,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMtx(PlayerModelManagerFormHandle h, Lin
 
     entry->matrixPtrs[mtxId] = matrix;
 
-    refreshProxyIfEntryLoaded(entry);
+    refreshProxyMtxIfEntryLoaded(entry, mtxId);
 
     return true;
 }
@@ -247,7 +293,8 @@ RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerFormHandle h
 
 #define SET_LIMB_DL(pLimb, entryDL)       \
     if (!entry->displayListPtrs[entryDL]) \
-    entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gCallEmptyDisplayList
+    entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gCallEmptyDisplayList; \
+    refreshProxyDLIfEntryLoaded(entry, entryDL)
 
 RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerFormHandle h, FlexSkeletonHeader *skel) {
     CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setSkeleton");
@@ -316,11 +363,13 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerFor
 
 #undef SET_SHIELDING_LIMB_DL
 
+    refreshProxyIfEntryLoaded(entry);
+
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerFormHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setEyesTextures");
+    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setEyesTextures");
 
     if (!entry) {
         return false;
@@ -328,9 +377,7 @@ RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerFormHand
 
     entry->eyesTex = eyesTextures;
 
-    if (isEntryLoaded(entry) && GET_PLAYER_FORM == getFormFromModelType(entry->modelEntry.type)) {
-        requestRefreshFaceTextures();
-    }
+    refreshProxyEyesTexturesIfEntryLoaded(entry);
 
     return true;
 }
@@ -344,9 +391,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerFormHan
 
     entry->mouthTex = mouthTextures;
 
-    if (isEntryLoaded(entry) && GET_PLAYER_FORM == getFormFromModelType(entry->modelEntry.type)) {
-        requestRefreshFaceTextures();
-    }
+    refreshProxyMouthTexturesIfEntryLoaded(entry);
 
     return true;
 }
@@ -354,11 +399,6 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerFormHan
 RECOMP_EXPORT Gfx *PlayerModelManager_getDL(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dl) {
     if (apiVersion > PMM_API_VERSION) {
         recomp_printf("PlayerModelManager_getDL: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
-        return NULL;
-    }
-
-    // TODO: remove this check when all forms supported
-    if (form != PLAYER_FORM_HUMAN) {
         return NULL;
     }
 
