@@ -258,7 +258,7 @@ void initSharedDLs() {
 
     setupSharedListenerDL(OBJECT_LINK_GORON, gLinkGoronCurledDL, LINK_DL_CURLED);
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_00C540, LINK_DL_SPIKES);
-    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_0127B0, LINK_DL_INIT_FIRE);
+    setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_0127B0, LINK_DL_FIRE_INIT);
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_0134D0, LINK_DL_FIRE_ROLL);
     setupSharedListenerDL(OBJECT_LINK_GORON, gLinkGoronGoronPunchEffectDL, LINK_DL_FIRE_PUNCH);
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_017180, LINK_DL_BODY_SHIELD_BODY);
