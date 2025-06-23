@@ -176,13 +176,13 @@ void initFormProxies() {
 
     repointSharedModelsToProxy();
 
-    refreshFaceTextures();
+    requestRefreshFaceTextures();
 }
 
 RECOMP_HOOK("Player_Init")
 void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
     if ((Player *)thisx == GET_PLAYER(play)) {
-        refreshFaceTextures();
+        requestRefreshFaceTextures();
 
         refreshExternalDLs(GET_PLAYER_FORM_PROXY);
 
@@ -207,7 +207,7 @@ void refreshSharedModelsOnModelApply(PlayerTransformation form) {
 
     if (form == GET_PLAYER_FORM) {
         refreshSharedModels();
-        refreshFaceTextures();
+        requestRefreshFaceTextures();
     }
 }
 

@@ -13,11 +13,12 @@ extern Link_FormProxy gLinkFormProxies[];
 extern bool gIsAgePropertyRefreshRequested;
 
 void matchFaceTexturesToProxy(Link_FormProxy *formProxy);
-void refreshFaceTextures();
+void requestRefreshFaceTextures();
 void initFormProxy(Link_FormProxy *formProxy, PlayerTransformation form);
 void requestRefreshFormProxy(Link_FormProxy *formProxy);
 Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target);
 void setSkeletonDLsOnModelInfo(Link_ModelInfo *info, FlexSkeletonHeader *skel);
 void requestRefreshFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId);
+void requestRefreshFormProxyMtx(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId);
 
 #endif

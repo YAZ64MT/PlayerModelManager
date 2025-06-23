@@ -329,7 +329,7 @@ RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerFormHand
     entry->eyesTex = eyesTextures;
 
     if (isEntryLoaded(entry) && GET_PLAYER_FORM == getFormFromModelType(entry->modelEntry.type)) {
-        refreshFaceTextures();
+        requestRefreshFaceTextures();
     }
 
     return true;
@@ -345,7 +345,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerFormHan
     entry->mouthTex = mouthTextures;
 
     if (isEntryLoaded(entry) && GET_PLAYER_FORM == getFormFromModelType(entry->modelEntry.type)) {
-        refreshFaceTextures();
+        requestRefreshFaceTextures();
     }
 
     return true;

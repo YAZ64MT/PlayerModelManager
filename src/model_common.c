@@ -325,7 +325,7 @@ void overrideFormDL(Link_FormProxy *formProxy, PlayerTransformation overrideForm
     }
 }
 
-void refreshProxySingleDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
+void refreshProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
     Gfx *dl = getFormProxyDL(formProxy, linkDLId);
 
     if (dl) {
@@ -470,24 +470,28 @@ void refreshFaceTextures() {
     matchFaceTexturesToProxy(GET_PLAYER_FORM_PROXY);
 }
 
+void refreshProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
+    Mtx *matrix = formProxy->current.equipMtx[mtxId];
+
+    if (!matrix) {
+        matrix = formProxy->current.equipMtx[mtxId];
+    }
+
+    if (!matrix) {
+        matrix = gSharedMatrixes[mtxId];
+    }
+
+    if (matrix) {
+        gSPMatrix(&formProxy->mtxDisplayLists[mtxId][0], matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+    }
+}
+
 void refreshProxyMatrixes(Link_FormProxy *formProxy) {
     Link_ModelInfo *current = &formProxy->current;
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
-    for (u32 i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        Mtx *matrix = current->equipMtx[i];
-
-        if (!matrix) {
-            matrix = vanilla->equipMtx[i];
-        }
-
-        if (!matrix) {
-            matrix = gSharedMatrixes[i];
-        }
-
-        if (matrix) {
-            gSPMatrix(&formProxy->mtxDisplayLists[i][0], matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
-        }
+    for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
+        refreshProxyMatrix(formProxy, i);
     }
 }
 
@@ -708,68 +712,66 @@ void clearArraySet(U32ArraySet *arrSet) {
 
 }
 
-static U32ArraySet sFormProxyFullRefreshRequests;
+void initArraySet(U32ArraySet *arrSet) {
+    arrSet->set = recomputil_create_u32_hashset();
+}
 
-static U32MemoryHashmapHandle sFormProxyDLRefreshRequests;
-static U32ArraySet sFormProxyDLRefreshRequestsForms;
+static bool sFullRefreshRequests[PLAYER_FORM_MAX];
+static U32ArraySet sDLRefreshReqs[PLAYER_FORM_MAX];
+static U32ArraySet sMtxRefreshReqs[PLAYER_FORM_MAX];
+static bool sIsFaceRefreshRequested;
 
 void requestRefreshFormProxy(Link_FormProxy *formProxy) {
-    tryPushArraySet(&sFormProxyFullRefreshRequests, (uintptr_t)formProxy);
+    sFullRefreshRequests[formProxy->form] = true;
 }
 
 void requestRefreshFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
-    U32ArraySet *requests = NULL;
-    uintptr_t fp = (uintptr_t)formProxy;
+    tryPushArraySet(&sDLRefreshReqs[formProxy->form], linkDLId);
+}
 
-    if (recomputil_u32_memory_hashmap_create(sFormProxyDLRefreshRequests, fp)) {
-        requests = recomputil_u32_memory_hashmap_get(sFormProxyDLRefreshRequests, fp);
-        requests->set = recomputil_create_u32_hashset();
-    }
+void requestRefreshFormProxyMtx(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
+    tryPushArraySet(&sMtxRefreshReqs[formProxy->form], mtxId);
+}
 
-    if (!requests) {
-        requests = recomputil_u32_memory_hashmap_get(sFormProxyDLRefreshRequests, fp);
-    }
-
-    if (requests) {
-        tryPushArraySet(requests, linkDLId);
-        tryPushArraySet(&sFormProxyDLRefreshRequestsForms, fp);
-    }
+void requestRefreshFaceTextures() {
+    sIsFaceRefreshRequested = true;
 }
 
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
-    for (size_t i = 0; i < sFormProxyFullRefreshRequests.dArr.count; ++i) {
-        uintptr_t fp = sFormProxyFullRefreshRequests.dArr.data[i];
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        Link_FormProxy *fp = &gLinkFormProxies[i];
+        U32ArraySet *dlReqs = &sDLRefreshReqs[i];
+        U32ArraySet *mtxReqs = &sMtxRefreshReqs[i];
 
-        refreshFormProxy((Link_FormProxy *)fp);
-    }
-
-    clearArraySet(&sFormProxyFullRefreshRequests);
-
-    // Handle single display lists
-    for (size_t i = 0; i < sFormProxyDLRefreshRequestsForms.dArr.count; ++i) {
-        uintptr_t fp = sFormProxyDLRefreshRequestsForms.dArr.data[i];
-
-        U32ArraySet *requests = recomputil_u32_memory_hashmap_get(sFormProxyDLRefreshRequests, fp);
-
-        if (requests) {
-            for (size_t j = 0; j < requests->dArr.count; ++j) {
-                refreshProxySingleDL((Link_FormProxy *)fp, requests->dArr.data[j]);
+        if (sFullRefreshRequests[i]) {
+            refreshFormProxy(fp);
+        } else {
+            for (size_t j = 0; j < dlReqs->dArr.count; ++j) {
+                refreshProxyDL(fp, dlReqs->dArr.data[j]);
             }
 
-            clearArraySet(requests);
-
-            // recomputil_destroy_u32_hashset(requests->set);
-            // recomputil_u32_memory_hashmap_erase(sFormProxyDLRefreshRequests, fp);
+            for (size_t j = 0; j < mtxReqs->dArr.count; ++j) {
+                refreshProxyMatrix(fp, mtxReqs->dArr.data[j]);
+            }
         }
+
+        sFullRefreshRequests[i] = false;
+        clearArraySet(dlReqs);
+        clearArraySet(mtxReqs);
     }
 
-    clearArraySet(&sFormProxyDLRefreshRequestsForms);
+    if (sIsFaceRefreshRequested) {
+        refreshFaceTextures();
+    }
+
+    sIsFaceRefreshRequested = false;
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initModelCommonHashObjs() {
-    sFormProxyFullRefreshRequests.set = recomputil_create_u32_hashset();
-    sFormProxyDLRefreshRequests = recomputil_create_u32_memory_hashmap(sizeof(U32ArraySet));
-    sFormProxyDLRefreshRequestsForms.set = recomputil_create_u32_hashset();
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        initArraySet(&sDLRefreshReqs[i]);
+        initArraySet(&sMtxRefreshReqs[i]);
+    }
 }
