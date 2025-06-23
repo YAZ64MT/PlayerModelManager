@@ -141,7 +141,9 @@ Gfx gLinkHumanFirstPersonArmDL[] = {
     gsSPEndDisplayList(),
 };
 
-Gfx *getHumanDL(Gfx *dl);
+Gfx *getHumanDL(Gfx *dl) {
+    return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, dl);
+}
 
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)
 void setupVanillaHuman() {
