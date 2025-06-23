@@ -174,30 +174,46 @@ void clearDiskEntries(PlayerTransformation form) {
 
 RECOMP_DECLARE_EVENT(_internal_onModelApplied(PlayerTransformation form));
 
-bool CMEM_tryApplyEntry(PlayerTransformation form, FormModelEntry *newEntry) {
+void CMEM_reapplyEntry(PlayerTransformation form) {
+    FormModelEntry *currEntry = CMEM_getCurrentEntry(form);
+
+    if (currEntry) {
+        currEntry->applyToModelInfo(currEntry, &gLinkFormProxies[form].current);
+    }
+}
+
+bool CMEM_forceApplyEntry(PlayerTransformation form, FormModelEntry *newEntry) {
     Link_FormProxy *proxy = &gLinkFormProxies[form];
     FormModelEntry *currEntry = CMEM_getCurrentEntry(form);
+
+    if (newEntry == NULL) {
+        CMEM_removeModel(form);
+        return true;
+    }
+
+    if (newEntry->applyToModelInfo(newEntry, &proxy->current)) {
+        if (currEntry && currEntry->callback) {
+            currEntry->callback(currEntry->handle, PMM_EVENT_MODEL_REMOVED, currEntry->callbackData);
+        }
+
+        CMEM_setCurrentEntry(form, newEntry);
+
+        _internal_onModelApplied(form);
+
+        if (newEntry->callback) {
+            newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, newEntry->callbackData);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CMEM_tryApplyEntry(PlayerTransformation form, FormModelEntry *newEntry) {
+    FormModelEntry *currEntry = CMEM_getCurrentEntry(form);
     if (newEntry != currEntry) {
-        if (newEntry == NULL) {
-            CMEM_removeModel(form);
-            return true;
-        }
-
-        if (newEntry->applyToModelInfo(newEntry, &proxy->current)) {
-            if (currEntry && currEntry->callback) {
-                currEntry->callback(currEntry->handle, PMM_EVENT_MODEL_REMOVED, currEntry->callbackData);
-            }
-
-            CMEM_setCurrentEntry(form, newEntry);
-
-            _internal_onModelApplied(form);
-
-            if (newEntry->callback) {
-                newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, newEntry->callbackData);
-            }
-
-            return true;
-        }
+        return CMEM_forceApplyEntry(form, newEntry);
     }
 
     return false;
@@ -565,6 +581,8 @@ void loadSavedModels() {
             if (KV_Global_Get(sSavedModelNames[i].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
                 applyByInternalName(i, retrievedName);
             }
+        } else {
+            CMEM_forceApplyEntry(i, NULL);
         }
     }
 

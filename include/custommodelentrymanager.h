@@ -15,5 +15,7 @@ PlayerModelManagerFormHandle CMEM_createMemoryHandle(PlayerTransformation form);
 CustomModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerFormHandle h);
 void CMEM_saveCurrentEntry(PlayerTransformation form);
 PlayerTransformation getFormFromModelType(FormModelType t);
+void CMEM_reapplyEntry(PlayerTransformation form);
+bool CMEM_forceApplyEntry(PlayerTransformation form, FormModelEntry *newEntry);
 
 #endif
