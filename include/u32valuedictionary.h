@@ -17,4 +17,7 @@ bool U32ValueDictionary_get(U32ValueDictionaryHandle dict, const char *key, u32 
 // Returns true if key existed and was removed, false otherwise
 bool U32ValueDictionary_unset(U32ValueDictionaryHandle dict, const char *key);
 
+// Returns true if key exists in dictionary, false otherwise
+bool U32ValueDictionary_has(U32ValueDictionaryHandle dict, const char *key);
+
 #endif

@@ -74,18 +74,33 @@ bool U32ValueDictionary_get(U32ValueDictionaryHandle dict, const char *key, u32 
         return false;
     }
 
-    // Most common case if key exists and collisions are rare
-    if (slots->count == 1) {
-        DictionaryEntrySlot *firstSlot = DynMemArr_get(slots, 0);
-        *out = firstSlot->value;
-        return true;
+    for (size_t i = 0; i < slots->count; ++i) {
+        DictionaryEntrySlot *candidate = DynMemArr_get(slots, i);
+
+        if (candidate && strcmp(key, candidate->key) == 0) {
+            *out = candidate->value;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool U32ValueDictionary_has(U32ValueDictionaryHandle dict, const char *key) {
+    size_t keyLen = strlen(key);
+
+    u32 hash = crc32(key, keyLen);
+
+    DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict, hash);
+
+    if (!slots) {
+        return false;
     }
 
     for (size_t i = 0; i < slots->count; ++i) {
         DictionaryEntrySlot *candidate = DynMemArr_get(slots, i);
 
         if (candidate && strcmp(key, candidate->key) == 0) {
-            *out = candidate->value;
             return true;
         }
     }
@@ -103,15 +118,7 @@ bool U32ValueDictionary_unset(U32ValueDictionaryHandle dict, const char *key) {
     if (!slots) {
         return false;
     }
-
-    // Most common case if key exists and collisions are rare
-    if (slots->count == 1) {
-        DictionaryEntrySlot *firstSlot = DynMemArr_get(slots, 0);
-        destroySlotMembers(firstSlot);
-        DynMemArr_remove(slots, 0);
-        return true;
-    }
-
+    
     for (size_t i = 0; i < slots->count; ++i) {
         DictionaryEntrySlot *candidate = DynMemArr_get(slots, i);
 
