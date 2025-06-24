@@ -12,6 +12,7 @@
 #include "defines_ooto.h"
 #include "proxymm_kv_api.h"
 #include "playermodelmanager_api.h"
+#include "u32valuedictionary.h"
 
 #define ARRAY_GROWTH_FACTOR 3 / 2
 #define ARRAY_STARTING_SIZE 16
@@ -21,14 +22,16 @@ RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 static U32MemoryHashmapHandle sHandleToMemoryEntry;
 static PlayerModelManagerFormHandle sNextMemoryHandle = 1;
 
+static U32ValueDictionaryHandle sInternalNamesToEntries;
+
 typedef struct {
     void **entries;
     size_t count;
     size_t capacity;
-} CustomModelEntries;
+} FormModelEntries ;
 
-static CustomModelEntries sDiskEntries[PLAYER_FORM_MAX];
-static CustomModelEntries sMemoryEntries[PLAYER_FORM_MAX];
+static FormModelEntries  sDiskEntries[PLAYER_FORM_MAX];
+static FormModelEntries  sMemoryEntries[PLAYER_FORM_MAX];
 
 static FormModelEntry *sCurrentModelEntries[PLAYER_FORM_MAX];
 
@@ -68,22 +71,10 @@ void increaseDiskBufferSizeIfNeeded(PlayerTransformation form, size_t minSize) {
 }
 
 void applyByInternalName(PlayerTransformation form, const char *name) {
-    for (size_t i = 0; i < sMemoryEntries[form].count; ++i) {
-        FormModelMemoryEntry *e = sMemoryEntries[form].entries[i];
+    u32 entryPtr;
 
-        if (strcmp(name, e->modelEntry.internalName) == 0) {
-            CMEM_tryApplyEntry(form, &e->modelEntry);
-            return;
-        }
-    }
-
-    for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
-        FormModelDiskEntry *e = sDiskEntries[form].entries[i];
-
-        if (strcmp(name, e->modelEntry.internalName) == 0) {
-            CMEM_tryApplyEntry(form, &e->modelEntry);
-            return;
-        }
+    if (U32ValueDictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
+        CMEM_tryApplyEntry(form, (FormModelEntry *)entryPtr);
     }
 }
 
@@ -111,13 +102,13 @@ void CMEM_setCurrentEntry(PlayerTransformation form, FormModelEntry *e) {
     sCurrentModelEntries[form] = e;
 }
 
-void initCustomModelEntries(CustomModelEntries *cme) {
+void initFormModelEntries (FormModelEntries  *cme) {
     cme->capacity = ARRAY_STARTING_SIZE;
     cme->entries = recomp_alloc(sizeof(*cme->entries) * cme->capacity);
     cme->count = 0;
 }
 
-void increaseCapacity(CustomModelEntries *cme) {
+void increaseCapacity(FormModelEntries  *cme) {
     void **newArray;
     size_t newCapacity = cme->capacity * ARRAY_GROWTH_FACTOR;
     newArray = recomp_alloc(sizeof(*newArray) * newCapacity);
@@ -131,21 +122,27 @@ void increaseCapacity(CustomModelEntries *cme) {
     cme->capacity = newCapacity;
 }
 
-void pushEntry(CustomModelEntries *cme, void *entry) {
-    size_t newCount = cme->count + 1;
+void pushEntry(FormModelEntries  *cme, void *entry) {
+    FormModelEntry *fme = entry;
 
-    if (newCount > cme->capacity) {
-        increaseCapacity(cme);
+    if (!U32ValueDictionary_has(sInternalNamesToEntries, fme->internalName)) {
+        size_t newCount = cme->count + 1;
+
+        if (newCount > cme->capacity) {
+            increaseCapacity(cme);
+        }
+
+        cme->entries[cme->count] = entry;
+        cme->count++;
+
+        U32ValueDictionary_set(sInternalNamesToEntries, fme->internalName, (uintptr_t)entry);
     }
-
-    cme->entries[cme->count] = entry;
-    cme->count++;
 }
 
 void initEntryManager() {
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        initCustomModelEntries(&sDiskEntries[i]);
-        initCustomModelEntries(&sMemoryEntries[i]);
+        initFormModelEntries (&sDiskEntries[i]);
+        initFormModelEntries (&sMemoryEntries[i]);
     }
 
     unsigned char *modFolderPath = recomp_get_mod_folder_path();
@@ -604,6 +601,6 @@ void applySavedModelOnTitleScreen() {
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initCMEMHash() {
-    sHandleToMemoryEntry = recomputil_create_u32_memory_hashmap(sizeof(CustomModelMemoryEntry));
+    sHandleToMemoryEntry = recomputil_create_u32_memory_hashmap(sizeof(FormModelMemoryEntry));
     sInternalNamesToEntries = U32ValueDictionary_create();
 }
