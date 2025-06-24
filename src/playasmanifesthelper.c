@@ -230,6 +230,7 @@ const static ManifestDictEntry sZ64AllManifest[] = {
     DECLARE_MANIFEST_ENTRY("Bottle.Glass", BOTTLE_GLASS),
     DECLARE_MANIFEST_ENTRY("Bottle.Contents", BOTTLE_CONTENTS),
     DECLARE_MANIFEST_ENTRY("Boomerang", BOOMERANG),
+    DECLARE_MANIFEST_ENTRY("Hammer", HAMMER),
     DECLARE_MANIFEST_ENTRY("Deku.Stick", DEKU_STICK),
     DECLARE_MANIFEST_ENTRY("Slingshot", SLINGSHOT),
     DECLARE_MANIFEST_ENTRY("Ocarina.1", OCARINA_FAIRY),
@@ -274,7 +275,28 @@ const static ManifestDictEntry sZ64AllManifest[] = {
     DECLARE_MANIFEST_ENTRY("Mask.Deku.Scream", MASK_DEKU_SCREAM),
     DECLARE_MANIFEST_ENTRY("Mask.Goron.Scream", MASK_GORON_SCREAM),
     DECLARE_MANIFEST_ENTRY("Mask.Zora.Scream", MASK_ZORA_SCREAM),
-    DECLARE_MANIFEST_ENTRY("Mask.Fierce.Deity", MASK_FIERCE_DEITY_SCREAM),
+    DECLARE_MANIFEST_ENTRY("Mask.Fierce.Deity.Scream", MASK_FIERCE_DEITY_SCREAM),
+    DECLARE_MANIFEST_ENTRY("Elegy.Shell.Human", ELEGY_OF_EMPTINESS_SHELL_HUMAN),
+    DECLARE_MANIFEST_ENTRY("Elegy.Shell.Deku", ELEGY_OF_EMPTINESS_SHELL_DEKU),
+    DECLARE_MANIFEST_ENTRY("Elegy.Shell.Goron", ELEGY_OF_EMPTINESS_SHELL_GORON),
+    DECLARE_MANIFEST_ENTRY("Elegy.Shell.Zora", ELEGY_OF_EMPTINESS_SHELL_ZORA),
+    DECLARE_MANIFEST_ENTRY("Deku.Guard", DEKU_GUARD),
+    DECLARE_MANIFEST_ENTRY("Pipe.Mouth", PIPE_MOUTH),
+    DECLARE_MANIFEST_ENTRY("Pipe.Right", PIPE_RIGHT),
+    DECLARE_MANIFEST_ENTRY("Pipe.Up", PIPE_UP),
+    DECLARE_MANIFEST_ENTRY("Pipe.Down", PIPE_DOWN),
+    DECLARE_MANIFEST_ENTRY("Pipe.Left", PIPE_UP),
+    DECLARE_MANIFEST_ENTRY("Pipe.A", PIPE_A),
+    DECLARE_MANIFEST_ENTRY("Stem.R", STEM_RIGHT),
+    DECLARE_MANIFEST_ENTRY("Stem.L", STEM_LEFT),
+    DECLARE_MANIFEST_ENTRY("Petal.Particle", PETAL_PARTICLE),
+    DECLARE_MANIFEST_ENTRY("Flower.Propeller.Closed", FLOWER_PROPELLER_CLOSED),
+    DECLARE_MANIFEST_ENTRY("Flower.Center.Closed", FLOWER_CENTER_CLOSED),
+    DECLARE_MANIFEST_ENTRY("Flower.Propeller.Open", FLOWER_PROPELLER_OPEN),
+    DECLARE_MANIFEST_ENTRY("Flower.Center.Open", FLOWER_CENTER_OPEN),
+    DECLARE_MANIFEST_ENTRY("Pad.Wood", PAD_WOOD),
+    DECLARE_MANIFEST_ENTRY("Pad.Grass", PAD_GRASS),
+    DECLARE_MANIFEST_ENTRY("Pad.Opening", PAD_OPENING),
     // TODO: FINISH MEGA MANIFEST DICTIONARY
 };
 
@@ -295,6 +317,7 @@ static U32ValueDictionaryHandle sDictHuman;
 static U32ValueDictionaryHandle sDictDeku;
 static U32ValueDictionaryHandle sDictZora;
 static U32ValueDictionaryHandle sDictFierceDeity;
+static U32ValueDictionaryHandle sDictGeneric;
 
 U32ValueDictionaryHandle newDict(const ManifestDictEntry m[], size_t n) {
     U32ValueDictionaryHandle h = U32ValueDictionary_create();
@@ -314,4 +337,5 @@ void initManifestHelperDict() {
     sDictDeku = newDict(sMMDekuManifest, ARRAY_COUNT(sMMDekuManifest));
     sDictZora = newDict(sMMZoraManifest, ARRAY_COUNT(sMMZoraManifest));
     sDictFierceDeity = newDict(sMMFierceDeityManifest, ARRAY_COUNT(sMMFierceDeityManifest));
+    sDictGeneric = newDict(sZ64AllManifest, ARRAY_COUNT(sZ64AllManifest));
 }
