@@ -14,13 +14,13 @@ const size_t
     MAX_AUTHOR_NAME_LENGTH = 128,
     MAX_DISPLAY_NAME_LENGTH = 64;
 
-bool isEntryLoaded(CustomModelMemoryEntry *entry) {
+bool isEntryLoaded(FormModelMemoryEntry *entry) {
     return entry &&
            entry->modelEntry.type != PMM_FORM_MODEL_TYPE_NONE &&
            CMEM_getCurrentEntry(ENTRY_FORM(entry)) == (void *)entry;
 }
 
-void refreshProxyIfEntryLoaded(CustomModelMemoryEntry *entry) {
+void refreshProxyIfEntryLoaded(FormModelMemoryEntry *entry) {
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
@@ -29,7 +29,7 @@ void refreshProxyIfEntryLoaded(CustomModelMemoryEntry *entry) {
     }
 }
 
-void refreshProxyDLIfEntryLoaded(CustomModelMemoryEntry *entry, Link_DisplayList dlId) {
+void refreshProxyDLIfEntryLoaded(FormModelMemoryEntry *entry, Link_DisplayList dlId) {
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
@@ -38,7 +38,7 @@ void refreshProxyDLIfEntryLoaded(CustomModelMemoryEntry *entry, Link_DisplayList
     }
 }
 
-void refreshProxyMtxIfEntryLoaded(CustomModelMemoryEntry *entry, Link_EquipmentMatrix mtxId) {
+void refreshProxyMtxIfEntryLoaded(FormModelMemoryEntry *entry, Link_EquipmentMatrix mtxId) {
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
@@ -47,7 +47,7 @@ void refreshProxyMtxIfEntryLoaded(CustomModelMemoryEntry *entry, Link_EquipmentM
     }
 }
 
-void refreshProxyEyesTexturesIfEntryLoaded(CustomModelMemoryEntry *entry) {
+void refreshProxyEyesTexturesIfEntryLoaded(FormModelMemoryEntry *entry) {
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
@@ -61,7 +61,7 @@ void refreshProxyEyesTexturesIfEntryLoaded(CustomModelMemoryEntry *entry) {
     }
 }
 
-void refreshProxyMouthTexturesIfEntryLoaded(CustomModelMemoryEntry *entry) {
+void refreshProxyMouthTexturesIfEntryLoaded(FormModelMemoryEntry *entry) {
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
@@ -108,8 +108,8 @@ bool isStrValid(const char *callerName, const char *strToVerify, size_t maxLen) 
 
 static bool sIsAPILocked = true;
 
-CustomModelMemoryEntry *getEntryOrPrintErr(PlayerModelManagerFormHandle h, const char *funcName) {
-    CustomModelMemoryEntry *entry = CMEM_getMemoryEntry(h);
+FormModelMemoryEntry *getEntryOrPrintErr(PlayerModelManagerFormHandle h, const char *funcName) {
+    FormModelMemoryEntry *entry = CMEM_getMemoryEntry(h);
 
     if (!entry) {
         recomp_printf("PlayerModelManager: Invalid handle passed in to %s.\n", funcName);
@@ -118,7 +118,7 @@ CustomModelMemoryEntry *getEntryOrPrintErr(PlayerModelManagerFormHandle h, const
     return entry;
 }
 
-CustomModelMemoryEntry *getEntryOrPrintErrLocked(PlayerModelManagerFormHandle h, const char *funcName) {
+FormModelMemoryEntry *getEntryOrPrintErrLocked(PlayerModelManagerFormHandle h, const char *funcName) {
     if (sIsAPILocked) {
         recomp_printf(
             "PlayerModelManager: %s called while API locked. "
@@ -156,7 +156,7 @@ RECOMP_EXPORT PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(
 
     PlayerModelManagerFormHandle h = CMEM_createMemoryHandle(form);
 
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_registerModel");
+    FormModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_registerModel");
 
     if (!entry) {
         return 0;
@@ -176,7 +176,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandl
         return 0;
     }
 
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setDisplayName");
+    FormModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setDisplayName");
 
     if (!entry) {
         return false;
@@ -192,7 +192,7 @@ RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, 
         return false;
     }
 
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setAuthor");
+    FormModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setAuthor");
 
     if (!entry) {
         return false;
@@ -204,7 +204,7 @@ RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, 
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setFlags(PlayerModelManagerFormHandle h, u64 flags) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setFlags");
+    FormModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setFlags");
 
     if (!entry) {
         return false;
@@ -216,7 +216,7 @@ RECOMP_EXPORT bool PlayerModelManager_setFlags(PlayerModelManagerFormHandle h, u
 }
 
 RECOMP_EXPORT bool PlayerModelManager_clearFlags(PlayerModelManagerFormHandle h, u64 flags) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_clearFlags");
+    FormModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_clearFlags");
 
     if (!entry) {
         return false;
@@ -228,7 +228,7 @@ RECOMP_EXPORT bool PlayerModelManager_clearFlags(PlayerModelManagerFormHandle h,
 }
 
 RECOMP_EXPORT bool PlayerModelManager_clearAllFlags(PlayerModelManagerFormHandle h, u64 flags) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_clearAllFlags");
+    FormModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_clearAllFlags");
 
     if (!entry) {
         return false;
@@ -245,7 +245,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDL(PlayerModelManagerFormHandle h, Link
         return false;
     }
 
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_registerModel");
+    FormModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_registerModel");
 
     if (!entry) {
         return false;
@@ -264,7 +264,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMtx(PlayerModelManagerFormHandle h, Lin
         return false;
     }
 
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setMtx");
+    FormModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setMtx");
 
     if (!entry) {
         return false;
@@ -278,7 +278,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMtx(PlayerModelManagerFormHandle h, Lin
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerFormHandle h, PlayerModelManagerEventHandler *callback, void *userdata) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setLoadCallback");
+    FormModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setLoadCallback");
 
     if (!entry) {
         return false;
@@ -297,7 +297,7 @@ RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerFormHandle h
     refreshProxyDLIfEntryLoaded(entry, entryDL)
 
 RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerFormHandle h, FlexSkeletonHeader *skel) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setSkeleton");
+    FormModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setSkeleton");
 
     if (!entry) {
         return false;
@@ -336,7 +336,7 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerFormHandle h
 #undef SET_LIMB_DL
 
 RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerFormHandle h, FlexSkeletonHeader *skel) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setShieldingSkeleton");
+    FormModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setShieldingSkeleton");
 
     if (!entry) {
         return false;
@@ -369,7 +369,7 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerFor
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerFormHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setEyesTextures");
+    FormModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setEyesTextures");
 
     if (!entry) {
         return false;
@@ -383,7 +383,7 @@ RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerFormHand
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerFormHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setMouthTextures");
+    FormModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setMouthTextures");
 
     if (!entry) {
         return false;
@@ -406,7 +406,7 @@ RECOMP_EXPORT Gfx *PlayerModelManager_getDL(unsigned long apiVersion, PlayerTran
 }
 
 bool PlayerModelManager_isApplied(PlayerModelManagerFormHandle h) {
-    CustomModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_isApplied");
+    FormModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_isApplied");
 
     if (!entry) {
         return false;

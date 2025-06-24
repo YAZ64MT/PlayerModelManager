@@ -17,10 +17,10 @@ void FormModelEntry_init(FormModelEntry *this) {
     this->applyToModelInfo = NULL;
 }
 
-bool applyCustomModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
+bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
     clearLinkModelInfo(modelInfo);
 
-    CustomModelMemoryEntry *this = thisx;
+    FormModelMemoryEntry *this = thisx;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         modelInfo->models[i] = this->displayListPtrs[i];
@@ -51,8 +51,8 @@ bool applyCustomModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
-bool applyCustomModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
-    CustomModelDiskEntry *this = thisx;
+bool applyFormModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
+    FormModelDiskEntry *this = thisx;
 
     if (!this->filePath) {
         return false;
@@ -99,15 +99,15 @@ bool applyCustomModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
-void customModelDiskEntryCallback(PlayerModelManagerFormHandle h, PlayerModelManager_ModelEvent evt, void *userdata) {
+void formModelDiskEntryCallback(PlayerModelManagerFormHandle h, PlayerModelManager_ModelEvent evt, void *userdata) {
     if (evt == PMM_EVENT_MODEL_REMOVED) {
-        CustomModelDiskEntry *this = userdata;
+        FormModelDiskEntry *this = userdata;
 
         this->fileData = NULL;
     }
 }
 
-void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this) {
+void FormModelMemoryEntry_init(FormModelMemoryEntry *this) {
     FormModelEntry_init(&this->modelEntry);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
@@ -118,7 +118,7 @@ void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this) {
         this->matrixPtrs[i] = NULL;
     }
 
-    this->modelEntry.applyToModelInfo = applyCustomModelMemoryEntry;
+    this->modelEntry.applyToModelInfo = applyFormModelMemoryEntry;
 
     this->skel = NULL;
 
@@ -127,20 +127,20 @@ void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this) {
     this->eyesTex = NULL;
 }
 
-void CustomModelDiskEntry_init(CustomModelDiskEntry *this, FormModelType type) {
+void FormModelDiskEntry_init(FormModelDiskEntry *this, FormModelType type) {
     FormModelEntry_init(&this->modelEntry);
 
     this->fileData = NULL;
 
     this->filePath = NULL;
 
-    this->modelEntry.applyToModelInfo = applyCustomModelDiskEntry;
-    this->modelEntry.callback = customModelDiskEntryCallback;
+    this->modelEntry.applyToModelInfo = applyFormModelDiskEntry;
+    this->modelEntry.callback = formModelDiskEntryCallback;
     this->modelEntry.callbackData = this;
     this->modelEntry.type = type;
 }
 
-void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this) {
+void FormModelDiskEntry_freeMembers(FormModelDiskEntry *this) {
     this->fileData = NULL;
 
     if (this->filePath) {

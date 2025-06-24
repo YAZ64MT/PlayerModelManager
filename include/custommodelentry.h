@@ -26,7 +26,7 @@ typedef struct {
     FormModelEntry modelEntry;
     char *filePath;
     void *fileData;
-} CustomModelDiskEntry;
+} FormModelDiskEntry;
 
 typedef struct {
     FormModelEntry modelEntry;
@@ -36,14 +36,14 @@ typedef struct {
     FlexSkeletonHeader *shieldingSkel;
     TexturePtr *eyesTex;
     TexturePtr *mouthTex;
-} CustomModelMemoryEntry;
+} FormModelMemoryEntry;
 
 void FormModelEntry_init(FormModelEntry *entry);
 
-void CustomModelMemoryEntry_init(CustomModelMemoryEntry *this);
+void FormModelMemoryEntry_init(FormModelMemoryEntry *this);
 
-void CustomModelDiskEntry_init(CustomModelDiskEntry *this, FormModelType type);
+void FormModelDiskEntry_init(FormModelDiskEntry *this, FormModelType type);
 
-void CustomModelDiskEntry_freeMembers(CustomModelDiskEntry *this);
+void FormModelDiskEntry_freeMembers(FormModelDiskEntry *this);
 
 #endif

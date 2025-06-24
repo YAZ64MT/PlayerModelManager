@@ -12,7 +12,7 @@ bool CMEM_tryApplyEntry(PlayerTransformation form, FormModelEntry *newEntry);
 void CMEM_refreshDiskEntries();
 void CMEM_removeModel(PlayerTransformation form);
 PlayerModelManagerFormHandle CMEM_createMemoryHandle(PlayerTransformation form);
-CustomModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerFormHandle h);
+FormModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerFormHandle h);
 void CMEM_saveCurrentEntry(PlayerTransformation form);
 PlayerTransformation getFormFromModelType(FormModelType t);
 void CMEM_reapplyEntry(PlayerTransformation form);

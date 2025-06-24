@@ -69,7 +69,7 @@ void increaseDiskBufferSizeIfNeeded(PlayerTransformation form, size_t minSize) {
 
 void applyByInternalName(PlayerTransformation form, const char *name) {
     for (size_t i = 0; i < sMemoryEntries[form].count; ++i) {
-        CustomModelMemoryEntry *e = sMemoryEntries[form].entries[i];
+        FormModelMemoryEntry *e = sMemoryEntries[form].entries[i];
 
         if (strcmp(name, e->modelEntry.internalName) == 0) {
             CMEM_tryApplyEntry(form, &e->modelEntry);
@@ -78,7 +78,7 @@ void applyByInternalName(PlayerTransformation form, const char *name) {
     }
 
     for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
-        CustomModelDiskEntry *e = sDiskEntries[form].entries[i];
+        FormModelDiskEntry *e = sDiskEntries[form].entries[i];
 
         if (strcmp(name, e->modelEntry.internalName) == 0) {
             CMEM_tryApplyEntry(form, &e->modelEntry);
@@ -153,18 +153,18 @@ void initEntryManager() {
     recomp_free(modFolderPath);
 }
 
-void pushMemoryEntry(PlayerTransformation form, CustomModelMemoryEntry *entry) {
+void pushMemoryEntry(PlayerTransformation form, FormModelMemoryEntry *entry) {
     pushEntry(&sMemoryEntries[form], entry);
 }
 
-void pushDiskEntry(PlayerTransformation form, CustomModelDiskEntry *entry) {
+void pushDiskEntry(PlayerTransformation form, FormModelDiskEntry *entry) {
     pushEntry(&sDiskEntries[form], entry);
 }
 
 void clearDiskEntries(PlayerTransformation form) {
     for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
-        CustomModelDiskEntry *curr = sDiskEntries[form].entries[i];
-        CustomModelDiskEntry_freeMembers(curr);
+        FormModelDiskEntry *curr = sDiskEntries[form].entries[i];
+        FormModelDiskEntry_freeMembers(curr);
         recomp_free(curr);
         sDiskEntries[form].entries[i] = NULL;
     }
@@ -326,13 +326,13 @@ typedef struct {
     char displayName[DISKENTRY_DISPLAY_NAME_FIELD_SIZE];
     char authorName[DISKENTRY_AUTHOR_NAME_FIELD_SIZE];
 
-} CustomModelDiskEntryEmbeddedInfo;
+} FormModelDiskEntryEmbeddedInfo;
 
-bool isEmbeddedVersionSupported(CustomModelDiskEntryEmbeddedInfo *info) {
+bool isEmbeddedVersionSupported(FormModelDiskEntryEmbeddedInfo *info) {
     return info->embedVersion <= 2;
 }
 
-CustomModelDiskEntryEmbeddedInfo *getEmbeddedInfo(void *zobj) {
+FormModelDiskEntryEmbeddedInfo *getEmbeddedInfo(void *zobj) {
     if (zobj == NULL) {
         return NULL;
     }
@@ -345,7 +345,7 @@ CustomModelDiskEntryEmbeddedInfo *getEmbeddedInfo(void *zobj) {
         }
     }
 
-    CustomModelDiskEntryEmbeddedInfo *info = (void *)&data[DISKENTRY_MODEL_INFO_LOCATION];
+    FormModelDiskEntryEmbeddedInfo *info = (void *)&data[DISKENTRY_MODEL_INFO_LOCATION];
 
     if (!isEmbeddedVersionSupported(info)) {
         return NULL;
@@ -416,7 +416,7 @@ void CMEM_refreshDiskEntries() {
                 isValid = isValidZobj(zobj, fileSize);
 
                 if (isValid) {
-                    CustomModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
+                    FormModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
 
                     FormModelType modelType = PMM_FORM_MODEL_TYPE_NONE;
 
@@ -443,11 +443,11 @@ void CMEM_refreshDiskEntries() {
                     }
 
                     if (isValid) {
-                        CustomModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
-                        CustomModelDiskEntry_init(entry, modelType);
+                        FormModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
+                        FormModelDiskEntry_init(entry, modelType);
                         entry->filePath = fullPath;
 
-                        CustomModelDiskEntryEmbeddedInfo *embed = getEmbeddedInfo(zobj);
+                        FormModelDiskEntryEmbeddedInfo *embed = getEmbeddedInfo(zobj);
 
                         if (embed) {
                             entry->modelEntry.internalName = getTruncatedStringCopy(embed->internalName, sizeof(embed->internalName) - 1);
@@ -541,9 +541,9 @@ PlayerModelManagerFormHandle CMEM_createMemoryHandle(PlayerTransformation form) 
 
     recomputil_u32_memory_hashmap_create(sHandleToMemoryEntry, handle);
 
-    CustomModelMemoryEntry *entry = recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, handle);
+    FormModelMemoryEntry *entry = recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, handle);
 
-    CustomModelMemoryEntry_init(entry);
+    FormModelMemoryEntry_init(entry);
 
     entry->modelEntry.handle = handle;
 
@@ -552,7 +552,7 @@ PlayerModelManagerFormHandle CMEM_createMemoryHandle(PlayerTransformation form) 
     return handle;
 }
 
-CustomModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerFormHandle h) {
+FormModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerFormHandle h) {
     return recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, h);
 }
 
@@ -605,4 +605,5 @@ void applySavedModelOnTitleScreen() {
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initCMEMHash() {
     sHandleToMemoryEntry = recomputil_create_u32_memory_hashmap(sizeof(CustomModelMemoryEntry));
+    sInternalNamesToEntries = U32ValueDictionary_create();
 }
