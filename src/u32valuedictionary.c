@@ -7,7 +7,7 @@
 #include "dynmemarray.h"
 
 typedef struct {
-    const char *key;
+    char *key;
     u32 value;
 } DictionaryEntrySlot;
 
@@ -85,7 +85,7 @@ bool U32ValueDictionary_get(U32ValueDictionaryHandle dict, const char *key, u32 
         DictionaryEntrySlot *candidate = DynMemArr_get(slots, i);
 
         if (candidate && strcmp(key, candidate->key) == 0) {
-            u32 *data = candidate->value;
+            *out = candidate->value;
             return true;
         }
     }
