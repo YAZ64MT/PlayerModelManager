@@ -161,6 +161,7 @@ void pushDiskEntry(PlayerTransformation form, FormModelDiskEntry *entry) {
 void clearDiskEntries(PlayerTransformation form) {
     for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
         FormModelDiskEntry *curr = sDiskEntries[form].entries[i];
+        U32ValueDictionary_unset(sInternalNamesToEntries, curr->modelEntry.internalName);
         FormModelDiskEntry_freeMembers(curr);
         recomp_free(curr);
         sDiskEntries[form].entries[i] = NULL;
