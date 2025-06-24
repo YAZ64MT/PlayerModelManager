@@ -1,10 +1,14 @@
 #include "global.h"
 #include "u32valuedictionary.h"
-#include "crc32.h"
 #include "libc/string.h"
 #include "recompdata.h"
 #include "recomputils.h"
 #include "dynmemarray.h"
+#include "fnv.h"
+
+u32 hasher(const void *data, size_t length) {
+    return fnv_32a_buf(data, length, FNV1_32A_INIT);
+}
 
 typedef struct {
     char *key;
@@ -27,7 +31,7 @@ void U32ValueDictionary_destroy(U32ValueDictionaryHandle dict) {
 bool U32ValueDictionary_set(U32ValueDictionaryHandle dict, const char *key, u32 value) {
     size_t keyLen = strlen(key);
 
-    u32 hash = crc32(key, keyLen);
+    u32 hash = hasher(key, keyLen);
 
     DynamicMemoryArray *dynMemArr = NULL;
 
@@ -70,7 +74,7 @@ bool U32ValueDictionary_set(U32ValueDictionaryHandle dict, const char *key, u32 
 bool U32ValueDictionary_get(U32ValueDictionaryHandle dict, const char *key, u32 *out) {
     size_t keyLen = strlen(key);
 
-    u32 hash = crc32(key, keyLen);
+    u32 hash = hasher(key, keyLen);
 
     DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict, hash);
 
@@ -93,7 +97,7 @@ bool U32ValueDictionary_get(U32ValueDictionaryHandle dict, const char *key, u32 
 bool U32ValueDictionary_has(U32ValueDictionaryHandle dict, const char *key) {
     size_t keyLen = strlen(key);
 
-    u32 hash = crc32(key, keyLen);
+    u32 hash = hasher(key, keyLen);
 
     DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict, hash);
 
@@ -115,7 +119,7 @@ bool U32ValueDictionary_has(U32ValueDictionaryHandle dict, const char *key) {
 bool U32ValueDictionary_unset(U32ValueDictionaryHandle dict, const char *key) {
     size_t keyLen = strlen(key);
 
-    u32 hash = crc32(key, keyLen);
+    u32 hash = hasher(key, keyLen);
 
     DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict, hash);
 
