@@ -163,7 +163,6 @@ typedef enum {
     LINK_DL_FIN_SHIELD,
     LINK_DL_MAGIC_BARRIER,
     LINK_DL_GUITAR,
-    LINK_DL_PEDESTAL_SWORD,
 
     // This should be in sync with the end of ZPlayerModelManager_DisplayListId
     // in playermodelmanager_api.h

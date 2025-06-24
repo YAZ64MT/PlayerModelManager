@@ -162,7 +162,6 @@ typedef enum {
     PMM_DL_FIN_SHIELD,
     PMM_DL_MAGIC_BARRIER,
     PMM_DL_GUITAR,
-    PMM_DL_PEDESTAL_SWORD,
     PMM_DL_MAX
 } PlayerModelManager_DisplayListId;
 
