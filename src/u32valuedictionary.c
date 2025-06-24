@@ -118,11 +118,12 @@ bool U32ValueDictionary_unset(U32ValueDictionaryHandle dict, const char *key) {
     if (!slots) {
         return false;
     }
-    
+
     for (size_t i = 0; i < slots->count; ++i) {
         DictionaryEntrySlot *candidate = DynMemArr_get(slots, i);
 
         if (candidate && strcmp(key, candidate->key) == 0) {
+            destroySlotMembers(candidate);
             DynMemArr_remove(slots, i);
             return true;
         }
