@@ -20,6 +20,10 @@ U32ValueDictionaryHandle U32ValueDictionary_create() {
     return recomputil_create_u32_memory_hashmap(sizeof(DynamicMemoryArray));
 }
 
+void U32ValueDictionary_destroy(U32ValueDictionaryHandle dict) {
+    recomputil_destroy_u32_memory_hashmap(dict);
+}
+
 bool U32ValueDictionary_set(U32ValueDictionaryHandle dict, const char *key, u32 value) {
     size_t keyLen = strlen(key);
 
