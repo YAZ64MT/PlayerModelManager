@@ -4,6 +4,7 @@
 #include "recompdata.h"
 #include "recomputils.h"
 #include "dynmemarray.h"
+#include "dynu32array.h"
 #include "fnv.h"
 
 u32 hasher(const void *data, size_t length) {
@@ -15,35 +16,97 @@ typedef struct {
     u32 value;
 } DictionaryEntrySlot;
 
+typedef struct {
+    U32MemoryHashmapHandle hashmap;
+    DynamicU32Array keyHashes;
+} Dictionary;
+
 void destroySlotMembers(DictionaryEntrySlot *slot) {
     recomp_free(slot->key);
     slot->key = NULL;
 }
 
+static U32ValueDictionaryHandle sNextDictHandle = 1;
+static U32MemoryHashmapHandle sDictionaries;
+
 U32ValueDictionaryHandle U32ValueDictionary_create() {
-    return recomputil_create_u32_memory_hashmap(sizeof(DynamicMemoryArray));
+    U32ValueDictionaryHandle h = sNextDictHandle;
+    sNextDictHandle++;
+
+    if (recomputil_u32_memory_hashmap_create(sDictionaries, h)) {
+        Dictionary *dict = recomputil_u32_memory_hashmap_get(sDictionaries, h);
+
+        if (dict) {
+            dict->hashmap = recomputil_create_u32_memory_hashmap(sizeof(DynamicMemoryArray));
+            DynU32Arr_init(&dict->keyHashes);
+        } else {
+            return 0;
+        }
+    } else {
+        return 0;
+    }
+
+    return h;
 }
 
-void U32ValueDictionary_destroy(U32ValueDictionaryHandle dict) {
-    recomputil_destroy_u32_memory_hashmap(dict);
+bool isValidDictionary(U32ValueDictionaryHandle dictHandle) {
+    return recomputil_u32_memory_hashmap_contains(sDictionaries, dictHandle);
 }
 
-bool U32ValueDictionary_set(U32ValueDictionaryHandle dict, const char *key, u32 value) {
+Dictionary *getDictionary(U32ValueDictionaryHandle dictHandle) {
+    return recomputil_u32_memory_hashmap_get(sDictionaries, dictHandle);
+}
+
+void U32ValueDictionary_destroy(U32ValueDictionaryHandle dictHandle) {
+    Dictionary *dict = getDictionary(dictHandle);
+
+    if (!dict) {
+        return;
+    }
+
+    for (size_t i = 0; i < dict->keyHashes.count; ++i) {
+        u32 hash = dict->keyHashes.data[i];
+
+        DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict->hashmap, hash);
+
+        if (slots) {
+            for (size_t j = 0; slots->count; ++j) {
+                DictionaryEntrySlot *slot = DynMemArr_get(slots, j);
+
+                if (slot) {
+                    destroySlotMembers(slot);
+                }
+            }
+
+            DynMemArr_destroyMembers(slots);
+        }
+    }
+
+    recomputil_u32_memory_hashmap_erase(sDictionaries, dictHandle);
+}
+
+bool U32ValueDictionary_set(U32ValueDictionaryHandle dictHandle, const char *key, u32 value) {
+    Dictionary *dict = getDictionary(dictHandle);
+
+    if (!dict) {
+        return false;
+    }
+
     size_t keyLen = strlen(key);
 
     u32 hash = hasher(key, keyLen);
 
     DynamicMemoryArray *dynMemArr = NULL;
 
-    if (recomputil_u32_memory_hashmap_create(dict, hash)) {
-        dynMemArr = recomputil_u32_memory_hashmap_get(dict, hash);
+    if (recomputil_u32_memory_hashmap_create(dict->hashmap, hash)) {
+        dynMemArr = recomputil_u32_memory_hashmap_get(dict->hashmap, hash);
 
         // collisions should be rare, so start with 1 slot
         DynMemArr_init(dynMemArr, sizeof(DictionaryEntrySlot), 1);
     }
 
     if (!dynMemArr) {
-        dynMemArr = recomputil_u32_memory_hashmap_get(dict, hash);
+        dynMemArr = recomputil_u32_memory_hashmap_get(dict->hashmap, hash);
     }
 
     DictionaryEntrySlot *slot = NULL;
@@ -58,7 +121,7 @@ bool U32ValueDictionary_set(U32ValueDictionaryHandle dict, const char *key, u32 
 
     bool wasElementCreated = !!slot;
 
-    if (!slot) {
+    if (!wasElementCreated) {
         slot = DynMemArr_createElement(dynMemArr);
         slot->key = recomp_alloc((keyLen + 1) * sizeof(*key));
         strcpy(slot->key, key);
@@ -66,17 +129,25 @@ bool U32ValueDictionary_set(U32ValueDictionaryHandle dict, const char *key, u32 
 
     if (slot) {
         slot->value = value;
+
+        DynU32Arr_push(&dict->keyHashes, hash);
     }
 
     return wasElementCreated;
 }
 
-bool U32ValueDictionary_get(U32ValueDictionaryHandle dict, const char *key, u32 *out) {
+bool U32ValueDictionary_get(U32ValueDictionaryHandle dictHandle, const char *key, u32 *out) {
+    Dictionary *dict = getDictionary(dictHandle);
+
+    if (!dict) {
+        return false;
+    }
+
     size_t keyLen = strlen(key);
 
     u32 hash = hasher(key, keyLen);
 
-    DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict, hash);
+    DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict->hashmap, hash);
 
     if (!slots) {
         return false;
@@ -94,12 +165,18 @@ bool U32ValueDictionary_get(U32ValueDictionaryHandle dict, const char *key, u32 
     return false;
 }
 
-bool U32ValueDictionary_has(U32ValueDictionaryHandle dict, const char *key) {
+bool U32ValueDictionary_has(U32ValueDictionaryHandle dictHandle, const char *key) {
+    Dictionary *dict = getDictionary(dictHandle);
+
+    if (!dict) {
+        return false;
+    }
+
     size_t keyLen = strlen(key);
 
     u32 hash = hasher(key, keyLen);
 
-    DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict, hash);
+    DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict->hashmap, hash);
 
     if (!slots) {
         return false;
@@ -116,12 +193,18 @@ bool U32ValueDictionary_has(U32ValueDictionaryHandle dict, const char *key) {
     return false;
 }
 
-bool U32ValueDictionary_unset(U32ValueDictionaryHandle dict, const char *key) {
+bool U32ValueDictionary_unset(U32ValueDictionaryHandle dictHandle, const char *key) {
+    Dictionary *dict = getDictionary(dictHandle);
+
+    if (!dict) {
+        return false;
+    }
+
     size_t keyLen = strlen(key);
 
     u32 hash = hasher(key, keyLen);
 
-    DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict, hash);
+    DynamicMemoryArray *slots = recomputil_u32_memory_hashmap_get(dict->hashmap, hash);
 
     if (!slots) {
         return false;
@@ -138,4 +221,9 @@ bool U32ValueDictionary_unset(U32ValueDictionaryHandle dict, const char *key) {
     }
 
     return false;
+}
+
+RECOMP_CALLBACK(".", _internal_initDictionary)
+void initU32StringDictionaryHandleTracker() {
+    sDictionaries = recomputil_create_u32_memory_hashmap(sizeof(Dictionary));
 }

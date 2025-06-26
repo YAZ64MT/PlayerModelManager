@@ -9,6 +9,8 @@ typedef struct {
     size_t count;
 } DynamicU32Array;
 
+void DynU32Arr_init(DynamicU32Array *dArr);
+
 void DynU32Arr_clear(DynamicU32Array *dArr);
 
 void DynU32Arr_destroyMembers(DynamicU32Array *dArr);

@@ -27,6 +27,12 @@ void resizeDynU32Arr(DynamicU32Array *dArr, size_t newSize) {
     }
 }
 
+void DynU32Arr_init(DynamicU32Array *dArr) {
+    dArr->capacity = 0;
+    dArr->count = 0;
+    dArr->data = NULL;
+}
+
 void DynU32Arr_clear(DynamicU32Array *dArr) {
     dArr->count = 0;
 }
