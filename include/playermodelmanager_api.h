@@ -233,9 +233,7 @@ typedef void PlayerModelManagerEventHandler(PlayerModelManagerFormHandle handle,
 // A handle represents an entry in the in-game model manager menu, so hold onto it.
 //
 // Choose a unique string identifier. It will not show up in the menu if you set a display name, so it need not be human readable.
-// There is a maximum length of 255 characters.
-//
-// Choose a model type from the PlayerModelManager_FormModelType enum. For now, only PMM_FORM_MODEL_TYPE_CHILD and PMM_FORM_MODEL_TYPE_ADULT are supported.
+// There is a maximum length of 64 characters.
 //
 // This function can only be used during the PlayerModelManager_onRegisterModels event. Otherwise, an invalid handle will be returned.
 #define PLAYERMODELMANAGER_REGISTER_FORM_MODEL(internalName, modelType) PlayerModelManager_registerFormModel(PMM_API_VERSION, id, modelType)
@@ -243,25 +241,49 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerFormHandle PlayerModelManage
 
 // Sets the name that will appear in the menu for the passed in model handle.
 //
-// Limited to 64 characters.
+// Limited to 32 characters.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandle h, char *displayName));
 
 // Sets the name that will appear in the author field of the menu.
 //
-// Limited to 128 characters.
+// Limited to 64 characters.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, char *author));
 
-// Set a display list on the model. The ID can be obtained from PlayerModelManager_DisplayListId
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDL(PlayerModelManagerFormHandle h, PlayerModelManager_DisplayListId dlId, Gfx *dl));
-
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMtx(PlayerModelManagerFormHandle h, PlayerModelManager_MatrixId mtxId, Mtx *matrix));
-
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setCallback(PlayerModelManagerFormHandle h, PlayerModelManagerEventHandler *callback, void *userdata));
-
+// Sets the skeleton and any display lists attached to it on a custom model.
+//
+// Returns true if successfully set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setSkeleton(PlayerModelManagerFormHandle h, FlexSkeletonHeader *skel));
 
+// Sets the skeleton and any display lists attached to it on the shielding skeleton of a custom model.
+//
+// This is used for Goron Link's guard animation, so make sure to pass in a skeleton with the appropriaate amount of limbs.
+//
+// Returns true if successfully set, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerFormHandle h, FlexSkeletonHeader *skel));
+
+// Set a display list on the model. The ID can be obtained from PlayerModelManager_DisplayListId.
+//
+// Returns true upon successful display list set, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDL(PlayerModelManagerFormHandle h, PlayerModelManager_DisplayListId dlId, Gfx *dl));
+
+// Sets a matrix on the custom model. 
+//
+// Returns true if matrix was successfully set, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMtx(PlayerModelManagerFormHandle h, PlayerModelManager_MatrixId mtxId, Mtx *matrix));
+
+// Set a callback function for this model. The types of events that can be responded to are in the PlayerModelManager_ModelEvent enum.
+//
+// Returns true if callback successfully set, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setCallback(PlayerModelManagerFormHandle h, PlayerModelManagerEventHandler *callback, void *userdata));
+
+// Set eye face textures for this model. Passed in array is expected to be at least 8 elements large.
+//
+// Returns true if eyes textures successfully set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setEyesTextures(PlayerModelManagerFormHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]));
 
+// Set mouth face textures for this model. Passed in array is expected to be at least 4 elements large.
+//
+// Returns true if mouth textures successfully set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMouthTextures(PlayerModelManagerFormHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]));
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getDL(unsigned long apiVersion, PlayerTransformation form, PlayerModelManager_DisplayListId dl));
