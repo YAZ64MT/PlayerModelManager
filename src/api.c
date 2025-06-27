@@ -9,10 +9,9 @@
 #define ENTRY_FORM(entry) (getFormFromModelType(entry->modelEntry.type))
 #define ENTRY_LOADED_PROXY(entry) (isEntryLoaded(entry) ? &gLinkFormProxies[ENTRY_FORM(entry)] : NULL)
 
-const size_t
-    MAX_INTERNAL_NAME_LENGTH = INTERNAL_NAME_MAX_LENGTH,
-    MAX_AUTHOR_NAME_LENGTH = 128,
-    MAX_DISPLAY_NAME_LENGTH = 64;
+#define MAX_INTERNAL_NAME_LENGTH 64
+#define MAX_AUTHOR_NAME_LENGTH 64
+#define MAX_DISPLAY_NAME_LENGTH 32
 
 bool isEntryLoaded(FormModelMemoryEntry *entry) {
     return entry &&
