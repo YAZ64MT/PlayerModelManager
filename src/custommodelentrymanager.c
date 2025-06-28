@@ -12,7 +12,7 @@
 #include "defines_ooto.h"
 #include "proxymm_kv_api.h"
 #include "playermodelmanager_api.h"
-#include "u32valuedictionary.h"
+#include "stringu32dictionary.h"
 
 #define ARRAY_GROWTH_FACTOR 3 / 2
 #define ARRAY_STARTING_SIZE 16
