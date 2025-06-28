@@ -141,7 +141,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     shims[LINK_SHIMDL_FPS_RHAND_BOW] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_BOW]);
     shims[LINK_SHIMDL_FPS_RHAND_HOOKSHOT] = createShimDisplayList(2, &dls[LINK_DL_FPS_RHAND], &dls[LINK_DL_FPS_HOOKSHOT]);
 
-    shims[LINK_SHIMDL_SHIELD1_ITEM] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD1_ODD], &dls[LINK_DL_SHIELD1], gPopModelViewMtx);
+    shims[LINK_SHIMDL_SHIELD1_ITEM] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD1_ITEM], &dls[LINK_DL_SHIELD1], gPopModelViewMtx);
 
     shims[LINK_SHIMDL_CENTER_FLOWER_PROPELLER_CLOSED] = createShimDisplayList(2, &dls[LINK_DL_FLOWER_PROPELLER_CLOSED], &dls[LINK_DL_FLOWER_CENTER_CLOSED]);
     shims[LINK_SHIMDL_CENTER_FLOWER_PROPELLER_OPEN] = createShimDisplayList(2, &dls[LINK_DL_FLOWER_PROPELLER_OPEN], &dls[LINK_DL_FLOWER_CENTER_OPEN]);
@@ -443,7 +443,7 @@ void refreshProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
     Mtx *matrix = formProxy->current.equipMtx[mtxId];
 
     if (!matrix) {
-        matrix = formProxy->current.equipMtx[mtxId];
+        matrix = formProxy->vanilla.equipMtx[mtxId];
     }
 
     if (!matrix) {
@@ -504,7 +504,7 @@ void initFormProxyMatrixes(Link_FormProxy *formProxy) {
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
         formProxy->mtxDisplayLists[i] = recomp_alloc(sizeof(Gfx) * 2);
 
-        gSPMatrix(&formProxy->mtxDisplayLists[i][0], &gZeroMtx, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+        gSPMatrix(&formProxy->mtxDisplayLists[i][0], &gIdentityMtx, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
         gSPEndDisplayList(&formProxy->mtxDisplayLists[i][1]);
     }
 }
