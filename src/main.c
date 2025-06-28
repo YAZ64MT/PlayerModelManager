@@ -152,7 +152,7 @@ RECOMP_DECLARE_EVENT(_internal_setupVanillaModels());
 
 // initialize player models as blank display lists
 void initFormProxies() {
-    for (u8 i = 0; i < PLAYER_FORM_MAX; ++i) {
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
         Link_FormProxy *formProxy = &gLinkFormProxies[i];
 
         clearLinkModelInfo(&formProxy->current);
@@ -160,11 +160,11 @@ void initFormProxies() {
         initFormProxy(formProxy, i);
 
         // vanilla forms share these segmented ptrs
-        for (u32 j = 0; j < PLAYER_EYES_MAX; ++j) {
+        for (int j = 0; j < PLAYER_EYES_MAX; ++j) {
             formProxy->vanilla.eyesTextures[j] = sPlayerEyesTextures[j];
         }
 
-        for (u32 j = 0; j < PLAYER_MOUTH_MAX; ++j) {
+        for (int j = 0; j < PLAYER_MOUTH_MAX; ++j) {
             formProxy->vanilla.mouthTextures[j] = sPlayerMouthTextures[j];
         }
 
