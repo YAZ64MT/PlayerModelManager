@@ -737,6 +737,10 @@ void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
     sIsFaceRefreshRequested = false;
 }
 
+void setupSharedListenerDL(ObjectId id, Gfx *vanillaDL, Link_DisplayList linkDLId) {
+    MRC_setupListenerDL(id, vanillaDL, MRC_PLAYER_FORM_EVERY, linkDLId);
+}
+
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initModelCommonHashObjs() {
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {

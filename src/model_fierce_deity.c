@@ -13,26 +13,7 @@ RECOMP_CALLBACK(".", _internal_setupVanillaModels)
 void setupVanillaFierceDeity() {
     Link_FormProxy *formProxy = &gLinkFormProxies[PLAYER_FORM_FIERCE_DEITY];
 
-    TexturePtr eyesTex[PLAYER_EYES_MAX];
-    TexturePtr mouthTex[PLAYER_MOUTH_MAX];
-
-    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
-        eyesTex[i] = formProxy->vanilla.eyesTextures[i];
-    }
-
-    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        mouthTex[i] = formProxy->vanilla.mouthTextures[i];
-    }
-
-    clearLinkModelInfo(&formProxy->vanilla);
-
-    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
-        formProxy->vanilla.eyesTextures[i] = eyesTex[i];
-    }
-
-    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        formProxy->vanilla.mouthTextures[i] = mouthTex[i];
-    }
+    clearModelInfoKeepEyes(&formProxy->vanilla);
 
     void *fd = GlobalObjects_getGlobalObject(OBJECT_LINK_BOY);
 

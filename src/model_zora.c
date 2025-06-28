@@ -12,26 +12,7 @@ RECOMP_CALLBACK(".", _internal_setupVanillaModels)
 void setupVanillaZora() {
     Link_FormProxy *formProxy = &gLinkFormProxies[PLAYER_FORM_ZORA];
 
-    TexturePtr eyesTex[PLAYER_EYES_MAX];
-    TexturePtr mouthTex[PLAYER_MOUTH_MAX];
-
-    for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
-        eyesTex[i] = formProxy->vanilla.eyesTextures[i];
-    }
-
-    for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        mouthTex[i] = formProxy->vanilla.mouthTextures[i];
-    }
-
-    clearLinkModelInfo(&formProxy->vanilla);
-
-    for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
-        formProxy->vanilla.eyesTextures[i] = eyesTex[i];
-    }
-
-    for (u32 i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        formProxy->vanilla.mouthTextures[i] = mouthTex[i];
-    }
+    clearModelInfoKeepEyes(&formProxy->vanilla);
 
     void *zora = GlobalObjects_getGlobalObject(OBJECT_LINK_ZORA);
 

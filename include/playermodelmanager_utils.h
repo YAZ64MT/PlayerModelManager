@@ -6,6 +6,8 @@
 #include "playermodelmanager.h"
 
 void clearLinkModelInfo(Link_ModelInfo *modelInfo);
+void clearModelInfoKeepEyes(Link_ModelInfo *info);
+
 Gfx *createShimWithMatrix(Mtx *matrix, u32 displayListCount, ...);
 Gfx *createShimDisplayList(u32 displayListCount, ...);
 

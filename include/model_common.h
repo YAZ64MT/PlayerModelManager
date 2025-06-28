@@ -20,5 +20,6 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target);
 void setSkeletonDLsOnModelInfo(Link_ModelInfo *info, FlexSkeletonHeader *skel);
 void requestRefreshFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId);
 void requestRefreshFormProxyMtx(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId);
+void setupSharedListenerDL(ObjectId id, Gfx *vanillaDL, Link_DisplayList linkDLId);
 
 #endif

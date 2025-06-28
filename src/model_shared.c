@@ -15,6 +15,7 @@
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "maskdls.h"
 #include "modelreplacer_compat.h"
+#include "model_common.h"
 
 // handless first person hookshot
 Gfx gLinkHumanFirstPersonHookshotDL[] = {
@@ -115,10 +116,6 @@ Mtx *getHumanMtx(Mtx *mtx) {
 
 Gfx *getGameplayKeepDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, dl);
-}
-
-void setupSharedListenerDL(ObjectId id, Gfx *vanillaDL, Link_DisplayList linkDLId) {
-    MRC_setupListenerDL(id, vanillaDL, MRC_PLAYER_FORM_EVERY, linkDLId);
 }
 
 void initSharedDLs() {
