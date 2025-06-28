@@ -1,27 +1,27 @@
-#ifndef __U32VALUEDICTIONARY_H__
-#define __U32VALUEDICTIONARY_H__
+#ifndef __STRINGU32DICTIONARY_H__
+#define __STRINGU32DICTIONARY_H__
 
 #include "ultra64.h"
 #include "recompdata.h"
 
-typedef U32MemoryHashmapHandle U32ValueDictionaryHandle;
+typedef U32MemoryHashmapHandle StringU32DictionaryHandle;
 
 // Creates a U32ValueDictionary and returns a handle
-U32ValueDictionaryHandle U32ValueDictionary_create();
+StringU32DictionaryHandle StringU32Dictionary_create();
 
 // Returns true if key was created, false otherwise.
-bool U32ValueDictionary_set(U32ValueDictionaryHandle dict, const char *key, u32 value);
+bool StringU32Dictionary_set(StringU32DictionaryHandle dict, const char *key, u32 value);
 
 // Destroys a U32ValueDictionary
-void U32ValueDictionary_destroy(U32ValueDictionaryHandle dict);
+void StringU32Dictionary_destroy(StringU32DictionaryHandle dict);
 
 // Returns true and writes to out if key exists, false and leaves out unmodified otherwise
-bool U32ValueDictionary_get(U32ValueDictionaryHandle dict, const char *key, u32 *out);
+bool StringU32Dictionary_get(StringU32DictionaryHandle dict, const char *key, u32 *out);
 
 // Returns true if key existed and was removed, false otherwise
-bool U32ValueDictionary_unset(U32ValueDictionaryHandle dict, const char *key);
+bool StringU32Dictionary_unset(StringU32DictionaryHandle dict, const char *key);
 
 // Returns true if key exists in dictionary, false otherwise
-bool U32ValueDictionary_has(U32ValueDictionaryHandle dict, const char *key);
+bool StringU32Dictionary_has(StringU32DictionaryHandle dict, const char *key);
 
 #endif

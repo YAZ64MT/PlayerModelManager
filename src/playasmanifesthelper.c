@@ -331,19 +331,19 @@ typedef enum {
     MDID_MAX
 } ManifestDictionaryId;
 
-static U32ValueDictionaryHandle sDictChild;
-static U32ValueDictionaryHandle sDictAdult;
-static U32ValueDictionaryHandle sDictHuman;
-static U32ValueDictionaryHandle sDictDeku;
-static U32ValueDictionaryHandle sDictZora;
-static U32ValueDictionaryHandle sDictFierceDeity;
-static U32ValueDictionaryHandle sDictGeneric;
+static StringU32DictionaryHandle sDictChild;
+static StringU32DictionaryHandle sDictAdult;
+static StringU32DictionaryHandle sDictHuman;
+static StringU32DictionaryHandle sDictDeku;
+static StringU32DictionaryHandle sDictZora;
+static StringU32DictionaryHandle sDictFierceDeity;
+static StringU32DictionaryHandle sDictGeneric;
 
-U32ValueDictionaryHandle newDict(const ManifestDictEntry m[], size_t n) {
-    U32ValueDictionaryHandle h = U32ValueDictionary_create();
+StringU32DictionaryHandle newDict(const ManifestDictEntry m[], size_t n) {
+    StringU32DictionaryHandle h = StringU32Dictionary_create();
 
     for (size_t i = 0; i < n; ++i) {
-        U32ValueDictionary_set(h, m[i].key, m[i].dlId);
+        StringU32Dictionary_set(h, m[i].key, m[i].dlId);
     }
 
     return h;

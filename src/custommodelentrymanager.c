@@ -22,7 +22,7 @@ RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 static U32MemoryHashmapHandle sHandleToMemoryEntry;
 static PlayerModelManagerFormHandle sNextMemoryHandle = 1;
 
-static U32ValueDictionaryHandle sInternalNamesToEntries;
+static StringU32DictionaryHandle sInternalNamesToEntries;
 
 typedef struct {
     void **entries;
@@ -73,7 +73,7 @@ void increaseDiskBufferSizeIfNeeded(PlayerTransformation form, size_t minSize) {
 void applyByInternalName(PlayerTransformation form, const char *name) {
     u32 entryPtr;
 
-    if (U32ValueDictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
+    if (StringU32Dictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
         CMEM_tryApplyEntry(form, (FormModelEntry *)entryPtr);
     }
 }
@@ -125,7 +125,7 @@ void increaseCapacity(FormModelEntries  *cme) {
 void pushEntry(FormModelEntries  *cme, void *entry) {
     FormModelEntry *fme = entry;
 
-    if (!U32ValueDictionary_has(sInternalNamesToEntries, fme->internalName)) {
+    if (!StringU32Dictionary_has(sInternalNamesToEntries, fme->internalName)) {
         size_t newCount = cme->count + 1;
 
         if (newCount > cme->capacity) {
@@ -135,7 +135,7 @@ void pushEntry(FormModelEntries  *cme, void *entry) {
         cme->entries[cme->count] = entry;
         cme->count++;
 
-        U32ValueDictionary_set(sInternalNamesToEntries, fme->internalName, (uintptr_t)entry);
+        StringU32Dictionary_set(sInternalNamesToEntries, fme->internalName, (uintptr_t)entry);
     }
 }
 
@@ -161,7 +161,7 @@ void pushDiskEntry(PlayerTransformation form, FormModelDiskEntry *entry) {
 void clearDiskEntries(PlayerTransformation form) {
     for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
         FormModelDiskEntry *curr = sDiskEntries[form].entries[i];
-        U32ValueDictionary_unset(sInternalNamesToEntries, curr->modelEntry.internalName);
+        StringU32Dictionary_unset(sInternalNamesToEntries, curr->modelEntry.internalName);
         FormModelDiskEntry_freeMembers(curr);
         recomp_free(curr);
         sDiskEntries[form].entries[i] = NULL;
@@ -603,5 +603,5 @@ void applySavedModelOnTitleScreen() {
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initCMEMHash() {
     sHandleToMemoryEntry = recomputil_create_u32_memory_hashmap(sizeof(FormModelMemoryEntry));
-    sInternalNamesToEntries = U32ValueDictionary_create();
+    sInternalNamesToEntries = StringU32Dictionary_create();
 }

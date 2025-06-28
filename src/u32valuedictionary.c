@@ -26,11 +26,11 @@ void destroySlotMembers(DictionaryEntrySlot *slot) {
     slot->key = NULL;
 }
 
-static U32ValueDictionaryHandle sNextDictHandle = 1;
+static StringU32DictionaryHandle sNextDictHandle = 1;
 static U32MemoryHashmapHandle sDictionaries;
 
-U32ValueDictionaryHandle U32ValueDictionary_create() {
-    U32ValueDictionaryHandle h = sNextDictHandle;
+StringU32DictionaryHandle StringU32Dictionary_create() {
+    StringU32DictionaryHandle h = sNextDictHandle;
     sNextDictHandle++;
 
     if (recomputil_u32_memory_hashmap_create(sDictionaries, h)) {
@@ -49,15 +49,15 @@ U32ValueDictionaryHandle U32ValueDictionary_create() {
     return h;
 }
 
-bool isValidDictionary(U32ValueDictionaryHandle dictHandle) {
+bool isValidDictionary(StringU32DictionaryHandle dictHandle) {
     return recomputil_u32_memory_hashmap_contains(sDictionaries, dictHandle);
 }
 
-Dictionary *getDictionary(U32ValueDictionaryHandle dictHandle) {
+Dictionary *getDictionary(StringU32DictionaryHandle dictHandle) {
     return recomputil_u32_memory_hashmap_get(sDictionaries, dictHandle);
 }
 
-void U32ValueDictionary_destroy(U32ValueDictionaryHandle dictHandle) {
+void StringU32Dictionary_destroy(StringU32DictionaryHandle dictHandle) {
     Dictionary *dict = getDictionary(dictHandle);
 
     if (!dict) {
@@ -85,7 +85,7 @@ void U32ValueDictionary_destroy(U32ValueDictionaryHandle dictHandle) {
     recomputil_u32_memory_hashmap_erase(sDictionaries, dictHandle);
 }
 
-bool U32ValueDictionary_set(U32ValueDictionaryHandle dictHandle, const char *key, u32 value) {
+bool StringU32Dictionary_set(StringU32DictionaryHandle dictHandle, const char *key, u32 value) {
     Dictionary *dict = getDictionary(dictHandle);
 
     if (!dict) {
@@ -136,7 +136,7 @@ bool U32ValueDictionary_set(U32ValueDictionaryHandle dictHandle, const char *key
     return wasElementCreated;
 }
 
-bool U32ValueDictionary_get(U32ValueDictionaryHandle dictHandle, const char *key, u32 *out) {
+bool StringU32Dictionary_get(StringU32DictionaryHandle dictHandle, const char *key, u32 *out) {
     Dictionary *dict = getDictionary(dictHandle);
 
     if (!dict) {
@@ -165,7 +165,7 @@ bool U32ValueDictionary_get(U32ValueDictionaryHandle dictHandle, const char *key
     return false;
 }
 
-bool U32ValueDictionary_has(U32ValueDictionaryHandle dictHandle, const char *key) {
+bool StringU32Dictionary_has(StringU32DictionaryHandle dictHandle, const char *key) {
     Dictionary *dict = getDictionary(dictHandle);
 
     if (!dict) {
@@ -193,7 +193,7 @@ bool U32ValueDictionary_has(U32ValueDictionaryHandle dictHandle, const char *key
     return false;
 }
 
-bool U32ValueDictionary_unset(U32ValueDictionaryHandle dictHandle, const char *key) {
+bool StringU32Dictionary_unset(StringU32DictionaryHandle dictHandle, const char *key) {
     Dictionary *dict = getDictionary(dictHandle);
 
     if (!dict) {

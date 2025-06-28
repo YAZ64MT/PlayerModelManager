@@ -177,7 +177,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
 #undef SHIM_SHIELD_RFIST
 }
 
-void setDlToShims(Link_FormProxy *formProxy) {
+void setDLsToShims(Link_FormProxy *formProxy) {
 
 #define PROXY_TO_SHIM(dlName) gSPDisplayList(&formProxy->wrappedDisplayLists[LINK_DL_##dlName].displayList[WRAPPED_DL_DRAW], formProxy->shimDisplayListPtrs[LINK_SHIMDL_##dlName])
 
@@ -394,7 +394,7 @@ void refreshProxyDLs(Link_FormProxy *formProxy) {
         gSPDisplayList(&wDLs[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
     }
 
-    setDlToShims(formProxy);
+    setDLsToShims(formProxy);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         Gfx *dl = getFormProxyDL(formProxy, i);
