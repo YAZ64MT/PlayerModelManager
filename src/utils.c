@@ -11,7 +11,7 @@ void clearLinkModelInfo(Link_ModelInfo* modelInfo) {
     memset(modelInfo, 0, sizeof(Link_ModelInfo));
 }
 
-void clearVanillaModelInfo(Link_ModelInfo *info) {
+void clearModelInfoKeepEyes(Link_ModelInfo *info) {
 
     TexturePtr eyesTex[PLAYER_EYES_MAX];
     TexturePtr mouthTex[PLAYER_MOUTH_MAX];
