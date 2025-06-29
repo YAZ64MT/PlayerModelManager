@@ -98,6 +98,8 @@ void remapPtrs(void *obj, Gfx *dlPtr, U32ValueHashmapHandle oldPtrs2New) {
             case G_VTX:
             case G_MTX:
             case G_SETTIMG:
+            case G_SETZIMG:
+            case G_SETCIMG:
             case G_MOVEMEM:
                 recomputil_u32_value_hashmap_get(oldPtrs2New, globalPtr->words.w1, &globalPtr->words.w1);
                 break;
