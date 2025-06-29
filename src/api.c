@@ -401,6 +401,10 @@ RECOMP_EXPORT Gfx *PlayerModelManager_getDL(unsigned long apiVersion, PlayerTran
         return NULL;
     }
 
+    if (form >= PLAYER_FORM_MAX || dl >= LINK_DL_MAX) {
+        return NULL;
+    }
+
     return &gLinkFormProxies[form].displayLists[dl];
 }
 
