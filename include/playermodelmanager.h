@@ -24,6 +24,8 @@ typedef enum {
     LINK_DL_RHAND,
     LINK_DL_SHEATH_NONE,
     LINK_DL_TORSO,
+
+    // Other hand DLs
     LINK_DL_LFIST,
     LINK_DL_LHAND_BOTTLE,
     LINK_DL_LHAND_GUITAR,
@@ -60,6 +62,8 @@ typedef enum {
     LINK_DL_SHIELD3_RAY, // Mirror Shield Projection
     LINK_DL_BOTTLE_GLASS,
     LINK_DL_BOTTLE_CONTENTS,
+
+    // Items
     LINK_DL_OCARINA_FAIRY,
     LINK_DL_OCARINA_TIME,
     LINK_DL_DEKU_STICK,
@@ -73,10 +77,16 @@ typedef enum {
     LINK_DL_HOOKSHOT_HOOK,
     LINK_DL_HOOKSHOT_RETICLE,
     LINK_DL_FPS_HOOKSHOT,
+    LINK_DL_BOOMERANG,
+    LINK_DL_HAMMER,
+
+    // First Person
     LINK_DL_FPS_LFOREARM,
     LINK_DL_FPS_LHAND,
     LINK_DL_FPS_RFOREARM,
     LINK_DL_FPS_RHAND,
+
+    // Masks
     LINK_DL_MASK_SKULL,
     LINK_DL_MASK_SPOOKY,
     LINK_DL_MASK_GERUDO,
@@ -109,12 +119,14 @@ typedef enum {
     LINK_DL_MASK_GORON_SCREAM,
     LINK_DL_MASK_ZORA_SCREAM,
     LINK_DL_MASK_FIERCE_DEITY_SCREAM,
+
+    // Elegy of Emptiness statues
     LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN,
     LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,
     LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON,
     LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,
-    LINK_DL_BOOMERANG,
-    LINK_DL_HAMMER,
+
+    // Strength Upgrades (OoT)
     LINK_DL_BRACELET_LFOREARM,
     LINK_DL_GAUNTLET_LFOREARM,
     LINK_DL_GAUNTLET_LHAND,
@@ -122,10 +134,14 @@ typedef enum {
     LINK_DL_GAUNTLET_RFOREARM,
     LINK_DL_GAUNTLET_RHAND,
     LINK_DL_GAUNTLET_RFIST,
+
+    // Boots (OoT)
     LINK_DL_BOOT_LIRON,
     LINK_DL_BOOT_RIRON,
     LINK_DL_BOOT_LHOVER,
     LINK_DL_BOOT_RHOVER,
+
+    // Deku Instrument / Pipes
     LINK_DL_DEKU_GUARD,
     LINK_DL_PIPE_MOUTH,
     LINK_DL_PIPE_RIGHT,
@@ -133,6 +149,8 @@ typedef enum {
     LINK_DL_PIPE_DOWN,
     LINK_DL_PIPE_LEFT,
     LINK_DL_PIPE_A,
+
+    // Deku Propellers
     LINK_DL_STEM_RIGHT,
     LINK_DL_STEM_LEFT,
     LINK_DL_PETAL_PARTICLE,
@@ -140,9 +158,13 @@ typedef enum {
     LINK_DL_FLOWER_CENTER_CLOSED,
     LINK_DL_FLOWER_PROPELLER_OPEN,
     LINK_DL_FLOWER_CENTER_OPEN,
+
+    // Deku Pad DLs
     LINK_DL_PAD_WOOD,
     LINK_DL_PAD_GRASS,
     LINK_DL_PAD_OPENING,
+
+    // Goron Instrument / Drums
     LINK_DL_DRUM_STRAP,
     LINK_DL_DRUM_UP,
     LINK_DL_DRUM_LEFT,
@@ -155,24 +177,25 @@ typedef enum {
     LINK_DL_BODY_SHIELD_BODY,
     LINK_DL_BODY_SHIELD_ARMS_AND_LEGS,
 
+    // Goron Roll / Goron Magic DLs
     LINK_DL_CURLED,
     LINK_DL_SPIKES,
     LINK_DL_FIRE_INIT,
     LINK_DL_FIRE_ROLL,
     LINK_DL_FIRE_PUNCH,
+
+    // Zora Fins
     LINK_DL_LFIN,
     LINK_DL_LFIN_SWIM,
     LINK_DL_RFIN,
     LINK_DL_RFIN_SWIM,
     LINK_DL_FIN_SHIELD,
-    LINK_DL_MAGIC_BARRIER,
-    LINK_DL_GUITAR,
 
-    // This should be in sync with the end of ZPlayerModelManager_DisplayListId
-    // in playermodelmanager_api.h
-    //
-    // To preserve compatibility between versions, do not change the ordering of DLs before this point.
-    LINK_DL_API_END,
+    // Zora Magic
+    LINK_DL_MAGIC_BARRIER,
+
+    // Zora Instrument / Guitar
+    LINK_DL_GUITAR,
 
     // Keep these shim names in sync with Link_ShimDisplayList
 
@@ -252,9 +275,9 @@ typedef enum {
     LINK_DL_RFIST_SHIELD3,
 
     // Reserved (OoT)
-    LINK_DL_SHIELD1_ITEM,
-    LINK_DL_SWORD3_PEDESTAL,
-    LINK_DL_SWORD3_PEDESTAL_GRABBED,
+    LINK_DL_SHIELD1_ITEM,            // Burning Deku Shield
+    LINK_DL_SWORD3_PEDESTAL,         // Master Sword rotated to be inside pedestal
+    LINK_DL_SWORD3_PEDESTAL_GRABBED, // Master Sword rotated for grabbed from pedestal
 
     // Left First + Items
     LINK_DL_LFIST_HAMMER,
