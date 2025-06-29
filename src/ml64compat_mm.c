@@ -469,7 +469,7 @@ RECOMP_CALLBACK(".", _internal_onReadyML64CompatBase)
 void initML64CompatMM_onReadyML64CompatBase() {
     remapSegmentPtrs();
 
-    guPosition(&sHookshotMatrix, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
+    guPosition(&sHookshotMatrix, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 800.0f);
 
     _internal_onReadyML64Compat();
 }
