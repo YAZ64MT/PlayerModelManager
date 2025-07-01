@@ -13,6 +13,8 @@ typedef unsigned long PlayerModelManagerFormHandle;
 #define YAZMT_PMM_MOD_NAME "yazmt_mm_playermodelmanager"
 
 typedef enum {
+
+    // Main skeleton DLs
     PMM_DL_WAIST,
     PMM_DL_RTHIGH,
     PMM_DL_RSHIN,
@@ -430,12 +432,12 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMtx(PlayerModelMana
 // Returns true if callback successfully set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setCallback(PlayerModelManagerFormHandle h, PlayerModelManagerEventHandler *callback, void *userdata));
 
-// Set eye face textures for this model. Passed in array is expected to be at least 8 elements large.
+// Set eye flipbook textures for this model. Passed in array is expected to be at least 8 elements large.
 //
 // Returns true if successfully set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setEyesTextures(PlayerModelManagerFormHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]));
 
-// Set mouth face textures for this model. Passed in array is expected to be at least 4 elements large.
+// Set mouth flipbook textures for this model. Passed in array is expected to be at least 4 elements large.
 //
 // Returns true if successfully set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMouthTextures(PlayerModelManagerFormHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]));
