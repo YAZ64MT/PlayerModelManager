@@ -130,79 +130,73 @@ void initSharedDLs() {
 
     Gfx **models = gSharedDisplayLists;
 
-    // sword sheathes
+    // Gameplay Keep
+    setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL, LINK_DL_SWORD_KOKIRI_HILT);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gRazorSwordHandleDL, LINK_DL_SWORD_KOKIRI_HILT);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL, LINK_DL_SWORD_KOKIRI_BLADE);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gRazorSwordBladeDL, LINK_DL_SWORD_RAZOR_BLADE);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gDekuStickDL, LINK_DL_DEKU_STICK);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0, LINK_DL_BOW_ARROW);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gHookshotChainDL, LINK_DL_HOOKSHOT_CHAIN);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gHookshotReticleDL, LINK_DL_HOOKSHOT_RETICLE);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gBottleContentsDL, LINK_DL_BOTTLE_CONTENTS);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gBottleGlassDL, LINK_DL_BOTTLE_GLASS);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellHumanDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellDekuDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellGoronDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellZoraDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gDekuMaskDL, LINK_DL_MASK_DEKU);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gGoronMaskDL, LINK_DL_MASK_GORON);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gDekuMaskDL, LINK_DL_MASK_DEKU);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gFierceDeityMaskDL, LINK_DL_MASK_FIERCE_DEITY);
+
+    // Human
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanKokiriSwordSheathDL, LINK_DL_SWORD_KOKIRI_SHEATH);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanRazorSwordSheathDL, LINK_DL_SWORD_RAZOR_SHEATH);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL, LINK_DL_SWORD_GILDED_SHEATH);
 
-    // sword hilts
-    setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL, LINK_DL_SWORD_KOKIRI_HILT);
-    setupSharedListenerDL(GAMEPLAY_KEEP, gRazorSwordHandleDL, LINK_DL_SWORD_KOKIRI_HILT);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordHandleDL, LINK_DL_SWORD_GILDED_HILT);
-
-    // sword blades
-    setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL, LINK_DL_SWORD_KOKIRI_BLADE);
-    setupSharedListenerDL(GAMEPLAY_KEEP, gRazorSwordBladeDL, LINK_DL_SWORD_RAZOR_BLADE);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordBladeDL, LINK_DL_SWORD_GILDED_BLADE);
 
-    // shields
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanHerosShieldDL, LINK_DL_SHIELD_HERO);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanMirrorShieldDL, LINK_DL_SHIELD_MIRROR);
     setupSharedListenerDL(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0, LINK_DL_SHIELD_MIRROR_RAY);
 
-    setupSharedListenerDL(GAMEPLAY_KEEP, gDekuStickDL, LINK_DL_DEKU_STICK);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanBowDL, LINK_DL_BOW);
     setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_017818, LINK_DL_BOW_STRING);
-    setupSharedListenerDL(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0, LINK_DL_BOW_ARROW);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanHookshotDL, LINK_DL_HOOKSHOT);
-    setupSharedListenerDL(GAMEPLAY_KEEP, gHookshotChainDL, LINK_DL_HOOKSHOT_CHAIN);
-    setupSharedListenerDL(GAMEPLAY_KEEP, gHookshotReticleDL, LINK_DL_HOOKSHOT_RETICLE);
     setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_01D960, LINK_DL_HOOKSHOT_HOOK);
 
-    // First Person
     models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;       // not in Link obj
     GlobalObjects_rebaseDL(GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD), gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
 
-    // bottles
-    setupSharedListenerDL(GAMEPLAY_KEEP, gBottleContentsDL, LINK_DL_BOTTLE_CONTENTS);
-    setupSharedListenerDL(GAMEPLAY_KEEP, gBottleGlassDL, LINK_DL_BOTTLE_GLASS);
-
-    // whole sword
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
     models[LINK_DL_SWORD_GREAT_FAIRY_HILT] = gEmptyDL;
 
-#define SET_MASK_DL(linkDL, objectId, maskDL) (setupSharedListenerDL(objectId, maskDL, linkDL))
-
-    SET_MASK_DL(LINK_DL_MASK_TRUTH, OBJECT_MASK_TRUTH, object_mask_truth_DL_0001A0);
-    SET_MASK_DL(LINK_DL_MASK_KAFEIS_MASK, OBJECT_MASK_KERFAY, gKafeisMaskDL);
-    SET_MASK_DL(LINK_DL_MASK_ALL_NIGHT, OBJECT_MASK_YOFUKASI, object_mask_yofukasi_DL_000490);
-    SET_MASK_DL(LINK_DL_MASK_BUNNY, OBJECT_MASK_RABIT, object_mask_rabit_DL_000610);
-    SET_MASK_DL(LINK_DL_MASK_KEATON, OBJECT_MASK_KI_TAN, object_mask_ki_tan_DL_0004A0);
-    SET_MASK_DL(LINK_DL_MASK_GARO, OBJECT_MASK_JSON, object_mask_json_DL_0004C0);
-    SET_MASK_DL(LINK_DL_MASK_ROMANI, OBJECT_MASK_ROMERNY, object_mask_romerny_DL_0007A0);
-    SET_MASK_DL(LINK_DL_MASK_CIRCUS_LEADER, OBJECT_MASK_ZACHO, object_mask_zacho_DL_000700);
-    SET_MASK_DL(LINK_DL_MASK_POSTMAN, OBJECT_MASK_POSTHAT, object_mask_posthat_DL_000290);
-    SET_MASK_DL(LINK_DL_MASK_GREAT_FAIRY, OBJECT_MASK_BIGELF, object_mask_bigelf_DL_0016F0);
-    SET_MASK_DL(LINK_DL_MASK_GIBDO, OBJECT_MASK_GIBUDO, object_mask_gibudo_DL_000250);
-    SET_MASK_DL(LINK_DL_MASK_DON_GERO, OBJECT_MASK_GERO, gDonGeroMaskDL);
-    SET_MASK_DL(LINK_DL_MASK_KAMARO, OBJECT_MASK_DANCER, object_mask_dancer_DL_000EF0);
-    SET_MASK_DL(LINK_DL_MASK_CAPTAIN, OBJECT_MASK_SKJ, object_mask_skj_DL_0009F0);
-    SET_MASK_DL(LINK_DL_MASK_STONE, OBJECT_MASK_STONE, object_mask_stone_DL_000820);
-    SET_MASK_DL(LINK_DL_MASK_BREMEN, OBJECT_MASK_BREE, object_mask_bree_DL_0003C0);
-    SET_MASK_DL(LINK_DL_MASK_BLAST, OBJECT_MASK_BAKURETU, object_mask_bakuretu_DL_0005C0);
-    SET_MASK_DL(LINK_DL_MASK_BLAST_COOLING_DOWN, OBJECT_MASK_BAKURETU, object_mask_bakuretu_DL_000440);
-    SET_MASK_DL(LINK_DL_MASK_SCENTS, OBJECT_MASK_BU_SAN, object_mask_bu_san_DL_000710);
-    SET_MASK_DL(LINK_DL_MASK_GIANT, OBJECT_MASK_KYOJIN, object_mask_kyojin_DL_000380);
-    SET_MASK_DL(LINK_DL_MASK_FIERCE_DEITY, GAMEPLAY_KEEP, gFierceDeityMaskDL);
-    SET_MASK_DL(LINK_DL_MASK_GORON, GAMEPLAY_KEEP, gGoronMaskDL);
-    SET_MASK_DL(LINK_DL_MASK_ZORA, GAMEPLAY_KEEP, gZoraMaskDL);
-    SET_MASK_DL(LINK_DL_MASK_DEKU, GAMEPLAY_KEEP, gDekuMaskDL);
-    SET_MASK_DL(LINK_DL_MASK_FIERCE_DEITY_SCREAM, OBJECT_MASK_BOY, object_mask_boy_DL_000900);
-    SET_MASK_DL(LINK_DL_MASK_GORON_SCREAM, OBJECT_MASK_GORON, object_mask_goron_DL_0014A0);
-    SET_MASK_DL(LINK_DL_MASK_ZORA_SCREAM, OBJECT_MASK_ZORA, object_mask_zora_DL_000DB0);
-    SET_MASK_DL(LINK_DL_MASK_DEKU_SCREAM, OBJECT_MASK_NUTS, object_mask_nuts_DL_001D90);
-
-#undef SET_MASK_DL
+    setupSharedListenerDL(OBJECT_MASK_TRUTH, object_mask_truth_DL_0001A0, LINK_DL_MASK_TRUTH);
+    setupSharedListenerDL(OBJECT_MASK_KERFAY, gKafeisMaskDL, LINK_DL_MASK_KAFEIS_MASK);
+    setupSharedListenerDL(OBJECT_MASK_YOFUKASI, object_mask_yofukasi_DL_000490, LINK_DL_MASK_ALL_NIGHT);
+    setupSharedListenerDL(OBJECT_MASK_RABIT, object_mask_rabit_DL_000610, LINK_DL_MASK_BUNNY);
+    setupSharedListenerDL(OBJECT_MASK_KI_TAN, object_mask_ki_tan_DL_0004A0, LINK_DL_MASK_KEATON);
+    setupSharedListenerDL(OBJECT_MASK_JSON, object_mask_json_DL_0004C0, LINK_DL_MASK_GARO);
+    setupSharedListenerDL(OBJECT_MASK_ROMERNY, object_mask_romerny_DL_0007A0, LINK_DL_MASK_ROMANI);
+    setupSharedListenerDL(OBJECT_MASK_ZACHO, object_mask_zacho_DL_000700, LINK_DL_MASK_CIRCUS_LEADER);
+    setupSharedListenerDL(OBJECT_MASK_POSTHAT, object_mask_posthat_DL_000290, LINK_DL_MASK_POSTMAN);
+    setupSharedListenerDL(OBJECT_MASK_BIGELF, object_mask_bigelf_DL_0016F0, LINK_DL_MASK_GREAT_FAIRY);
+    setupSharedListenerDL(OBJECT_MASK_GIBUDO, object_mask_gibudo_DL_000250, LINK_DL_MASK_GIBDO);
+    setupSharedListenerDL(OBJECT_MASK_GERO, gDonGeroMaskDL, LINK_DL_MASK_DON_GERO);
+    setupSharedListenerDL(OBJECT_MASK_DANCER, object_mask_dancer_DL_000EF0, LINK_DL_MASK_KAMARO);
+    setupSharedListenerDL(OBJECT_MASK_SKJ, object_mask_skj_DL_0009F0, LINK_DL_MASK_CAPTAIN);
+    setupSharedListenerDL(OBJECT_MASK_STONE, object_mask_stone_DL_000820, LINK_DL_MASK_STONE);
+    setupSharedListenerDL(OBJECT_MASK_BREE, object_mask_bree_DL_0003C0, LINK_DL_MASK_BREMEN);
+    setupSharedListenerDL(OBJECT_MASK_BAKURETU, object_mask_bakuretu_DL_0005C0, LINK_DL_MASK_BLAST);
+    setupSharedListenerDL(OBJECT_MASK_BAKURETU, object_mask_bakuretu_DL_000440, LINK_DL_MASK_BLAST_COOLING_DOWN);
+    setupSharedListenerDL(OBJECT_MASK_BU_SAN, object_mask_bu_san_DL_000710, LINK_DL_MASK_SCENTS);
+    setupSharedListenerDL(OBJECT_MASK_KYOJIN, object_mask_kyojin_DL_000380, LINK_DL_MASK_GIANT);
+    setupSharedListenerDL(OBJECT_MASK_BOY, object_mask_boy_DL_000900, LINK_DL_MASK_FIERCE_DEITY_SCREAM);
+    setupSharedListenerDL(OBJECT_MASK_GORON, object_mask_goron_DL_0014A0, LINK_DL_MASK_GORON_SCREAM);
+    setupSharedListenerDL(OBJECT_MASK_ZORA, object_mask_zora_DL_000DB0, LINK_DL_MASK_ZORA_SCREAM);
+    setupSharedListenerDL(OBJECT_MASK_NUTS, object_mask_nuts_DL_001D90, LINK_DL_MASK_DEKU_SCREAM);
 
     // Zora DLs
     setupSharedListenerDL(OBJECT_LINK_ZORA, object_link_zora_DL_00CC38, LINK_DL_LFIN);
@@ -255,12 +249,6 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_017180, LINK_DL_BODY_SHIELD_BODY);
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_017620, LINK_DL_BODY_SHIELD_HEAD);
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_016A88, LINK_DL_BODY_SHIELD_ARMS_AND_LEGS);
-
-    // Elegy of Emptiness Statues
-    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellHumanDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN);
-    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellDekuDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU);
-    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellGoronDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON);
-    setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellZoraDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA);
 }
 
 RECOMP_CALLBACK(".", _internal_onReadyFormProxies)
