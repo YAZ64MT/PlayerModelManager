@@ -332,19 +332,19 @@ typedef enum {
 #define PMM_DL_SHIELD_MIRROR_RAY PMM_DL_SHIELD3_RAY
 
 typedef enum {
-    PMM_MATRIX_SWORD1_BACK,
-    PMM_MATRIX_SWORD2_BACK,
-    PMM_MATRIX_SWORD3_BACK,
-    PMM_MATRIX_SWORD4_BACK,
-    PMM_MATRIX_SWORD5_BACK,
-    PMM_MATRIX_SHIELD1_BACK,
-    PMM_MATRIX_SHIELD2_BACK,
-    PMM_MATRIX_SHIELD3_BACK,
-    PMM_MATRIX_SHIELD1_ITEM,
-    PMM_MATRIX_SWORD3_PEDESTAL,
-    PMM_MATRIX_SWORD3_PEDESTAL_GRABBED,
-    PMM_MATRIX_MAX,
-} PlayerModelManager_MatrixId;
+    PMM_GEAR_MTX_SWORD1_BACK,
+    PMM_GEAR_MTX_SWORD2_BACK,
+    PMM_GEAR_MTX_SWORD3_BACK,
+    PMM_GEAR_MTX_SWORD4_BACK,
+    PMM_GEAR_MTX_SWORD5_BACK,
+    PMM_GEAR_MTX_SHIELD1_BACK,
+    PMM_GEAR_MTX_SHIELD2_BACK,
+    PMM_GEAR_MTX_SHIELD3_BACK,
+    PMM_GEAR_MTX_SHIELD1_ITEM,
+    PMM_GEAR_MTX_SWORD3_PEDESTAL,
+    PMM_GEAR_MTX_SWORD3_PEDESTAL_GRABBED,
+    PMM_GEAR_MTX_MAX,
+} PlayerModelManager_GearMatrixId;
 
 #define PMM_MTX_SWORD_KOKIRI_BACK PMM_MTX_SWORD1_BACK
 #define PMM_MTX_SWORD_RAZOR_BACK PMM_MTX_SWORD2_BACK
@@ -425,7 +425,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDL(PlayerModelManag
 // Sets a matrix on the custom model.
 //
 // Returns true if matrix was successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMtx(PlayerModelManagerFormHandle h, PlayerModelManager_MatrixId mtxId, Mtx *matrix));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setGearMtx(PlayerModelManagerFormHandle h, PlayerModelManager_GearMatrixId mtxId, Mtx *matrix));
 
 // Set a callback function for this model. The types of events that can be responded to are in the PlayerModelManager_ModelEvent enum.
 //
