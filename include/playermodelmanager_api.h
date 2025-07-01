@@ -69,10 +69,10 @@ typedef enum {
     PMM_DL_SHIELD2,     // Hylian Shield / Hero's Shield
     PMM_DL_SHIELD3,     // Mirror Shield
     PMM_DL_SHIELD3_RAY, // Mirror Shield Projection
-    PMM_DL_BOTTLE_GLASS,
-    PMM_DL_BOTTLE_CONTENTS,
 
     // Items
+    PMM_DL_BOTTLE_GLASS,
+    PMM_DL_BOTTLE_CONTENTS,
     PMM_DL_OCARINA_FAIRY,
     PMM_DL_OCARINA_TIME,
     PMM_DL_DEKU_STICK,
@@ -86,7 +86,8 @@ typedef enum {
     PMM_DL_HOOKSHOT_HOOK,
     PMM_DL_HOOKSHOT_RETICLE,
     PMM_DL_FPS_HOOKSHOT,
-    PMM_DL_BOOMERANG,
+    PMM_DL_BOOMERANG,        // Boomerang model while held in hand
+    PMM_DL_BOOMERANG_FLYING, // Boomerang model after being thrown
     PMM_DL_HAMMER,
 
     // First Person
@@ -196,8 +197,10 @@ typedef enum {
     // Zora Fins
     PMM_DL_LFIN,
     PMM_DL_LFIN_SWIM,
+    PMM_DL_LFIN_BOOMERANG,
     PMM_DL_RFIN,
     PMM_DL_RFIN_SWIM,
+    PMM_DL_RFIN_BOOMERANG,
     PMM_DL_FIN_SHIELD,
 
     // Zora Magic

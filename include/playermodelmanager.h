@@ -60,10 +60,10 @@ typedef enum {
     LINK_DL_SHIELD2,     // Hylian Shield / Hero's Shield
     LINK_DL_SHIELD3,     // Mirror Shield
     LINK_DL_SHIELD3_RAY, // Mirror Shield Projection
-    LINK_DL_BOTTLE_GLASS,
-    LINK_DL_BOTTLE_CONTENTS,
 
     // Items
+    LINK_DL_BOTTLE_GLASS,
+    LINK_DL_BOTTLE_CONTENTS,
     LINK_DL_OCARINA_FAIRY,
     LINK_DL_OCARINA_TIME,
     LINK_DL_DEKU_STICK,
@@ -77,7 +77,8 @@ typedef enum {
     LINK_DL_HOOKSHOT_HOOK,
     LINK_DL_HOOKSHOT_RETICLE,
     LINK_DL_FPS_HOOKSHOT,
-    LINK_DL_BOOMERANG,
+    LINK_DL_BOOMERANG,        // Boomerang model while held in hand
+    LINK_DL_BOOMERANG_FLYING, // Boomerang model after being thrown
     LINK_DL_HAMMER,
 
     // First Person
@@ -187,8 +188,10 @@ typedef enum {
     // Zora Fins
     LINK_DL_LFIN,
     LINK_DL_LFIN_SWIM,
+    LINK_DL_LFIN_BOOMERANG,
     LINK_DL_RFIN,
     LINK_DL_RFIN_SWIM,
+    LINK_DL_RFIN_BOOMERANG,
     LINK_DL_FIN_SHIELD,
 
     // Zora Magic
