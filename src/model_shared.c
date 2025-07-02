@@ -147,7 +147,7 @@ void initSharedDLs() {
     setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellZoraDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA);
     setupSharedListenerDL(GAMEPLAY_KEEP, gDekuMaskDL, LINK_DL_MASK_DEKU);
     setupSharedListenerDL(GAMEPLAY_KEEP, gGoronMaskDL, LINK_DL_MASK_GORON);
-    setupSharedListenerDL(GAMEPLAY_KEEP, gDekuMaskDL, LINK_DL_MASK_DEKU);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gZoraMaskDL, LINK_DL_MASK_ZORA);
     setupSharedListenerDL(GAMEPLAY_KEEP, gFierceDeityMaskDL, LINK_DL_MASK_FIERCE_DEITY);
     setupSharedListenerDL(GAMEPLAY_KEEP, gameplay_keep_DL_06FE20, LINK_DL_LFIN_BOOMERANG);
     setupSharedListenerDL(GAMEPLAY_KEEP, gameplay_keep_DL_06FF68, LINK_DL_RFIN_BOOMERANG);
