@@ -328,6 +328,7 @@ static Gfx sHookshotTranslatedDL[] = {
     gsSPMatrix(&sHookshotMatrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW),
     gsSPDisplayList(gEmptyDisplayList),
     gsSPPopMatrix(G_MTX_MODELVIEW),
+    gsSPEndDisplayList(),
 };
 
 #define SET_OOTO_ADULT_MODEL(dest, src) SET_Z64O_MODEL(dest, src, OOTO_ADULT)
