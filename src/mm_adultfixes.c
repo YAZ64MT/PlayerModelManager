@@ -175,6 +175,26 @@ void fixArrowPos_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, 
     }
 }
 
+// Use adult camera for first person bow/hookshot
+static PlayerTransformation sRealPlayerFormFPCamera = PLAYER_FORM_HUMAN;
+static Player *sPlayerFPCamera;
+
+RECOMP_HOOK("func_8083868C")
+void fixFPCmaera_on_func_8083868C(PlayState *play, Player *this) {
+    sRealPlayerFormFPCamera = this->transformation;
+
+    sPlayerFPCamera = this;
+
+    if (this->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL) {
+        this->transformation = PLAYER_FORM_ZORA;
+    }
+}
+
+RECOMP_HOOK_RETURN("func_8083868C")
+void fixFPCmaera_on_return_func_8083868C() {
+    sPlayerFPCamera->transformation = sRealPlayerFormFPCamera;
+}
+
 // TODO: figure out what do do with this later
 /*
 #define ADULT_MASK_SCALE_MODIFIER 1.0f
