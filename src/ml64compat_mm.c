@@ -323,10 +323,10 @@ void setupZobjOotoChild(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_OOTO_CHILD_MODEL(FPS_RHAND);
 }
 
-static Mtx sHookshotMatrix;
-static Gfx sHookshotTranslatedDL[] = {
-    gsSPMatrix(&sHookshotMatrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW),
-    gsSPDisplayList(gEmptyDisplayList),
+static Mtx sHookshotHookMatrix;
+static Gfx sHookshotHookTranslatedDL[] = {
+    gsSPMatrix(&sHookshotHookMatrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW),
+    gsSPDisplayList(gEmptyDL),
     gsSPPopMatrix(G_MTX_MODELVIEW),
     gsSPEndDisplayList(),
 };
@@ -396,8 +396,8 @@ void setupZobjOotoAdult(Link_ModelInfo *modelInfo, u8 *zobj) {
     QSET_OOTO_ADULT_MODEL(SHIELD_MIRROR);
     QSET_OOTO_ADULT_MODEL(OCARINA_TIME);
 
-    modelInfo->models[LINK_DL_HOOKSHOT_HOOK] = sHookshotTranslatedDL;
-    gSPDisplayList(&sHookshotTranslatedDL[1], &zobj[OOTO_ADULT_LUT_DL_HOOKSHOT_HOOK]);
+    modelInfo->models[LINK_DL_HOOKSHOT_HOOK] = sHookshotHookTranslatedDL;
+    gSPDisplayList(&sHookshotHookTranslatedDL[1], &zobj[OOTO_ADULT_LUT_DL_HOOKSHOT_HOOK]);
 
     QSET_OOTO_ADULT_MODEL(HOOKSHOT_CHAIN);
     QSET_OOTO_ADULT_MODEL(HOOKSHOT_RETICLE);
@@ -470,7 +470,7 @@ RECOMP_CALLBACK(".", _internal_onReadyML64CompatBase)
 void initML64CompatMM_onReadyML64CompatBase() {
     remapSegmentPtrs();
 
-    guPosition(&sHookshotMatrix, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 800.0f);
+    guPosition(&sHookshotHookMatrix, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 800.0f);
 
     _internal_onReadyML64Compat();
 }
