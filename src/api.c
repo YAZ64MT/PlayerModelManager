@@ -257,7 +257,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDL(PlayerModelManagerFormHandle h, Link
     return true;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_setGearMtx(PlayerModelManagerFormHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix) {
+RECOMP_EXPORT bool PlayerModelManager_setMtx(PlayerModelManagerFormHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix) {
     if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
         recomp_printf("PlayerModelManager: Invalid matrix ID passed in to PlayerModelManager_setMtx.\n");
         return false;

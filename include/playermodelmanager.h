@@ -409,7 +409,7 @@ typedef enum {
 } Link_ShimDisplayList;
 
 // Parts after LINK_EQUIP need to be kept in sync with Link_ShimDisplayList
-// MUST BE KEPT IN SYNC WITH PlayerModelManager_GearMatrixId IN playermodelmanager_api.h
+// MUST BE KEPT IN SYNC WITH PlayerModelManager_MatrixId IN playermodelmanager_api.h
 typedef enum {
     LINK_EQUIP_MATRIX_SWORD1_BACK,
     LINK_EQUIP_MATRIX_SWORD2_BACK,
