@@ -196,49 +196,6 @@ void fixFPCmaera_on_return_func_8083868C() {
     sPlayerFPCamera->transformation = sRealPlayerFormFPCamera;
 }
 
-// TODO: figure out what do do with this later
-/*
-#define ADULT_MASK_SCALE_MODIFIER 1.0f
-#define ADULT_MASK_DOWNWARDS_OFFSET 0.0f
-#define ADULT_MASK_FORWARDS_OFSSEET 0.0f
-#define ADULT_MASK_LATERAL_OFFSET 0.0f
-bool gPushedMaskMatrix = false;
-extern LinkAnimationHeader gPlayerAnim_cl_setmask;
-RECOMP_HOOK("Player_PostLimbDrawGameplay")
-void on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
-    if (limbIndex == PLAYER_LIMB_HEAD && IS_HUMAN_ADULT_LINK_MODEL) {
-        Player *player = (Player *)actor;
-        if (((*dList1 != NULL) && ((u32)player->currentMask != PLAYER_MASK_NONE)) &&
-            (((player->transformation == PLAYER_FORM_HUMAN) &&
-              ((player->skelAnime.animation != &gPlayerAnim_cl_setmask) || (player->skelAnime.curFrame >= 12.0f))) ||
-             ((((player->transformation != PLAYER_FORM_HUMAN) && (player->currentMask >= PLAYER_MASK_FIERCE_DEITY)) &&
-               ((player->transformation + PLAYER_MASK_FIERCE_DEITY) != player->currentMask)) &&
-              (player->skelAnime.curFrame >= 10.0f)))) {
-            s32 maskMinusOne = player->currentMask - 1;
-            OPEN_DISPS(play->state.gfxCtx);
-            Matrix_Push();
-            gPushedMaskMatrix = true;
-            Matrix_Scale(ADULT_MASK_SCALE_MODIFIER, ADULT_MASK_SCALE_MODIFIER, ADULT_MASK_SCALE_MODIFIER, MTXMODE_APPLY);
-            Matrix_Translate(ADULT_MASK_FORWARDS_OFSSEET, ADULT_MASK_DOWNWARDS_OFFSET, ADULT_MASK_LATERAL_OFFSET, MTXMODE_APPLY);
-            MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, play->state.gfxCtx);
-            CLOSE_DISPS(play->state.gfxCtx);
-        } else {
-            gPushedMaskMatrix = false;
-        }
-    } else {
-        gPushedMaskMatrix = false;
-    }
-}
-
-RECOMP_HOOK_RETURN("Player_PostLimbDrawGameplay")
-void return_Player_PostLimbDrawGameplay(void) {
-    if (gPushedMaskMatrix) {
-        Matrix_Pop();
-    }
-    gPushedMaskMatrix = false;
-}
-*/
-
 static PlayerTransformation sRealPlayerFormGrab;
 
 RECOMP_HOOK("EnRd_Grab") 

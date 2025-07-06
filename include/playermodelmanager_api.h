@@ -346,6 +346,7 @@ typedef enum {
     PMM_MTX_SHIELD1_ITEM,
     PMM_MTX_SWORD3_PEDESTAL,
     PMM_MTX_SWORD3_PEDESTAL_GRABBED,
+    PMM_MTX_MASKS,
     PMM_MTX_MAX,
 } PlayerModelManager_MatrixId;
 
