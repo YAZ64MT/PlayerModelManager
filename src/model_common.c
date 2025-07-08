@@ -13,6 +13,7 @@
 #include "globalobjects_api.h"
 #include "modelreplacer_compat.h"
 #include "dynu32array.h"
+#include "yazmtcorelib_api.h"
 
 bool gIsAgePropertyRefreshRequested = false;
 
@@ -665,36 +666,9 @@ void refreshFormProxy(Link_FormProxy *formProxy) {
     refreshProxyMatrixes(formProxy);
 }
 
-typedef struct {
-    DynamicU32Array dArr;
-    U32HashsetHandle set;
-} U32ArraySet;
-
-bool tryPushArraySet(U32ArraySet *arrSet, u32 value) {
-    if (recomputil_u32_hashset_insert(arrSet->set, value)) {
-        DynU32Arr_push(&arrSet->dArr, value);
-        return true;
-    }
-
-    return false;
-}
-
-void clearArraySet(U32ArraySet *arrSet) {
-    for (size_t i = 0; i < arrSet->dArr.count; ++i) {
-        recomputil_u32_hashset_erase(arrSet->set, arrSet->dArr.data[i]);
-    }
-
-    DynU32Arr_clear(&arrSet->dArr);
-
-}
-
-void initArraySet(U32ArraySet *arrSet) {
-    arrSet->set = recomputil_create_u32_hashset();
-}
-
 static bool sFullRefreshRequests[PLAYER_FORM_MAX];
-static U32ArraySet sDLRefreshReqs[PLAYER_FORM_MAX];
-static U32ArraySet sMtxRefreshReqs[PLAYER_FORM_MAX];
+static YAZMTCore_IterableU32Set *sDLRefreshReqs[PLAYER_FORM_MAX];
+static YAZMTCore_IterableU32Set *sMtxRefreshReqs[PLAYER_FORM_MAX];
 static bool sIsFaceRefreshRequested;
 
 void requestRefreshFormProxy(Link_FormProxy *formProxy) {
@@ -702,11 +676,11 @@ void requestRefreshFormProxy(Link_FormProxy *formProxy) {
 }
 
 void requestRefreshFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
-    tryPushArraySet(&sDLRefreshReqs[formProxy->form], linkDLId);
+    YAZMTCore_IterableU32Set_insert(sDLRefreshReqs[formProxy->form], linkDLId);
 }
 
 void requestRefreshFormProxyMtx(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
-    tryPushArraySet(&sMtxRefreshReqs[formProxy->form], mtxId);
+    YAZMTCore_IterableU32Set_insert(sMtxRefreshReqs[formProxy->form], mtxId);
 }
 
 void requestRefreshFaceTextures() {
@@ -717,24 +691,30 @@ RECOMP_CALLBACK("*", recomp_on_play_main)
 void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
         Link_FormProxy *fp = &gLinkFormProxies[i];
-        U32ArraySet *dlReqs = &sDLRefreshReqs[i];
-        U32ArraySet *mtxReqs = &sMtxRefreshReqs[i];
+        YAZMTCore_IterableU32Set *dlReqs = sDLRefreshReqs[i];
+        YAZMTCore_IterableU32Set *mtxReqs = sMtxRefreshReqs[i];
 
         if (sFullRefreshRequests[i]) {
             refreshFormProxy(fp);
         } else {
-            for (size_t j = 0; j < dlReqs->dArr.count; ++j) {
-                refreshProxyDL(fp, dlReqs->dArr.data[j]);
+            size_t dlReqsSize = YAZMTCore_IterableU32Set_size(dlReqs);
+            const u32 *dlReqsData = YAZMTCore_IterableU32Set_values(dlReqs);
+
+            for (size_t j = 0; j < dlReqsSize; ++j) {
+                refreshProxyDL(fp, dlReqsData[j]);
             }
 
-            for (size_t j = 0; j < mtxReqs->dArr.count; ++j) {
-                refreshProxyMatrix(fp, mtxReqs->dArr.data[j]);
+            size_t mtxReqsSize = YAZMTCore_IterableU32Set_size(mtxReqs);
+            const u32 *mtxReqsData = YAZMTCore_IterableU32Set_values(mtxReqs);
+
+            for (size_t j = 0; j < mtxReqsSize; ++j) {
+                refreshProxyMatrix(fp, mtxReqsData[j]);
             }
         }
 
         sFullRefreshRequests[i] = false;
-        clearArraySet(dlReqs);
-        clearArraySet(mtxReqs);
+        YAZMTCore_IterableU32Set_clear(dlReqs);
+        YAZMTCore_IterableU32Set_clear(mtxReqs);
     }
 
     if (sIsFaceRefreshRequested) {
@@ -751,7 +731,7 @@ void setupSharedListenerDL(ObjectId id, Gfx *vanillaDL, Link_DisplayList linkDLI
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initModelCommonHashObjs() {
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        initArraySet(&sDLRefreshReqs[i]);
-        initArraySet(&sMtxRefreshReqs[i]);
+        sDLRefreshReqs[i] = YAZMTCore_IterableU32Set_new();
+        sMtxRefreshReqs[i] = YAZMTCore_IterableU32Set_new();
     }
 }
