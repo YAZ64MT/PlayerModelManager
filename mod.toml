@@ -45,6 +45,7 @@ dependencies = [
     "yazmt_mm_global_objects",
     "yazmt_mm_modelreplacer",
     "ProxyMM_KV:0.0.5",
+    "yazmt_mm_corelib"
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.
