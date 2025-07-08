@@ -12,7 +12,6 @@
 #include "model_shared.h"
 #include "globalobjects_api.h"
 #include "modelreplacer_compat.h"
-#include "dynu32array.h"
 #include "yazmtcorelib_api.h"
 
 bool gIsAgePropertyRefreshRequested = false;
