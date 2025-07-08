@@ -195,7 +195,7 @@ void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
 static bool sPushedMaskMatrix = false;
 extern LinkAnimationHeader gPlayerAnim_cl_setmask;
 RECOMP_HOOK("Player_PostLimbDrawGameplay")
-void on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
+void useMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
     sPushedMaskMatrix = false;
 
     Mtx *maskMtx = GET_PLAYER_FORM_PROXY->current.equipMtx[LINK_EQUIP_MATRIX_MASKS];
@@ -222,7 +222,7 @@ void on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1
 }
 
 RECOMP_HOOK_RETURN("Player_PostLimbDrawGameplay")
-void return_Player_PostLimbDrawGameplay(void) {
+void useMaskMtx_on_return_Player_PostLimbDrawGameplay(void) {
     if (sPushedMaskMatrix) {
         Matrix_Pop();
     }
