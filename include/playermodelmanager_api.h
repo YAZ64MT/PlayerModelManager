@@ -12,6 +12,10 @@ typedef unsigned long PlayerModelManagerFormHandle;
 
 #define YAZMT_PMM_MOD_NAME "yazmt_mm_playermodelmanager"
 
+#define PMM_MAX_INTERNAL_NAME_LENGTH 64
+#define PMM_MAX_AUTHOR_NAME_LENGTH 64
+#define PMM_MAX_DISPLAY_NAME_LENGTH 32
+
 typedef enum {
 
     // Main skeleton DLs

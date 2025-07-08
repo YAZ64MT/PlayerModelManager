@@ -9,10 +9,6 @@
 #define ENTRY_FORM(entry) (getFormFromModelType(entry->modelEntry.type))
 #define ENTRY_LOADED_PROXY(entry) (isEntryLoaded(entry) ? &gLinkFormProxies[ENTRY_FORM(entry)] : NULL)
 
-#define MAX_INTERNAL_NAME_LENGTH 64
-#define MAX_AUTHOR_NAME_LENGTH 64
-#define MAX_DISPLAY_NAME_LENGTH 32
-
 bool isEntryLoaded(FormModelMemoryEntry *entry) {
     return entry &&
            entry->modelEntry.type != PMM_FORM_MODEL_TYPE_NONE &&
@@ -142,7 +138,7 @@ RECOMP_EXPORT PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(
         return 0;
     }
 
-    if (!isStrValid("PlayerModelManager_registerFormModel", internalName, MAX_INTERNAL_NAME_LENGTH)) {
+    if (!isStrValid("PlayerModelManager_registerFormModel", internalName, PMM_MAX_INTERNAL_NAME_LENGTH)) {
         return 0;
     }
 
@@ -171,7 +167,7 @@ RECOMP_EXPORT PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandle h, char *displayName) {
-    if (!isStrValid("PlayerModelManager_setDisplayName", displayName, MAX_DISPLAY_NAME_LENGTH)) {
+    if (!isStrValid("PlayerModelManager_setDisplayName", displayName, PMM_MAX_DISPLAY_NAME_LENGTH)) {
         return 0;
     }
 
@@ -187,7 +183,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandl
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, char *author) {
-    if (!isStrValid("PlayerModelManager_setAuthor", author, MAX_AUTHOR_NAME_LENGTH)) {
+    if (!isStrValid("PlayerModelManager_setAuthor", author, PMM_MAX_AUTHOR_NAME_LENGTH)) {
         return false;
     }
 
