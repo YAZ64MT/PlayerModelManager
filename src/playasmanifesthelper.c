@@ -1,5 +1,5 @@
 #include "global.h"
-#include "stringu32dictionary.h"
+#include "yazmtcorelib_api.h"
 #include "playermodelmanager.h"
 
 typedef struct {
@@ -332,19 +332,19 @@ typedef enum {
     MDID_MAX
 } ManifestDictionaryId;
 
-static StringU32DictionaryHandle sDictChild;
-static StringU32DictionaryHandle sDictAdult;
-static StringU32DictionaryHandle sDictHuman;
-static StringU32DictionaryHandle sDictDeku;
-static StringU32DictionaryHandle sDictZora;
-static StringU32DictionaryHandle sDictFierceDeity;
-static StringU32DictionaryHandle sDictGeneric;
+static YAZMTCore_StringU32Dictionary* sDictChild;
+static YAZMTCore_StringU32Dictionary* sDictAdult;
+static YAZMTCore_StringU32Dictionary* sDictHuman;
+static YAZMTCore_StringU32Dictionary* sDictDeku;
+static YAZMTCore_StringU32Dictionary* sDictZora;
+static YAZMTCore_StringU32Dictionary* sDictFierceDeity;
+static YAZMTCore_StringU32Dictionary* sDictGeneric;
 
-StringU32DictionaryHandle newDict(const ManifestDictEntry m[], size_t n) {
-    StringU32DictionaryHandle h = StringU32Dictionary_create();
+YAZMTCore_StringU32Dictionary *newDict(const ManifestDictEntry m[], size_t n) {
+    YAZMTCore_StringU32Dictionary *h = YAZMTCore_StringU32Dictionary_new();
 
     for (size_t i = 0; i < n; ++i) {
-        StringU32Dictionary_set(h, m[i].key, m[i].dlId);
+        YAZMTCore_StringU32Dictionary_set(h, m[i].key, m[i].dlId);
     }
 
     return h;

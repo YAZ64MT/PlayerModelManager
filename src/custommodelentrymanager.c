@@ -12,7 +12,7 @@
 #include "defines_ooto.h"
 #include "proxymm_kv_api.h"
 #include "playermodelmanager_api.h"
-#include "stringu32dictionary.h"
+#include "yazmtcorelib_api.h"
 
 #define ARRAY_GROWTH_FACTOR 3 / 2
 #define ARRAY_STARTING_SIZE 16
@@ -21,7 +21,7 @@ RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
 static MemorySlotmapHandle sHandleToMemoryEntry;
 
-static StringU32DictionaryHandle sInternalNamesToEntries;
+static YAZMTCore_StringU32Dictionary *sInternalNamesToEntries;
 
 typedef struct {
     void **entries;
@@ -72,7 +72,7 @@ void increaseDiskBufferSizeIfNeeded(PlayerTransformation form, size_t minSize) {
 void applyByInternalName(PlayerTransformation form, const char *name) {
     u32 entryPtr;
 
-    if (StringU32Dictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
+    if (YAZMTCore_StringU32Dictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
         CMEM_tryApplyEntry(form, (FormModelEntry *)entryPtr);
     }
 }
@@ -124,7 +124,7 @@ void increaseCapacity(FormModelEntries *cme) {
 void pushEntry(FormModelEntries *cme, void *entry) {
     FormModelEntry *fme = entry;
 
-    if (!StringU32Dictionary_has(sInternalNamesToEntries, fme->internalName)) {
+    if (!YAZMTCore_StringU32Dictionary_contains(sInternalNamesToEntries, fme->internalName)) {
         size_t newCount = cme->count + 1;
 
         if (newCount > cme->capacity) {
@@ -134,7 +134,7 @@ void pushEntry(FormModelEntries *cme, void *entry) {
         cme->entries[cme->count] = entry;
         cme->count++;
 
-        StringU32Dictionary_set(sInternalNamesToEntries, fme->internalName, (uintptr_t)entry);
+        YAZMTCore_StringU32Dictionary_set(sInternalNamesToEntries, fme->internalName, (uintptr_t)entry);
     }
 }
 
@@ -160,7 +160,7 @@ void pushDiskEntry(PlayerTransformation form, FormModelDiskEntry *entry) {
 void clearDiskEntries(PlayerTransformation form) {
     for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
         FormModelDiskEntry *curr = sDiskEntries[form].entries[i];
-        StringU32Dictionary_unset(sInternalNamesToEntries, curr->modelEntry.internalName);
+        YAZMTCore_StringU32Dictionary_unset(sInternalNamesToEntries, curr->modelEntry.internalName);
         FormModelDiskEntry_freeMembers(curr);
         recomp_free(curr);
         sDiskEntries[form].entries[i] = NULL;
@@ -608,5 +608,5 @@ void applySavedModelOnTitleScreen() {
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initCMEMHash() {
     sHandleToMemoryEntry = recomputil_create_memory_slotmap(sizeof(FormModelMemoryEntry));
-    sInternalNamesToEntries = StringU32Dictionary_create();
+    sInternalNamesToEntries = YAZMTCore_StringU32Dictionary_new();
 }
