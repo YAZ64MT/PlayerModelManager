@@ -19,8 +19,7 @@
 
 RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
 
-static U32MemoryHashmapHandle sHandleToMemoryEntry;
-static PlayerModelManagerFormHandle sNextMemoryHandle = 1;
+static MemorySlotmapHandle sHandleToMemoryEntry;
 
 static StringU32DictionaryHandle sInternalNamesToEntries;
 
@@ -28,10 +27,10 @@ typedef struct {
     void **entries;
     size_t count;
     size_t capacity;
-} FormModelEntries ;
+} FormModelEntries;
 
-static FormModelEntries  sDiskEntries[PLAYER_FORM_MAX];
-static FormModelEntries  sMemoryEntries[PLAYER_FORM_MAX];
+static FormModelEntries sDiskEntries[PLAYER_FORM_MAX];
+static FormModelEntries sMemoryEntries[PLAYER_FORM_MAX];
 
 static FormModelEntry *sCurrentModelEntries[PLAYER_FORM_MAX];
 
@@ -102,13 +101,13 @@ void CMEM_setCurrentEntry(PlayerTransformation form, FormModelEntry *e) {
     sCurrentModelEntries[form] = e;
 }
 
-void initFormModelEntries (FormModelEntries  *cme) {
+void initFormModelEntries(FormModelEntries *cme) {
     cme->capacity = ARRAY_STARTING_SIZE;
     cme->entries = recomp_alloc(sizeof(*cme->entries) * cme->capacity);
     cme->count = 0;
 }
 
-void increaseCapacity(FormModelEntries  *cme) {
+void increaseCapacity(FormModelEntries *cme) {
     void **newArray;
     size_t newCapacity = cme->capacity * ARRAY_GROWTH_FACTOR;
     newArray = recomp_alloc(sizeof(*newArray) * newCapacity);
@@ -122,7 +121,7 @@ void increaseCapacity(FormModelEntries  *cme) {
     cme->capacity = newCapacity;
 }
 
-void pushEntry(FormModelEntries  *cme, void *entry) {
+void pushEntry(FormModelEntries *cme, void *entry) {
     FormModelEntry *fme = entry;
 
     if (!StringU32Dictionary_has(sInternalNamesToEntries, fme->internalName)) {
@@ -141,8 +140,8 @@ void pushEntry(FormModelEntries  *cme, void *entry) {
 
 void initEntryManager() {
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        initFormModelEntries (&sDiskEntries[i]);
-        initFormModelEntries (&sMemoryEntries[i]);
+        initFormModelEntries(&sDiskEntries[i]);
+        initFormModelEntries(&sMemoryEntries[i]);
     }
 
     unsigned char *modFolderPath = recomp_get_mod_folder_path();
@@ -532,20 +531,26 @@ PlayerTransformation getFormFromModelType(FormModelType t) {
     return 0;
 }
 
+void *slotmapGet(MemorySlotmapHandle slotmap, collection_key_t k) {
+    void *result = NULL;
+
+    recomputil_memory_slotmap_get(slotmap, k, &result);
+
+    return result;
+}
+
 PlayerModelManagerFormHandle CMEM_createMemoryHandle(PlayerTransformation form) {
-    PlayerModelManagerFormHandle handle = sNextMemoryHandle;
+    PlayerModelManagerFormHandle handle = recomputil_memory_slotmap_create(sHandleToMemoryEntry);
 
-    sNextMemoryHandle++;
+    FormModelMemoryEntry *entry = slotmapGet(sHandleToMemoryEntry, handle);
 
-    recomputil_u32_memory_hashmap_create(sHandleToMemoryEntry, handle);
+    if (entry) {
+        FormModelMemoryEntry_init(entry);
 
-    FormModelMemoryEntry *entry = recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, handle);
+        entry->modelEntry.handle = handle;
 
-    FormModelMemoryEntry_init(entry);
-
-    entry->modelEntry.handle = handle;
-
-    pushMemoryEntry(form, entry);
+        pushMemoryEntry(form, entry);
+    }
 
     return handle;
 }
@@ -602,6 +607,6 @@ void applySavedModelOnTitleScreen() {
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initCMEMHash() {
-    sHandleToMemoryEntry = recomputil_create_u32_memory_hashmap(sizeof(FormModelMemoryEntry));
+    sHandleToMemoryEntry = recomputil_create_memory_slotmap(sizeof(FormModelMemoryEntry));
     sInternalNamesToEntries = StringU32Dictionary_create();
 }
