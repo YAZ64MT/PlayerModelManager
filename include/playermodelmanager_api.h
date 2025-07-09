@@ -1,9 +1,6 @@
 #ifndef __PLAYERMODELMANAGER_API__
 #define __PLAYERMODELMANAGER_API__
 
-#include "global.h"
-#include "modding.h"
-
 typedef unsigned long PlayerModelManagerFormHandle;
 
 // Used for keeping compatibility between versions
@@ -380,6 +377,9 @@ typedef enum {
 typedef void PlayerModelManagerEventHandler(PlayerModelManagerFormHandle handle, PlayerModelManager_ModelEvent event, void *userdata);
 
 #ifndef YAZMT_PMM_NO_API_IMPORTS
+
+#include "global.h"
+#include "modding.h"
 
 // Registers a new player model and returns a handle to it.
 //
