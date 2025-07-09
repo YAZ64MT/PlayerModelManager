@@ -390,7 +390,7 @@ typedef void PlayerModelManagerEventHandler(PlayerModelManagerFormHandle handle,
 //
 // This function can only be used during the PlayerModelManager_onRegisterModels event. Otherwise, an invalid handle will be returned.
 #define PLAYERMODELMANAGER_REGISTER_FORM_MODEL(internalName, modelType) PlayerModelManager_registerFormModel(PMM_API_VERSION, id, modelType)
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, char *id, PlayerModelManager_FormModelType modelType));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, const char *internalName, PlayerModelManager_FormModelType modelType));
 
 // Sets the name that will appear in the menu for the passed in model handle.
 //
@@ -399,7 +399,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerFormHandle PlayerModelManage
 // This function can only be used during the PlayerModelManager_onRegisterModels event.
 //
 // Returns true if successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandle h, char *displayName));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandle h, const char *displayName));
 
 // Sets the name that will appear in the author field of the menu.
 //
@@ -408,7 +408,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayName(PlayerM
 // This function can only be used during the PlayerModelManager_onRegisterModels event.
 //
 // Returns true if successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, char *author));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, const char *author));
 
 // Sets the skeleton and any display lists attached to it on a custom model.
 //

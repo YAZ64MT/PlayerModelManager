@@ -126,7 +126,7 @@ FormModelMemoryEntry *getEntryOrPrintErrLocked(PlayerModelManagerFormHandle h, c
     return getEntryOrPrintErr(h, funcName);
 }
 
-RECOMP_EXPORT PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, char *internalName, FormModelType modelType) {
+RECOMP_EXPORT PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, const char *internalName, FormModelType modelType) {
 
     if (apiVersion > PMM_API_VERSION) {
         recomp_printf("PlayerModelManager_registerFormModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
@@ -166,7 +166,7 @@ RECOMP_EXPORT PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(
     return h;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandle h, char *displayName) {
+RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandle h, const char *displayName) {
     if (!isStrValid("PlayerModelManager_setDisplayName", displayName, PMM_MAX_DISPLAY_NAME_LENGTH)) {
         return 0;
     }
@@ -182,7 +182,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandl
     return true;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, char *author) {
+RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, const char *author) {
     if (!isStrValid("PlayerModelManager_setAuthor", author, PMM_MAX_AUTHOR_NAME_LENGTH)) {
         return false;
     }
