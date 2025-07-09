@@ -6,15 +6,15 @@
 #include "playermodelmanager_utils.h"
 #include "custommodelentrymanager.h"
 
-void FormModelEntry_init(FormModelEntry *this) {
-    this->displayName = NULL;
-    this->internalName = NULL;
-    this->authorName = NULL;
-    this->flags = 0;
-    this->callback = NULL;
-    this->callbackData = NULL;
-    this->handle = 0;
-    this->applyToModelInfo = NULL;
+void FormModelEntry_init(FormModelEntry *entry) {
+    entry->displayName = NULL;
+    entry->internalName = NULL;
+    entry->authorName = NULL;
+    entry->flags = 0;
+    entry->callback = NULL;
+    entry->callbackData = NULL;
+    entry->handle = 0;
+    entry->applyToModelInfo = NULL;
 }
 
 bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
