@@ -556,7 +556,9 @@ PlayerModelManagerFormHandle CMEM_createMemoryHandle(PlayerTransformation form) 
 }
 
 FormModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerFormHandle h) {
-    return recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, h);
+    void *entry = NULL;
+    recomputil_memory_slotmap_get(sHandleToMemoryEntry, h, &entry);
+    return entry;
 }
 
 void CMEM_saveCurrentEntry(PlayerTransformation form) {
