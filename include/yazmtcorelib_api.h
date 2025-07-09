@@ -13,6 +13,8 @@ typedef struct YAZMTCore_StringU32Dictionary YAZMTCore_StringU32Dictionary;
 
 RECOMP_IMPORT(YAZMT_CORELIB_MOD_NAME, int YAZMTCore_Utils_MemCmp(void *dest, const void *src, size_t size));
 
+RECOMP_IMPORT(YAZMT_CORELIB_MOD_NAME, char *YAZMTCore_Utils_StrDup(const char *s));
+
 RECOMP_IMPORT(YAZMT_CORELIB_MOD_NAME, YAZMTCore_DynamicU32Array *YAZMTCore_DynamicU32Array_new());
 
 RECOMP_IMPORT(YAZMT_CORELIB_MOD_NAME, void YAZMTCore_DynamicU32Array_destroy(YAZMTCore_DynamicU32Array *dynArr));
