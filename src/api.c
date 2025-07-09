@@ -5,6 +5,7 @@
 #include "model_common.h"
 #include "defines_modelinfo.h"
 #include "playermodelmanager_api.h"
+#include "yazmtcorelib_api.h"
 
 #define ENTRY_FORM(entry) (getFormFromModelType(entry->modelEntry.type))
 #define ENTRY_LOADED_PROXY(entry) (isEntryLoaded(entry) ? &gLinkFormProxies[ENTRY_FORM(entry)] : NULL)
@@ -126,6 +127,15 @@ FormModelMemoryEntry *getEntryOrPrintErrLocked(PlayerModelManagerFormHandle h, c
     return getEntryOrPrintErr(h, funcName);
 }
 
+// Set dest to a ne
+void dupStrAndFreeOld(char **dest, const char *src) {
+    if (*dest) {
+        recomp_free(*dest);
+    }
+
+    *dest = YAZMTCore_Utils_StrDup(src);
+}
+
 RECOMP_EXPORT PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, const char *internalName, FormModelType modelType) {
 
     if (apiVersion > PMM_API_VERSION) {
@@ -157,7 +167,7 @@ RECOMP_EXPORT PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(
         return 0;
     }
 
-    entry->modelEntry.internalName = internalName;
+    dupStrAndFreeOld(&entry->modelEntry.internalName, internalName);
 
     if (modelType == PMM_FORM_MODEL_TYPE_ADULT) {
         entry->modelEntry.flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
@@ -177,7 +187,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandl
         return false;
     }
 
-    entry->modelEntry.displayName = displayName;
+    dupStrAndFreeOld(&entry->modelEntry.displayName, displayName);
 
     return true;
 }
@@ -193,7 +203,7 @@ RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, 
         return false;
     }
 
-    entry->modelEntry.authorName = author;
+    dupStrAndFreeOld(&entry->modelEntry.authorName, author);
 
     return true;
 }
