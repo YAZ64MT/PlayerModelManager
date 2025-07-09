@@ -122,10 +122,10 @@ typedef enum {
     LINK_DL_MASK_FIERCE_DEITY_SCREAM,
 
     // Elegy of Emptiness statues
-    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN,
-    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,
-    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON,
-    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,
+    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN, // Only used if model is human
+    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,  // Only used if model is Deku
+    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON, // Only used if model is Goron
+    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,  // Only used if model is Zora
 
     // Strength Upgrades (OoT)
     LINK_DL_BRACELET_LFOREARM,

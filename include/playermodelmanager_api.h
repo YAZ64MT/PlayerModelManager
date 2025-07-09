@@ -135,10 +135,10 @@ typedef enum {
     PMM_DL_MASK_FIERCE_DEITY_SCREAM,
 
     // Elegy of Emptiness statues
-    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN,
-    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,
-    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_GORON,
-    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,
+    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN, // Only used if model is human
+    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,  // Only used if model is Deku
+    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_GORON, // Only used if model is Goron
+    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,  // Only used if model is Zora
 
     // Strength Upgrades (OoT)
     PMM_DL_BRACELET_LFOREARM,
