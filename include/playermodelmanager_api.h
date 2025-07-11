@@ -1,7 +1,7 @@
 #ifndef __PLAYERMODELMANAGER_API__
 #define __PLAYERMODELMANAGER_API__
 
-typedef unsigned long PlayerModelManagerFormHandle;
+typedef unsigned long PlayerModelManagerHandle;
 
 // Used for keeping compatibility between versions
 // DO NOT EDIT
@@ -359,22 +359,22 @@ typedef enum {
 #define PMM_MTX_SHIELD_MIRROR_BACK PMM_MTX_SHIELD3_BACK
 
 typedef enum {
-    PMM_FORM_MODEL_TYPE_NONE,
-    PMM_FORM_MODEL_TYPE_CHILD,
-    PMM_FORM_MODEL_TYPE_ADULT,
-    PMM_FORM_MODEL_TYPE_DEKU,
-    PMM_FORM_MODEL_TYPE_GORON,
-    PMM_FORM_MODEL_TYPE_ZORA,
-    PMM_FORM_MODEL_TYPE_FIERCE_DEITY,
-    PMM_FORM_MODEL_TYPE_MAX
-} PlayerModelManagerFormModelType;
+    PMM_MODEL_TYPE_NONE,
+    PMM_MODEL_TYPE_CHILD,
+    PMM_MODEL_TYPE_ADULT,
+    PMM_MODEL_TYPE_DEKU,
+    PMM_MODEL_TYPE_GORON,
+    PMM_MODEL_TYPE_ZORA,
+    PMM_MODEL_TYPE_FIERCE_DEITY,
+    PMM_MODEL_TYPE_MAX
+} PlayerModelManagerModelType;
 
 typedef enum {
     PMM_EVENT_MODEL_APPLIED,
     PMM_EVENT_MODEL_REMOVED,
 } PlayerModelManagerModelEvent;
 
-typedef void PlayerModelManagerEventHandler(PlayerModelManagerFormHandle handle, PlayerModelManagerModelEvent event, void *userdata);
+typedef void PlayerModelManagerEventHandler(PlayerModelManagerHandle handle, PlayerModelManagerModelEvent event, void *userdata);
 
 #ifndef YAZMT_PMM_NO_API_IMPORTS
 
@@ -390,7 +390,7 @@ typedef void PlayerModelManagerEventHandler(PlayerModelManagerFormHandle handle,
 //
 // This function can only be used during the PlayerModelManager_onRegisterModels event. Otherwise, an invalid handle will be returned.
 #define PLAYERMODELMANAGER_REGISTER_FORM_MODEL(internalName, modelType) PlayerModelManager_registerFormModel(PMM_API_VERSION, internalName, modelType)
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerFormModelType modelType));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType));
 
 // Sets the name that will appear in the menu for the passed in model handle.
 //
@@ -399,7 +399,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerFormHandle PlayerModelManage
 // This function can only be used during the PlayerModelManager_onRegisterModels event.
 //
 // Returns true if successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayName(PlayerModelManagerFormHandle h, const char *displayName));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayName(PlayerModelManagerHandle h, const char *displayName));
 
 // Sets the name that will appear in the author field of the menu.
 //
@@ -408,19 +408,19 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayName(PlayerM
 // This function can only be used during the PlayerModelManager_onRegisterModels event.
 //
 // Returns true if successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setAuthor(PlayerModelManagerFormHandle h, const char *author));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setAuthor(PlayerModelManagerHandle h, const char *author));
 
 // Sets the skeleton and any display lists attached to it on a custom model.
 //
 // Returns true if successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setSkeleton(PlayerModelManagerFormHandle h, FlexSkeletonHeader *skel));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel));
 
 // Sets the skeleton and any display lists attached to it on the shielding skeleton of a custom model.
 //
 // This is used for Goron Link's guard animation, so make sure to pass in a skeleton with the appropriaate amount of limbs.
 //
 // Returns true if successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerFormHandle h, FlexSkeletonHeader *skel));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel));
 
 // Set a display list on the model. The ID can be obtained from PlayerModelManagerDisplayListId.
 //
@@ -428,27 +428,27 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setShieldingSkeleton(P
 // to increase compatibility with equipment replacement mods.
 //
 // Returns true upon successful display list set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDL(PlayerModelManagerFormHandle h, PlayerModelManagerDisplayListId dlId, Gfx *dl));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, PlayerModelManagerDisplayListId dlId, Gfx *dl));
 
 // Sets a matrix on the custom model.
 //
 // Returns true if matrix was successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMtx(PlayerModelManagerFormHandle h, PlayerModelManagerMatrixId mtxId, Mtx *matrix));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, PlayerModelManagerMatrixId mtxId, Mtx *matrix));
 
 // Set a callback function for this model. The types of events that can be responded to are in the PlayerModelManagerModelEvent enum.
 //
 // Returns true if callback successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setCallback(PlayerModelManagerFormHandle h, PlayerModelManagerEventHandler *callback, void *userdata));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setCallback(PlayerModelManagerHandle h, PlayerModelManagerEventHandler *callback, void *userdata));
 
 // Set eye flipbook textures for this model. Passed in array is expected to be at least 8 elements large.
 //
 // Returns true if successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setEyesTextures(PlayerModelManagerFormHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setEyesTextures(PlayerModelManagerHandle h, TexturePtr eyesTextures[]));
 
 // Set mouth flipbook textures for this model. Passed in array is expected to be at least 4 elements large.
 //
 // Returns true if successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMouthTextures(PlayerModelManagerFormHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle h, TexturePtr mouthTextures[]));
 
 // Get a static pointer to a DL in a particular form. The visual will be automatically updated if the model for that form changes.
 //
@@ -459,7 +459,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getFormDisplayList(uns
 #define PLAYERMODELMANAGER_GET_FORM_DISPLAY_LIST(form, displayListId) PlayerModelManager_getDL(PMM_API_VERSION, form, displayListId)
 
 // Returns true if the model attached to the passed in handle is currently equipped, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isApplied(PlayerModelManagerFormHandle h));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isApplied(PlayerModelManagerHandle h));
 
 #define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
 

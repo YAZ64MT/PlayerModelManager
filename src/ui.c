@@ -469,7 +469,7 @@ void refreshButtonEntryColors() {
 void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     FormModelEntry *entry = userdata;
 
-    if (entry->type != PMM_FORM_MODEL_TYPE_NONE) {
+    if (entry->type != PMM_MODEL_TYPE_NONE) {
         PlayerTransformation form = getFormFromModelType(entry->type);
 
         if (form < PLAYER_FORM_MAX) {
@@ -485,7 +485,7 @@ void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *da
                 sIsDiskSaveNeeded = true;
             } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
                 destroyAuthor();
-                
+
                 setAuthor(entry->authorName);
 
                 if (shouldLivePreview()) {

@@ -61,24 +61,24 @@ bool applyFormModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
     PlayerTransformation form = PLAYER_FORM_HUMAN;
 
     switch (this->modelEntry.type) {
-        case PMM_FORM_MODEL_TYPE_ADULT:
-        case PMM_FORM_MODEL_TYPE_CHILD:
+        case PMM_MODEL_TYPE_ADULT:
+        case PMM_MODEL_TYPE_CHILD:
             form = PLAYER_FORM_HUMAN;
             break;
         
-        case PMM_FORM_MODEL_TYPE_DEKU:
+        case PMM_MODEL_TYPE_DEKU:
             form = PLAYER_FORM_DEKU;
             break;
 
-        case PMM_FORM_MODEL_TYPE_GORON:
+        case PMM_MODEL_TYPE_GORON:
             form = PLAYER_FORM_GORON;
             break;
 
-        case PMM_FORM_MODEL_TYPE_ZORA:
+        case PMM_MODEL_TYPE_ZORA:
             form = PLAYER_FORM_ZORA;
             break;
 
-        case PMM_FORM_MODEL_TYPE_FIERCE_DEITY:
+        case PMM_MODEL_TYPE_FIERCE_DEITY:
             form = PLAYER_FORM_FIERCE_DEITY;
             break;
 
@@ -99,7 +99,7 @@ bool applyFormModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
-void formModelDiskEntryCallback(PlayerModelManagerFormHandle h, PlayerModelManagerModelEvent evt, void *userdata) {
+void formModelDiskEntryCallback(PlayerModelManagerHandle h, PlayerModelManagerModelEvent evt, void *userdata) {
     if (evt == PMM_EVENT_MODEL_REMOVED) {
         FormModelDiskEntry *this = userdata;
 
