@@ -99,7 +99,7 @@ bool applyFormModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
-void formModelDiskEntryCallback(PlayerModelManagerFormHandle h, PlayerModelManager_ModelEvent evt, void *userdata) {
+void formModelDiskEntryCallback(PlayerModelManagerFormHandle h, PlayerModelManagerModelEvent evt, void *userdata) {
     if (evt == PMM_EVENT_MODEL_REMOVED) {
         FormModelDiskEntry *this = userdata;
 

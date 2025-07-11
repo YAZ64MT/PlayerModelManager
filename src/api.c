@@ -153,7 +153,7 @@ RECOMP_EXPORT PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(
     }
 
     if (modelType == PMM_FORM_MODEL_TYPE_NONE || modelType >= PMM_FORM_MODEL_TYPE_MAX) {
-        recomp_printf("PlayerModelManager_registerFormModel: Passed in unsupported PlayerModelManager_FormModelType to PlayerModelManager_registerModel.\n");
+        recomp_printf("PlayerModelManager_registerFormModel: Passed in unsupported PlayerModelManagerFormModelType to PlayerModelManager_registerModel.\n");
         return 0;
     }
 
@@ -401,9 +401,9 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerFormHan
     return true;
 }
 
-RECOMP_EXPORT Gfx *PlayerModelManager_getDL(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dl) {
+RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dl) {
     if (apiVersion > PMM_API_VERSION) {
-        recomp_printf("PlayerModelManager_getDL: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
+        recomp_printf("PlayerModelManager_getFormDisplayList: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
         return NULL;
     }
 
