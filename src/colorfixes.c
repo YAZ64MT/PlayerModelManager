@@ -1,5 +1,6 @@
 #include "global.h"
 #include "modding.h"
+#include "recompconfig.h"
 
 typedef struct {
     u8 r;
