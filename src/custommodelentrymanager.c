@@ -501,34 +501,21 @@ void CMEM_removeModel(PlayerTransformation form) {
 }
 
 PlayerTransformation getFormFromModelType(FormModelType t) {
-    switch (t) {
-        case PMM_FORM_MODEL_TYPE_CHILD:
-        case PMM_FORM_MODEL_TYPE_ADULT:
-            return PLAYER_FORM_HUMAN;
-            break;
-
-        case PMM_FORM_MODEL_TYPE_DEKU:
-            return PLAYER_FORM_DEKU;
-            break;
-
-        case PMM_FORM_MODEL_TYPE_GORON:
-            return PLAYER_FORM_GORON;
-            break;
-
-        case PMM_FORM_MODEL_TYPE_ZORA:
-            return PLAYER_FORM_ZORA;
-            break;
-
-        case PMM_FORM_MODEL_TYPE_FIERCE_DEITY:
-            return PLAYER_FORM_FIERCE_DEITY;
-            break;
-
-        default:
-            recomp_printf("PlayerModelManager: Unknown player form passed into getPlayerFormFromType\n");
-            break;
+    if (t >= PMM_FORM_MODEL_TYPE_MAX) {
+        return PLAYER_FORM_MAX;
     }
 
-    return 0;
+    static const PlayerTransformation FORM_MODEL_TO_FORM[PMM_FORM_MODEL_TYPE_MAX] = {
+        [PMM_FORM_MODEL_TYPE_NONE] = PLAYER_FORM_MAX,
+        [PMM_FORM_MODEL_TYPE_CHILD] = PLAYER_FORM_HUMAN,
+        [PMM_FORM_MODEL_TYPE_ADULT] = PLAYER_FORM_HUMAN,
+        [PMM_FORM_MODEL_TYPE_DEKU] = PLAYER_FORM_DEKU,
+        [PMM_FORM_MODEL_TYPE_GORON] = PLAYER_FORM_GORON,
+        [PMM_FORM_MODEL_TYPE_ZORA] = PLAYER_FORM_ZORA,
+        [PMM_FORM_MODEL_TYPE_FIERCE_DEITY] = PLAYER_FORM_FIERCE_DEITY,
+    };
+
+    return FORM_MODEL_TO_FORM[t];
 }
 
 void *slotmapGet(MemorySlotmapHandle slotmap, collection_key_t k) {

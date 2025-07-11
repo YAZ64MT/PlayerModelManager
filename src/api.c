@@ -11,15 +11,22 @@
 #define ENTRY_LOADED_PROXY(entry) (isEntryLoaded(entry) ? &gLinkFormProxies[ENTRY_FORM(entry)] : NULL)
 
 bool isEntryLoaded(FormModelMemoryEntry *entry) {
-    return entry &&
-           entry->modelEntry.type != PMM_FORM_MODEL_TYPE_NONE &&
-           CMEM_getCurrentEntry(ENTRY_FORM(entry)) == (void *)entry;
+    if (entry) {
+        PlayerTransformation form = getFormFromModelType(entry->modelEntry.type);
+
+        if (form < PLAYER_FORM_MAX) {
+            return CMEM_getCurrentEntry(form) == (void *)entry;
+        }
+    }
+
+    return false;
 }
 
 void refreshProxyIfEntryLoaded(FormModelMemoryEntry *entry) {
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
+        // Don't need to verify ENTRY_FORM return because fp will be NULL if invalid
         CMEM_reapplyEntry(ENTRY_FORM(entry));
         requestRefreshFormProxy(fp);
     }
@@ -152,12 +159,12 @@ RECOMP_EXPORT PlayerModelManagerFormHandle PlayerModelManager_registerFormModel(
         return 0;
     }
 
-    if (modelType == PMM_FORM_MODEL_TYPE_NONE || modelType >= PMM_FORM_MODEL_TYPE_MAX) {
+    PlayerTransformation form = getFormFromModelType(modelType);
+
+    if (form >= PLAYER_FORM_MAX) {
         recomp_printf("PlayerModelManager_registerFormModel: Passed in unsupported PlayerModelManagerFormModelType to PlayerModelManager_registerModel.\n");
         return 0;
     }
-
-    PlayerTransformation form = getFormFromModelType(modelType);
 
     PlayerModelManagerFormHandle h = CMEM_createMemoryHandle(form);
 
@@ -296,9 +303,9 @@ RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerFormHandle h
     return true;
 }
 
-#define SET_LIMB_DL(pLimb, entryDL)       \
-    if (!entry->displayListPtrs[entryDL]) \
-    entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gCallEmptyDisplayList; \
+#define SET_LIMB_DL(pLimb, entryDL)                                                                                      \
+    if (!entry->displayListPtrs[entryDL])                                                                                \
+        entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gCallEmptyDisplayList; \
     refreshProxyDLIfEntryLoaded(entry, entryDL)
 
 RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerFormHandle h, FlexSkeletonHeader *skel) {
