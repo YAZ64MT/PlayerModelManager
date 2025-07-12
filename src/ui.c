@@ -581,7 +581,7 @@ void createModelButtons() {
 void refreshFileList() {
     // MUST CALL INSIDE UI CONTEXT
     destroyModelButtons();
-    CMEM_refreshDiskEntries();
+    //CMEM_refreshDiskEntries();
     createModelButtons();
 }
 
