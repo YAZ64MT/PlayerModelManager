@@ -150,9 +150,6 @@ void fixAdultBremen_on_return_Player_Draw() {
     }
 }
 
-#define TRANSLATE_ARROW_X -40
-#define TRANSLATE_ARROW_Y 400
-#define TRANSLATE_ARROW_Z 0
 RECOMP_HOOK("Player_PostLimbDrawGameplay")
 void fixArrowPos_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
     Player *player = (Player *)actor;
