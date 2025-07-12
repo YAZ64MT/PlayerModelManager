@@ -8,6 +8,7 @@
 #include "overlays/actors/ovl_En_Rd/z_en_rd.h"
 #include "overlays/actors/ovl_En_Railgibud/z_en_railgibud.h"
 #include "overlays/actors/ovl_En_Talk_Gibud/z_en_talk_gibud.h"
+#include "overlays/actors/ovl_Arms_Hook/z_arms_hook.h"
 
 PlayState *gPlayState;
 s32 gLimbIndex;
@@ -125,9 +126,10 @@ bool gPushedMatrixBremen = false;
 
 RECOMP_HOOK("Player_Draw")
 void fixAdultBremen_on_Player_Draw(Actor *thisx, PlayState *play) {
-    if (IS_HUMAN_ADULT_LINK_MODEL) {
-        Player *this = (Player *)thisx;
+    gPushedMatrixBremen = false;
+    Player *this = (Player *)thisx;
 
+    if (this->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL) {
         if (this->stateFlags3 & PLAYER_STATE3_20000000) {
             OPEN_DISPS(play->state.gfxCtx);
             Matrix_Push();
@@ -140,36 +142,48 @@ void fixAdultBremen_on_Player_Draw(Actor *thisx, PlayState *play) {
 }
 
 RECOMP_HOOK_RETURN("Player_Draw")
-void fixAdultBremen_on_return_Player_Draw(Actor *thisx, PlayState *play) {
+void fixAdultBremen_on_return_Player_Draw() {
     if (IS_HUMAN_ADULT_LINK_MODEL) {
         if (gPushedMatrixBremen) {
             Matrix_Pop();
         }
-        gPushedMatrixBremen = false;
     }
 }
 
-// TODO: FIGURE OUT HOW OOT HANDLES TRANSLATING THE LEFT HAND FOR ADULT VS. CHILD BOW/SLINGSHOT HAND
 #define TRANSLATE_ARROW_X -40
 #define TRANSLATE_ARROW_Y 400
 #define TRANSLATE_ARROW_Z 0
 RECOMP_HOOK("Player_PostLimbDrawGameplay")
 void fixArrowPos_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
-    if (IS_HUMAN_ADULT_LINK_MODEL) {
-        Player *player = (Player *)actor;
-        if (limbIndex == PLAYER_LIMB_LEFT_HAND && player->actor.scale.y >= 0.0f) {
-            Actor *heldActor = player->heldActor;
-            MtxF sp230;
-            if (!Player_IsHoldingHookshot(player) && heldActor != NULL) {
-                if ((player->stateFlags3 & PLAYER_STATE3_40) && (player->transformation != PLAYER_FORM_DEKU)) {
-                    if (player->transformation == PLAYER_FORM_HUMAN) {
-                        Vec3s *temp_s1;
-                        Matrix_Translate(TRANSLATE_ARROW_X, TRANSLATE_ARROW_Y, TRANSLATE_ARROW_Z, MTXMODE_APPLY);
-                        Matrix_Get(&sp230);
-                        temp_s1 = &heldActor->world.rot;
-                        Matrix_MtxFToYXZRot(&sp230, temp_s1, false);
-                        heldActor->shape.rot = *temp_s1;
+    Player *player = (Player *)actor;
+
+    Actor *heldActor = player->heldActor;
+
+    if (heldActor) {
+        if (player->actor.scale.y >= 0.0f) {
+            if (limbIndex == PLAYER_LIMB_LEFT_HAND && player->rightHandType == PLAYER_MODELTYPE_RH_BOW) {
+                if (!Player_IsHoldingHookshot(player)) {
+                    if ((player->stateFlags3 & PLAYER_STATE3_40) && (player->transformation != PLAYER_FORM_DEKU)) {
+                        Mtx *arrowMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_ARROW_DRAWN);
+
+                        if (arrowMtx) {
+                            OPEN_DISPS(play->state.gfxCtx);
+                            MtxF arrowMtxF;
+                            Matrix_MtxToMtxF(arrowMtx, &arrowMtxF);
+                            Matrix_Mult(&arrowMtxF, MTXMODE_APPLY);
+                            CLOSE_DISPS(play->state.gfxCtx);
+                        }
                     }
+                }
+            } else if (limbIndex == PLAYER_LIMB_RIGHT_HAND && Player_IsHoldingHookshot(player)) {
+                Mtx *hookMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK);
+
+                if (hookMtx) {
+                    OPEN_DISPS(play->state.gfxCtx);
+                    MtxF hookMtxF;
+                    Matrix_MtxToMtxF(hookMtx, &hookMtxF);
+                    Matrix_Mult(&hookMtxF, MTXMODE_APPLY);
+                    CLOSE_DISPS(play->state.gfxCtx);
                 }
             }
         }
@@ -198,7 +212,7 @@ void fixFPCmaera_on_return_func_8083868C() {
 
 static PlayerTransformation sRealPlayerFormGrab;
 
-RECOMP_HOOK("EnRd_Grab") 
+RECOMP_HOOK("EnRd_Grab")
 void fixEnemyHeight_on_EnRd_Grab(EnRd *this, PlayState *play) {
     Player *p = GET_PLAYER(play);
     sRealPlayerFormGrab = GET_PLAYER_FORM;

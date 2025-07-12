@@ -127,6 +127,8 @@ void initSharedDLs() {
     equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = getHumanMtx(&gLinkHumanMirrorShieldMtx);
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL] = &gIdentityMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL_GRABBED] = &gIdentityMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_ARROW_DRAWN] = &gIdentityMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK] = &gIdentityMtx;
 
     Gfx **models = gSharedDisplayLists;
 

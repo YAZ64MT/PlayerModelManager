@@ -446,6 +446,10 @@ void refreshFaceTextures() {
     matchFaceTexturesToProxy(GET_PLAYER_FORM_PROXY);
 }
 
+Mtx *getFormProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
+    return (Mtx *)formProxy->mtxDisplayLists[mtxId][0].words.w1;
+}
+
 void refreshProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
     Mtx *matrix = formProxy->current.equipMtx[mtxId];
 
