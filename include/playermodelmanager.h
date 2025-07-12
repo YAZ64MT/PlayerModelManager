@@ -4,7 +4,7 @@
 #include "global.h"
 
 // Parts after LINK_DL_ need to be kept in sync with Link_ShimDisplayList
-// MUST BE KEPT IN SYNC WITH PlayerModelManager_DisplayListId IN playermodelmanager_api.h
+// MUST BE KEPT IN SYNC WITH PlayerModelManagerDisplayListId IN playermodelmanager_api.h
 typedef enum {
     LINK_DL_WAIST,
     LINK_DL_RTHIGH,
@@ -122,10 +122,10 @@ typedef enum {
     LINK_DL_MASK_FIERCE_DEITY_SCREAM,
 
     // Elegy of Emptiness statues
-    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN,
-    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,
-    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON,
-    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,
+    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN, // Only used if model is human
+    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,  // Only used if model is Deku
+    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON, // Only used if model is Goron
+    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,  // Only used if model is Zora
 
     // Strength Upgrades (OoT)
     LINK_DL_BRACELET_LFOREARM,
@@ -409,7 +409,7 @@ typedef enum {
 } Link_ShimDisplayList;
 
 // Parts after LINK_EQUIP need to be kept in sync with Link_ShimDisplayList
-// MUST BE KEPT IN SYNC WITH PlayerModelManager_MatrixId IN playermodelmanager_api.h
+// MUST BE KEPT IN SYNC WITH PlayerModelManagerMatrixId IN playermodelmanager_api.h
 typedef enum {
     LINK_EQUIP_MATRIX_SWORD1_BACK,
     LINK_EQUIP_MATRIX_SWORD2_BACK,
@@ -423,6 +423,8 @@ typedef enum {
     LINK_EQUIP_MATRIX_SWORD3_PEDESTAL,
     LINK_EQUIP_MATRIX_SWORD3_PEDESTAL_GRABBED,
     LINK_EQUIP_MATRIX_MASKS,
+    LINK_EQUIP_MATRIX_ARROW_DRAWN,
+    LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK,
     LINK_EQUIP_MATRIX_MAX,
 } Link_EquipmentMatrix;
 

@@ -195,7 +195,7 @@ void changeCategoryButtonPressed(RecompuiResource resource, const RecompuiEventD
         if (*isNextButton) {
             sCurrentMenuIndex++;
 
-            while(sCurrentMenuIndex >= ARRAY_COUNT(sSelectionOrder)) {
+            while (sCurrentMenuIndex >= ARRAY_COUNT(sSelectionOrder)) {
                 sCurrentMenuIndex -= ARRAY_COUNT(sSelectionOrder);
             }
         } else {
@@ -469,20 +469,32 @@ void refreshButtonEntryColors() {
 void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     FormModelEntry *entry = userdata;
 
-    if (entry->type != PMM_FORM_MODEL_TYPE_NONE) {
-        if (data->type == UI_EVENT_CLICK) {
-            Audio_PlaySfx(NA_SE_SY_DECIDE);
-            CMEM_tryApplyEntry(getFormFromModelType(entry->type), entry);
-            sRealEntries[getSelectedForm()] = entry;
-            refreshButtonEntryColors();
-            sIsDiskSaveNeeded = true;
-        } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
-            destroyAuthor();
-            setAuthor(entry->authorName);
+    if (entry->type != PMM_MODEL_TYPE_NONE) {
+        PlayerTransformation form = getFormFromModelType(entry->type);
 
-            if (shouldLivePreview()) {
-                CMEM_tryApplyEntry(getFormFromModelType(entry->type), entry);
+        if (form < PLAYER_FORM_MAX) {
+            if (data->type == UI_EVENT_CLICK) {
+                Audio_PlaySfx(NA_SE_SY_DECIDE);
+
+                CMEM_tryApplyEntry(form, entry);
+
+                sRealEntries[getSelectedForm()] = entry;
+
+                refreshButtonEntryColors();
+
+                sIsDiskSaveNeeded = true;
+            } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
+                destroyAuthor();
+
+                setAuthor(entry->authorName);
+
+                if (shouldLivePreview()) {
+                    CMEM_tryApplyEntry(form, entry);
+                }
             }
+        }
+        else {
+            Audio_PlaySfx(NA_SE_SY_ERROR);
         }
     }
 }

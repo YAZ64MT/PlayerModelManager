@@ -6,15 +6,15 @@
 #include "playermodelmanager_utils.h"
 #include "custommodelentrymanager.h"
 
-void FormModelEntry_init(FormModelEntry *this) {
-    this->displayName = NULL;
-    this->internalName = NULL;
-    this->authorName = NULL;
-    this->flags = 0;
-    this->callback = NULL;
-    this->callbackData = NULL;
-    this->handle = 0;
-    this->applyToModelInfo = NULL;
+void FormModelEntry_init(FormModelEntry *entry) {
+    entry->displayName = NULL;
+    entry->internalName = NULL;
+    entry->authorName = NULL;
+    entry->flags = 0;
+    entry->callback = NULL;
+    entry->callbackData = NULL;
+    entry->handle = 0;
+    entry->applyToModelInfo = NULL;
 }
 
 bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
@@ -61,24 +61,24 @@ bool applyFormModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
     PlayerTransformation form = PLAYER_FORM_HUMAN;
 
     switch (this->modelEntry.type) {
-        case PMM_FORM_MODEL_TYPE_ADULT:
-        case PMM_FORM_MODEL_TYPE_CHILD:
+        case PMM_MODEL_TYPE_ADULT:
+        case PMM_MODEL_TYPE_CHILD:
             form = PLAYER_FORM_HUMAN;
             break;
         
-        case PMM_FORM_MODEL_TYPE_DEKU:
+        case PMM_MODEL_TYPE_DEKU:
             form = PLAYER_FORM_DEKU;
             break;
 
-        case PMM_FORM_MODEL_TYPE_GORON:
+        case PMM_MODEL_TYPE_GORON:
             form = PLAYER_FORM_GORON;
             break;
 
-        case PMM_FORM_MODEL_TYPE_ZORA:
+        case PMM_MODEL_TYPE_ZORA:
             form = PLAYER_FORM_ZORA;
             break;
 
-        case PMM_FORM_MODEL_TYPE_FIERCE_DEITY:
+        case PMM_MODEL_TYPE_FIERCE_DEITY:
             form = PLAYER_FORM_FIERCE_DEITY;
             break;
 
@@ -99,7 +99,7 @@ bool applyFormModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
-void formModelDiskEntryCallback(PlayerModelManagerFormHandle h, PlayerModelManager_ModelEvent evt, void *userdata) {
+void formModelDiskEntryCallback(PlayerModelManagerHandle h, PlayerModelManagerModelEvent evt, void *userdata) {
     if (evt == PMM_EVENT_MODEL_REMOVED) {
         FormModelDiskEntry *this = userdata;
 

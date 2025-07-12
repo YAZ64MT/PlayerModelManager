@@ -415,7 +415,7 @@ void CMEM_refreshDiskEntries() {
                 if (isValid) {
                     FormModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
 
-                    FormModelType modelType = PMM_FORM_MODEL_TYPE_NONE;
+                    FormModelType modelType = PMM_MODEL_TYPE_NONE;
 
                     u8 *data = sDiskBuffers[PLAYER_FORM_HUMAN].buffer;
 
@@ -424,13 +424,13 @@ void CMEM_refreshDiskEntries() {
                     switch (data[Z64O_FORM_BYTE]) {
                         case MMO_FORM_BYTE_CHILD:
                         case OOTO_FORM_BYTE_CHILD:
-                            modelType = PMM_FORM_MODEL_TYPE_CHILD;
+                            modelType = PMM_MODEL_TYPE_CHILD;
                             form = PLAYER_FORM_HUMAN;
                             break;
 
                         case MMO_FORM_BYTE_ADULT:
                         case OOTO_FORM_BYTE_ADULT:
-                            modelType = PMM_FORM_MODEL_TYPE_ADULT;
+                            modelType = PMM_MODEL_TYPE_ADULT;
                             form = PLAYER_FORM_HUMAN;
                             break;
 
@@ -501,34 +501,21 @@ void CMEM_removeModel(PlayerTransformation form) {
 }
 
 PlayerTransformation getFormFromModelType(FormModelType t) {
-    switch (t) {
-        case PMM_FORM_MODEL_TYPE_CHILD:
-        case PMM_FORM_MODEL_TYPE_ADULT:
-            return PLAYER_FORM_HUMAN;
-            break;
-
-        case PMM_FORM_MODEL_TYPE_DEKU:
-            return PLAYER_FORM_DEKU;
-            break;
-
-        case PMM_FORM_MODEL_TYPE_GORON:
-            return PLAYER_FORM_GORON;
-            break;
-
-        case PMM_FORM_MODEL_TYPE_ZORA:
-            return PLAYER_FORM_ZORA;
-            break;
-
-        case PMM_FORM_MODEL_TYPE_FIERCE_DEITY:
-            return PLAYER_FORM_FIERCE_DEITY;
-            break;
-
-        default:
-            recomp_printf("PlayerModelManager: Unknown player form passed into getPlayerFormFromType\n");
-            break;
+    if (t >= PMM_MODEL_TYPE_MAX) {
+        return PLAYER_FORM_MAX;
     }
 
-    return 0;
+    static const PlayerTransformation FORM_MODEL_TO_FORM[PMM_MODEL_TYPE_MAX] = {
+        [PMM_MODEL_TYPE_NONE] = PLAYER_FORM_MAX,
+        [PMM_MODEL_TYPE_CHILD] = PLAYER_FORM_HUMAN,
+        [PMM_MODEL_TYPE_ADULT] = PLAYER_FORM_HUMAN,
+        [PMM_MODEL_TYPE_DEKU] = PLAYER_FORM_DEKU,
+        [PMM_MODEL_TYPE_GORON] = PLAYER_FORM_GORON,
+        [PMM_MODEL_TYPE_ZORA] = PLAYER_FORM_ZORA,
+        [PMM_MODEL_TYPE_FIERCE_DEITY] = PLAYER_FORM_FIERCE_DEITY,
+    };
+
+    return FORM_MODEL_TO_FORM[t];
 }
 
 void *slotmapGet(MemorySlotmapHandle slotmap, collection_key_t k) {
@@ -539,8 +526,8 @@ void *slotmapGet(MemorySlotmapHandle slotmap, collection_key_t k) {
     return result;
 }
 
-PlayerModelManagerFormHandle CMEM_createMemoryHandle(PlayerTransformation form) {
-    PlayerModelManagerFormHandle handle = recomputil_memory_slotmap_create(sHandleToMemoryEntry);
+PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerTransformation form) {
+    PlayerModelManagerHandle handle = recomputil_memory_slotmap_create(sHandleToMemoryEntry);
 
     FormModelMemoryEntry *entry = slotmapGet(sHandleToMemoryEntry, handle);
 
@@ -555,8 +542,10 @@ PlayerModelManagerFormHandle CMEM_createMemoryHandle(PlayerTransformation form) 
     return handle;
 }
 
-FormModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerFormHandle h) {
-    return recomputil_u32_memory_hashmap_get(sHandleToMemoryEntry, h);
+FormModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerHandle h) {
+    void *entry = NULL;
+    recomputil_memory_slotmap_get(sHandleToMemoryEntry, h, &entry);
+    return entry;
 }
 
 void CMEM_saveCurrentEntry(PlayerTransformation form) {

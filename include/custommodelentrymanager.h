@@ -2,7 +2,7 @@
 #define __CUSTOMMODELENTRYMANAGER_H
 #include "custommodelentry.h"
 
-typedef unsigned long PlayerModelManagerFormHandle;
+typedef unsigned long PlayerModelManagerHandle;
 
 void *CMEM_loadFromDisk(PlayerTransformation form, const char* path);
 void CMEM_setCurrentEntry(PlayerTransformation form, FormModelEntry *entry);
@@ -11,8 +11,8 @@ FormModelEntry **CMEM_getCombinedEntries(PlayerTransformation, size_t *count);
 bool CMEM_tryApplyEntry(PlayerTransformation form, FormModelEntry *newEntry);
 void CMEM_refreshDiskEntries();
 void CMEM_removeModel(PlayerTransformation form);
-PlayerModelManagerFormHandle CMEM_createMemoryHandle(PlayerTransformation form);
-FormModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerFormHandle h);
+PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerTransformation form);
+FormModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerHandle h);
 void CMEM_saveCurrentEntry(PlayerTransformation form);
 PlayerTransformation getFormFromModelType(FormModelType t);
 void CMEM_reapplyEntry(PlayerTransformation form);
