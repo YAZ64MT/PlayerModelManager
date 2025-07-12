@@ -134,13 +134,24 @@ FormModelMemoryEntry *getEntryOrPrintErrLocked(PlayerModelManagerHandle h, const
     return getEntryOrPrintErr(h, funcName);
 }
 
-// Set dest to a ne
 void dupStrAndFreeOld(char **dest, const char *src) {
     if (*dest) {
         recomp_free(*dest);
     }
 
     *dest = YAZMTCore_Utils_StrDup(src);
+}
+
+static bool sIsAdultDefaultsInitialized = false;
+static Mtx sAdultDefaultArrowMtx;
+//static Mtx sAdultDefaultHookshotMtx; // OOT hookshot actor position
+
+void initializeAdultDefaults() {
+    if (!sIsAdultDefaultsInitialized) {
+        sIsAdultDefaultsInitialized = true;
+        guPosition(&sAdultDefaultArrowMtx, 0, 0, 0, 1, 40, 400, 0);
+        //guPosition(&sAdultDefaultHookshotMtx, 0, 0, 0, 1, 50, 840, 0);
+    }
 }
 
 RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, const char *internalName, FormModelType modelType) {
@@ -178,6 +189,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerFormModel(unsi
 
     if (modelType == PMM_MODEL_TYPE_ADULT) {
         entry->modelEntry.flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
+        entry->matrixPtrs[LINK_EQUIP_MATRIX_ARROW_DRAWN] = &sAdultDefaultArrowMtx;
     }
 
     return h;
@@ -283,6 +295,10 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
     }
 
     entry->matrixPtrs[mtxId] = matrix;
+
+    if (mtxId == LINK_EQUIP_MATRIX_ARROW_DRAWN && entry->modelEntry.type == PMM_MODEL_TYPE_ADULT && !matrix) {
+        entry->matrixPtrs[mtxId] = &sAdultDefaultArrowMtx;
+    }
 
     refreshProxyMtxIfEntryLoaded(entry, mtxId);
 
@@ -442,6 +458,8 @@ RECOMP_DECLARE_EVENT(_internal_onFinishedRegisterModels());
 
 RECOMP_CALLBACK(".", _internal_onReadyCMEM)
 void doRegisterModels() {
+    initializeAdultDefaults();
+
     sIsAPILocked = false;
     onRegisterModels();
     sIsAPILocked = true;
