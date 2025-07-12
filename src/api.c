@@ -154,43 +154,51 @@ void initializeAdultDefaults() {
     }
 }
 
-RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, const char *internalName, FormModelType modelType) {
-
+RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, FormModelType modelType) {
+    recomp_printf("Got here 1\n");
     if (apiVersion > PMM_API_VERSION) {
-        recomp_printf("PlayerModelManager_registerFormModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
+        recomp_printf("PlayerModelManager_registerModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
         return 0;
     }
 
+    recomp_printf("Got here 2\n");
     if (sIsAPILocked) {
-        recomp_printf("PlayerModelManager_registerFormModel: Models can only be registered during a onRegisterModels callback.\n");
+        recomp_printf("PlayerModelManager_registerModel: Models can only be registered during a onRegisterModels callback.\n");
         return 0;
     }
 
-    if (!isStrValid("PlayerModelManager_registerFormModel", internalName, PMM_MAX_INTERNAL_NAME_LENGTH)) {
+    recomp_printf("Got here 3\n");
+    if (!isStrValid("PlayerModelManager_registerModel", internalName, PMM_MAX_INTERNAL_NAME_LENGTH)) {
         return 0;
     }
 
+    recomp_printf("Got here 4\n");
     PlayerTransformation form = getFormFromModelType(modelType);
 
     if (form >= PLAYER_FORM_MAX) {
         recomp_printf("PlayerModelManager_registerFormModel: Passed in unsupported PlayerModelManagerModelType to PlayerModelManager_registerModel.\n");
         return 0;
     }
+    recomp_printf("Got here 5\n");
 
-    PlayerModelManagerHandle h = CMEM_createMemoryHandle(form);
+    char *internalNameCopy = YAZMTCore_Utils_StrDup(internalName);
+    PlayerModelManagerHandle h = CMEM_createMemoryHandle(form, internalNameCopy);
+    recomp_printf("Got here 6\n");
 
     FormModelMemoryEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_registerModel");
+    recomp_printf("Got here 7\n");
 
     if (!entry) {
         return 0;
     }
 
-    dupStrAndFreeOld(&entry->modelEntry.internalName, internalName);
+    recomp_printf("Got here 8\n");
 
     if (modelType == PMM_MODEL_TYPE_ADULT) {
         entry->modelEntry.flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
         entry->matrixPtrs[LINK_EQUIP_MATRIX_ARROW_DRAWN] = &sAdultDefaultArrowMtx;
     }
+    recomp_printf("Got here 9\n");
 
     return h;
 }

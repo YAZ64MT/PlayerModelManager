@@ -391,8 +391,8 @@ typedef void PlayerModelManagerEventHandler(PlayerModelManagerHandle handle, Pla
 // There is a maximum length of 64 characters.
 //
 // This function can only be used during the PlayerModelManager_onRegisterModels event. Otherwise, an invalid handle will be returned.
-#define PLAYERMODELMANAGER_REGISTER_FORM_MODEL(internalName, modelType) PlayerModelManager_registerFormModel(PMM_API_VERSION, internalName, modelType)
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerHandle PlayerModelManager_registerFormModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType));
+#define PLAYERMODELMANAGER_REGISTER_MODEL(internalName, modelType) PlayerModelManager_registerModel(PMM_API_VERSION, internalName, modelType)
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType));
 
 // Sets the name that will appear in the menu for the passed in model handle.
 //

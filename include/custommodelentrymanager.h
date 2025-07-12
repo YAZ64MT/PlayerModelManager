@@ -11,7 +11,7 @@ FormModelEntry **CMEM_getCombinedEntries(PlayerTransformation, size_t *count);
 bool CMEM_tryApplyEntry(PlayerTransformation form, FormModelEntry *newEntry);
 void CMEM_refreshDiskEntries();
 void CMEM_removeModel(PlayerTransformation form);
-PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerTransformation form);
+PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerTransformation form, char *internalName);
 FormModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerHandle h);
 void CMEM_saveCurrentEntry(PlayerTransformation form);
 PlayerTransformation getFormFromModelType(FormModelType t);

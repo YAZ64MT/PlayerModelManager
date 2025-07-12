@@ -526,7 +526,7 @@ void *slotmapGet(MemorySlotmapHandle slotmap, collection_key_t k) {
     return result;
 }
 
-PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerTransformation form) {
+PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerTransformation form, char* internalName) {
     PlayerModelManagerHandle handle = recomputil_memory_slotmap_create(sHandleToMemoryEntry);
 
     FormModelMemoryEntry *entry = slotmapGet(sHandleToMemoryEntry, handle);
@@ -535,6 +535,7 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerTransformation form) {
         FormModelMemoryEntry_init(entry);
 
         entry->modelEntry.handle = handle;
+        entry->modelEntry.internalName = internalName;
 
         pushMemoryEntry(form, entry);
     }
