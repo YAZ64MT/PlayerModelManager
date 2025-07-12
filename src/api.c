@@ -190,6 +190,8 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
         entry->matrixPtrs[LINK_EQUIP_MATRIX_ARROW_DRAWN] = &sAdultDefaultArrowMtx;
     }
 
+    entry->modelEntry.type = modelType;
+
     return h;
 }
 
