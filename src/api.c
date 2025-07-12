@@ -149,7 +149,7 @@ static Mtx sAdultDefaultArrowMtx;
 void initializeAdultDefaults() {
     if (!sIsAdultDefaultsInitialized) {
         sIsAdultDefaultsInitialized = true;
-        guPosition(&sAdultDefaultArrowMtx, 0, 0, 0, 1, 40, 400, 0);
+        guPosition(&sAdultDefaultArrowMtx, 0, 0, 0, 1, -40, 400, 0);
         //guPosition(&sAdultDefaultHookshotMtx, 0, 0, 0, 1, 50, 840, 0);
     }
 }
