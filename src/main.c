@@ -251,10 +251,7 @@ void refreshSharedModelsOnModelApply(PlayerTransformation form) {
 
 RECOMP_DECLARE_EVENT(_internal_initHashObjects());
 
-RECOMP_DECLARE_EVENT(_internal_initDictionary());
-
 RECOMP_CALLBACK("*", recomp_on_init)
 void handleInits() {
-    _internal_initDictionary();
     _internal_initHashObjects();
 }
