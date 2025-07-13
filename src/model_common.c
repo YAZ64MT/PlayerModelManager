@@ -250,7 +250,7 @@ void setDLsToShims(Link_FormProxy *formProxy) {
     PROXY_TO_SHIM(SHIELD1_ITEM);
     PROXY_TO_SHIM(SWORD3_PEDESTAL);
     PROXY_TO_SHIM(SWORD3_PEDESTAL_GRABBED);
-    
+
     PROXY_TO_SHIM(CENTER_FLOWER_PROPELLER_CLOSED);
     PROXY_TO_SHIM(CENTER_FLOWER_PROPELLER_OPEN);
 
@@ -475,6 +475,32 @@ void refreshProxyMatrixes(Link_FormProxy *formProxy) {
     }
 }
 
+#define NO_DISPLAY_LIST LINK_DL_MAX
+
+static const Link_DisplayList LIMB_TO_DL_ENTRY[PLAYER_LIMB_COUNT] = {
+    NO_DISPLAY_LIST,
+    LINK_DL_WAIST,
+    NO_DISPLAY_LIST,
+    LINK_DL_RTHIGH,
+    LINK_DL_RSHIN,
+    LINK_DL_RFOOT,
+    LINK_DL_LTHIGH,
+    LINK_DL_LSHIN,
+    LINK_DL_LFOOT,
+    NO_DISPLAY_LIST,
+    LINK_DL_HEAD,
+    LINK_DL_HAT,
+    LINK_DL_COLLAR,
+    LINK_DL_LSHOULDER,
+    LINK_DL_LFOREARM,
+    LINK_DL_LHAND,
+    LINK_DL_RSHOULDER,
+    LINK_DL_RFOREARM,
+    LINK_DL_RHAND,
+    LINK_DL_SHEATH_NONE,
+    LINK_DL_TORSO,
+};
+
 void refreshProxySkeleton(Link_FormProxy *formProxy) {
     FlexSkeletonHeader *skel = formProxy->current.skeleton;
 
@@ -488,6 +514,17 @@ void refreshProxySkeleton(Link_FormProxy *formProxy) {
             formProxy->skeleton.limbs[i].child = limb->child;
             formProxy->skeleton.limbs[i].sibling = limb->sibling;
             formProxy->skeleton.limbs[i].jointPos = limb->jointPos;
+
+            if (!limb->dList) {
+                formProxy->skeleton.limbs[i].dLists[0] = NULL;
+                formProxy->skeleton.limbs[i].dLists[1] = NULL;
+            } else {
+                Link_DisplayList id = LIMB_TO_DL_ENTRY[i];
+                if (id != NO_DISPLAY_LIST) {
+                    formProxy->skeleton.limbs[i].dLists[0] = &formProxy->displayLists[id];
+                    formProxy->skeleton.limbs[i].dLists[1] = &formProxy->displayLists[id];
+                }
+            }
         }
 
         formProxy->skeleton.flexSkeleton.dListCount = skel->dListCount;
@@ -510,6 +547,8 @@ void refreshProxySkeleton(Link_FormProxy *formProxy) {
         formProxy->shieldingSkeleton.flexSkeleton.dListCount = skel->dListCount;
     }
 }
+
+#undef NO_DISPLAY_LIST
 
 void initFormProxyMatrixes(Link_FormProxy *formProxy) {
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
