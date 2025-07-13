@@ -454,15 +454,46 @@ bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
 RECOMP_DECLARE_EVENT(onRegisterModels());
 RECOMP_DECLARE_EVENT(onReady());
 
+static bool sIsCMEMReady = false;
+static bool sIsModelReplacerReady = false;
+static bool sIsGlobalObjectsReady = false;
+static bool sIsModelsRegistered = false;
+
 RECOMP_DECLARE_EVENT(_internal_onFinishedRegisterModels());
 
-RECOMP_CALLBACK(".", _internal_onReadyCMEM)
 void doRegisterModels() {
-    initializeAdultDefaults();
+    if (sIsModelsRegistered) {
+        return;
+    }
 
+    if (!sIsCMEMReady || !sIsModelReplacerReady || !sIsGlobalObjectsReady) {
+        return;
+    }
+
+    sIsModelsRegistered = true;
+
+    initializeAdultDefaults();
     sIsAPILocked = false;
     onRegisterModels();
     sIsAPILocked = true;
     _internal_onFinishedRegisterModels();
     onReady();
+}
+
+RECOMP_CALLBACK(".", _internal_onReadyCMEM)
+void doRegisterModelsCMEMReady() {
+    sIsCMEMReady = true;
+    doRegisterModels();
+}
+
+MODEL_REPLACER_CALLBACK_ON_REGISTER_REPLACERS
+void doRegisterModelsModelReplacerReady() {
+    sIsModelReplacerReady = true;
+    doRegisterModels();
+}
+
+GLOBAL_OBJECTS_CALLBACK_ON_READY
+void doRegisterModelsGlobalObjectsReady() {
+    sIsGlobalObjectsReady = true;
+    doRegisterModels();
 }
