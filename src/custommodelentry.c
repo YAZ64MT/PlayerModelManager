@@ -34,14 +34,14 @@ bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
 
     modelInfo->skeleton = this->skel;
 
-    if (this->mouthTex) {
-        for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        if (this->eyesTex[i]) {
             modelInfo->mouthTextures[i] = this->mouthTex[i];
         }
     }
 
-    if (this->eyesTex) {
-        for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
+    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
+        if (this->eyesTex[i]) {
             modelInfo->eyesTextures[i] = this->eyesTex[i];
         }
     }
@@ -65,7 +65,7 @@ bool applyFormModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
         case PMM_MODEL_TYPE_CHILD:
             form = PLAYER_FORM_HUMAN;
             break;
-        
+
         case PMM_MODEL_TYPE_DEKU:
             form = PLAYER_FORM_DEKU;
             break;
@@ -122,9 +122,9 @@ void FormModelMemoryEntry_init(FormModelMemoryEntry *this) {
 
     this->skel = NULL;
 
-    this->mouthTex = NULL;
+    Lib_MemSet(this->mouthTex, 0, sizeof(this->mouthTex));
 
-    this->eyesTex = NULL;
+    Lib_MemSet(this->eyesTex, 0, sizeof(this->eyesTex));
 }
 
 void FormModelDiskEntry_init(FormModelDiskEntry *this, FormModelType type) {

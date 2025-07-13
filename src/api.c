@@ -6,6 +6,8 @@
 #include "defines_modelinfo.h"
 #include "playermodelmanager_api.h"
 #include "yazmtcorelib_api.h"
+#include "modelreplacer_api.h"
+#include "globalobjects_api.h"
 
 #define ENTRY_FORM(entry) (getFormFromModelType(entry->modelEntry.type))
 #define ENTRY_LOADED_PROXY(entry) (isEntryLoaded(entry) ? &gLinkFormProxies[ENTRY_FORM(entry)] : NULL)
@@ -396,28 +398,32 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
     return true;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerHandle h, TexturePtr eyesTextures[PLAYER_EYES_MAX]) {
+RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerHandle h, TexturePtr eyesTextures[]) {
     FormModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setEyesTextures");
 
     if (!entry) {
         return false;
     }
 
-    entry->eyesTex = eyesTextures;
+    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
+        entry->eyesTex[i] = eyesTextures[i];
+    }
 
     refreshProxyEyesTexturesIfEntryLoaded(entry);
 
     return true;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle h, TexturePtr mouthTextures[PLAYER_MOUTH_MAX]) {
+RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle h, TexturePtr mouthTextures[]) {
     FormModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setMouthTextures");
 
     if (!entry) {
         return false;
     }
 
-    entry->mouthTex = mouthTextures;
+    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        entry->mouthTex[i] = mouthTextures[i];
+    }
 
     refreshProxyMouthTexturesIfEntryLoaded(entry);
 

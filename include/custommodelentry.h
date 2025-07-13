@@ -34,8 +34,8 @@ typedef struct {
     Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
     FlexSkeletonHeader *skel;
     FlexSkeletonHeader *shieldingSkel;
-    TexturePtr *eyesTex;
-    TexturePtr *mouthTex;
+    TexturePtr eyesTex[PLAYER_EYES_MAX];
+    TexturePtr mouthTex[PLAYER_MOUTH_MAX];
 } FormModelMemoryEntry;
 
 void FormModelEntry_init(FormModelEntry *entry);
