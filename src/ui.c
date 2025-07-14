@@ -26,7 +26,6 @@ RecompuiResource buttonCategoryPrev;
 RecompuiResource labelCategory;
 RecompuiResource buttonClose;
 RecompuiResource buttonRemoveModel;
-RecompuiResource buttonRefreshFiles;
 
 RecompuiResource imageview;
 RecompuiTextureHandle bomb_texture_handle;
@@ -140,22 +139,6 @@ void clearRealEntries() {
 void fillRealEntries() {
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
         sRealEntries[i] = CMEM_getCurrentEntry(i);
-    }
-}
-
-void refreshButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
-    if (data->type == UI_EVENT_CLICK) {
-        Audio_PlaySfx(NA_SE_SY_DECIDE);
-        clearRealEntries();
-        refreshFileList();
-        fillRealEntries();
-        refreshButtonEntryColors();
-    } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
-        destroyAuthor();
-
-        if (shouldLivePreview()) {
-            applyRealEntry();
-        }
     }
 }
 
@@ -357,32 +340,23 @@ void on_init() {
     recompui_set_width(buttonRemoveModel, 100.0f, UNIT_PERCENT);
     recompui_set_text_align(buttonRemoveModel, TEXT_ALIGN_CENTER);
 
-    buttonRefreshFiles = recompui_create_button(context, row1, "Refresh File List", BUTTONSTYLE_SECONDARY);
-    recompui_set_text_align(buttonRefreshFiles, TEXT_ALIGN_CENTER);
-    recompui_register_callback(buttonRefreshFiles, refreshButtonPressed, NULL);
-    recompui_set_text_align(buttonRefreshFiles, TEXT_ALIGN_CENTER);
-
     buttonCategoryPrev = recompui_create_button(context, rowCategory, "◀", BUTTONSTYLE_SECONDARY);
     buttonCategoryNext = recompui_create_button(context, rowCategory, "▶", BUTTONSTYLE_SECONDARY);
 
     recompui_register_callback(buttonCategoryPrev, changeCategoryButtonPressed, &sFalse);
     recompui_register_callback(buttonCategoryNext, changeCategoryButtonPressed, &sTrue);
 
-    recompui_set_nav(buttonClose, NAVDIRECTION_RIGHT, buttonRefreshFiles);
+    recompui_set_nav(buttonClose, NAVDIRECTION_RIGHT, buttonCategoryPrev);
     recompui_set_nav(buttonClose, NAVDIRECTION_DOWN, buttonCategoryPrev);
 
     recompui_set_nav(buttonRemoveModel, NAVDIRECTION_UP, buttonCategoryPrev);
     recompui_set_nav(buttonRemoveModel, NAVDIRECTION_LEFT, buttonCategoryNext);
 
-    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_LEFT, buttonRefreshFiles);
+    recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_LEFT, buttonClose);
     recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_DOWN, buttonRemoveModel);
     recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_UP, buttonClose);
 
-    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_DOWN, buttonCategoryNext);
-    recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_RIGHT, buttonCategoryPrev);
-
     recompui_set_nav(buttonCategoryNext, NAVDIRECTION_DOWN, buttonRemoveModel);
-    recompui_set_nav(buttonCategoryNext, NAVDIRECTION_UP, buttonRefreshFiles);
     recompui_set_nav(buttonCategoryNext, NAVDIRECTION_RIGHT, buttonRemoveModel);
 
     refreshCategoryName();
@@ -545,7 +519,6 @@ void createModelButtons() {
         RecompuiResource buttonLast = sButtonEntries.buttons[sButtonEntries.count - 1];
 
         recompui_set_nav(buttonClose, NAVDIRECTION_UP, buttonLast);
-        recompui_set_nav(buttonRefreshFiles, NAVDIRECTION_UP, buttonLast);
         recompui_set_nav(buttonRemoveModel, NAVDIRECTION_RIGHT, buttonLast);
         recompui_set_nav(buttonRemoveModel, NAVDIRECTION_DOWN, buttonFirst);
 
