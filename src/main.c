@@ -5,7 +5,7 @@
 #include "playermodelmanager_mm.h"
 #include "model_common.h"
 #include "model_human.h"
-#include "mm_adultfixes.h"
+#include "defines_modelinfo.h"
 #include "playermodelmanager_utils.h"
 #include "modelreplacer_api.h"
 #include "modelreplacements.h"
@@ -189,44 +189,6 @@ void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
         refreshSharedModels();
 
         gIsAgePropertyRefreshRequested = true;
-    }
-}
-
-static bool sPushedMaskMatrix = false;
-extern LinkAnimationHeader gPlayerAnim_cl_setmask;
-RECOMP_HOOK("Player_PostLimbDrawGameplay")
-void useMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
-    sPushedMaskMatrix = false;
-
-    if (limbIndex == PLAYER_LIMB_HEAD) {
-        Mtx *maskMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_MASKS);
-
-        if (maskMtx) {
-            Player *player = (Player *)actor;
-            if (((*dList1 != NULL) && ((u32)player->currentMask != PLAYER_MASK_NONE)) &&
-                (((player->transformation == PLAYER_FORM_HUMAN) &&
-                  ((player->skelAnime.animation != &gPlayerAnim_cl_setmask) || (player->skelAnime.curFrame >= 12.0f))) ||
-                 ((((player->transformation != PLAYER_FORM_HUMAN) && (player->currentMask >= PLAYER_MASK_FIERCE_DEITY)) &&
-                   ((player->transformation + PLAYER_MASK_FIERCE_DEITY) != player->currentMask)) &&
-                  (player->skelAnime.curFrame >= 10.0f)))) {
-                s32 maskMinusOne = player->currentMask - 1;
-                OPEN_DISPS(play->state.gfxCtx);
-                Matrix_Push();
-                sPushedMaskMatrix = true;
-                static MtxF sMaskMtxF;
-                Matrix_MtxToMtxF(maskMtx, &sMaskMtxF);
-                Matrix_Mult(&sMaskMtxF, MTXMODE_APPLY);
-                MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, play->state.gfxCtx);
-                CLOSE_DISPS(play->state.gfxCtx);
-            }
-        }
-    }
-}
-
-RECOMP_HOOK_RETURN("Player_PostLimbDrawGameplay")
-void useMaskMtx_on_return_Player_PostLimbDrawGameplay(void) {
-    if (sPushedMaskMatrix) {
-        Matrix_Pop();
     }
 }
 

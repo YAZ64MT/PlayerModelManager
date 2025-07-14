@@ -3,7 +3,6 @@
 #include "recomputils.h"
 #include "recompconfig.h"
 #include "model_common.h"
-#include "mm_adultfixes.h"
 #include "defines_modelinfo.h"
 #include "overlays/actors/ovl_En_Rd/z_en_rd.h"
 #include "overlays/actors/ovl_En_Railgibud/z_en_railgibud.h"
@@ -121,72 +120,6 @@ void return_Player_GetHeight(void) {
     sPlayerFromHeight->transformation = sRealPlayerFormHeight;
 }
 
-#define ADULT_LINK_BREMEN_HEIGHT_MODIFIER 1250.0f
-bool gPushedMatrixBremen = false;
-
-RECOMP_HOOK("Player_Draw")
-void fixAdultBremen_on_Player_Draw(Actor *thisx, PlayState *play) {
-    gPushedMatrixBremen = false;
-    Player *this = (Player *)thisx;
-
-    if (this->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL) {
-        if (this->stateFlags3 & PLAYER_STATE3_20000000) {
-            OPEN_DISPS(play->state.gfxCtx);
-            Matrix_Push();
-            gPushedMatrixBremen = true;
-            Matrix_Translate(0.f, ADULT_LINK_BREMEN_HEIGHT_MODIFIER, 0.f, MTXMODE_APPLY);
-            MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, play->state.gfxCtx);
-            CLOSE_DISPS(play->state.gfxCtx);
-        }
-    }
-}
-
-RECOMP_HOOK_RETURN("Player_Draw")
-void fixAdultBremen_on_return_Player_Draw() {
-    if (IS_HUMAN_ADULT_LINK_MODEL) {
-        if (gPushedMatrixBremen) {
-            Matrix_Pop();
-        }
-    }
-}
-
-RECOMP_HOOK("Player_PostLimbDrawGameplay")
-void fixArrowPos_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
-    Player *player = (Player *)actor;
-
-    Actor *heldActor = player->heldActor;
-
-    if (heldActor) {
-        if (player->actor.scale.y >= 0.0f) {
-            if (limbIndex == PLAYER_LIMB_LEFT_HAND && player->rightHandType == PLAYER_MODELTYPE_RH_BOW) {
-                if (!Player_IsHoldingHookshot(player)) {
-                    if ((player->stateFlags3 & PLAYER_STATE3_40) && (player->transformation != PLAYER_FORM_DEKU)) {
-                        Mtx *arrowMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_ARROW_DRAWN);
-
-                        if (arrowMtx) {
-                            OPEN_DISPS(play->state.gfxCtx);
-                            MtxF arrowMtxF;
-                            Matrix_MtxToMtxF(arrowMtx, &arrowMtxF);
-                            Matrix_Mult(&arrowMtxF, MTXMODE_APPLY);
-                            CLOSE_DISPS(play->state.gfxCtx);
-                        }
-                    }
-                }
-            } else if (limbIndex == PLAYER_LIMB_RIGHT_HAND && Player_IsHoldingHookshot(player)) {
-                Mtx *hookMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK);
-
-                if (hookMtx) {
-                    OPEN_DISPS(play->state.gfxCtx);
-                    MtxF hookMtxF;
-                    Matrix_MtxToMtxF(hookMtx, &hookMtxF);
-                    Matrix_Mult(&hookMtxF, MTXMODE_APPLY);
-                    CLOSE_DISPS(play->state.gfxCtx);
-                }
-            }
-        }
-    }
-}
-
 // Use adult camera for first person bow/hookshot
 static PlayerTransformation sRealPlayerFormFPCamera = PLAYER_FORM_HUMAN;
 static Player *sPlayerFPCamera;
@@ -229,7 +162,6 @@ static PlayerTransformation sRealPlayerFormIdealPosMusicBox;
 
 RECOMP_HOOK("EnRailgibud_MoveToIdealGrabPositionAndRotation")
 void fixEnemyHeight_on_EnRailgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
-    Player *p = GET_PLAYER(play);
     sRealPlayerFormIdealPosMusicBox = GET_PLAYER_FORM;
 
     if (IS_HUMAN_ADULT_LINK_MODEL && sRealPlayerFormIdealPosMusicBox == PLAYER_FORM_HUMAN) {
@@ -247,7 +179,6 @@ static PlayerTransformation sRealPlayerFormIdealPosTalk;
 
 RECOMP_HOOK("EnTalkGibud_MoveToIdealGrabPositionAndRotation")
 void fixEnemyHeight_on_EnTalkgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
-    Player *p = GET_PLAYER(play);
     sRealPlayerFormIdealPosTalk = GET_PLAYER_FORM;
 
     if (IS_HUMAN_ADULT_LINK_MODEL && sRealPlayerFormIdealPosTalk == PLAYER_FORM_HUMAN) {
