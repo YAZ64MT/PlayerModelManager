@@ -41,7 +41,6 @@ minimum_recomp_version = "1.2.1"
 dependencies = [
 # Example dependency:
 #    "modname:1.0.0"
-    "yazmt_mm_qdfileloader",
     "yazmt_mm_global_objects",
     "yazmt_mm_modelreplacer",
     "ProxyMM_KV:0.0.5",
