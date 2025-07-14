@@ -4,7 +4,6 @@
 #include "recomputils.h"
 #include "model_common.h"
 #include "defines_z64o.h"
-#include "qdfileloader_api.h"
 #include "libc/string.h"
 #include "custommodelentrymanager.h"
 #include "recompdata.h"
@@ -29,17 +28,9 @@ typedef struct {
     size_t capacity;
 } FormModelEntries;
 
-static FormModelEntries sDiskEntries[PLAYER_FORM_MAX];
 static FormModelEntries sMemoryEntries[PLAYER_FORM_MAX];
 
 static FormModelEntry *sCurrentModelEntries[PLAYER_FORM_MAX];
-
-static char *sZobjDir;
-
-typedef struct {
-    void *buffer;
-    size_t capacity;
-} DiskEntryBuffer;
 
 #define SAVED_INTERNAL_NAME_BUFFER_SIZE (INTERNAL_NAME_MAX_LENGTH + 1)
 
@@ -49,25 +40,12 @@ typedef struct {
 } SavedModelName;
 
 static SavedModelName sSavedModelNames[PLAYER_FORM_MAX] = {
-    {.key = "zpm_saved_fierce_deity_name"},
-    {.key = "zpm_saved_goron_name"},
-    {.key = "zpm_saved_zora_name"},
-    {.key = "zpm_saved_deku_name"},
-    {.key = "zpm_saved_human_name"},
+    {.key = "pmm_saved_fierce_deity_name"},
+    {.key = "pmm_saved_goron_name"},
+    {.key = "pmm_saved_zora_name"},
+    {.key = "pmm_saved_deku_name"},
+    {.key = "pmm_saved_human_name"},
 };
-
-static DiskEntryBuffer sDiskBuffers[PLAYER_FORM_MAX] = {0};
-
-void increaseDiskBufferSizeIfNeeded(PlayerTransformation form, size_t minSize) {
-    if (minSize > sDiskBuffers[form].capacity) {
-        if (sDiskBuffers[form].buffer) {
-            recomp_free(sDiskBuffers[form].buffer);
-        }
-
-        sDiskBuffers[form].buffer = recomp_alloc(minSize);
-        sDiskBuffers[form].capacity = minSize;
-    }
-}
 
 void applyByInternalName(PlayerTransformation form, const char *name) {
     u32 entryPtr;
@@ -75,22 +53,6 @@ void applyByInternalName(PlayerTransformation form, const char *name) {
     if (YAZMTCore_StringU32Dictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
         CMEM_tryApplyEntry(form, (FormModelEntry *)entryPtr);
     }
-}
-
-void *CMEM_loadFromDisk(PlayerTransformation form, const char *path) {
-    unsigned long fileSize = 0;
-
-    QDFL_getFileSize(path, &fileSize);
-
-    increaseDiskBufferSizeIfNeeded(form, fileSize);
-
-    QDFL_Status s = QDFL_loadFileIntoBuffer(path, sDiskBuffers[form].buffer, sDiskBuffers[form].capacity);
-
-    if (s != QDFL_STATUS_OK) {
-        return NULL;
-    }
-
-    return sDiskBuffers[form].buffer;
 }
 
 FormModelEntry *CMEM_getCurrentEntry(PlayerTransformation form) {
@@ -140,33 +102,12 @@ void pushEntry(FormModelEntries *cme, void *entry) {
 
 void initEntryManager() {
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        initFormModelEntries(&sDiskEntries[i]);
         initFormModelEntries(&sMemoryEntries[i]);
     }
-
-    unsigned char *modFolderPath = recomp_get_mod_folder_path();
-    sZobjDir = QDFL_getCombinedPath(2, modFolderPath, "zobj");
-    recomp_free(modFolderPath);
 }
 
 void pushMemoryEntry(PlayerTransformation form, FormModelMemoryEntry *entry) {
     pushEntry(&sMemoryEntries[form], entry);
-}
-
-void pushDiskEntry(PlayerTransformation form, FormModelDiskEntry *entry) {
-    pushEntry(&sDiskEntries[form], entry);
-}
-
-void clearDiskEntries(PlayerTransformation form) {
-    for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
-        FormModelDiskEntry *curr = sDiskEntries[form].entries[i];
-        YAZMTCore_StringU32Dictionary_unset(sInternalNamesToEntries, curr->modelEntry.internalName);
-        FormModelDiskEntry_freeMembers(curr);
-        recomp_free(curr);
-        sDiskEntries[form].entries[i] = NULL;
-    }
-
-    sDiskEntries[form].count = 0;
 }
 
 RECOMP_DECLARE_EVENT(_internal_onModelApplied(PlayerTransformation form));
@@ -217,7 +158,7 @@ bool CMEM_tryApplyEntry(PlayerTransformation form, FormModelEntry *newEntry) {
 }
 
 FormModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *count) {
-    size_t combinedLength = sDiskEntries[form].count + sMemoryEntries[form].count;
+    size_t combinedLength = sMemoryEntries[form].count;
 
     if (combinedLength == 0) {
         *count = 0;
@@ -228,10 +169,6 @@ FormModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *coun
 
     for (size_t i = 0; i < sMemoryEntries[form].count; ++i) {
         combined[i] = sMemoryEntries[form].entries[i];
-    }
-
-    for (size_t i = 0; i < sDiskEntries[form].count; ++i) {
-        combined[i + sMemoryEntries[form].count] = sDiskEntries[form].entries[i];
     }
 
     *count = combinedLength;
@@ -296,61 +233,6 @@ char *getBaseNameNoExt(const char *path) {
     return base;
 }
 
-const char DISKENTRY_MODEL_INFO_HEADER[] = "PLAYERMODELINFO";
-#define DISKENTRY_INTERNAL_NAME_FIELD_SIZE 64
-#define DISKENTRY_DISPLAY_NAME_FIELD_SIZE 32
-#define DISKENTRY_AUTHOR_NAME_FIELD_SIZE 64
-#define DISKENTRY_MODEL_INFO_LOCATION 0x5500
-#define DISKENTRY_NUM_MATRIXES 8
-
-typedef struct {
-    f32 x;
-    f32 y;
-    f32 z;
-    bool isUsed;
-} EmbeddedMatrixType;
-
-typedef struct {
-    EmbeddedMatrixType translation;
-    EmbeddedMatrixType rotation;
-    EmbeddedMatrixType scale;
-} EmbeddedMatrix;
-
-typedef struct {
-    char header[sizeof(DISKENTRY_MODEL_INFO_HEADER) - 1];
-    char embedVersion;
-    char internalName[DISKENTRY_INTERNAL_NAME_FIELD_SIZE];
-    char displayName[DISKENTRY_DISPLAY_NAME_FIELD_SIZE];
-    char authorName[DISKENTRY_AUTHOR_NAME_FIELD_SIZE];
-
-} FormModelDiskEntryEmbeddedInfo;
-
-bool isEmbeddedVersionSupported(FormModelDiskEntryEmbeddedInfo *info) {
-    return info->embedVersion <= 2;
-}
-
-FormModelDiskEntryEmbeddedInfo *getEmbeddedInfo(void *zobj) {
-    if (zobj == NULL) {
-        return NULL;
-    }
-
-    char *data = zobj;
-
-    for (size_t i = 0; i < sizeof(DISKENTRY_MODEL_INFO_HEADER) - 1; ++i) {
-        if (data[DISKENTRY_MODEL_INFO_LOCATION + i] != DISKENTRY_MODEL_INFO_HEADER[i]) {
-            return NULL;
-        }
-    }
-
-    FormModelDiskEntryEmbeddedInfo *info = (void *)&data[DISKENTRY_MODEL_INFO_LOCATION];
-
-    if (!isEmbeddedVersionSupported(info)) {
-        return NULL;
-    }
-
-    return info;
-}
-
 char *getTruncatedStringCopy(const char s[], size_t maxLength) {
     size_t length = 0;
 
@@ -369,115 +251,6 @@ char *getTruncatedStringCopy(const char s[], size_t maxLength) {
     }
 
     return sCopy;
-}
-
-void CMEM_refreshDiskEntries() {
-    unsigned long numFiles;
-    QDFL_Status err = QDFL_getNumDirEntries(sZobjDir, &numFiles);
-
-    if (err == QDFL_STATUS_OK) {
-        char *entryNames[PLAYER_FORM_MAX];
-
-        for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-
-            FormModelEntry *currentEntry = CMEM_getCurrentEntry(i);
-
-            if (currentEntry) {
-                entryNames[i] = recomp_alloc(strlen(currentEntry->internalName) + 1);
-                strcpy(entryNames[i], currentEntry->internalName);
-            } else {
-                entryNames[i] = NULL;
-            }
-
-            CMEM_removeModel(i);
-
-            clearDiskEntries(i);
-        }
-
-        for (unsigned long i = 0; i < numFiles; ++i) {
-            char *path = NULL;
-            char *fullPath = NULL;
-
-            bool isValid = QDFL_getDirEntryNameByIndex(sZobjDir, i, &path) == QDFL_STATUS_OK;
-
-            if (isValid) {
-                fullPath = QDFL_getCombinedPath(2, sZobjDir, path);
-
-                unsigned long fileSize = 0;
-
-                QDFL_getFileSize(fullPath, &fileSize);
-
-                // any buffer will do here, so we will default to human
-                void *zobj = CMEM_loadFromDisk(PLAYER_FORM_HUMAN, fullPath);
-
-                isValid = isValidZobj(zobj, fileSize);
-
-                if (isValid) {
-                    FormModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
-
-                    FormModelType modelType = PMM_MODEL_TYPE_NONE;
-
-                    u8 *data = sDiskBuffers[PLAYER_FORM_HUMAN].buffer;
-
-                    PlayerTransformation form;
-
-                    switch (data[Z64O_FORM_BYTE]) {
-                        case MMO_FORM_BYTE_CHILD:
-                        case OOTO_FORM_BYTE_CHILD:
-                            modelType = PMM_MODEL_TYPE_CHILD;
-                            form = PLAYER_FORM_HUMAN;
-                            break;
-
-                        case MMO_FORM_BYTE_ADULT:
-                        case OOTO_FORM_BYTE_ADULT:
-                            modelType = PMM_MODEL_TYPE_ADULT;
-                            form = PLAYER_FORM_HUMAN;
-                            break;
-
-                        default:
-                            isValid = false;
-                            break;
-                    }
-
-                    if (isValid) {
-                        FormModelDiskEntry *entry = recomp_alloc(sizeof(*entry));
-                        FormModelDiskEntry_init(entry, modelType);
-                        entry->filePath = fullPath;
-
-                        FormModelDiskEntryEmbeddedInfo *embed = getEmbeddedInfo(zobj);
-
-                        if (embed) {
-                            entry->modelEntry.internalName = getTruncatedStringCopy(embed->internalName, sizeof(embed->internalName) - 1);
-
-                            entry->modelEntry.displayName = getTruncatedStringCopy(embed->displayName, sizeof(embed->displayName) - 1);
-
-                            entry->modelEntry.authorName = getTruncatedStringCopy(embed->authorName, sizeof(embed->authorName) - 1);
-                        } else {
-                            entry->modelEntry.internalName = getTruncatedStringCopy(path, INTERNAL_NAME_MAX_LENGTH);
-                            entry->modelEntry.displayName = getBaseNameNoExt(path);
-                        }
-
-                        pushDiskEntry(form, entry);
-                    }
-                }
-            }
-
-            recomp_free(path);
-            path = NULL;
-
-            if (!isValid) {
-                recomp_free(fullPath);
-                fullPath = NULL;
-            }
-        }
-
-        for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-            if (entryNames[i]) {
-                applyByInternalName(i, entryNames[i]);
-                recomp_free(entryNames[i]);
-            }
-        }
-    }
 }
 
 void CMEM_removeModel(PlayerTransformation form) {

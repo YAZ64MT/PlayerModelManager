@@ -24,12 +24,6 @@ typedef struct FormModelEntry {
 
 typedef struct {
     FormModelEntry modelEntry;
-    char *filePath;
-    void *fileData;
-} FormModelDiskEntry;
-
-typedef struct {
-    FormModelEntry modelEntry;
     Gfx *displayListPtrs[LINK_DL_MAX];
     Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
     FlexSkeletonHeader *skel;
@@ -41,9 +35,5 @@ typedef struct {
 void FormModelEntry_init(FormModelEntry *entry);
 
 void FormModelMemoryEntry_init(FormModelMemoryEntry *this);
-
-void FormModelDiskEntry_init(FormModelDiskEntry *this, FormModelType type);
-
-void FormModelDiskEntry_freeMembers(FormModelDiskEntry *this);
 
 #endif

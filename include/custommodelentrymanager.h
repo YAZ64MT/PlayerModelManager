@@ -4,12 +4,10 @@
 
 typedef unsigned long PlayerModelManagerHandle;
 
-void *CMEM_loadFromDisk(PlayerTransformation form, const char* path);
 void CMEM_setCurrentEntry(PlayerTransformation form, FormModelEntry *entry);
 FormModelEntry *CMEM_getCurrentEntry(PlayerTransformation form);
 FormModelEntry **CMEM_getCombinedEntries(PlayerTransformation, size_t *count);
 bool CMEM_tryApplyEntry(PlayerTransformation form, FormModelEntry *newEntry);
-void CMEM_refreshDiskEntries();
 void CMEM_removeModel(PlayerTransformation form);
 PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerTransformation form, char *internalName);
 FormModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerHandle h);

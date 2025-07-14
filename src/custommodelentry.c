@@ -1,6 +1,5 @@
 #include "global.h"
 #include "custommodelentry.h"
-#include "qdfileloader_api.h"
 #include "ml64compat_mm.h"
 #include "recomputils.h"
 #include "playermodelmanager_utils.h"
@@ -51,62 +50,6 @@ bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
-bool applyFormModelDiskEntry(void *thisx, Link_ModelInfo *modelInfo) {
-    FormModelDiskEntry *this = thisx;
-
-    if (!this->filePath) {
-        return false;
-    }
-
-    PlayerTransformation form = PLAYER_FORM_HUMAN;
-
-    switch (this->modelEntry.type) {
-        case PMM_MODEL_TYPE_ADULT:
-        case PMM_MODEL_TYPE_CHILD:
-            form = PLAYER_FORM_HUMAN;
-            break;
-
-        case PMM_MODEL_TYPE_DEKU:
-            form = PLAYER_FORM_DEKU;
-            break;
-
-        case PMM_MODEL_TYPE_GORON:
-            form = PLAYER_FORM_GORON;
-            break;
-
-        case PMM_MODEL_TYPE_ZORA:
-            form = PLAYER_FORM_ZORA;
-            break;
-
-        case PMM_MODEL_TYPE_FIERCE_DEITY:
-            form = PLAYER_FORM_FIERCE_DEITY;
-            break;
-
-        default:
-            // invalid form
-            return false;
-            break;
-    }
-
-    this->fileData = CMEM_loadFromDisk(form, this->filePath);
-
-    if (!this->fileData) {
-        return false;
-    }
-
-    setupZobjZ64O(modelInfo, this->fileData);
-
-    return true;
-}
-
-void formModelDiskEntryCallback(PlayerModelManagerHandle h, PlayerModelManagerModelEvent evt, void *userdata) {
-    if (evt == PMM_EVENT_MODEL_REMOVED) {
-        FormModelDiskEntry *this = userdata;
-
-        this->fileData = NULL;
-    }
-}
-
 void FormModelMemoryEntry_init(FormModelMemoryEntry *this) {
     FormModelEntry_init(&this->modelEntry);
 
@@ -125,43 +68,4 @@ void FormModelMemoryEntry_init(FormModelMemoryEntry *this) {
     Lib_MemSet(this->mouthTex, 0, sizeof(this->mouthTex));
 
     Lib_MemSet(this->eyesTex, 0, sizeof(this->eyesTex));
-}
-
-void FormModelDiskEntry_init(FormModelDiskEntry *this, FormModelType type) {
-    FormModelEntry_init(&this->modelEntry);
-
-    this->fileData = NULL;
-
-    this->filePath = NULL;
-
-    this->modelEntry.applyToModelInfo = applyFormModelDiskEntry;
-    this->modelEntry.callback = formModelDiskEntryCallback;
-    this->modelEntry.callbackData = this;
-    this->modelEntry.type = type;
-}
-
-void FormModelDiskEntry_freeMembers(FormModelDiskEntry *this) {
-    this->fileData = NULL;
-
-    if (this->filePath) {
-        recomp_free(this->filePath);
-        this->filePath = NULL;
-    }
-
-    FormModelEntry *entry = &this->modelEntry;
-
-    if (entry->displayName) {
-        recomp_free(entry->displayName);
-        entry->displayName = NULL;
-    }
-
-    if (entry->internalName) {
-        recomp_free(entry->internalName);
-        entry->internalName = NULL;
-    }
-
-    if (entry->authorName) {
-        recomp_free(entry->authorName);
-        entry->authorName = NULL;
-    }
 }
