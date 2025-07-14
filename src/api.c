@@ -146,12 +146,14 @@ void dupStrAndFreeOld(char **dest, const char *src) {
 
 static bool sIsAdultDefaultsInitialized = false;
 static Mtx sAdultDefaultArrowMtx;
+static Mtx sAdultDefaultMaskMtx;
 //static Mtx sAdultDefaultHookshotMtx; // OOT hookshot actor position
 
 void initializeAdultDefaults() {
     if (!sIsAdultDefaultsInitialized) {
         sIsAdultDefaultsInitialized = true;
-        guPosition(&sAdultDefaultArrowMtx, 0, 0, 0, 1, -40, 400, 0);
+        guPosition(&sAdultDefaultArrowMtx, 0.f, 0.f, 0.f, 1.f, -40.f, 400.f, 0.f);
+        guPosition(&sAdultDefaultMaskMtx, 0.f, 0.f, 0.f, 1.f, 20.f, -150.f, 0.f);
         //guPosition(&sAdultDefaultHookshotMtx, 0, 0, 0, 1, 50, 840, 0);
     }
 }
@@ -190,6 +192,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
     if (modelType == PMM_MODEL_TYPE_ADULT) {
         entry->modelEntry.flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
         entry->matrixPtrs[LINK_EQUIP_MATRIX_ARROW_DRAWN] = &sAdultDefaultArrowMtx;
+        entry->matrixPtrs[LINK_EQUIP_MATRIX_MASKS] = &sAdultDefaultMaskMtx;
     }
 
     entry->modelEntry.type = modelType;
