@@ -172,7 +172,12 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_01D960, LINK_DL_HOOKSHOT_HOOK);
 
     models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;       // not in Link obj
-    GlobalObjects_rebaseDL(GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD), gLinkHumanFirstPersonHookshotDL, 0x06); // repoint vertices, textures, etc. to static link obj
+
+    GlobalObjectsSegmentMap sharedSegMap = {0};
+    sharedSegMap[0x04] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
+    sharedSegMap[0x06] = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
+
+    GlobalObjects_rebaseDL(gLinkHumanFirstPersonHookshotDL, sharedSegMap); // repoint vertices, textures, etc. to static link obj
 
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
     models[LINK_DL_SWORD_GREAT_FAIRY_HILT] = gEmptyDL;

@@ -6,6 +6,8 @@
 
 #define YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME "yazmt_mm_global_objects"
 
+typedef void *GlobalObjectsSegmentMap[0x10];
+
 // Helper macro for converting segmented pointers to global pointers.
 //
 // If you are trying to get a pointer to a vanilla object, you should grab a global object pointer
@@ -16,14 +18,18 @@
 // For a Gfx global pointer, use GlobalObjects_getGlobalGfxPtr instead.
 #define SEGMENTED_TO_GLOBAL_PTR(globalObj, segmentedPtr) ((void *)((uintptr_t)globalObj + SEGMENT_OFFSET(segmentedPtr)))
 
-// Converts the segmented pointers with segment targetSegment of the Gfx commands in a display list 
-// to global pointers relative to newBase.
+// Converts segmented pointers in the passed in display list to the specified mappings in the
+// segments parameter.
 //
-// Pointers with segment 04 will be repointed to a static gameplay_keep object.
+// For example, if segments[0x06] == 0x81010000, then a command with the pointer 0x06005000
+// will be set to 0x81010000 + 0x00005000 = 0x81015000.
 //
-// If a gSPBranchList or gSPDisplayList command is encountered, this function is called recursively
-// on the DL pointed to by the respective command.
-RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void GlobalObjects_rebaseDL(void *newBase, Gfx *dlToRebase, unsigned targetSegment));
+// If a segmented address is encountered and its entry in segments is set to NULL, the command will
+// be left unchanged.
+//
+// If a gSPBranchList or gSPDisplayList command is encountered, this function will automatically jump to
+// the DL pointed to by the respective command if there is a valid entry in segments for it.
+RECOMP_IMPORT(YAZMT_Z64_GLOBAL_OBJECTS_MOD_NAME, void GlobalObjects_rebaseDL(Gfx *globalPtr, GlobalObjectsSegmentMap segments));
 
 // Wrapper for GlobalObjects_rebaseDL that takes a segmented pointer into the passed in object and uses
 // address of the passed in object as the new base.

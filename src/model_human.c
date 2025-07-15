@@ -177,10 +177,15 @@ void setupVanillaHuman() {
     models[LINK_DL_FPS_LHAND] = getHumanDL(gLinkHumanLeftHandClosedDL);
     models[LINK_DL_FPS_RFOREARM] = gEmptyDisplayList;
 
+    GlobalObjectsSegmentMap humanSegMap = {0};
+    humanSegMap[0x04] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
+    humanSegMap[0x06] = human;
+
     models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArmDL; // not in Link obj
-    GlobalObjects_rebaseDL(human, gLinkHumanFirstPersonArmDL, 0x06); // repoint vertices, textures, etc. to static link obj
+
+    GlobalObjects_rebaseDL(gLinkHumanFirstPersonArmDL, humanSegMap); // repoint vertices, textures, etc. to static link obj
 
     // items
     models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL;       // not in Link obj
-    GlobalObjects_rebaseDL(human, gLinkHumanOcarinaDL, 0x06); // repoint vertices, textures, etc. to static link obj
+    GlobalObjects_rebaseDL(gLinkHumanOcarinaDL, humanSegMap); // repoint vertices, textures, etc. to static link obj
 }
