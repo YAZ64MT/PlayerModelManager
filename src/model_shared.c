@@ -133,7 +133,7 @@ void initSharedDLs() {
     Gfx **models = gSharedDisplayLists;
 
     // Gameplay Keep
-    setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL, LINK_DL_SWORD_KOKIRI_HILT);
+    setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordHandleDL, LINK_DL_SWORD_KOKIRI_HILT);
     setupSharedListenerDL(GAMEPLAY_KEEP, gRazorSwordHandleDL, LINK_DL_SWORD_RAZOR_HILT);
     setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL, LINK_DL_SWORD_KOKIRI_BLADE);
     setupSharedListenerDL(GAMEPLAY_KEEP, gRazorSwordBladeDL, LINK_DL_SWORD_RAZOR_BLADE);
