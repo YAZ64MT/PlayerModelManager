@@ -122,13 +122,13 @@ typedef enum {
     PMM_DL_MASK_BLAST_COOLING_DOWN,
     PMM_DL_MASK_SCENTS,
     PMM_DL_MASK_GIANT,
-    PMM_DL_MASK_DEKU,
-    PMM_DL_MASK_GORON,
-    PMM_DL_MASK_ZORA,
-    PMM_DL_MASK_FIERCE_DEITY,
-    PMM_DL_MASK_DEKU_SCREAM,
-    PMM_DL_MASK_GORON_SCREAM,
-    PMM_DL_MASK_ZORA_SCREAM,
+    PMM_DL_MASK_DEKU,         // Only used if model is Deku
+    PMM_DL_MASK_GORON,        // Only used if model is Goron
+    PMM_DL_MASK_ZORA,         // Only used if model is Zora
+    PMM_DL_MASK_FIERCE_DEITY, // Only used if model is Fierce Deity
+    PMM_DL_MASK_DEKU_SCREAM,  // Only used if model is Deku
+    PMM_DL_MASK_GORON_SCREAM, // Only used if model is Goron
+    PMM_DL_MASK_ZORA_SCREAM,  // Only used if model is Zora
     PMM_DL_MASK_FIERCE_DEITY_SCREAM,
 
     // Elegy of Emptiness statues

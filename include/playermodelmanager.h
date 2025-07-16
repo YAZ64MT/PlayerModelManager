@@ -115,11 +115,13 @@ typedef enum {
     LINK_DL_MASK_DEKU,
     LINK_DL_MASK_GORON,
     LINK_DL_MASK_ZORA,
-    LINK_DL_MASK_FIERCE_DEITY,
-    LINK_DL_MASK_DEKU_SCREAM,
-    LINK_DL_MASK_GORON_SCREAM,
-    LINK_DL_MASK_ZORA_SCREAM,
-    LINK_DL_MASK_FIERCE_DEITY_SCREAM,
+    LINK_DL_MASK_DEKU,         // Only used if model is Deku
+    LINK_DL_MASK_GORON,        // Only used if model is Goron
+    LINK_DL_MASK_ZORA,         // Only used if model is Zora
+    LINK_DL_MASK_FIERCE_DEITY, // Only used if model is Fierce Deity
+    LINK_DL_MASK_DEKU_SCREAM,  // Only used if model is Deku
+    LINK_DL_MASK_GORON_SCREAM, // Only used if model is Goron
+    LINK_DL_MASK_ZORA_SCREAM,  // Only used if model is Zora
 
     // Elegy of Emptiness statues
     LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN, // Only used if model is human
@@ -409,6 +411,7 @@ typedef enum {
 } Link_ShimDisplayList;
 
 // Parts after LINK_EQUIP need to be kept in sync with Link_ShimDisplayList
+// 
 // MUST BE KEPT IN SYNC WITH PlayerModelManagerMatrixId IN playermodelmanager_api.h
 typedef enum {
     LINK_EQUIP_MATRIX_SWORD1_BACK,
