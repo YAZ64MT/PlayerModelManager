@@ -26,6 +26,7 @@ typedef struct {
     FormModelEntry modelEntry;
     Gfx *displayListPtrs[LINK_DL_MAX];
     Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
+    Mtx matrixes[LINK_EQUIP_MATRIX_MAX];
     FlexSkeletonHeader *skel;
     FlexSkeletonHeader *shieldingSkel;
     TexturePtr eyesTex[PLAYER_EYES_MAX];

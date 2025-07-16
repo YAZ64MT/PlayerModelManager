@@ -299,10 +299,21 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
         return false;
     }
 
-    entry->matrixPtrs[mtxId] = matrix;
+    if (matrix) {
+        entry->matrixes[mtxId] = *matrix;
+        entry->matrixPtrs[mtxId] = &entry->matrixes[mtxId];
+    } else {
+        entry->matrixPtrs[mtxId] = NULL;
+    }
 
-    if (mtxId == LINK_EQUIP_MATRIX_ARROW_DRAWN && entry->modelEntry.type == PMM_MODEL_TYPE_ADULT && !matrix) {
-        entry->matrixPtrs[mtxId] = &sAdultDefaultArrowMtx;
+    if (!matrix && entry->modelEntry.type == PMM_MODEL_TYPE_ADULT) {
+        if (mtxId == LINK_EQUIP_MATRIX_ARROW_DRAWN) {
+            entry->matrixes[mtxId] = sAdultDefaultArrowMtx;
+            entry->matrixPtrs[mtxId] = &entry->matrixes[mtxId];
+        } else if (mtxId == LINK_EQUIP_MATRIX_MASKS) {
+            entry->matrixes[mtxId] = sAdultDefaultMaskMtx;
+            entry->matrixPtrs[mtxId] = &entry->matrixes[mtxId];
+        }
     }
 
     refreshProxyMtxIfEntryLoaded(entry, mtxId);
