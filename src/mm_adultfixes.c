@@ -9,20 +9,18 @@
 #include "overlays/actors/ovl_En_Talk_Gibud/z_en_talk_gibud.h"
 #include "overlays/actors/ovl_Arms_Hook/z_arms_hook.h"
 
-PlayState *gPlayState;
-s32 gLimbIndex;
+s32 gLimbIndexFirstPerson;
 Gfx **gFirstPersonDList;
 
 RECOMP_HOOK("Player_OverrideLimbDrawGameplayFirstPerson")
 void addFPSrightForearm_on_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
-    gPlayState = play;
-    gLimbIndex = limbIndex;
+    gLimbIndexFirstPerson = limbIndex;
     gFirstPersonDList = dList;
 }
 
 RECOMP_HOOK_RETURN("Player_OverrideLimbDrawGameplayFirstPerson")
 void addFPSrightForearm_on_return_OverrideLimbDrawFirstPerson() {
-    if (gLimbIndex == PLAYER_LIMB_RIGHT_FOREARM) {
+    if (gLimbIndexFirstPerson == PLAYER_LIMB_RIGHT_FOREARM) {
         Link_FormProxy *p = GET_PLAYER_FORM_PROXY;
         *gFirstPersonDList = &p->displayLists[LINK_DL_FPS_RFOREARM];
     }
@@ -189,4 +187,20 @@ void fixEnemyHeight_on_EnTalkgibud_MoveToIdealGrabPositionAndRotation(EnRailgibu
 RECOMP_HOOK_RETURN("EnTalkGibud_MoveToIdealGrabPositionAndRotation")
 void fixEnemyHeight_on_return_EnTalkgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
     gSaveContext.save.playerForm = sRealPlayerFormIdealPosTalk;
+}
+
+// Move adult models higher on Epona
+#define EPONA_HEIGHT_OFFSET 1100.f
+PlayState *gPlayStateEponaFix = NULL;
+RECOMP_HOOK("Player_UpdateCommon")
+void Player_UpdateCommon(Player *this, PlayState *play, Input *input) {
+    gPlayStateEponaFix = play;
+}
+
+RECOMP_HOOK_RETURN("Player_UpdateCommon")
+void Player_UpdateCommonReturn(void) {
+    Player *player = GET_PLAYER(gPlayStateEponaFix);
+    if (player->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL && player->stateFlags1 & PLAYER_STATE1_800000) {
+        player->actor.shape.yOffset -= EPONA_HEIGHT_OFFSET;
+    }
 }
