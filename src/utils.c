@@ -35,13 +35,17 @@ void clearModelInfoKeepEyes(Link_ModelInfo *info) {
     }
 }
 
-Gfx *createShimDisplayList(u32 displayListCount, ...) {
+Gfx *createShimDisplayList(int displayListCount, ...) {
+    if (displayListCount < 1) {
+        return NULL;
+    }
+
     Gfx *shimDl = recomp_alloc(sizeof(Gfx) * displayListCount);
 
     va_list args;
     va_start(args, displayListCount);
 
-    for (u32 i = 0; i < displayListCount - 1; ++i) {
+    for (int i = 0; i < displayListCount - 1; ++i) {
         Gfx *dlToCall = va_arg(args, Gfx *);
 
         gSPDisplayList(&shimDl[i], dlToCall);
@@ -56,7 +60,11 @@ Gfx *createShimDisplayList(u32 displayListCount, ...) {
     return shimDl;
 }
 
-Gfx *createShimWithMatrix(Mtx* matrix, u32 displayListCount, ...) {
+Gfx *createShimWithMatrix(Mtx* matrix, int displayListCount, ...) {
+    if (displayListCount < 1) {
+        return NULL;
+    }
+
     u32 shimSize = displayListCount + 3;
 
     Gfx *shimDl = recomp_alloc(sizeof(Gfx) * (shimSize));
@@ -67,7 +75,7 @@ Gfx *createShimWithMatrix(Mtx* matrix, u32 displayListCount, ...) {
     va_start(args, displayListCount);
 
     Gfx *calledLists = shimDl + 1;
-    for (u32 i = 0; i < displayListCount; ++i) {
+    for (int i = 0; i < displayListCount; ++i) {
         Gfx *dlToCall = va_arg(args, Gfx *);
 
         gSPDisplayList(&calledLists[i], dlToCall);
