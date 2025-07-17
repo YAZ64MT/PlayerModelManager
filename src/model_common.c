@@ -43,12 +43,12 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     Gfx **shims = formProxy->shimDisplayListPtrs;
 
     // init by pointing all to DF command
-    for (u32 i = 0; i < LINK_SHIMDL_MAX; ++i) {
+    for (int i = 0; i < LINK_SHIMDL_MAX; ++i) {
         shims[i] = recomp_alloc(sizeof(Gfx));
         gSPBranchList(shims[i], gEmptyDisplayList);
     }
 
-#define SHIM_ITEM_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item] = createShimDisplayList(2, &dls[LINK_DL_##hand], &dls[LINK_DL_##item])
+#define SHIM_ITEM_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item] = createShimDisplayList(2, &dls[LINK_DL_##item], &dls[LINK_DL_##hand])
 #define SHIM_ITEM_LFIST(item) SHIM_ITEM_HAND(LFIST, item)
 #define SHIM_ITEM_RFIST(item) SHIM_ITEM_HAND(RFIST, item)
 #define SHIM_ITEM_LHAND(item) SHIM_ITEM_HAND(LHAND, item)
