@@ -13,8 +13,6 @@
 #define ARRAY_GROWTH_FACTOR 3 / 2
 #define ARRAY_STARTING_SIZE 16
 
-RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
-
 static MemorySlotmapHandle sHandleToMemoryEntry;
 
 static YAZMTCore_StringU32Dictionary *sInternalNamesToEntries;

@@ -12,8 +12,6 @@
 #include "externs_z_player_lib.h"
 #include "model_shared.h"
 
-RECOMP_IMPORT("*", unsigned char *recomp_get_mod_folder_path());
-
 Link_FormProxy gLinkFormProxies[PLAYER_FORM_MAX];
 
 void changeFormPtrsToProxy(PlayerTransformation playerForm) {
