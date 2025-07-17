@@ -18,6 +18,15 @@ Look at the header itself for function names and what they do.
 
 For a functional example of replacing a model using this API, see the [PlayasKafei mod's main.c](https://github.com/YAZ64MT/PlayasKafei/blob/main/src/main.c).
 
+Models can only be registered during the onRegisterModels event. Helper macros have been defined for you, seen below.
+
+```c
+PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS void registerModels() {
+    PlayerModelManagerHandle humanModel = PLAYERMODELMANAGER_REGISTER_MODEL("example_model_internal_name", PMM_MODEL_TYPE_CHILD);
+    // ... do stuff
+}
+```
+
 ### Writing mods
 See [this document](https://hackmd.io/fMDiGEJ9TBSjomuZZOgzNg) for an explanation of the modding framework, including how to write function patches and perform interop between different mods.
 
