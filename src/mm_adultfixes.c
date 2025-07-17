@@ -60,6 +60,7 @@ RECOMP_HOOK("Player_Init")
 void initAgeProps(Actor *thisx, PlayState *play) {
     if (!isAdultAgePropsInitialized()) {
         gVanillaHumanLinkAgeProps = sPlayerAgeProperties[PLAYER_FORM_HUMAN];
+        gVanillaPlayerMass = sPlayerMass[PLAYER_FORM_HUMAN];
         initAdultLinkAgeProperties();
     }
 }
@@ -202,5 +203,14 @@ void doEponaHeightOffset_on_return_Player_UpdateCommon(void) {
     Player *player = GET_PLAYER(gPlayStateEponaFix);
     if (player->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL && player->stateFlags1 & PLAYER_STATE1_800000) {
         player->actor.shape.yOffset -= EPONA_HEIGHT_OFFSET;
+    }
+}
+
+RECOMP_HOOK("Player_Action_13")
+void increaseWalkingSpeed_on_Player_Action_13(Player *this, PlayState *play) {
+    if (this->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL) {
+        // workaround for child Link being ~10% slower than Zora Link
+        // TODO: find the reason child Link is slower in the first place
+        this->speedXZ *= 1.09091f;
     }
 }
