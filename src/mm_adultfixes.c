@@ -223,6 +223,11 @@ void increaseWalkingSpeed_on_Player_Action_13(Player *this, PlayState *play) {
     if (this->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL) {
         // workaround for child Link being ~10% slower than Zora Link
         // TODO: find the reason child Link is slower in the first place
-        this->speedXZ *= 1.09091f;
+        if (this->speedXZ < 6.0f) {
+            this->speedXZ *= 1.09091f;
+            if (this->speedXZ > 6.0f) {
+                this->speedXZ = 6.0f;
+            }
+        }
     }
 }
