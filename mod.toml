@@ -17,8 +17,6 @@ display_name = "Player Model Manager"
 description =  """
 This is a mod for Majora's Mask: Recompiled that allows Link's model to be swapped out on the fly.
 
-To load ModLoader64 zobjs, throw them in a zobj folder in your MM Recomp mods folder.
-
 To open the model menu, use the button combo you have configured. By default, it is L + A."""
 
 # A short description that will show up in this mod's entry in the mod list. This should be human readable and kept short
