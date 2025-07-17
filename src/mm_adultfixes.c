@@ -32,11 +32,16 @@ PlayerAgeProperties gVanillaHumanLinkAgeProps;
 
 u8 gVanillaPlayerMass = 0;
 
-u8 gAdultPlayerMass = 0;
+#define NUM_BOOT_PROPERTIES 18
+
+s16 gVanillaHumanBootProperties[NUM_BOOT_PROPERTIES];
 
 extern PlayerAgeProperties sPlayerAgeProperties[];
 
 extern u8 sPlayerMass[];
+
+extern s16 D_801BFE14[PLAYER_BOOTS_MAX][NUM_BOOT_PROPERTIES];
+#define PLAYER_BOOTS_ARR D_801BFE14
 
 void initAdultLinkAgeProperties() {
     PlayerAgeProperties *fdProps = &sPlayerAgeProperties[PLAYER_FORM_FIERCE_DEITY];
@@ -57,18 +62,24 @@ void initAdultLinkAgeProperties() {
     gAdultLinkAgeProps.voiceSfxIdOffset = SFX_VOICE_BANK_SIZE * 0;
     gAdultLinkAgeProps.surfaceSfxIdOffset = 0x80;
 
-    gAdultPlayerMass = sPlayerMass[PLAYER_FORM_ZORA];
 }
 
 bool isAdultAgePropsInitialized() {
     return gAdultLinkAgeProps.surfaceSfxIdOffset == 0x80;
 }
 
+void initVanillaAgeProps() {
+    gVanillaHumanLinkAgeProps = sPlayerAgeProperties[PLAYER_FORM_HUMAN];
+    gVanillaPlayerMass = sPlayerMass[PLAYER_FORM_HUMAN];
+    for (int i = 0; i < NUM_BOOT_PROPERTIES; ++i) {
+        gVanillaHumanBootProperties[i] = PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i];
+    }
+}
+
 RECOMP_HOOK("Player_Init")
 void initAgeProps(Actor *thisx, PlayState *play) {
     if (!isAdultAgePropsInitialized()) {
-        gVanillaHumanLinkAgeProps = sPlayerAgeProperties[PLAYER_FORM_HUMAN];
-        gVanillaPlayerMass = sPlayerMass[PLAYER_FORM_HUMAN];
+        initVanillaAgeProps();
         initAdultLinkAgeProperties();
     }
 }
@@ -89,7 +100,11 @@ void handleAgePropsOnPlay(PlayState *play) {
                 D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = D_8085BE84[PLAYER_ANIMGROUP_doorB_free][i];
             }
 
-            sPlayerMass[PLAYER_FORM_HUMAN] = gAdultPlayerMass;
+            sPlayerMass[PLAYER_FORM_HUMAN] = sPlayerMass[PLAYER_FORM_ZORA];
+
+            for (int i = 0; i < NUM_BOOT_PROPERTIES; ++i) {
+                PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i] = PLAYER_BOOTS_ARR[PLAYER_BOOTS_ZORA_LAND][i];
+            }
         } else {
             sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gVanillaHumanLinkAgeProps;
 
@@ -99,6 +114,10 @@ void handleAgePropsOnPlay(PlayState *play) {
             }
 
             sPlayerMass[PLAYER_FORM_HUMAN] = gVanillaPlayerMass;
+
+            for (int i = 0; i < NUM_BOOT_PROPERTIES; ++i) {
+                PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i] = gVanillaHumanBootProperties[i];
+            }
         }
 
         Player *player = (Player *)GET_PLAYER(play);
@@ -215,19 +234,5 @@ void doEponaHeightOffset_on_return_Player_UpdateCommon(void) {
     Player *player = GET_PLAYER(gPlayStateEponaFix);
     if (player->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL && player->stateFlags1 & PLAYER_STATE1_800000) {
         player->actor.shape.yOffset -= EPONA_HEIGHT_OFFSET;
-    }
-}
-
-RECOMP_HOOK("Player_Action_13")
-void increaseWalkingSpeed_on_Player_Action_13(Player *this, PlayState *play) {
-    if (this->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL) {
-        // workaround for child Link being ~10% slower than Zora Link
-        // TODO: find the reason child Link is slower in the first place
-        if (this->speedXZ < 6.0f) {
-            this->speedXZ *= 1.09091f;
-            if (this->speedXZ > 6.0f) {
-                this->speedXZ = 6.0f;
-            }
-        }
     }
 }
