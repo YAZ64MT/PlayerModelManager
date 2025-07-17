@@ -30,7 +30,13 @@ PlayerAgeProperties gAdultLinkAgeProps = {};
 
 PlayerAgeProperties gVanillaHumanLinkAgeProps;
 
+u8 gVanillaPlayerMass = 0;
+
+u8 gAdultPlayerMass = 0;
+
 extern PlayerAgeProperties sPlayerAgeProperties[];
+
+extern u8 sPlayerMass[];
 
 void initAdultLinkAgeProperties() {
     PlayerAgeProperties *fdProps = &sPlayerAgeProperties[PLAYER_FORM_FIERCE_DEITY];
@@ -50,6 +56,8 @@ void initAdultLinkAgeProperties() {
     gAdultLinkAgeProps.unk_7A->z = fdProps->unk_7A->z;
     gAdultLinkAgeProps.voiceSfxIdOffset = SFX_VOICE_BANK_SIZE * 0;
     gAdultLinkAgeProps.surfaceSfxIdOffset = 0x80;
+
+    gAdultPlayerMass = sPlayerMass[PLAYER_FORM_ZORA];
 }
 
 bool isAdultAgePropsInitialized() {
@@ -80,6 +88,8 @@ void handleAgePropsOnPlay(PlayState *play) {
                 D_8085BE84[PLAYER_ANIMGROUP_doorA][i] = D_8085BE84[PLAYER_ANIMGROUP_doorA_free][i];
                 D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = D_8085BE84[PLAYER_ANIMGROUP_doorB_free][i];
             }
+
+            sPlayerMass[PLAYER_FORM_HUMAN] = gAdultPlayerMass;
         } else {
             sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gVanillaHumanLinkAgeProps;
 
@@ -87,6 +97,8 @@ void handleAgePropsOnPlay(PlayState *play) {
                 D_8085BE84[PLAYER_ANIMGROUP_doorA][i] = &gPlayerAnim_clink_demo_doorA_link;
                 D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = &gPlayerAnim_clink_demo_doorB_link;
             }
+
+            sPlayerMass[PLAYER_FORM_HUMAN] = gVanillaPlayerMass;
         }
 
         Player *player = (Player *)GET_PLAYER(play);
