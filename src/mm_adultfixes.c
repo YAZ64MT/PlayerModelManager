@@ -193,12 +193,12 @@ void fixEnemyHeight_on_return_EnTalkgibud_MoveToIdealGrabPositionAndRotation(EnR
 #define EPONA_HEIGHT_OFFSET 1100.f
 PlayState *gPlayStateEponaFix = NULL;
 RECOMP_HOOK("Player_UpdateCommon")
-void Player_UpdateCommon(Player *this, PlayState *play, Input *input) {
+void doEponaHeightOffset_on_Player_UpdateCommon(Player *this, PlayState *play, Input *input) {
     gPlayStateEponaFix = play;
 }
 
 RECOMP_HOOK_RETURN("Player_UpdateCommon")
-void Player_UpdateCommonReturn(void) {
+void doEponaHeightOffset_on_return_Player_UpdateCommon(void) {
     Player *player = GET_PLAYER(gPlayStateEponaFix);
     if (player->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL && player->stateFlags1 & PLAYER_STATE1_800000) {
         player->actor.shape.yOffset -= EPONA_HEIGHT_OFFSET;
