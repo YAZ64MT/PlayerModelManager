@@ -457,7 +457,7 @@ RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersio
     return &gLinkFormProxies[form].displayLists[dl];
 }
 
-bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
+RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
     FormModelMemoryEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_isApplied");
 
     if (!entry) {
