@@ -73,9 +73,9 @@ void readTunicColor_on_Player_DrawGameplay(PlayState *play, Player *this, s32 lo
                 sTunicColor.g = sToU8(color + 2);
                 sTunicColor.b = sToU8(color + 4);
             }
-        }
 
-        recomp_free_config_string(color);
+            recomp_free_config_string(color);
+        }
     }
 }
 
