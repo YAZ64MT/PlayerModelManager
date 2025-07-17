@@ -1,8 +1,22 @@
-# Majora's Mask: Recompiled Mod Template
+# PlayerModelManager for Majora's Mask: Recompiled
 
-This is an example mod for Majora's Mask: Recompiled that can be used as a template for creating mods. It has a basic build system, headers, sample code, and a mod config toml.
+This is an API mod for Majora's Mask: Recompiled that simplifies Link model replacement and adds a menu that lets the user swap 
+between models for each form.
 
-Example code for using the recompui API to build ingame UI can be found in the `ui-example` branch.
+### API Usage
+
+Add [this header file](https://github.com/YAZ64MT/https://github.com/YAZ64MT/PlayerModelManager/blob/main/include/playermodelmanager_api.h) to your mod's includes and the mod to your dependencies in your toml:
+
+```toml
+dependencies = [
+    "yazmt_mm_playermodelmanager",
+]
+
+```
+
+Look at the header itself for function names and what they do.
+
+For a functional example of replacing a model using this API, see the [PlayasKafei mod's main.c](https://github.com/YAZ64MT/PlayasKafei/blob/main/src/main.c).
 
 ### Writing mods
 See [this document](https://hackmd.io/fMDiGEJ9TBSjomuZZOgzNg) for an explanation of the modding framework, including how to write function patches and perform interop between different mods.
