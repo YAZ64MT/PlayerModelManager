@@ -93,6 +93,8 @@ void handleAgeProps(PlayState *play) {
         for (int i = 0; i < NUM_BOOT_PROPERTIES; ++i) {
             PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i] = PLAYER_BOOTS_ARR[PLAYER_BOOTS_ZORA_LAND][i];
         }
+
+        GET_PLAYER(play)->ageProperties = &gAdultLinkAgeProps;
     } else {
         sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gVanillaHumanLinkAgeProps;
 
@@ -106,21 +108,19 @@ void handleAgeProps(PlayState *play) {
         for (int i = 0; i < NUM_BOOT_PROPERTIES; ++i) {
             PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i] = gVanillaHumanBootProperties[i];
         }
+
+        GET_PLAYER(play)->ageProperties = &gVanillaHumanLinkAgeProps;
     }
 }
 
-RECOMP_HOOK("Player_Init")
-void initAgeProps(Actor *thisx, PlayState *play) {
+// Need to do this every frame or adult Link clips into the floor on unpause
+RECOMP_CALLBACK("*", recomp_on_play_main)
+void handleAgePropsOnPlay(PlayState *play) {
     if (!isAdultAgePropsInitialized()) {
         initVanillaAgeProps();
         initAdultLinkAgeProperties();
     }
 
-    handleAgeProps(play);
-}
-
-RECOMP_CALLBACK("*", recomp_on_play_main)
-void handleAgePropsOnPlay(PlayState *play) {
     handleAgeProps(play);
 }
 
