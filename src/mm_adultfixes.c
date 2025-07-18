@@ -80,7 +80,9 @@ extern LinkAnimationHeader gPlayerAnim_clink_demo_doorA_link;
 extern LinkAnimationHeader gPlayerAnim_clink_demo_doorB_link;
 
 void handleAgeProps(PlayState *play) {
-    if (GET_PLAYER_FORM == PLAYER_FORM_HUMAN) {
+    Player *player = GET_PLAYER(play);
+
+    if (player->transformation == PLAYER_FORM_HUMAN && player->skelAnime.animation != &gPlayerAnim_pg_maskoffstart) {
         if (IS_HUMAN_ADULT_LINK_MODEL) {
             sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gAdultLinkAgeProps;
 
@@ -95,7 +97,7 @@ void handleAgeProps(PlayState *play) {
                 PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i] = PLAYER_BOOTS_ARR[PLAYER_BOOTS_ZORA_LAND][i];
             }
 
-            GET_PLAYER(play)->ageProperties = &gAdultLinkAgeProps;
+            player->ageProperties = &gAdultLinkAgeProps;
         } else {
             sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gVanillaHumanLinkAgeProps;
 
@@ -110,7 +112,7 @@ void handleAgeProps(PlayState *play) {
                 PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i] = gVanillaHumanBootProperties[i];
             }
 
-            GET_PLAYER(play)->ageProperties = &gVanillaHumanLinkAgeProps;
+            player->ageProperties = &gVanillaHumanLinkAgeProps;
         }
     }
 }
