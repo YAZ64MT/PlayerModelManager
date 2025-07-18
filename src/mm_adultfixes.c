@@ -61,7 +61,6 @@ void initAdultLinkAgeProperties() {
     gAdultLinkAgeProps.unk_7A->z = fdProps->unk_7A->z;
     gAdultLinkAgeProps.voiceSfxIdOffset = SFX_VOICE_BANK_SIZE * 0;
     gAdultLinkAgeProps.surfaceSfxIdOffset = 0x80;
-
 }
 
 bool isAdultAgePropsInitialized() {
@@ -76,56 +75,53 @@ void initVanillaAgeProps() {
     }
 }
 
+extern PlayerAnimationHeader *D_8085BE84[PLAYER_ANIMGROUP_MAX][PLAYER_ANIMTYPE_MAX];
+extern LinkAnimationHeader gPlayerAnim_clink_demo_doorA_link;
+extern LinkAnimationHeader gPlayerAnim_clink_demo_doorB_link;
+
+void handleAgeProps(PlayState *play) {
+    if (IS_HUMAN_ADULT_LINK_MODEL) {
+        sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gAdultLinkAgeProps;
+
+        for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
+            D_8085BE84[PLAYER_ANIMGROUP_doorA][i] = D_8085BE84[PLAYER_ANIMGROUP_doorA_free][i];
+            D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = D_8085BE84[PLAYER_ANIMGROUP_doorB_free][i];
+        }
+
+        sPlayerMass[PLAYER_FORM_HUMAN] = sPlayerMass[PLAYER_FORM_ZORA];
+
+        for (int i = 0; i < NUM_BOOT_PROPERTIES; ++i) {
+            PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i] = PLAYER_BOOTS_ARR[PLAYER_BOOTS_ZORA_LAND][i];
+        }
+    } else {
+        sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gVanillaHumanLinkAgeProps;
+
+        for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
+            D_8085BE84[PLAYER_ANIMGROUP_doorA][i] = &gPlayerAnim_clink_demo_doorA_link;
+            D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = &gPlayerAnim_clink_demo_doorB_link;
+        }
+
+        sPlayerMass[PLAYER_FORM_HUMAN] = gVanillaPlayerMass;
+
+        for (int i = 0; i < NUM_BOOT_PROPERTIES; ++i) {
+            PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i] = gVanillaHumanBootProperties[i];
+        }
+    }
+}
+
 RECOMP_HOOK("Player_Init")
 void initAgeProps(Actor *thisx, PlayState *play) {
     if (!isAdultAgePropsInitialized()) {
         initVanillaAgeProps();
         initAdultLinkAgeProperties();
     }
-}
 
-extern PlayerAnimationHeader *D_8085BE84[PLAYER_ANIMGROUP_MAX][PLAYER_ANIMTYPE_MAX];
-extern LinkAnimationHeader gPlayerAnim_clink_demo_doorA_link;
-extern LinkAnimationHeader gPlayerAnim_clink_demo_doorB_link;
+    handleAgeProps(play);
+}
 
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void handleAgePropsOnPlay(PlayState *play) {
-    if (gIsAgePropertyRefreshRequested) {
-        gIsAgePropertyRefreshRequested = false;
-        if (IS_HUMAN_ADULT_LINK_MODEL) {
-            sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gAdultLinkAgeProps;
-
-            for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
-                D_8085BE84[PLAYER_ANIMGROUP_doorA][i] = D_8085BE84[PLAYER_ANIMGROUP_doorA_free][i];
-                D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = D_8085BE84[PLAYER_ANIMGROUP_doorB_free][i];
-            }
-
-            sPlayerMass[PLAYER_FORM_HUMAN] = sPlayerMass[PLAYER_FORM_ZORA];
-
-            for (int i = 0; i < NUM_BOOT_PROPERTIES; ++i) {
-                PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i] = PLAYER_BOOTS_ARR[PLAYER_BOOTS_ZORA_LAND][i];
-            }
-        } else {
-            sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gVanillaHumanLinkAgeProps;
-
-            for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
-                D_8085BE84[PLAYER_ANIMGROUP_doorA][i] = &gPlayerAnim_clink_demo_doorA_link;
-                D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = &gPlayerAnim_clink_demo_doorB_link;
-            }
-
-            sPlayerMass[PLAYER_FORM_HUMAN] = gVanillaPlayerMass;
-
-            for (int i = 0; i < NUM_BOOT_PROPERTIES; ++i) {
-                PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN][i] = gVanillaHumanBootProperties[i];
-            }
-        }
-
-        Player *player = (Player *)GET_PLAYER(play);
-
-        if (player->transformation == PLAYER_FORM_HUMAN) {
-            player->ageProperties = &sPlayerAgeProperties[PLAYER_FORM_HUMAN];
-        }
-    }
+    handleAgeProps(play);
 }
 
 RECOMP_HOOK_RETURN("Object_LoadAll")
