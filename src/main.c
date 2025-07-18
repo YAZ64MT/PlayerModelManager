@@ -173,21 +173,22 @@ void initFormProxies() {
     _internal_setupVanillaModels();
 
     repointSharedModelsToProxy();
-
-    requestRefreshFaceTextures();
 }
 
 RECOMP_HOOK("Player_Init")
 void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
     if ((Player *)thisx == GET_PLAYER(play)) {
-        requestRefreshFaceTextures();
-
         refreshExternalDLs(GET_PLAYER_FORM_PROXY);
 
         refreshSharedModels();
 
         gIsAgePropertyRefreshRequested = true;
     }
+}
+
+RECOMP_HOOK("Player_Draw")
+void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
+    matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER(play)->transformation]);
 }
 
 RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
@@ -205,7 +206,6 @@ void refreshSharedModelsOnModelApply(PlayerTransformation form) {
 
     if (form == GET_PLAYER_FORM) {
         refreshSharedModels();
-        requestRefreshFaceTextures();
     }
 }
 

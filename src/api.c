@@ -60,10 +60,6 @@ void refreshProxyEyesTexturesIfEntryLoaded(FormModelMemoryEntry *entry) {
         for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
             fp->current.eyesTextures[i] = entry->eyesTex[i];
         }
-
-        if (fp->form == GET_PLAYER_FORM) {
-            requestRefreshFaceTextures();
-        }
     }
 }
 
@@ -73,10 +69,6 @@ void refreshProxyMouthTexturesIfEntryLoaded(FormModelMemoryEntry *entry) {
     if (fp) {
         for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
             fp->current.mouthTextures[i] = entry->mouthTex[i];
-        }
-
-        if (fp->form == GET_PLAYER_FORM) {
-            requestRefreshFaceTextures();
         }
     }
 }

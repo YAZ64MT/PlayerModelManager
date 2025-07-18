@@ -711,7 +711,6 @@ void refreshFormProxy(Link_FormProxy *formProxy) {
 static bool sFullRefreshRequests[PLAYER_FORM_MAX];
 static YAZMTCore_IterableU32Set *sDLRefreshReqs[PLAYER_FORM_MAX];
 static YAZMTCore_IterableU32Set *sMtxRefreshReqs[PLAYER_FORM_MAX];
-static bool sIsFaceRefreshRequested;
 
 void requestRefreshFormProxy(Link_FormProxy *formProxy) {
     sFullRefreshRequests[formProxy->form] = true;
@@ -723,10 +722,6 @@ void requestRefreshFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkD
 
 void requestRefreshFormProxyMtx(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
     YAZMTCore_IterableU32Set_insert(sMtxRefreshReqs[formProxy->form], mtxId);
-}
-
-void requestRefreshFaceTextures() {
-    sIsFaceRefreshRequested = true;
 }
 
 RECOMP_CALLBACK("*", recomp_on_play_main)
@@ -758,12 +753,6 @@ void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
         YAZMTCore_IterableU32Set_clear(dlReqs);
         YAZMTCore_IterableU32Set_clear(mtxReqs);
     }
-
-    if (sIsFaceRefreshRequested) {
-        refreshFaceTextures();
-    }
-
-    sIsFaceRefreshRequested = false;
 }
 
 void setupSharedListenerDL(ObjectId id, Gfx *vanillaDL, Link_DisplayList linkDLId) {
