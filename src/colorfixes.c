@@ -6,19 +6,38 @@ typedef struct {
     u8 r;
     u8 g;
     u8 b;
+    u8 a;
 } TunicColor;
 
 static TunicColor sTunicColor = {
     .r = 30,
     .g = 105,
     .b = 27,
+    .a = 0,
 };
+
+static TunicColor sRequestedTunicColor = {
+    .r = 30,
+    .g = 105,
+    .b = 27,
+    .a = 0,
+};
+
+static bool sIsTunicOverrideRequested = false;
+
+void setTunicColor(u8 r, u8 g, u8 b, u8 a) {
+    sIsTunicOverrideRequested = true;
+    sRequestedTunicColor.r = r;
+    sRequestedTunicColor.g = g;
+    sRequestedTunicColor.b = b;
+    sRequestedTunicColor.a = a;
+}
 
 void fixTunicColor(PlayState *play) {
     if (recomp_get_config_u32("is_modify_tunic_color")) {
         OPEN_DISPS(play->state.gfxCtx);
 
-        gDPSetEnvColor(POLY_OPA_DISP++, sTunicColor.r, sTunicColor.g, sTunicColor.b, 0);
+        gDPSetEnvColor(POLY_OPA_DISP++, sTunicColor.r, sTunicColor.g, sTunicColor.b, sTunicColor.a);
 
         CLOSE_DISPS(play->state.gfxCtx);
     }
@@ -62,9 +81,35 @@ bool isValidHexString(const char *s) {
     return isValid;
 }
 
+typedef enum {
+    TUNIC_COLOR_OFF,
+    TUNIC_COLOR_AUTO,
+    TUNIC_COLOR_FORCE,
+} TunicColorConfigOption;
+
 RECOMP_HOOK("Player_Draw")
 void readTunicColor_on_Player_DrawGameplay(PlayState *play, Player *this, s32 lod, Gfx *cullDList, OverrideLimbDrawFlex overrideLimbDraw) {
-    if (recomp_get_config_u32("is_modify_tunic_color")) {
+    TunicColorConfigOption tunicColorOpt = recomp_get_config_u32("is_modify_tunic_color");
+
+    bool shouldPullFromConfig = false;
+
+    switch (tunicColorOpt) {
+        case TUNIC_COLOR_AUTO:
+            shouldPullFromConfig = !sIsTunicOverrideRequested;
+
+            if (sIsTunicOverrideRequested) {
+                sTunicColor = sRequestedTunicColor;
+            }
+            break;
+
+        case TUNIC_COLOR_FORCE:
+            shouldPullFromConfig = true;
+
+        default:
+            break;
+    }
+
+    if (shouldPullFromConfig) {
         char *color = recomp_get_config_string("tunic_color");
 
         if (color) {

@@ -4,6 +4,7 @@
 #include "playermodelmanager.h"
 #include "model_common.h"
 #include "defines_modelinfo.h"
+#include "colorfixes.h"
 #include "playermodelmanager_api.h"
 #include "yazmtcorelib_api.h"
 #include "modelreplacer_api.h"
@@ -469,6 +470,10 @@ RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
     }
 
     return CMEM_getCurrentEntry(getFormFromModelType(entry->modelEntry.type)) == &entry->modelEntry;
+}
+
+RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {
+    setTunicColor(r, g, b, a);
 }
 
 RECOMP_DECLARE_EVENT(onRegisterModels());
