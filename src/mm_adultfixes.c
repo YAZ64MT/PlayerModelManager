@@ -82,7 +82,7 @@ extern LinkAnimationHeader gPlayerAnim_clink_demo_doorB_link;
 void handleAgeProps(PlayState *play) {
     Player *player = GET_PLAYER(play);
 
-    if (player->transformation == PLAYER_FORM_HUMAN && player->skelAnime.animation != &gPlayerAnim_pg_maskoffstart) {
+    if (player->transformation == PLAYER_FORM_HUMAN) {
         if (IS_HUMAN_ADULT_LINK_MODEL) {
             sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gAdultLinkAgeProps;
 
