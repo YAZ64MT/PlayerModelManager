@@ -9,9 +9,12 @@
 #include "proxymm_kv_api.h"
 #include "playermodelmanager_api.h"
 #include "yazmtcorelib_api.h"
+#include "z64recomp_interpolation.h"
 
 #define ARRAY_GROWTH_FACTOR 3 / 2
 #define ARRAY_STARTING_SIZE 16
+
+static bool sShouldSkipInterpolation[PLAYER_FORM_MAX];
 
 static MemorySlotmapHandle sHandleToMemoryEntry;
 
@@ -137,6 +140,7 @@ bool CMEM_forceApplyEntry(PlayerTransformation form, FormModelEntry *newEntry) {
             newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, newEntry->callbackData);
         }
 
+        sShouldSkipInterpolation[form] = true;
         return true;
     }
 
@@ -187,6 +191,8 @@ void CMEM_removeModel(PlayerTransformation form) {
         _internal_onModelApplied(form);
 
         gIsAgePropertyRefreshRequested = true;
+
+        sShouldSkipInterpolation[form] = true;
     }
 }
 
@@ -289,4 +295,17 @@ RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initCMEMHash() {
     sHandleToMemoryEntry = recomputil_create_memory_slotmap(sizeof(FormModelMemoryEntry));
     sInternalNamesToEntries = YAZMTCore_StringU32Dictionary_new();
+}
+
+RECOMP_CALLBACK("*", recomp_on_play_main)
+void skipInterpolationOnPlay(PlayState *play) {
+    Player *player = GET_PLAYER(play);
+
+    if (sShouldSkipInterpolation[player->transformation]) {
+        actor_set_interpolation_skipped(&player->actor);
+    }
+
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        sShouldSkipInterpolation[i] = false;
+    }
 }
