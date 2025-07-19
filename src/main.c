@@ -188,7 +188,7 @@ void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
 
 RECOMP_HOOK("Player_Draw")
 void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
-    matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER(play)->transformation]);
+    matchFaceTexturesToProxy(&gLinkFormProxies[((Player *)thisx)->transformation]);
 }
 
 RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
