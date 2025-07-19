@@ -3,7 +3,7 @@
 
 #include "playermodelmanager.h"
 
-#define GET_PLAYER_FORM_PROXY (&gLinkFormProxies[GET_PLAYER_FORM])
+#define GET_PLAYER_FORM_PROXY(player) (&gLinkFormProxies[player->transformation])
 
 extern Gfx gEmptyDisplayList[];
 extern Gfx gCallEmptyDisplayList[];
@@ -22,5 +22,6 @@ void requestRefreshFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkD
 void requestRefreshFormProxyMtx(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId);
 void setupSharedListenerDL(ObjectId id, Gfx *vanillaDL, Link_DisplayList linkDLId);
 Mtx *getFormProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId);
+void handleRequestedRefreshes(PlayState *play);
 
 #endif

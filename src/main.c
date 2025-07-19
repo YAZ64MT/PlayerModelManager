@@ -110,8 +110,8 @@ void repointSharedModelsToProxy() {
     sPlayerPads[2] = &gPlayerLibDLs[PLAYERLIB_DL_PAD_OPENING];
 }
 
-void refreshSharedModels() {
-    Link_FormProxy *currProxy = GET_PLAYER_FORM_PROXY;
+void refreshSharedModels(Player *player) {
+    Link_FormProxy *currProxy = GET_PLAYER_FORM_PROXY(player);
     Link_FormProxy *human = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
 #define REFRESH_DL(name) gSPBranchList(&gPlayerLibDLs[PLAYERLIB_DL_##name], &currProxy->displayLists[LINK_DL_##name])
@@ -177,18 +177,24 @@ void initFormProxies() {
 
 RECOMP_HOOK("Player_Init")
 void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
-    if ((Player *)thisx == GET_PLAYER(play)) {
-        refreshExternalDLs(GET_PLAYER_FORM_PROXY);
+    Player *player = GET_PLAYER(play);
 
-        refreshSharedModels();
-
-        gIsAgePropertyRefreshRequested = true;
+    if ((Player *)thisx == player) {
+        refreshExternalDLs(GET_PLAYER_FORM_PROXY(player));
+        matchFaceTexturesToProxy(&gLinkFormProxies[player->transformation]);
+        refreshSharedModels(player);
+        handleRequestedRefreshes(play);
     }
 }
 
 RECOMP_HOOK("Player_Draw")
-void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
-    matchFaceTexturesToProxy(&gLinkFormProxies[GET_PLAYER(play)->transformation]);
+void updatedSharedAssets_on_Player_Draw(Actor *thisx, PlayState *play) {
+    Player *player = GET_PLAYER(play);
+
+    refreshExternalDLs(GET_PLAYER_FORM_PROXY(player));
+    matchFaceTexturesToProxy(GET_PLAYER_FORM_PROXY(player));
+    refreshSharedModels(player);
+    handleRequestedRefreshes(play);
 }
 
 RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
@@ -203,10 +209,6 @@ RECOMP_CALLBACK(".", _internal_onModelApplied)
 void refreshSharedModelsOnModelApply(PlayerTransformation form) {
     requestRefreshFormProxy(&gLinkFormProxies[form]);
     gIsAgePropertyRefreshRequested = true;
-
-    if (form == GET_PLAYER_FORM) {
-        refreshSharedModels();
-    }
 }
 
 RECOMP_DECLARE_EVENT(_internal_initHashObjects());

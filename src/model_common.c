@@ -442,10 +442,6 @@ void matchFaceTexturesToProxy(Link_FormProxy *formProxy) {
     }
 }
 
-void refreshFaceTextures() {
-    matchFaceTexturesToProxy(GET_PLAYER_FORM_PROXY);
-}
-
 Mtx *getFormProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
     return (Mtx *)formProxy->mtxDisplayLists[mtxId][0].words.w1;
 }
@@ -724,8 +720,7 @@ void requestRefreshFormProxyMtx(Link_FormProxy *formProxy, Link_EquipmentMatrix 
     YAZMTCore_IterableU32Set_insert(sMtxRefreshReqs[formProxy->form], mtxId);
 }
 
-RECOMP_CALLBACK("*", recomp_on_play_main)
-void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
+void handleRequestedRefreshes(PlayState *play) {
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
         Link_FormProxy *fp = &gLinkFormProxies[i];
         YAZMTCore_IterableU32Set *dlReqs = sDLRefreshReqs[i];
@@ -753,6 +748,11 @@ void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
         YAZMTCore_IterableU32Set_clear(dlReqs);
         YAZMTCore_IterableU32Set_clear(mtxReqs);
     }
+}
+
+RECOMP_CALLBACK("*", recomp_on_play_main)
+void handleRequestedRefreshes_on_Play_Main(PlayState *play) {
+    handleRequestedRefreshes(play);
 }
 
 void setupSharedListenerDL(ObjectId id, Gfx *vanillaDL, Link_DisplayList linkDLId) {

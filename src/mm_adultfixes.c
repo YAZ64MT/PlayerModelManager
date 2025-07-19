@@ -11,17 +11,19 @@
 
 s32 gLimbIndexFirstPerson;
 Gfx **gFirstPersonDList;
+Player *gFirstPersonPlayer;
 
 RECOMP_HOOK("Player_OverrideLimbDrawGameplayFirstPerson")
 void addFPSrightForearm_on_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
     gLimbIndexFirstPerson = limbIndex;
     gFirstPersonDList = dList;
+    gFirstPersonPlayer = GET_PLAYER(play);
 }
 
 RECOMP_HOOK_RETURN("Player_OverrideLimbDrawGameplayFirstPerson")
 void addFPSrightForearm_on_return_OverrideLimbDrawFirstPerson() {
     if (gLimbIndexFirstPerson == PLAYER_LIMB_RIGHT_FOREARM) {
-        Link_FormProxy *p = GET_PLAYER_FORM_PROXY;
+        Link_FormProxy *p = GET_PLAYER_FORM_PROXY(gFirstPersonPlayer);
         *gFirstPersonDList = &p->displayLists[LINK_DL_FPS_RFOREARM];
     }
 }
@@ -82,7 +84,7 @@ extern LinkAnimationHeader gPlayerAnim_clink_demo_doorB_link;
 void handleAgeProps(PlayState *play) {
     Player *player = GET_PLAYER(play);
 
-    if (player->transformation == PLAYER_FORM_HUMAN && player->skelAnime.animation != &gPlayerAnim_pg_maskoffstart) {
+    if (player->transformation == PLAYER_FORM_HUMAN) {
         if (IS_HUMAN_ADULT_LINK_MODEL) {
             sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gAdultLinkAgeProps;
 

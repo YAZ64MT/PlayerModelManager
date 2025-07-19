@@ -9,12 +9,12 @@ extern LinkAnimationHeader gPlayerAnim_cl_setmask;
 RECOMP_HOOK("Player_PostLimbDrawGameplay")
 void useMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
     sPushedMaskMatrix = false;
+    Player *player = (Player *)actor;
 
     if (limbIndex == PLAYER_LIMB_HEAD) {
-        Mtx *maskMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_MASKS);
+        Mtx *maskMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY(player), LINK_EQUIP_MATRIX_MASKS);
 
         if (maskMtx) {
-            Player *player = (Player *)actor;
             if (((*dList1 != NULL) && ((u32)player->currentMask != PLAYER_MASK_NONE)) &&
                 (((player->transformation == PLAYER_FORM_HUMAN) &&
                   ((player->skelAnime.animation != &gPlayerAnim_cl_setmask) || (player->skelAnime.curFrame >= 12.0f))) ||
@@ -82,7 +82,7 @@ void fixArrowPos_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, 
             if (limbIndex == PLAYER_LIMB_LEFT_HAND && player->rightHandType == PLAYER_MODELTYPE_RH_BOW) {
                 if (!Player_IsHoldingHookshot(player)) {
                     if ((player->stateFlags3 & PLAYER_STATE3_40) && (player->transformation != PLAYER_FORM_DEKU)) {
-                        Mtx *arrowMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_ARROW_DRAWN);
+                        Mtx *arrowMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY(player), LINK_EQUIP_MATRIX_ARROW_DRAWN);
 
                         if (arrowMtx) {
                             OPEN_DISPS(play->state.gfxCtx);
@@ -94,7 +94,7 @@ void fixArrowPos_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, 
                     }
                 }
             } else if (limbIndex == PLAYER_LIMB_RIGHT_HAND && Player_IsHoldingHookshot(player)) {
-                Mtx *hookMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK);
+                Mtx *hookMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY(player), LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK);
 
                 if (hookMtx) {
                     OPEN_DISPS(play->state.gfxCtx);
