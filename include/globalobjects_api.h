@@ -16,7 +16,9 @@ typedef void *GlobalObjectsSegmentMap[0x10];
 // You generally should NOT use this for Gfx pointers since their DL commands need to be handled.
 //
 // For a Gfx global pointer, use GlobalObjects_getGlobalGfxPtr instead.
-#define SEGMENTED_TO_GLOBAL_PTR(globalObj, segmentedPtr) ((void *)((uintptr_t)globalObj + SEGMENT_OFFSET(segmentedPtr)))
+//
+// If the segmentedPtr arg is already global, it will be left unchanged.
+#define SEGMENTED_TO_GLOBAL_PTR(globalObj, segmentedPtr) ((void *)(!(segmentedPtr) || ((uintptr_t)(segmentedPtr) >= K0BASE) ? (uintptr_t)(segmentedPtr) : ((uintptr_t)(globalObj) + SEGMENT_OFFSET(segmentedPtr))))
 
 // Converts segmented pointers in the passed in display list to the specified mappings in the
 // segments parameter.
