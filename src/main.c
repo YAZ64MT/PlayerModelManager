@@ -110,8 +110,8 @@ void repointSharedModelsToProxy() {
     sPlayerPads[2] = &gPlayerLibDLs[PLAYERLIB_DL_PAD_OPENING];
 }
 
-void refreshSharedModels(bool useOriginalForms) {
-    Link_FormProxy *currProxy = GET_PLAYER_FORM_PROXY;
+void refreshSharedModels(Link_FormProxy *proxy, bool useOriginalForms) {
+    Link_FormProxy *currProxy = proxy;
 
 #define REFRESH_DL(name) gSPBranchList(&gPlayerLibDLs[PLAYERLIB_DL_##name], &currProxy->displayLists[LINK_DL_##name])
 
@@ -204,13 +204,13 @@ void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
     bool isMultipleLinksExist = GET_PLAYER(play)->actor.next;
 
     if (isMultipleLinksExist || sPlayerAppearanceNeedsUpdate) {
-        Link_FormProxy *fp = &gLinkFormProxies[((Player *)thisx)->transformation];
-
         sPlayerAppearanceNeedsUpdate = isMultipleLinksExist;
+
+        Link_FormProxy *fp = &gLinkFormProxies[((Player *)thisx)->transformation];
 
         refreshExternalDLs(fp, isMultipleLinksExist);
 
-        refreshSharedModels(isMultipleLinksExist);
+        refreshSharedModels(fp, isMultipleLinksExist);
 
         matchFaceTexturesToProxy(fp);
     }
@@ -230,7 +230,7 @@ void refreshSharedModelsOnModelApply(PlayerTransformation form) {
     gIsAgePropertyRefreshRequested = true;
 
     if (form == GET_PLAYER_FORM) {
-        refreshSharedModels(false);
+        sPlayerAppearanceNeedsUpdate = true;
     }
 }
 
