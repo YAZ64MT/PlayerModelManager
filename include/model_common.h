@@ -5,7 +5,6 @@
 
 #define GET_PLAYER_FORM_PROXY (&gLinkFormProxies[GET_PLAYER_FORM])
 
-extern Gfx gEmptyDisplayList[];
 extern Gfx gPopModelViewMtx[];
 extern Link_FormProxy gLinkFormProxies[];
 
