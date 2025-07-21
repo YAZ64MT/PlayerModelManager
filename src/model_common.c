@@ -14,10 +14,6 @@
 #include "modelreplacer_compat.h"
 #include "yazmtcorelib_api.h"
 
-Gfx gEmptyDisplayList[] = {
-    gsSPEndDisplayList(),
-};
-
 Gfx gPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
     gsSPEndDisplayList(),
@@ -549,26 +545,26 @@ void initFormProxyMatrixes(Link_FormProxy *formProxy) {
 
 LodLimb skeletonBase[PLAYER_LIMB_COUNT] = {
     {{0, 0, 0}, PLAYER_LIMB_WAIST - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_LOWER_ROOT - 1, PLAYER_LIMB_UPPER_ROOT - 1, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, PLAYER_LIMB_LOWER_ROOT - 1, PLAYER_LIMB_UPPER_ROOT - 1, {gEmptyDL, gEmptyDL}},
     {{0, 0, 0}, PLAYER_LIMB_RIGHT_THIGH - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_SHIN - 1, PLAYER_LIMB_LEFT_THIGH - 1, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOOT - 1, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_SHIN - 1, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOOT - 1, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_SHIN - 1, PLAYER_LIMB_LEFT_THIGH - 1, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOOT - 1, LIMB_DONE, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_SHIN - 1, LIMB_DONE, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOOT - 1, LIMB_DONE, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDL, gEmptyDL}},
     {{0, 0, 0}, PLAYER_LIMB_HEAD - 1, LIMB_DONE, {NULL, NULL}},
-    {{0, 0, 0}, PLAYER_LIMB_HAT - 1, PLAYER_LIMB_COLLAR - 1, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_LEFT_SHOULDER - 1, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOREARM - 1, PLAYER_LIMB_RIGHT_SHOULDER - 1, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, PLAYER_LIMB_LEFT_HAND - 1, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOREARM - 1, PLAYER_LIMB_SHEATH - 1, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, PLAYER_LIMB_RIGHT_HAND - 1, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_TORSO - 1, {gEmptyDisplayList, gEmptyDisplayList}},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDisplayList, gEmptyDisplayList}},
+    {{0, 0, 0}, PLAYER_LIMB_HAT - 1, PLAYER_LIMB_COLLAR - 1, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_LEFT_SHOULDER - 1, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_FOREARM - 1, PLAYER_LIMB_RIGHT_SHOULDER - 1, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, PLAYER_LIMB_LEFT_HAND - 1, LIMB_DONE, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_FOREARM - 1, PLAYER_LIMB_SHEATH - 1, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, PLAYER_LIMB_RIGHT_HAND - 1, LIMB_DONE, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, LIMB_DONE, PLAYER_LIMB_TORSO - 1, {gEmptyDL, gEmptyDL}},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDL, gEmptyDL}},
 };
 
 void initFormProxySkeleton(Link_FormProxy *formProxy) {
@@ -625,9 +621,9 @@ void initFormProxyDLs(Link_FormProxy *formProxy) {
 
 static StandardLimb sShieldingDefaultLimbs[] = {
     {{0, 0, 0}, LINK_BODY_SHIELD_LIMB_BODY - 1, LIMB_DONE, NULL},
-    {{0, 2000, -800}, LINK_BODY_SHIELD_LIMB_HEAD - 1, LINK_BODY_SHIELD_LIMB_ARMS_AND_LEGS - 1, gEmptyDisplayList},
-    {{2600, 0, 0}, LIMB_DONE, LIMB_DONE, gEmptyDisplayList},
-    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, gEmptyDisplayList},
+    {{0, 2000, -800}, LINK_BODY_SHIELD_LIMB_HEAD - 1, LINK_BODY_SHIELD_LIMB_ARMS_AND_LEGS - 1, gEmptyDL},
+    {{2600, 0, 0}, LIMB_DONE, LIMB_DONE, gEmptyDL},
+    {{0, 0, 0}, LIMB_DONE, LIMB_DONE, gEmptyDL},
 };
 
 void initFormProxyShieldingSkeleton(Link_FormProxy *formProxy) {

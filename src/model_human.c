@@ -175,7 +175,7 @@ void setupVanillaHuman() {
     // First Person
     models[LINK_DL_FPS_LFOREARM] = getHumanDL(gLinkHumanLeftForearmDL);
     models[LINK_DL_FPS_LHAND] = getHumanDL(gLinkHumanLeftHandClosedDL);
-    models[LINK_DL_FPS_RFOREARM] = gEmptyDisplayList;
+    models[LINK_DL_FPS_RFOREARM] = gEmptyDL;
 
     GlobalObjectsSegmentMap humanSegMap = {0};
     humanSegMap[0x04] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
