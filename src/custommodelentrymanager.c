@@ -301,8 +301,12 @@ RECOMP_CALLBACK("*", recomp_on_play_main)
 void skipInterpolationOnPlay(PlayState *play) {
     Player *player = GET_PLAYER(play);
 
-    if (sShouldSkipInterpolation[player->transformation]) {
-        actor_set_interpolation_skipped(&player->actor);
+    while (player) {
+        if (sShouldSkipInterpolation[player->transformation] && player->actor.scale.y >= 0.0f) {
+            actor_set_interpolation_skipped(&player->actor);
+        }
+
+        player = (Player *)player->actor.next;
     }
 
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
