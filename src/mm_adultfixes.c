@@ -11,18 +11,23 @@
 
 s32 gLimbIndexFirstPerson;
 Gfx **gFirstPersonDList;
+Player *gFirstPersonPlayer;
 
 RECOMP_HOOK("Player_OverrideLimbDrawGameplayFirstPerson")
 void addFPSrightForearm_on_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
     gLimbIndexFirstPerson = limbIndex;
     gFirstPersonDList = dList;
+    gFirstPersonPlayer = NULL;
+
+    if (gLimbIndexFirstPerson == PLAYER_LIMB_RIGHT_FOREARM) {
+        gFirstPersonPlayer = (Player *)actor;
+    }
 }
 
 RECOMP_HOOK_RETURN("Player_OverrideLimbDrawGameplayFirstPerson")
 void addFPSrightForearm_on_return_OverrideLimbDrawFirstPerson() {
-    if (gLimbIndexFirstPerson == PLAYER_LIMB_RIGHT_FOREARM) {
-        Link_FormProxy *p = GET_PLAYER_FORM_PROXY;
-        *gFirstPersonDList = &p->displayLists[LINK_DL_FPS_RFOREARM];
+    if (gFirstPersonPlayer) {
+        *gFirstPersonDList = &gLinkFormProxies[gFirstPersonPlayer->transformation].displayLists[LINK_DL_FPS_RFOREARM];
     }
 }
 
