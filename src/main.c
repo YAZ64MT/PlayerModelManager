@@ -186,32 +186,34 @@ void initFormProxies() {
     repointSharedModelsToProxy();
 }
 
+bool sPlayerAppearanceNeedsUpdate = false;
+
 RECOMP_HOOK("Player_Init")
 void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
     Player *player = (Player *)thisx;
 
     if (thisx->id == ACTOR_PLAYER) {
-        refreshExternalDLs(GET_PLAYER_FORM_PROXY, false);
-
-        refreshSharedModels(false);
-
-        gIsAgePropertyRefreshRequested = true;
+        sPlayerAppearanceNeedsUpdate = true;
     }
 }
 
-bool sIsMultiLinkLastDraw = false;
-
 RECOMP_HOOK("Player_Draw")
 void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
+
+    // Multiple Link actors appear in Milk Bar sound check cutscene
     bool isMultipleLinksExist = GET_PLAYER(play)->actor.next;
 
-    if (isMultipleLinksExist || sIsMultiLinkLastDraw) {
-        sIsMultiLinkLastDraw = isMultipleLinksExist;
-        refreshExternalDLs(GET_PLAYER_FORM_PROXY, true);
-        refreshSharedModels(isMultipleLinksExist);
-    }
+    if (isMultipleLinksExist || sPlayerAppearanceNeedsUpdate) {
+        Link_FormProxy *fp = &gLinkFormProxies[((Player *)thisx)->transformation];
 
-    matchFaceTexturesToProxy(&gLinkFormProxies[((Player *)thisx)->transformation]);
+        sPlayerAppearanceNeedsUpdate = isMultipleLinksExist;
+
+        refreshExternalDLs(fp, isMultipleLinksExist);
+
+        refreshSharedModels(isMultipleLinksExist);
+
+        matchFaceTexturesToProxy(fp);
+    }
 }
 
 RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
