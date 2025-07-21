@@ -137,11 +137,6 @@ void handleAgePropsOnPlay(PlayState *play) {
     handleAgeProps(play);
 }
 
-RECOMP_HOOK_RETURN("Object_LoadAll")
-void refreshAgeProps_on_Object_LoadAll() {
-    gIsAgePropertyRefreshRequested = true;
-}
-
 static Player *sPlayerFromHeight;
 static PlayerTransformation sRealPlayerFormHeight;
 

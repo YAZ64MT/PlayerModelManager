@@ -227,7 +227,6 @@ void initFormProxies_on_event() {
 RECOMP_CALLBACK(".", _internal_onModelApplied)
 void refreshSharedModelsOnModelApply(PlayerTransformation form) {
     requestRefreshFormProxy(&gLinkFormProxies[form]);
-    gIsAgePropertyRefreshRequested = true;
 
     if (form == GET_PLAYER_FORM) {
         sPlayerAppearanceNeedsUpdate = true;

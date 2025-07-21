@@ -10,7 +10,6 @@ extern Gfx gCallEmptyDisplayList[];
 extern Gfx gPopModelViewMtx[];
 extern Mtx gZeroMtx;
 extern Link_FormProxy gLinkFormProxies[];
-extern bool gIsAgePropertyRefreshRequested;
 
 void matchFaceTexturesToProxy(Link_FormProxy *formProxy);
 void matchFaceTexturesToProxy(Link_FormProxy *formProxy);

@@ -14,8 +14,6 @@
 #include "modelreplacer_compat.h"
 #include "yazmtcorelib_api.h"
 
-bool gIsAgePropertyRefreshRequested = false;
-
 Gfx gEmptyDisplayList[] = {
     gsSPEndDisplayList(),
 };

@@ -190,8 +190,6 @@ void CMEM_removeModel(PlayerTransformation form) {
 
         _internal_onModelApplied(form);
 
-        gIsAgePropertyRefreshRequested = true;
-
         sShouldSkipInterpolation[form] = true;
     }
 }
