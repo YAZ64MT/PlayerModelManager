@@ -110,11 +110,14 @@ void repointSharedModelsToProxy() {
     sPlayerPads[2] = &gPlayerLibDLs[PLAYERLIB_DL_PAD_OPENING];
 }
 
-void refreshSharedModels() {
+void refreshSharedModels(bool useOriginalForms) {
     Link_FormProxy *currProxy = GET_PLAYER_FORM_PROXY;
-    Link_FormProxy *human = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
 #define REFRESH_DL(name) gSPBranchList(&gPlayerLibDLs[PLAYERLIB_DL_##name], &currProxy->displayLists[LINK_DL_##name])
+
+    if (useOriginalForms) {
+        currProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
+    }
 
     REFRESH_DL(LFIST_SWORD_KOKIRI);
     REFRESH_DL(LFIST_SWORD_RAZOR);
@@ -134,10 +137,18 @@ void refreshSharedModels() {
     REFRESH_DL(SWORD_RAZOR_SHEATH);
     REFRESH_DL(SWORD_GILDED_SHEATH);
 
+    if (useOriginalForms) {
+        currProxy = &gLinkFormProxies[PLAYER_FORM_ZORA];
+    }
+
     REFRESH_DL(LFIN);
     REFRESH_DL(RFIN);
     REFRESH_DL(LFIN_SWIM);
     REFRESH_DL(RFIN_SWIM);
+
+    if (useOriginalForms) {
+        currProxy = &gLinkFormProxies[PLAYER_FORM_DEKU];
+    }
 
     REFRESH_DL(PAD_GRASS);
     REFRESH_DL(PAD_WOOD);
@@ -177,10 +188,12 @@ void initFormProxies() {
 
 RECOMP_HOOK("Player_Init")
 void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
-    if ((Player *)thisx == GET_PLAYER(play)) {
+    Player *player = (Player *)thisx;
+
+    if (thisx->id == ACTOR_PLAYER) {
         refreshExternalDLs(GET_PLAYER_FORM_PROXY, false);
 
-        refreshSharedModels();
+        refreshSharedModels(false);
 
         gIsAgePropertyRefreshRequested = true;
     }
@@ -190,12 +203,12 @@ bool sIsMultiLinkLastDraw = false;
 
 RECOMP_HOOK("Player_Draw")
 void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
-    if (GET_PLAYER(play)->actor.next) {
+    bool isMultipleLinksExist = GET_PLAYER(play)->actor.next;
+
+    if (isMultipleLinksExist || sIsMultiLinkLastDraw) {
+        sIsMultiLinkLastDraw = isMultipleLinksExist;
         refreshExternalDLs(GET_PLAYER_FORM_PROXY, true);
-        sIsMultiLinkLastDraw = true;
-    } else if (sIsMultiLinkLastDraw) {
-        refreshExternalDLs(GET_PLAYER_FORM_PROXY, false);
-        sIsMultiLinkLastDraw = false;
+        refreshSharedModels(isMultipleLinksExist);
     }
 
     matchFaceTexturesToProxy(&gLinkFormProxies[((Player *)thisx)->transformation]);
@@ -215,7 +228,7 @@ void refreshSharedModelsOnModelApply(PlayerTransformation form) {
     gIsAgePropertyRefreshRequested = true;
 
     if (form == GET_PLAYER_FORM) {
-        refreshSharedModels();
+        refreshSharedModels(false);
     }
 }
 
