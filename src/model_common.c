@@ -18,10 +18,6 @@ Gfx gEmptyDisplayList[] = {
     gsSPEndDisplayList(),
 };
 
-Gfx gCallEmptyDisplayList[] = {
-    gsSPBranchList(gEmptyDisplayList),
-};
-
 Gfx gPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
     gsSPEndDisplayList(),
@@ -41,7 +37,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     // init by pointing all to DF command
     for (int i = 0; i < LINK_SHIMDL_MAX; ++i) {
         shims[i] = recomp_alloc(sizeof(Gfx));
-        gSPBranchList(shims[i], gEmptyDisplayList);
+        gSPBranchList(shims[i], gEmptyDL);
     }
 
 #define SHIM_ITEM_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item] = createShimDisplayList(2, &dls[LINK_DL_##item], &dls[LINK_DL_##hand])
@@ -667,7 +663,7 @@ void setSkeletonDLsOnModelInfo(Link_ModelInfo *info, FlexSkeletonHeader *skel) {
 
 #define SET_LIMB_DL(pLimb, dl) \
     if (!info->models[dl])     \
-    info->models[dl] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gCallEmptyDisplayList
+    info->models[dl] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL;
 
     if (skel) {
         LodLimb **limbs = (LodLimb **)skel->sh.segment;

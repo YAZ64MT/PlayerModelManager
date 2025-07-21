@@ -330,7 +330,7 @@ RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerHandle h, Pl
 
 #define SET_LIMB_DL(pLimb, entryDL)                                                                                      \
     if (!entry->displayListPtrs[entryDL])                                                                                \
-        entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gCallEmptyDisplayList; \
+        entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL; \
     refreshProxyDLIfEntryLoaded(entry, entryDL)
 
 RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel) {
@@ -391,7 +391,7 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 
 #define SET_SHIELDING_LIMB_DL(pLimb, entryDL) \
     if (!entry->displayListPtrs[entryDL])     \
-    entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gCallEmptyDisplayList
+    entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL
 
         SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_BODY, LINK_DL_BODY_SHIELD_BODY);
         SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_HEAD, LINK_DL_BODY_SHIELD_HEAD);
