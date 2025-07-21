@@ -32,8 +32,6 @@ static Gfx sSetBilerpDL[] = {
     gsSPEndDisplayList(),
 };
 
-Mtx gZeroMtx = {0};
-
 void initFormProxyShims(Link_FormProxy *formProxy) {
 
     Gfx *dls = formProxy->displayLists;
