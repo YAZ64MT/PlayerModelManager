@@ -110,11 +110,14 @@ void repointSharedModelsToProxy() {
     sPlayerPads[2] = &gPlayerLibDLs[PLAYERLIB_DL_PAD_OPENING];
 }
 
-void refreshSharedModels() {
-    Link_FormProxy *currProxy = GET_PLAYER_FORM_PROXY;
-    Link_FormProxy *human = &gLinkFormProxies[PLAYER_FORM_HUMAN];
+void refreshSharedModels(Link_FormProxy *proxy, bool useOriginalForms) {
+    Link_FormProxy *currProxy = proxy;
 
 #define REFRESH_DL(name) gSPBranchList(&gPlayerLibDLs[PLAYERLIB_DL_##name], &currProxy->displayLists[LINK_DL_##name])
+
+    if (useOriginalForms) {
+        currProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
+    }
 
     REFRESH_DL(LFIST_SWORD_KOKIRI);
     REFRESH_DL(LFIST_SWORD_RAZOR);
@@ -134,10 +137,18 @@ void refreshSharedModels() {
     REFRESH_DL(SWORD_RAZOR_SHEATH);
     REFRESH_DL(SWORD_GILDED_SHEATH);
 
+    if (useOriginalForms) {
+        currProxy = &gLinkFormProxies[PLAYER_FORM_ZORA];
+    }
+
     REFRESH_DL(LFIN);
     REFRESH_DL(RFIN);
     REFRESH_DL(LFIN_SWIM);
     REFRESH_DL(RFIN_SWIM);
+
+    if (useOriginalForms) {
+        currProxy = &gLinkFormProxies[PLAYER_FORM_DEKU];
+    }
 
     REFRESH_DL(PAD_GRASS);
     REFRESH_DL(PAD_WOOD);
@@ -175,20 +186,34 @@ void initFormProxies() {
     repointSharedModelsToProxy();
 }
 
+bool sPlayerAppearanceNeedsUpdate = false;
+
 RECOMP_HOOK("Player_Init")
 void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
-    if ((Player *)thisx == GET_PLAYER(play)) {
-        refreshExternalDLs(GET_PLAYER_FORM_PROXY);
+    Player *player = (Player *)thisx;
 
-        refreshSharedModels();
-
-        gIsAgePropertyRefreshRequested = true;
+    if (thisx->id == ACTOR_PLAYER) {
+        sPlayerAppearanceNeedsUpdate = true;
     }
 }
 
 RECOMP_HOOK("Player_Draw")
 void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
-    matchFaceTexturesToProxy(&gLinkFormProxies[((Player *)thisx)->transformation]);
+
+    // Multiple Link actors appear in Milk Bar sound check cutscene
+    bool isMultipleLinksExist = GET_PLAYER(play)->actor.next;
+
+    if (isMultipleLinksExist || sPlayerAppearanceNeedsUpdate) {
+        sPlayerAppearanceNeedsUpdate = isMultipleLinksExist;
+
+        Link_FormProxy *fp = &gLinkFormProxies[((Player *)thisx)->transformation];
+
+        refreshExternalDLs(fp, isMultipleLinksExist);
+
+        refreshSharedModels(fp, isMultipleLinksExist);
+
+        matchFaceTexturesToProxy(fp);
+    }
 }
 
 RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
@@ -205,7 +230,7 @@ void refreshSharedModelsOnModelApply(PlayerTransformation form) {
     gIsAgePropertyRefreshRequested = true;
 
     if (form == GET_PLAYER_FORM) {
-        refreshSharedModels();
+        sPlayerAppearanceNeedsUpdate = true;
     }
 }
 

@@ -66,7 +66,7 @@ PlayerTransformation getSelectedForm() {
 }
 
 bool shouldLivePreview() {
-    return sIsLivePreviewEnabled && getSelectedForm() == GET_PLAYER_FORM;
+    return sIsLivePreviewEnabled;
 }
 
 void destroyAuthor() {
@@ -88,8 +88,10 @@ void setAuthor(const char *author) {
     labelModelAuthor = recompui_create_label(context, row2, author, LABELSTYLE_NORMAL);
 }
 
-void applyRealEntry() {
-    CMEM_tryApplyEntry(getSelectedForm(), sRealEntries[getSelectedForm()]);
+void applyRealEntries() {
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        CMEM_tryApplyEntry(i, sRealEntries[i]);
+    }
 }
 
 void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
@@ -103,18 +105,19 @@ void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *dat
         destroyAuthor();
 
         if (shouldLivePreview()) {
-            applyRealEntry();
+            applyRealEntries();
         }
     }
 }
 
 void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        applyRealEntry();
+        applyRealEntries();
         recompui_hide_context(context);
         context_shown = false;
         if (sIsDiskSaveNeeded) {
             for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+                CMEM_tryApplyEntry(i, sRealEntries[i]);
                 CMEM_saveCurrentEntry(i);
             }
             Audio_PlaySfx(NA_SE_SY_PIECE_OF_HEART);
@@ -125,7 +128,7 @@ void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data
         destroyAuthor();
 
         if (shouldLivePreview()) {
-            applyRealEntry();
+            applyRealEntries();
         }
     }
 }

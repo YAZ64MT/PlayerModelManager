@@ -30,6 +30,6 @@ typedef enum {
 
 extern Gfx gPlayerLibDLs[];
 
-void refreshExternalDLs(Link_FormProxy *proxy);
+void refreshExternalDLs(Link_FormProxy *proxy, bool useOriginalForms);
 
 #endif

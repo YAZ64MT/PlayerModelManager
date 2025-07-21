@@ -11,7 +11,9 @@ void useMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, G
     sPushedMaskMatrix = false;
 
     if (limbIndex == PLAYER_LIMB_HEAD) {
-        Mtx *maskMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_MASKS);
+        Player *player = (Player *)actor;
+
+        Mtx *maskMtx = getFormProxyMatrix(&gLinkFormProxies[player->transformation], LINK_EQUIP_MATRIX_MASKS);
 
         if (maskMtx) {
             Player *player = (Player *)actor;
@@ -77,12 +79,14 @@ void fixArrowPos_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, 
 
     Actor *heldActor = player->heldActor;
 
+    Link_FormProxy *fp = &gLinkFormProxies[player->transformation];
+
     if (heldActor) {
         if (player->actor.scale.y >= 0.0f) {
             if (limbIndex == PLAYER_LIMB_LEFT_HAND && player->rightHandType == PLAYER_MODELTYPE_RH_BOW) {
                 if (!Player_IsHoldingHookshot(player)) {
                     if ((player->stateFlags3 & PLAYER_STATE3_40) && (player->transformation != PLAYER_FORM_DEKU)) {
-                        Mtx *arrowMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_ARROW_DRAWN);
+                        Mtx *arrowMtx = getFormProxyMatrix(fp, LINK_EQUIP_MATRIX_ARROW_DRAWN);
 
                         if (arrowMtx) {
                             OPEN_DISPS(play->state.gfxCtx);
@@ -94,7 +98,7 @@ void fixArrowPos_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, 
                     }
                 }
             } else if (limbIndex == PLAYER_LIMB_RIGHT_HAND && Player_IsHoldingHookshot(player)) {
-                Mtx *hookMtx = getFormProxyMatrix(GET_PLAYER_FORM_PROXY, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK);
+                Mtx *hookMtx = getFormProxyMatrix(fp, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK);
 
                 if (hookMtx) {
                     OPEN_DISPS(play->state.gfxCtx);
