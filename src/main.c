@@ -178,7 +178,7 @@ void initFormProxies() {
 RECOMP_HOOK("Player_Init")
 void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
     if ((Player *)thisx == GET_PLAYER(play)) {
-        refreshExternalDLs(GET_PLAYER_FORM_PROXY);
+        refreshExternalDLs(GET_PLAYER_FORM_PROXY, false);
 
         refreshSharedModels();
 
@@ -186,8 +186,18 @@ void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
     }
 }
 
+bool sIsMultiLinkLastDraw = false;
+
 RECOMP_HOOK("Player_Draw")
 void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
+    if (GET_PLAYER(play)->actor.next) {
+        refreshExternalDLs(GET_PLAYER_FORM_PROXY, true);
+        sIsMultiLinkLastDraw = true;
+    } else if (sIsMultiLinkLastDraw) {
+        refreshExternalDLs(GET_PLAYER_FORM_PROXY, false);
+        sIsMultiLinkLastDraw = false;
+    }
+
     matchFaceTexturesToProxy(&gLinkFormProxies[((Player *)thisx)->transformation]);
 }
 
