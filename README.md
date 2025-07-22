@@ -5,7 +5,7 @@ between models for each form.
 
 ### API Usage
 
-Add [this header file](https://github.com/YAZ64MT/https://github.com/YAZ64MT/PlayerModelManager/blob/main/include/playermodelmanager_api.h) to your mod's includes and the mod to your dependencies in your toml:
+Add [this header file](https://github.com/YAZ64MT/PlayerModelManager/blob/main/include/playermodelmanager_api.h) to your mod's includes and the mod to your dependencies in your toml:
 
 ```toml
 dependencies = [
