@@ -65,7 +65,7 @@ RECOMP_IMPORT(YAZMT_CORELIB_MOD_NAME, bool YAZMTCore_IterableU32Set_erase(YAZMTC
 
 RECOMP_IMPORT(YAZMT_CORELIB_MOD_NAME, bool YAZMTCore_IterableU32Set_contains(YAZMTCore_IterableU32Set *set, u32 val));
 
-RECOMP_IMPORT(YAZMT_CORELIB_MOD_NAME, bool YAZMTCore_IterableU32Set_size(YAZMTCore_IterableU32Set *set));
+RECOMP_IMPORT(YAZMT_CORELIB_MOD_NAME, size_t YAZMTCore_IterableU32Set_size(YAZMTCore_IterableU32Set *set));
 
 RECOMP_IMPORT(YAZMT_CORELIB_MOD_NAME, void YAZMTCore_IterableU32Set_clear(YAZMTCore_IterableU32Set *set));
 
