@@ -92,11 +92,6 @@ void handleAgeProps(PlayState *play) {
             if (IS_HUMAN_ADULT_LINK_MODEL) {
                 sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gAdultLinkAgeProps;
 
-                for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
-                    D_8085BE84[PLAYER_ANIMGROUP_doorA][i] = D_8085BE84[PLAYER_ANIMGROUP_doorA_free][i];
-                    D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = D_8085BE84[PLAYER_ANIMGROUP_doorB_free][i];
-                }
-
                 sPlayerMass[PLAYER_FORM_HUMAN] = sPlayerMass[PLAYER_FORM_ZORA];
 
                 for (int i = 0; i < NUM_BOOT_PROPERTIES; ++i) {
@@ -106,11 +101,6 @@ void handleAgeProps(PlayState *play) {
                 player->ageProperties = &gAdultLinkAgeProps;
             } else {
                 sPlayerAgeProperties[PLAYER_FORM_HUMAN] = gVanillaHumanLinkAgeProps;
-
-                for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
-                    D_8085BE84[PLAYER_ANIMGROUP_doorA][i] = &gPlayerAnim_clink_demo_doorA_link;
-                    D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = &gPlayerAnim_clink_demo_doorB_link;
-                }
 
                 sPlayerMass[PLAYER_FORM_HUMAN] = gVanillaPlayerMass;
 
@@ -123,6 +113,24 @@ void handleAgeProps(PlayState *play) {
         }
 
         player = (Player *)player->actor.next;
+    }
+}
+
+RECOMP_HOOK("Player_Door_Knob")
+void replaceDoorAnim_on_Player_Door_Knob(PlayState *play, Player *this, Actor *door) {
+    if (this->actor.category == ACTORCAT_PLAYER && this->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL) {
+        for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
+            D_8085BE84[PLAYER_ANIMGROUP_doorA][i] = D_8085BE84[PLAYER_ANIMGROUP_doorA_free][i];
+            D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = D_8085BE84[PLAYER_ANIMGROUP_doorB_free][i];
+        }
+    }
+}
+
+RECOMP_HOOK_RETURN("Player_Door_Knob")
+void replaceDoorAnim_on_return_Player_Door_Knob() {
+    for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
+        D_8085BE84[PLAYER_ANIMGROUP_doorA][i] = &gPlayerAnim_clink_demo_doorA_link;
+        D_8085BE84[PLAYER_ANIMGROUP_doorB][i] = &gPlayerAnim_clink_demo_doorB_link;
     }
 }
 
