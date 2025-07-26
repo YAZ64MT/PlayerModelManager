@@ -26,7 +26,7 @@ bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
     }
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        modelInfo->equipMtx[i] = this->modelEntry.matrixPtrs[i];
+        modelInfo->equipMtx[i] = ModelEntry_getMatrix(&this->modelEntry, i);
     }
 
     modelInfo->flags = this->modelEntry.flags;
@@ -54,7 +54,9 @@ void ModelEntryForm_init(ModelEntryForm *this) {
     ModelEntry_init(&this->modelEntry);
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        this->modelEntry.matrixPtrs[i] = NULL;
+        if (ModelEntry_getMatrix(&this->modelEntry, i)) {
+            ModelEntry_setMatrix(&this->modelEntry, i, NULL);
+        }
     }
 
     this->modelEntry.applyToModelInfo = applyFormEntry;
@@ -78,4 +80,25 @@ void ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) 
     }
 
     recomputil_u32_value_hashmap_insert(entry->displayListPtrs, id, (uintptr_t)dl);
+}
+
+Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
+    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
+        return NULL;
+    }
+
+    return entry->matrixPtrs[id];
+}
+
+void ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) {
+    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
+        return;
+    }
+
+    if (!mtx) {
+        entry->matrixPtrs[id] = NULL;
+    } else {
+        entry->matrixes[id] = *mtx;
+        entry->matrixPtrs[id] = &entry->matrixes[id];
+    }
 }

@@ -48,7 +48,7 @@ void refreshProxyMtxIfEntryLoaded(ModelEntryForm *entry, Link_EquipmentMatrix mt
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
-        fp->current.equipMtx[mtxId] = entry->modelEntry.matrixPtrs[mtxId];
+        fp->current.equipMtx[mtxId] = ModelEntry_getMatrix(&entry->modelEntry, mtxId);
         requestRefreshFormProxyMtx(&gLinkFormProxies[getFormFromModelType(entry->modelEntry.type)], mtxId);
     }
 }
@@ -184,8 +184,8 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
 
     if (modelType == PMM_MODEL_TYPE_ADULT) {
         entry->modelEntry.flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
-        entry->modelEntry.matrixPtrs[LINK_EQUIP_MATRIX_ARROW_DRAWN] = &sAdultDefaultArrowMtx;
-        entry->modelEntry.matrixPtrs[LINK_EQUIP_MATRIX_MASKS] = &sAdultDefaultMaskMtx;
+        ModelEntry_setMatrix(&entry->modelEntry, LINK_EQUIP_MATRIX_ARROW_DRAWN, &sAdultDefaultArrowMtx);
+        ModelEntry_setMatrix(&entry->modelEntry, LINK_EQUIP_MATRIX_MASKS, &sAdultDefaultMaskMtx);
     }
 
     entry->modelEntry.type = modelType;
@@ -292,20 +292,13 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
         return false;
     }
 
-    if (matrix) {
-        entry->modelEntry.matrixes[mtxId] = *matrix;
-        entry->modelEntry.matrixPtrs[mtxId] = &entry->modelEntry.matrixes[mtxId];
-    } else {
-        entry->modelEntry.matrixPtrs[mtxId] = NULL;
-    }
+    ModelEntry_setMatrix(&entry->modelEntry, mtxId, matrix);
 
     if (!matrix && entry->modelEntry.type == PMM_MODEL_TYPE_ADULT) {
         if (mtxId == LINK_EQUIP_MATRIX_ARROW_DRAWN) {
-            entry->modelEntry.matrixes[mtxId] = sAdultDefaultArrowMtx;
-            entry->modelEntry.matrixPtrs[mtxId] = &entry->modelEntry.matrixes[mtxId];
+            ModelEntry_setMatrix(&entry->modelEntry, LINK_EQUIP_MATRIX_ARROW_DRAWN, &sAdultDefaultArrowMtx);
         } else if (mtxId == LINK_EQUIP_MATRIX_MASKS) {
-            entry->modelEntry.matrixes[mtxId] = sAdultDefaultMaskMtx;
-            entry->modelEntry.matrixPtrs[mtxId] = &entry->modelEntry.matrixes[mtxId];
+            ModelEntry_setMatrix(&entry->modelEntry, LINK_EQUIP_MATRIX_MASKS, &sAdultDefaultMaskMtx);
         }
     }
 
