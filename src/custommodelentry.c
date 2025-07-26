@@ -14,6 +14,7 @@ void ModelEntry_init(ModelEntry *entry) {
     entry->handle = 0;
     entry->applyToModelInfo = NULL;
     entry->displayListPtrs = recomputil_create_u32_value_hashmap();
+    entry->matrixPtrs = recomputil_create_u32_value_hashmap();
 }
 
 bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
@@ -83,11 +84,9 @@ void ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) 
 }
 
 Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
-    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
-        return NULL;
-    }
-
-    return entry->matrixPtrs[id];
+    uintptr_t ret = 0;
+    recomputil_u32_value_hashmap_get(entry->matrixPtrs, id, &ret);
+    return (Mtx *)ret;
 }
 
 void ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) {
@@ -95,10 +94,5 @@ void ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) 
         return;
     }
 
-    if (!mtx) {
-        entry->matrixPtrs[id] = NULL;
-    } else {
-        entry->matrixes[id] = *mtx;
-        entry->matrixPtrs[id] = &entry->matrixes[id];
-    }
+    recomputil_u32_value_hashmap_insert(entry->matrixPtrs, id, (uintptr_t)mtx);
 }

@@ -20,8 +20,7 @@ typedef struct {
     PlayerModelManagerHandle handle;
     u64 flags;
     U32ValueHashmapHandle displayListPtrs;
-    Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
-    Mtx matrixes[LINK_EQUIP_MATRIX_MAX];
+    U32ValueHashmapHandle matrixPtrs;
 } ModelEntry;
 
 typedef struct {
