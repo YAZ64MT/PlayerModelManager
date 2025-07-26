@@ -39,7 +39,7 @@ void refreshProxyDLIfEntryLoaded(ModelEntryForm *entry, Link_DisplayList dlId) {
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
-        fp->current.models[dlId] = entry->modelEntry.displayListPtrs[dlId];
+        fp->current.models[dlId] = ModelEntry_getDisplayList(&entry->modelEntry, dlId);
         requestRefreshFormProxyDL(&gLinkFormProxies[ENTRY_FORM(entry)], dlId);
     }
 }
@@ -140,14 +140,14 @@ void dupStrAndFreeOld(char **dest, const char *src) {
 static bool sIsAdultDefaultsInitialized = false;
 static Mtx sAdultDefaultArrowMtx;
 static Mtx sAdultDefaultMaskMtx;
-//static Mtx sAdultDefaultHookshotMtx; // OOT hookshot actor position
+// static Mtx sAdultDefaultHookshotMtx; // OOT hookshot actor position
 
 void initializeAdultDefaults() {
     if (!sIsAdultDefaultsInitialized) {
         sIsAdultDefaultsInitialized = true;
         guPosition(&sAdultDefaultArrowMtx, 0.f, 0.f, 0.f, 1.f, -40.f, 400.f, 0.f);
         guPosition(&sAdultDefaultMaskMtx, 0.f, 0.f, 0.f, 1.f, 20.f, -150.f, 0.f);
-        //guPosition(&sAdultDefaultHookshotMtx, 0, 0, 0, 1, 50, 840, 0);
+        // guPosition(&sAdultDefaultHookshotMtx, 0, 0, 0, 1, 50, 840, 0);
     }
 }
 
@@ -273,7 +273,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
         return false;
     }
 
-    entry->modelEntry.displayListPtrs[dlId] = dl;
+    ModelEntry_setDisplayList(&entry->modelEntry, dlId, dl);
 
     refreshProxyDLIfEntryLoaded(entry, dlId);
 
@@ -328,11 +328,6 @@ RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerHandle h, Pl
     return true;
 }
 
-#define SET_LIMB_DL(pLimb, entryDL)                                                                                    \
-    if (!entry->modelEntry.displayListPtrs[entryDL])                                                                   \
-        entry->modelEntry.displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL; \
-    refreshProxyDLIfEntryLoaded(entry, entryDL)
-
 RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel) {
     ModelEntryForm *entry = getEntryOrPrintErr(h, "PlayerModelManager_setSkeleton");
 
@@ -344,6 +339,14 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, Fl
 
     if (skel) {
         StandardLimb **limbs = (StandardLimb **)skel->sh.segment;
+
+#define SET_LIMB_DL(pLimb, entryDL)                                                                                                   \
+    {                                                                                                                                 \
+        if (!ModelEntry_getDisplayList(&entry->modelEntry, entryDL))                                                                  \
+            ModelEntry_setDisplayList(&entry->modelEntry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
+        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                                  \
+    }                                                                                                                                 \
+    (void)0
 
         SET_LIMB_DL(PLAYER_LIMB_WAIST, LINK_DL_WAIST);
         SET_LIMB_DL(PLAYER_LIMB_RIGHT_THIGH, LINK_DL_RTHIGH);
@@ -365,12 +368,12 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, Fl
         SET_LIMB_DL(PLAYER_LIMB_TORSO, LINK_DL_TORSO);
     }
 
+#undef SET_LIMB_DL
+
     refreshProxyIfEntryLoaded(entry);
 
     return true;
 }
-
-#undef SET_LIMB_DL
 
 RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel) {
     ModelEntryForm *entry = getEntryOrPrintErr(h, "PlayerModelManager_setShieldingSkeleton");
@@ -389,9 +392,12 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 
         StandardLimb **limbs = (StandardLimb **)skel->sh.segment;
 
-#define SET_SHIELDING_LIMB_DL(pLimb, entryDL)        \
-    if (!entry->modelEntry.displayListPtrs[entryDL]) \
-    entry->modelEntry.displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL
+#define SET_SHIELDING_LIMB_DL(pLimb, entryDL)                                                                                         \
+    {                                                                                                                                 \
+        if (!ModelEntry_getDisplayList(&entry->modelEntry, entryDL))                                                                  \
+            ModelEntry_setDisplayList(&entry->modelEntry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
+    }                                                                                                                                 \
+    (void)0
 
         SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_BODY, LINK_DL_BODY_SHIELD_BODY);
         SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_HEAD, LINK_DL_BODY_SHIELD_HEAD);

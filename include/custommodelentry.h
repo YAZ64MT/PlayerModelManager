@@ -34,6 +34,10 @@ typedef struct {
 
 void ModelEntry_init(ModelEntry *entry);
 
+Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id);
+
+void ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl);
+
 void ModelEntryForm_init(ModelEntryForm *this);
 
 #endif

@@ -21,7 +21,7 @@ bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
     ModelEntryForm *this = thisx;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        modelInfo->models[i] = this->modelEntry.displayListPtrs[i];
+        modelInfo->models[i] = ModelEntry_getDisplayList(&this->modelEntry, i);
     }
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
@@ -53,7 +53,9 @@ void ModelEntryForm_init(ModelEntryForm *this) {
     ModelEntry_init(&this->modelEntry);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        this->modelEntry.displayListPtrs[i] = NULL;
+        if (ModelEntry_getDisplayList(&this->modelEntry, i)) {
+            ModelEntry_setDisplayList(&this->modelEntry, i, NULL);
+        }
     }
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
@@ -67,4 +69,20 @@ void ModelEntryForm_init(ModelEntryForm *this) {
     Lib_MemSet(this->mouthTex, 0, sizeof(this->mouthTex));
 
     Lib_MemSet(this->eyesTex, 0, sizeof(this->eyesTex));
+}
+
+Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
+    if (id >= LINK_DL_MAX || id < 0) {
+        return NULL;
+    }
+
+    return entry->displayListPtrs[id];
+}
+
+void ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) {
+    if (id >= LINK_DL_MAX || id < 0) {
+        return;
+    }
+
+    entry->displayListPtrs[id] = dl;
 }
