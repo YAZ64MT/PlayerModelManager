@@ -19,7 +19,7 @@ typedef struct {
     void *callbackData;
     PlayerModelManagerHandle handle;
     u64 flags;
-    Gfx *displayListPtrs[LINK_DL_MAX];
+    U32ValueHashmapHandle displayListPtrs;
     Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
     Mtx matrixes[LINK_EQUIP_MATRIX_MAX];
 } ModelEntry;

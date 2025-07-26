@@ -13,6 +13,7 @@ void ModelEntry_init(ModelEntry *entry) {
     entry->callbackData = NULL;
     entry->handle = 0;
     entry->applyToModelInfo = NULL;
+    entry->displayListPtrs = recomputil_create_u32_value_hashmap();
 }
 
 bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
@@ -52,12 +53,6 @@ bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
 void ModelEntryForm_init(ModelEntryForm *this) {
     ModelEntry_init(&this->modelEntry);
 
-    for (int i = 0; i < LINK_DL_MAX; ++i) {
-        if (ModelEntry_getDisplayList(&this->modelEntry, i)) {
-            ModelEntry_setDisplayList(&this->modelEntry, i, NULL);
-        }
-    }
-
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
         this->modelEntry.matrixPtrs[i] = NULL;
     }
@@ -72,11 +67,9 @@ void ModelEntryForm_init(ModelEntryForm *this) {
 }
 
 Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
-    if (id >= LINK_DL_MAX || id < 0) {
-        return NULL;
-    }
-
-    return entry->displayListPtrs[id];
+    uintptr_t ret = 0;
+    recomputil_u32_value_hashmap_get(entry->displayListPtrs, id, &ret);
+    return (Gfx *)ret;
 }
 
 void ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) {
@@ -84,5 +77,5 @@ void ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) 
         return;
     }
 
-    entry->displayListPtrs[id] = dl;
+    recomputil_u32_value_hashmap_insert(entry->displayListPtrs, id, (uintptr_t)dl);
 }
