@@ -4,7 +4,7 @@
 #include "playermodelmanager_utils.h"
 #include "custommodelentrymanager.h"
 
-void FormModelEntry_init(FormModelEntry *entry) {
+void ModelEntry_init(ModelEntry *entry) {
     entry->displayName = NULL;
     entry->internalName = NULL;
     entry->authorName = NULL;
@@ -50,7 +50,7 @@ bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
 }
 
 void FormModelMemoryEntry_init(FormModelMemoryEntry *this) {
-    FormModelEntry_init(&this->modelEntry);
+    ModelEntry_init(&this->modelEntry);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         this->modelEntry.displayListPtrs[i] = NULL;

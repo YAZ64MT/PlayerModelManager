@@ -28,7 +28,7 @@ typedef struct {
 
 static FormModelEntries sMemoryEntries[PLAYER_FORM_MAX];
 
-static FormModelEntry *sCurrentModelEntries[PLAYER_FORM_MAX];
+static ModelEntry *sCurrentModelEntries[PLAYER_FORM_MAX];
 
 #define SAVED_INTERNAL_NAME_BUFFER_SIZE (INTERNAL_NAME_MAX_LENGTH + 1)
 
@@ -49,15 +49,15 @@ void applyByInternalName(PlayerTransformation form, const char *name) {
     u32 entryPtr;
 
     if (YAZMTCore_StringU32Dictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
-        CMEM_tryApplyEntry(form, (FormModelEntry *)entryPtr);
+        CMEM_tryApplyEntry(form, (ModelEntry *)entryPtr);
     }
 }
 
-FormModelEntry *CMEM_getCurrentEntry(PlayerTransformation form) {
+ModelEntry *CMEM_getCurrentEntry(PlayerTransformation form) {
     return sCurrentModelEntries[form];
 }
 
-void CMEM_setCurrentEntry(PlayerTransformation form, FormModelEntry *e) {
+void CMEM_setCurrentEntry(PlayerTransformation form, ModelEntry *e) {
     sCurrentModelEntries[form] = e;
 }
 
@@ -82,7 +82,7 @@ void increaseCapacity(FormModelEntries *cme) {
 }
 
 void pushEntry(FormModelEntries *cme, void *entry) {
-    FormModelEntry *fme = entry;
+    ModelEntry *fme = entry;
 
     if (!YAZMTCore_StringU32Dictionary_contains(sInternalNamesToEntries, fme->internalName)) {
         size_t newCount = cme->count + 1;
@@ -111,16 +111,16 @@ void pushMemoryEntry(PlayerTransformation form, FormModelMemoryEntry *entry) {
 RECOMP_DECLARE_EVENT(_internal_onModelApplied(PlayerTransformation form));
 
 void CMEM_reapplyEntry(PlayerTransformation form) {
-    FormModelEntry *currEntry = CMEM_getCurrentEntry(form);
+    ModelEntry *currEntry = CMEM_getCurrentEntry(form);
 
     if (currEntry) {
         currEntry->applyToModelInfo(currEntry, &gLinkFormProxies[form].current);
     }
 }
 
-bool CMEM_forceApplyEntry(PlayerTransformation form, FormModelEntry *newEntry) {
+bool CMEM_forceApplyEntry(PlayerTransformation form, ModelEntry *newEntry) {
     Link_FormProxy *proxy = &gLinkFormProxies[form];
-    FormModelEntry *currEntry = CMEM_getCurrentEntry(form);
+    ModelEntry *currEntry = CMEM_getCurrentEntry(form);
 
     if (newEntry == NULL) {
         CMEM_removeModel(form);
@@ -147,8 +147,8 @@ bool CMEM_forceApplyEntry(PlayerTransformation form, FormModelEntry *newEntry) {
     return false;
 }
 
-bool CMEM_tryApplyEntry(PlayerTransformation form, FormModelEntry *newEntry) {
-    FormModelEntry *currEntry = CMEM_getCurrentEntry(form);
+bool CMEM_tryApplyEntry(PlayerTransformation form, ModelEntry *newEntry) {
+    ModelEntry *currEntry = CMEM_getCurrentEntry(form);
     if (newEntry != currEntry) {
         return CMEM_forceApplyEntry(form, newEntry);
     }
@@ -156,7 +156,7 @@ bool CMEM_tryApplyEntry(PlayerTransformation form, FormModelEntry *newEntry) {
     return false;
 }
 
-FormModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *count) {
+ModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *count) {
     size_t combinedLength = sMemoryEntries[form].count;
 
     if (combinedLength == 0) {
@@ -164,7 +164,7 @@ FormModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *coun
         return NULL;
     }
 
-    FormModelEntry **combined = recomp_alloc(sizeof(*combined) * combinedLength);
+    ModelEntry **combined = recomp_alloc(sizeof(*combined) * combinedLength);
 
     for (size_t i = 0; i < sMemoryEntries[form].count; ++i) {
         combined[i] = sMemoryEntries[form].entries[i];
@@ -177,7 +177,7 @@ FormModelEntry **CMEM_getCombinedEntries(PlayerTransformation form, size_t *coun
 void CMEM_removeModel(PlayerTransformation form) {
     Link_FormProxy *proxy = &gLinkFormProxies[form];
 
-    FormModelEntry *currentEntry = sCurrentModelEntries[form];
+    ModelEntry *currentEntry = sCurrentModelEntries[form];
 
     if (currentEntry) {
         if (currentEntry->callback) {

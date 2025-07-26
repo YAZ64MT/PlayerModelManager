@@ -11,7 +11,7 @@
 
 typedef PlayerModelManagerModelType FormModelType;
 
-typedef struct FormModelEntry {
+typedef struct {
     FormModelType type;
     char *displayName;
     char *internalName;
@@ -24,17 +24,17 @@ typedef struct FormModelEntry {
     Gfx *displayListPtrs[LINK_DL_MAX];
     Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
     Mtx matrixes[LINK_EQUIP_MATRIX_MAX];
-} FormModelEntry;
+} ModelEntry;
 
 typedef struct {
-    FormModelEntry modelEntry;
+    ModelEntry modelEntry;
     FlexSkeletonHeader *skel;
     FlexSkeletonHeader *shieldingSkel;
     TexturePtr eyesTex[PLAYER_EYES_MAX];
     TexturePtr mouthTex[PLAYER_MOUTH_MAX];
 } FormModelMemoryEntry;
 
-void FormModelEntry_init(FormModelEntry *entry);
+void ModelEntry_init(ModelEntry *entry);
 
 void FormModelMemoryEntry_init(FormModelMemoryEntry *this);
 
