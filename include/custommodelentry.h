@@ -9,10 +9,8 @@
 // This is the max file name length for most Linux distros and MacOS
 #define INTERNAL_NAME_MAX_LENGTH 255
 
-typedef PlayerModelManagerModelType FormModelType;
-
 typedef struct {
-    FormModelType type;
+    PlayerModelManagerModelType type;
     char *displayName;
     char *internalName;
     char *authorName;

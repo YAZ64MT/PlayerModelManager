@@ -194,7 +194,7 @@ void CMEM_removeModel(PlayerTransformation form) {
     }
 }
 
-PlayerTransformation getFormFromModelType(FormModelType t) {
+PlayerTransformation getFormFromModelType(PlayerModelManagerModelType t) {
     if (t >= PMM_MODEL_TYPE_MAX) {
         return PLAYER_FORM_MAX;
     }
