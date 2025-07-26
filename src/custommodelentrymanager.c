@@ -104,7 +104,7 @@ void initEntryManager() {
     }
 }
 
-void pushMemoryEntry(PlayerTransformation form, FormModelMemoryEntry *entry) {
+void pushMemoryEntry(PlayerTransformation form, ModelEntryForm *entry) {
     pushEntry(&sMemoryEntries[form], entry);
 }
 
@@ -223,10 +223,10 @@ void *slotmapGet(MemorySlotmapHandle slotmap, collection_key_t k) {
 PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerTransformation form, char* internalName) {
     PlayerModelManagerHandle handle = recomputil_memory_slotmap_create(sHandleToMemoryEntry);
 
-    FormModelMemoryEntry *entry = slotmapGet(sHandleToMemoryEntry, handle);
+    ModelEntryForm *entry = slotmapGet(sHandleToMemoryEntry, handle);
 
     if (entry) {
-        FormModelMemoryEntry_init(entry);
+        ModelEntryForm_init(entry);
 
         entry->modelEntry.handle = handle;
         entry->modelEntry.internalName = internalName;
@@ -237,7 +237,7 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerTransformation form, char
     return handle;
 }
 
-FormModelMemoryEntry *CMEM_getMemoryEntry(PlayerModelManagerHandle h) {
+ModelEntryForm *CMEM_getFormEntry(PlayerModelManagerHandle h) {
     void *entry = NULL;
     recomputil_memory_slotmap_get(sHandleToMemoryEntry, h, &entry);
     return entry;
@@ -291,7 +291,7 @@ void applySavedModelOnTitleScreen() {
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initCMEMHash() {
-    sHandleToMemoryEntry = recomputil_create_memory_slotmap(sizeof(FormModelMemoryEntry));
+    sHandleToMemoryEntry = recomputil_create_memory_slotmap(sizeof(ModelEntryForm));
     sInternalNamesToEntries = YAZMTCore_StringU32Dictionary_new();
 }
 

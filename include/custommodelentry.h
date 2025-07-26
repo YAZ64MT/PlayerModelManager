@@ -32,10 +32,10 @@ typedef struct {
     FlexSkeletonHeader *shieldingSkel;
     TexturePtr eyesTex[PLAYER_EYES_MAX];
     TexturePtr mouthTex[PLAYER_MOUTH_MAX];
-} FormModelMemoryEntry;
+} ModelEntryForm;
 
 void ModelEntry_init(ModelEntry *entry);
 
-void FormModelMemoryEntry_init(FormModelMemoryEntry *this);
+void ModelEntryForm_init(ModelEntryForm *this);
 
 #endif

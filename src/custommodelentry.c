@@ -15,10 +15,10 @@ void ModelEntry_init(ModelEntry *entry) {
     entry->applyToModelInfo = NULL;
 }
 
-bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
+bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
     clearLinkModelInfo(modelInfo);
 
-    FormModelMemoryEntry *this = thisx;
+    ModelEntryForm *this = thisx;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         modelInfo->models[i] = this->modelEntry.displayListPtrs[i];
@@ -49,7 +49,7 @@ bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
-void FormModelMemoryEntry_init(FormModelMemoryEntry *this) {
+void ModelEntryForm_init(ModelEntryForm *this) {
     ModelEntry_init(&this->modelEntry);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
@@ -60,7 +60,7 @@ void FormModelMemoryEntry_init(FormModelMemoryEntry *this) {
         this->modelEntry.matrixPtrs[i] = NULL;
     }
 
-    this->modelEntry.applyToModelInfo = applyFormModelMemoryEntry;
+    this->modelEntry.applyToModelInfo = applyFormEntry;
 
     this->skel = NULL;
 
