@@ -21,11 +21,11 @@ bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
     FormModelMemoryEntry *this = thisx;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        modelInfo->models[i] = this->displayListPtrs[i];
+        modelInfo->models[i] = this->modelEntry.displayListPtrs[i];
     }
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        modelInfo->equipMtx[i] = this->matrixPtrs[i];
+        modelInfo->equipMtx[i] = this->modelEntry.matrixPtrs[i];
     }
 
     modelInfo->flags = this->modelEntry.flags;
@@ -53,11 +53,11 @@ void FormModelMemoryEntry_init(FormModelMemoryEntry *this) {
     FormModelEntry_init(&this->modelEntry);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        this->displayListPtrs[i] = NULL;
+        this->modelEntry.displayListPtrs[i] = NULL;
     }
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        this->matrixPtrs[i] = NULL;
+        this->modelEntry.matrixPtrs[i] = NULL;
     }
 
     this->modelEntry.applyToModelInfo = applyFormModelMemoryEntry;

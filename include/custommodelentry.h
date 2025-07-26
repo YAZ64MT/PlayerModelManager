@@ -4,6 +4,7 @@
 #include "global.h"
 #include "playermodelmanager.h"
 #include "playermodelmanager_api.h"
+#include "recompdata.h"
 
 // This is the max file name length for most Linux distros and MacOS
 #define INTERNAL_NAME_MAX_LENGTH 255
@@ -20,13 +21,13 @@ typedef struct FormModelEntry {
     void *callbackData;
     PlayerModelManagerHandle handle;
     u64 flags;
+    Gfx *displayListPtrs[LINK_DL_MAX];
+    Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
+    Mtx matrixes[LINK_EQUIP_MATRIX_MAX];
 } FormModelEntry;
 
 typedef struct {
     FormModelEntry modelEntry;
-    Gfx *displayListPtrs[LINK_DL_MAX];
-    Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
-    Mtx matrixes[LINK_EQUIP_MATRIX_MAX];
     FlexSkeletonHeader *skel;
     FlexSkeletonHeader *shieldingSkel;
     TexturePtr eyesTex[PLAYER_EYES_MAX];

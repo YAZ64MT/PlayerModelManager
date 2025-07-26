@@ -39,7 +39,7 @@ void refreshProxyDLIfEntryLoaded(FormModelMemoryEntry *entry, Link_DisplayList d
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
-        fp->current.models[dlId] = entry->displayListPtrs[dlId];
+        fp->current.models[dlId] = entry->modelEntry.displayListPtrs[dlId];
         requestRefreshFormProxyDL(&gLinkFormProxies[ENTRY_FORM(entry)], dlId);
     }
 }
@@ -48,7 +48,7 @@ void refreshProxyMtxIfEntryLoaded(FormModelMemoryEntry *entry, Link_EquipmentMat
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
-        fp->current.equipMtx[mtxId] = entry->matrixPtrs[mtxId];
+        fp->current.equipMtx[mtxId] = entry->modelEntry.matrixPtrs[mtxId];
         requestRefreshFormProxyMtx(&gLinkFormProxies[getFormFromModelType(entry->modelEntry.type)], mtxId);
     }
 }
@@ -184,8 +184,8 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
 
     if (modelType == PMM_MODEL_TYPE_ADULT) {
         entry->modelEntry.flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
-        entry->matrixPtrs[LINK_EQUIP_MATRIX_ARROW_DRAWN] = &sAdultDefaultArrowMtx;
-        entry->matrixPtrs[LINK_EQUIP_MATRIX_MASKS] = &sAdultDefaultMaskMtx;
+        entry->modelEntry.matrixPtrs[LINK_EQUIP_MATRIX_ARROW_DRAWN] = &sAdultDefaultArrowMtx;
+        entry->modelEntry.matrixPtrs[LINK_EQUIP_MATRIX_MASKS] = &sAdultDefaultMaskMtx;
     }
 
     entry->modelEntry.type = modelType;
@@ -273,7 +273,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
         return false;
     }
 
-    entry->displayListPtrs[dlId] = dl;
+    entry->modelEntry.displayListPtrs[dlId] = dl;
 
     refreshProxyDLIfEntryLoaded(entry, dlId);
 
@@ -293,19 +293,19 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
     }
 
     if (matrix) {
-        entry->matrixes[mtxId] = *matrix;
-        entry->matrixPtrs[mtxId] = &entry->matrixes[mtxId];
+        entry->modelEntry.matrixes[mtxId] = *matrix;
+        entry->modelEntry.matrixPtrs[mtxId] = &entry->modelEntry.matrixes[mtxId];
     } else {
-        entry->matrixPtrs[mtxId] = NULL;
+        entry->modelEntry.matrixPtrs[mtxId] = NULL;
     }
 
     if (!matrix && entry->modelEntry.type == PMM_MODEL_TYPE_ADULT) {
         if (mtxId == LINK_EQUIP_MATRIX_ARROW_DRAWN) {
-            entry->matrixes[mtxId] = sAdultDefaultArrowMtx;
-            entry->matrixPtrs[mtxId] = &entry->matrixes[mtxId];
+            entry->modelEntry.matrixes[mtxId] = sAdultDefaultArrowMtx;
+            entry->modelEntry.matrixPtrs[mtxId] = &entry->modelEntry.matrixes[mtxId];
         } else if (mtxId == LINK_EQUIP_MATRIX_MASKS) {
-            entry->matrixes[mtxId] = sAdultDefaultMaskMtx;
-            entry->matrixPtrs[mtxId] = &entry->matrixes[mtxId];
+            entry->modelEntry.matrixes[mtxId] = sAdultDefaultMaskMtx;
+            entry->modelEntry.matrixPtrs[mtxId] = &entry->modelEntry.matrixes[mtxId];
         }
     }
 
@@ -328,9 +328,9 @@ RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerHandle h, Pl
     return true;
 }
 
-#define SET_LIMB_DL(pLimb, entryDL)                                                                                      \
-    if (!entry->displayListPtrs[entryDL])                                                                                \
-        entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL; \
+#define SET_LIMB_DL(pLimb, entryDL)                                                                                    \
+    if (!entry->modelEntry.displayListPtrs[entryDL])                                                                   \
+        entry->modelEntry.displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL; \
     refreshProxyDLIfEntryLoaded(entry, entryDL)
 
 RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel) {
@@ -389,9 +389,9 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 
         StandardLimb **limbs = (StandardLimb **)skel->sh.segment;
 
-#define SET_SHIELDING_LIMB_DL(pLimb, entryDL) \
-    if (!entry->displayListPtrs[entryDL])     \
-    entry->displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL
+#define SET_SHIELDING_LIMB_DL(pLimb, entryDL)        \
+    if (!entry->modelEntry.displayListPtrs[entryDL]) \
+    entry->modelEntry.displayListPtrs[entryDL] = (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL
 
         SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_BODY, LINK_DL_BODY_SHIELD_BODY);
         SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_HEAD, LINK_DL_BODY_SHIELD_HEAD);
