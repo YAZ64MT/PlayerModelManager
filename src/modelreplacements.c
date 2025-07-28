@@ -11,14 +11,6 @@
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "maskdls.h"
 
-Gfx gPlayerLibDLs[PLAYERLIB_DL_MAX];
-
-void initPlayerLibDLs() {
-    for (int i = 0; i < PLAYERLIB_DL_MAX; ++i) {
-        gSPBranchList(&gPlayerLibDLs[i], gEmptyDL);
-    }
-}
-
 typedef struct {
     PlayerTransformation form;
     ModelReplacerHandle handle;
@@ -120,8 +112,6 @@ static ModelReplacement sModelReplacements[] = {
 
 MODEL_REPLACER_CALLBACK_ON_REGISTER_REPLACERS
 void setupCodeReplacements() {
-    initPlayerLibDLs();
-
     for (int i = 0; i < ARRAY_COUNT(sModelReplacements); ++i) {
         ModelReplacement *curr = &sModelReplacements[i];
         curr->handle = ModelReplacer_registerReplacer(curr->objId, curr->vanillaDL, NULL);

@@ -116,10 +116,6 @@ void initModelReplacerHashObjects() {
 
     sExcludedDisplayLists = recomputil_create_u32_hashset();
 
-    for (int i = 0; i < PLAYERLIB_DL_MAX; ++i) {
-        recomputil_u32_hashset_insert(sExcludedDisplayLists, (uintptr_t)&gPlayerLibDLs[i]);
-    }
-
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         for (int j = 0; j < PLAYER_FORM_MAX; ++j) {
             recomputil_u32_hashset_insert(sExcludedDisplayLists, (uintptr_t)&gLinkFormProxies[j].displayLists[i]);

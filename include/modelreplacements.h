@@ -28,8 +28,6 @@ typedef enum {
     PLAYERLIB_DL_MAX
 } PlayerLibDisplayList;
 
-extern Gfx gPlayerLibDLs[];
-
 void refreshExternalDLs(Link_FormProxy *proxy, bool useOriginalForms);
 
 #endif

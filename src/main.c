@@ -67,94 +67,47 @@ static Gfx **sPlayerSwimFins = D_801C0ABC;
 
 static Gfx **sPlayerPads = D_8085D574;
 
-void repointSharedModelsToProxy() {
-    sPlayerHandHoldingSwords[0] = &gPlayerLibDLs[PLAYERLIB_DL_LFIST_SWORD_KOKIRI];
-    sPlayerHandHoldingSwords[1] = &gPlayerLibDLs[PLAYERLIB_DL_LFIST_SWORD_KOKIRI];
-    sPlayerHandHoldingSwords[2] = &gPlayerLibDLs[PLAYERLIB_DL_LFIST_SWORD_RAZOR];
-    sPlayerHandHoldingSwords[3] = &gPlayerLibDLs[PLAYERLIB_DL_LFIST_SWORD_RAZOR];
-    sPlayerHandHoldingSwords[4] = &gPlayerLibDLs[PLAYERLIB_DL_LFIST_SWORD_GILDED];
-    sPlayerHandHoldingSwords[5] = &gPlayerLibDLs[PLAYERLIB_DL_LFIST_SWORD_GILDED];
+void repointSharedModelsToProxy(Link_FormProxy *proxy) {
+    sPlayerHandHoldingSwords[0] = &proxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    sPlayerHandHoldingSwords[1] = &proxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
+    sPlayerHandHoldingSwords[2] = &proxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
+    sPlayerHandHoldingSwords[3] = &proxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
+    sPlayerHandHoldingSwords[4] = &proxy->displayLists[LINK_DL_LFIST_SWORD_GILDED];
+    sPlayerHandHoldingSwords[5] = &proxy->displayLists[LINK_DL_LFIST_SWORD_GILDED];
 
-    gPlayerShields[0] = &gPlayerLibDLs[PLAYERLIB_DL_SHIELD_HERO_BACK];
-    gPlayerShields[1] = &gPlayerLibDLs[PLAYERLIB_DL_SHIELD_HERO_BACK];
-    gPlayerShields[2] = &gPlayerLibDLs[PLAYERLIB_DL_SHIELD_MIRROR_BACK];
-    gPlayerShields[3] = &gPlayerLibDLs[PLAYERLIB_DL_SHIELD_MIRROR_BACK];
+    gPlayerShields[0] = &proxy->displayLists[LINK_DL_SHIELD_HERO_BACK];
+    gPlayerShields[1] = &proxy->displayLists[LINK_DL_SHIELD_HERO_BACK];
+    gPlayerShields[2] = &proxy->displayLists[LINK_DL_SHIELD_MIRROR_BACK];
+    gPlayerShields[3] = &proxy->displayLists[LINK_DL_SHIELD_MIRROR_BACK];
 
-    gPlayerHandHoldingShields[0] = &gPlayerLibDLs[PLAYERLIB_DL_RFIST_SHIELD_HERO];
-    gPlayerHandHoldingShields[1] = &gPlayerLibDLs[PLAYERLIB_DL_RFIST_SHIELD_HERO];
-    gPlayerHandHoldingShields[2] = &gPlayerLibDLs[PLAYERLIB_DL_RFIST_SHIELD_MIRROR];
-    gPlayerHandHoldingShields[3] = &gPlayerLibDLs[PLAYERLIB_DL_RFIST_SHIELD_MIRROR];
+    gPlayerHandHoldingShields[0] = &proxy->displayLists[LINK_DL_RFIST_SHIELD_HERO];
+    gPlayerHandHoldingShields[1] = &proxy->displayLists[LINK_DL_RFIST_SHIELD_HERO];
+    gPlayerHandHoldingShields[2] = &proxy->displayLists[LINK_DL_RFIST_SHIELD_MIRROR];
+    gPlayerHandHoldingShields[3] = &proxy->displayLists[LINK_DL_RFIST_SHIELD_MIRROR];
 
-    gPlayerSheathedSwords[0] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_KOKIRI_SHEATHED];
-    gPlayerSheathedSwords[1] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_KOKIRI_SHEATHED];
-    gPlayerSheathedSwords[2] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_RAZOR_SHEATHED];
-    gPlayerSheathedSwords[3] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_RAZOR_SHEATHED];
-    gPlayerSheathedSwords[4] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_GILDED_SHEATHED];
-    gPlayerSheathedSwords[5] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_GILDED_SHEATHED];
+    gPlayerSheathedSwords[0] = &proxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
+    gPlayerSheathedSwords[1] = &proxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
+    gPlayerSheathedSwords[2] = &proxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATHED];
+    gPlayerSheathedSwords[3] = &proxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATHED];
+    gPlayerSheathedSwords[4] = &proxy->displayLists[LINK_DL_SWORD_GILDED_SHEATHED];
+    gPlayerSheathedSwords[5] = &proxy->displayLists[LINK_DL_SWORD_GILDED_SHEATHED];
 
-    gPlayerSwordSheaths[0] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_KOKIRI_SHEATH];
-    gPlayerSwordSheaths[1] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_KOKIRI_SHEATH];
-    gPlayerSwordSheaths[2] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_RAZOR_SHEATH];
-    gPlayerSwordSheaths[3] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_RAZOR_SHEATH];
-    gPlayerSwordSheaths[4] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_GILDED_SHEATH];
-    gPlayerSwordSheaths[5] = &gPlayerLibDLs[PLAYERLIB_DL_SWORD_GILDED_SHEATH];
+    gPlayerSwordSheaths[0] = &proxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATH];
+    gPlayerSwordSheaths[1] = &proxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATH];
+    gPlayerSwordSheaths[2] = &proxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATH];
+    gPlayerSwordSheaths[3] = &proxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATH];
+    gPlayerSwordSheaths[4] = &proxy->displayLists[LINK_DL_SWORD_GILDED_SHEATH];
+    gPlayerSwordSheaths[5] = &proxy->displayLists[LINK_DL_SWORD_GILDED_SHEATH];
 
-    sPlayerFins[0] = &gPlayerLibDLs[PLAYERLIB_DL_LFIN];
-    sPlayerFins[1] = &gPlayerLibDLs[PLAYERLIB_DL_RFIN];
+    sPlayerFins[0] = &proxy->displayLists[LINK_DL_LFIN];
+    sPlayerFins[1] = &proxy->displayLists[LINK_DL_RFIN];
 
-    sPlayerSwimFins[0] = &gPlayerLibDLs[PLAYERLIB_DL_LFIN_SWIM];
-    sPlayerSwimFins[1] = &gPlayerLibDLs[PLAYERLIB_DL_RFIN_SWIM];
+    sPlayerSwimFins[0] = &proxy->displayLists[LINK_DL_LFIN_SWIM];
+    sPlayerSwimFins[1] = &proxy->displayLists[LINK_DL_RFIN_SWIM];
 
-    sPlayerPads[0] = &gPlayerLibDLs[PLAYERLIB_DL_PAD_GRASS];
-    sPlayerPads[1] = &gPlayerLibDLs[PLAYERLIB_DL_PAD_WOOD];
-    sPlayerPads[2] = &gPlayerLibDLs[PLAYERLIB_DL_PAD_OPENING];
-}
-
-void refreshSharedModels(Link_FormProxy *proxy, bool useOriginalForms) {
-    Link_FormProxy *currProxy = proxy;
-
-#define REFRESH_DL(name) gSPBranchList(&gPlayerLibDLs[PLAYERLIB_DL_##name], &currProxy->displayLists[LINK_DL_##name])
-
-    if (useOriginalForms) {
-        currProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
-    }
-
-    REFRESH_DL(LFIST_SWORD_KOKIRI);
-    REFRESH_DL(LFIST_SWORD_RAZOR);
-    REFRESH_DL(LFIST_SWORD_GILDED);
-
-    REFRESH_DL(SHIELD_HERO_BACK);
-    REFRESH_DL(SHIELD_MIRROR_BACK);
-
-    REFRESH_DL(RFIST_SHIELD_HERO);
-    REFRESH_DL(RFIST_SHIELD_MIRROR);
-
-    REFRESH_DL(SWORD_KOKIRI_SHEATHED);
-    REFRESH_DL(SWORD_RAZOR_SHEATHED);
-    REFRESH_DL(SWORD_GILDED_SHEATHED);
-
-    REFRESH_DL(SWORD_KOKIRI_SHEATH);
-    REFRESH_DL(SWORD_RAZOR_SHEATH);
-    REFRESH_DL(SWORD_GILDED_SHEATH);
-
-    if (useOriginalForms) {
-        currProxy = &gLinkFormProxies[PLAYER_FORM_ZORA];
-    }
-
-    REFRESH_DL(LFIN);
-    REFRESH_DL(RFIN);
-    REFRESH_DL(LFIN_SWIM);
-    REFRESH_DL(RFIN_SWIM);
-
-    if (useOriginalForms) {
-        currProxy = &gLinkFormProxies[PLAYER_FORM_DEKU];
-    }
-
-    REFRESH_DL(PAD_GRASS);
-    REFRESH_DL(PAD_WOOD);
-    REFRESH_DL(PAD_OPENING);
-
-#undef REFRESH_DL
+    sPlayerPads[0] = &proxy->displayLists[LINK_DL_PAD_GRASS];
+    sPlayerPads[1] = &proxy->displayLists[LINK_DL_PAD_WOOD];
+    sPlayerPads[2] = &proxy->displayLists[LINK_DL_PAD_OPENING];
 }
 
 RECOMP_DECLARE_EVENT(_internal_setupVanillaModels());
@@ -178,12 +131,11 @@ void initFormProxies() {
         }
 
         requestRefreshFormProxy(&gLinkFormProxies[i]);
+
         changeFormPtrsToProxy(i);
     }
 
     _internal_setupVanillaModels();
-
-    repointSharedModelsToProxy();
 }
 
 bool sPlayerAppearanceNeedsUpdate = false;
@@ -210,9 +162,9 @@ void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
 
         refreshExternalDLs(fp, isMultipleLinksExist);
 
-        refreshSharedModels(fp, isMultipleLinksExist);
-
         matchFaceTexturesToProxy(fp);
+
+        repointSharedModelsToProxy(fp);
     }
 }
 
