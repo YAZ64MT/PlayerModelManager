@@ -197,6 +197,8 @@ void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
     }
 }
 
+extern Gfx *D_801C0D94; // Bow string DL ptr
+
 RECOMP_HOOK("Player_Draw")
 void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
 
@@ -213,6 +215,8 @@ void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
         refreshSharedModels(fp, isMultipleLinksExist);
 
         matchFaceTexturesToProxy(fp);
+
+        D_801C0D94 = &fp->displayLists[LINK_DL_BOW_STRING];
     }
 }
 
