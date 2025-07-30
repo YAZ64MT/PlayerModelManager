@@ -74,7 +74,7 @@ void fixAdultBremen_on_return_Player_Draw() {
 }
 
 RECOMP_HOOK("Player_PostLimbDrawGameplay")
-void fixArrowPos_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
+void repositionHeldActors_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
     Player *player = (Player *)actor;
 
     Actor *heldActor = player->heldActor;
