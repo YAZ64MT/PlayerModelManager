@@ -280,6 +280,11 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
         PlayerModelManager_setDisplayList(h, LINK_DL_FPS_BOW, dl);
     }
 
+    // Use 3rd person hookshot model for 1st person if 1st person not set for consistency with FPS bow behavior
+    if (dlId == LINK_DL_HOOKSHOT && !ModelEntry_getDisplayList(&entry->modelEntry, LINK_DL_FPS_HOOKSHOT)) {
+        PlayerModelManager_setDisplayList(h, LINK_DL_FPS_HOOKSHOT, dl);
+    }
+
     refreshProxyDLIfEntryLoaded(entry, dlId);
 
     return true;
