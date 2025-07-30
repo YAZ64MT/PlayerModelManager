@@ -1,0 +1,12 @@
+# Manually curated static symbols that don't show up in the ELF.
+[[section]]
+name = "..code"
+rom = 0x00B3C000
+vram = 0x800A5AC0
+size = 0x13E4E0
+
+symbols = [
+    { name = "D_801C0D60", vram = 0x801C0D60 }, # from Player_PostLimbDrawGameplay in z_player_lib.c
+    { name = "D_801C0D6C", vram = 0x801C0D6C }, # from Player_PostLimbDrawGameplay in z_player_lib.c
+    { name = "D_801C0D98", vram = 0x801C0D98 }, # from Player_PostLimbDrawGameplay in z_player_lib.c
+]
