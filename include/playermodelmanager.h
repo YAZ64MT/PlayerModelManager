@@ -4,7 +4,13 @@
 #include "global.h"
 
 // Parts after LINK_DL_ need to be kept in sync with Link_ShimDisplayList
+//
+// The ordering of items should not change to ensure backwards compatibility.
+//
 // MUST BE KEPT IN SYNC WITH PlayerModelManagerDisplayListId IN playermodelmanager_api.h
+//
+// If a backwards-incompatible change is made to this list, the API version in
+// playermodelmanager_api.h must be bumped.
 typedef enum {
     LINK_DL_WAIST,
     LINK_DL_RTHIGH,
@@ -67,7 +73,7 @@ typedef enum {
     LINK_DL_OCARINA_FAIRY,
     LINK_DL_OCARINA_TIME,
     LINK_DL_DEKU_STICK,
-    LINK_DL_BOW,
+    LINK_DL_BOW, // Also has a first person variant
     LINK_DL_BOW_STRING,
     LINK_DL_BOW_ARROW,
     LINK_DL_SLINGSHOT,
@@ -301,6 +307,10 @@ typedef enum {
     // Deku Link flower propellers
     LINK_DL_CENTER_FLOWER_PROPELLER_OPEN,
     LINK_DL_CENTER_FLOWER_PROPELLER_CLOSED,
+
+    // First Person Bow
+    LINK_DL_FPS_BOW,
+    
     LINK_DL_MAX
 } Link_DisplayList;
 
@@ -409,7 +419,7 @@ typedef enum {
 } Link_ShimDisplayList;
 
 // Parts after LINK_EQUIP need to be kept in sync with Link_ShimDisplayList
-// 
+//
 // MUST BE KEPT IN SYNC WITH PlayerModelManagerMatrixId IN playermodelmanager_api.h
 typedef enum {
     LINK_EQUIP_MATRIX_SWORD1_BACK,

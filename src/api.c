@@ -275,6 +275,11 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
 
     entry->displayListPtrs[dlId] = dl;
 
+    // For backwards compatibility
+    if (dlId == LINK_DL_BOW && !entry->displayListPtrs[LINK_DL_FPS_BOW]) {
+        PlayerModelManager_setDisplayList(h, LINK_DL_FPS_BOW, dl);
+    }
+
     refreshProxyDLIfEntryLoaded(entry, dlId);
 
     return true;

@@ -106,6 +106,75 @@ Gfx gLinkHumanFirstPersonHookshotDL[] = {
     gsSPEndDisplayList(),
 };
 
+Gfx gLinkHumanFirstPersonBowDL[] = {
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPPipeSync(),
+    gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, TEXEL0, PRIMITIVE, 0, COMBINED, 0, 0, 0, 0, COMBINED),
+    gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2),
+    gsDPPipeSync(),
+    gsDPSetTextureLUT(G_TT_RGBA16),
+    gsDPLoadTLUT_pal256(object_link_child_TLUT_018A40),
+    gsDPLoadTextureBlock(object_link_child_Tex_01A280, G_IM_FMT_CI, G_IM_SIZ_8b, 16, 16, 0, G_TX_MIRROR | G_TX_CLAMP,
+                         G_TX_MIRROR | G_TX_CLAMP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
+    gsDPSetPrimColor(0, 0x80, 255, 255, 255, 255),
+    gsSPLoadGeometryMode(G_ZBUFFER | G_SHADE | G_CULL_BACK | G_FOG | G_LIGHTING | G_SHADING_SMOOTH),
+    gsSPVertex(object_link_childVtx_010538, 32, 0),
+    gsSP2Triangles(0, 1, 2, 0, 2, 1, 3, 0),
+    gsSP2Triangles(4, 5, 6, 0, 7, 8, 4, 0),
+    gsSP2Triangles(3, 1, 9, 0, 9, 1, 0, 0),
+    gsSP2Triangles(3, 10, 2, 0, 2, 10, 0, 0),
+    gsSP2Triangles(6, 11, 4, 0, 8, 7, 12, 0),
+    gsSP2Triangles(13, 14, 15, 0, 16, 17, 18, 0),
+    gsSP2Triangles(18, 13, 19, 0, 15, 14, 17, 0),
+    gsSP2Triangles(15, 19, 13, 0, 17, 16, 15, 0),
+    gsSP2Triangles(12, 6, 5, 0, 20, 21, 22, 0),
+    gsSP2Triangles(23, 24, 25, 0, 25, 26, 23, 0),
+    gsSP2Triangles(20, 27, 23, 0, 24, 22, 25, 0),
+    gsSP2Triangles(26, 25, 22, 0, 23, 21, 20, 0),
+    gsSP2Triangles(4, 11, 7, 0, 22, 27, 20, 0),
+    gsSP2Triangles(28, 29, 30, 0, 30, 29, 31, 0),
+    gsSPVertex(&object_link_childVtx_010538[32], 13, 0),
+    gsSP2Triangles(0, 1, 2, 0, 2, 1, 3, 0),
+    gsSP2Triangles(3, 1, 4, 0, 4, 1, 0, 0),
+    gsSP2Triangles(5, 6, 7, 0, 5, 8, 9, 0),
+    gsSP2Triangles(7, 10, 11, 0, 10, 7, 12, 0),
+    gsSP2Triangles(9, 6, 5, 0, 9, 11, 10, 0),
+    gsSP2Triangles(10, 12, 9, 0, 7, 8, 5, 0),
+    gsDPPipeSync(),
+    gsDPLoadTLUT_pal256(object_link_child_TLUT_018A40),
+    gsDPLoadTextureBlock(object_link_child_Tex_019A80, G_IM_FMT_CI, G_IM_SIZ_8b, 32, 64, 0, G_TX_MIRROR | G_TX_CLAMP,
+                         G_TX_MIRROR | G_TX_CLAMP, 5, 6, G_TX_NOLOD, G_TX_NOLOD),
+    gsSPVertex(&object_link_childVtx_010538[45], 32, 0),
+    gsSP2Triangles(0, 1, 2, 0, 3, 4, 5, 0),
+    gsSP2Triangles(6, 7, 3, 0, 8, 9, 10, 0),
+    gsSP2Triangles(11, 12, 13, 0, 11, 14, 12, 0),
+    gsSP2Triangles(13, 15, 16, 0, 13, 3, 15, 0),
+    gsSP2Triangles(16, 15, 12, 0, 15, 3, 12, 0),
+    gsSP2Triangles(3, 7, 12, 0, 13, 4, 3, 0),
+    gsSP2Triangles(13, 17, 4, 0, 12, 14, 16, 0),
+    gsSP2Triangles(3, 18, 6, 0, 5, 18, 3, 0),
+    gsSP2Triangles(19, 20, 21, 0, 8, 20, 19, 0),
+    gsSP2Triangles(19, 9, 8, 0, 21, 22, 19, 0),
+    gsSP2Triangles(23, 24, 9, 0, 22, 25, 26, 0),
+    gsSP2Triangles(26, 27, 22, 0, 28, 29, 7, 0),
+    gsSP2Triangles(4, 29, 28, 0, 25, 9, 24, 0),
+    gsSP2Triangles(28, 7, 6, 0, 29, 30, 31, 0),
+    gsSP2Triangles(31, 7, 29, 0, 4, 17, 30, 0),
+    gsSP2Triangles(30, 29, 4, 0, 7, 31, 12, 0),
+    gsSP2Triangles(16, 11, 13, 0, 24, 26, 25, 0),
+    gsSPVertex(&object_link_childVtx_010538[77], 22, 0),
+    gsSP2Triangles(0, 1, 2, 0, 0, 3, 1, 0),
+    gsSP2Triangles(0, 4, 3, 0, 0, 5, 4, 0),
+    gsSP2Triangles(6, 7, 8, 0, 9, 7, 6, 0),
+    gsSP2Triangles(8, 10, 11, 0, 12, 13, 14, 0),
+    gsSP2Triangles(11, 15, 16, 0, 16, 17, 18, 0),
+    gsSP2Triangles(11, 18, 15, 0, 18, 17, 15, 0),
+    gsSP2Triangles(6, 8, 19, 0, 20, 8, 11, 0),
+    gsSP2Triangles(18, 9, 20, 0, 18, 20, 21, 0),
+    gsSP2Triangles(21, 20, 11, 0, 18, 21, 16, 0),
+    gsSPEndDisplayList(),
+};
+
 Gfx *gSharedDisplayLists[LINK_DL_MAX];
 
 Mtx *gSharedMatrixes[LINK_EQUIP_MATRIX_MAX];
@@ -171,13 +240,17 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanHookshotDL, LINK_DL_HOOKSHOT);
     setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_01D960, LINK_DL_HOOKSHOT_HOOK);
 
-    models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;       // not in Link obj
+    // not in Link obj
+    models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;
+    models[LINK_DL_FPS_BOW] = gLinkHumanFirstPersonBowDL;
 
     GlobalObjectsSegmentMap sharedSegMap = {0};
     sharedSegMap[0x04] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
     sharedSegMap[0x06] = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
 
-    GlobalObjects_rebaseDL(gLinkHumanFirstPersonHookshotDL, sharedSegMap); // repoint vertices, textures, etc. to static link obj
+    // repoint vertices, textures, etc. to static link obj
+    GlobalObjects_rebaseDL(gLinkHumanFirstPersonHookshotDL, sharedSegMap);
+    GlobalObjects_rebaseDL(gLinkHumanFirstPersonBowDL, sharedSegMap);
 
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
     models[LINK_DL_SWORD_GREAT_FAIRY_HILT] = gEmptyDL;
