@@ -276,7 +276,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
     ModelEntry_setDisplayList(&entry->modelEntry, dlId, dl);
 
     // For backwards compatibility
-    if (dlId == LINK_DL_BOW && !entry->displayListPtrs[LINK_DL_FPS_BOW]) {
+    if (dlId == LINK_DL_BOW && !ModelEntry_getDisplayList(&entry->modelEntry, LINK_DL_FPS_BOW)) {
         PlayerModelManager_setDisplayList(h, LINK_DL_FPS_BOW, dl);
     }
 
