@@ -4,14 +4,13 @@
 #include "global.h"
 #include "playermodelmanager.h"
 #include "playermodelmanager_api.h"
+#include "recompdata.h"
 
 // This is the max file name length for most Linux distros and MacOS
 #define INTERNAL_NAME_MAX_LENGTH 255
 
-typedef PlayerModelManagerModelType FormModelType;
-
-typedef struct FormModelEntry {
-    FormModelType type;
+typedef struct {
+    PlayerModelManagerModelType type;
     char *displayName;
     char *internalName;
     char *authorName;
@@ -20,21 +19,28 @@ typedef struct FormModelEntry {
     void *callbackData;
     PlayerModelManagerHandle handle;
     u64 flags;
-} FormModelEntry;
+    U32ValueHashmapHandle displayListPtrs;
+    U32ValueHashmapHandle matrixPtrs;
+} ModelEntry;
 
 typedef struct {
-    FormModelEntry modelEntry;
-    Gfx *displayListPtrs[LINK_DL_MAX];
-    Mtx *matrixPtrs[LINK_EQUIP_MATRIX_MAX];
-    Mtx matrixes[LINK_EQUIP_MATRIX_MAX];
+    ModelEntry modelEntry;
     FlexSkeletonHeader *skel;
     FlexSkeletonHeader *shieldingSkel;
     TexturePtr eyesTex[PLAYER_EYES_MAX];
     TexturePtr mouthTex[PLAYER_MOUTH_MAX];
-} FormModelMemoryEntry;
+} ModelEntryForm;
 
-void FormModelEntry_init(FormModelEntry *entry);
+void ModelEntry_init(ModelEntry *entry);
 
-void FormModelMemoryEntry_init(FormModelMemoryEntry *this);
+Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id);
+
+void ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl);
+
+Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id);
+
+void ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx);
+
+void ModelEntryForm_init(ModelEntryForm *this);
 
 #endif
