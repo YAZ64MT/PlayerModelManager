@@ -248,3 +248,37 @@ void doEponaHeightOffset_on_return_Player_UpdateCommon(void) {
         player->actor.shape.yOffset -= EPONA_HEIGHT_OFFSET;
     }
 }
+
+extern Vec3f D_801C0D60; // Adult arrow hand position
+extern Vec3f D_801C0D6C; // Child arrow hand position
+static Vec3f sChildArrowOffset;
+
+extern Vec3f D_801C0D98; // Bow string data
+static Vec3f sChildBowStringData;
+static Vec3f sAdultBowStringData = {0.0f, -360.4f, 0.0f}; // From OoT
+
+static bool sIsBowDataModified = false;
+
+RECOMP_HOOK("Player_Draw")
+void fixBowProperties_on_Player_Draw(Actor *thisx, PlayState *play) {
+
+    Player *player = (Player *)thisx;
+
+    sIsBowDataModified = player->transformation == PLAYER_FORM_HUMAN && IS_HUMAN_ADULT_LINK_MODEL;
+
+    if (sIsBowDataModified) {
+        sChildBowStringData = D_801C0D98;
+        D_801C0D98 = sAdultBowStringData;
+
+        sChildArrowOffset = D_801C0D6C;
+        D_801C0D6C = D_801C0D60;
+    }
+}
+
+RECOMP_HOOK_RETURN("Player_Draw")
+void fixBowProperties_on_return_Player_Draw() {
+    if (sIsBowDataModified) {
+        D_801C0D6C = sChildArrowOffset;
+        D_801C0D98 = sChildBowStringData;
+    }
+}
