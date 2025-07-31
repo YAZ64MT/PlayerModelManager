@@ -606,7 +606,7 @@ void initFormProxySkeleton(Link_FormProxy *formProxy) {
 #undef SET_LIMB_DL
 }
 
-#define BOWSTRING_TRANSFORM_ID 0x400U
+RECOMP_IMPORT("*", u32 z64recomp_get_bowstring_transform_id());
 
 void initBowWrapper(Link_FormProxy *formProxy) {
     static Gfx sStartBowStringDL[] = {
@@ -618,7 +618,7 @@ void initBowWrapper(Link_FormProxy *formProxy) {
         gsSPEndDisplayList(),
     };
 
-    gEXMatrixGroupSimple(&sStartBowStringDL[0], BOWSTRING_TRANSFORM_ID, G_EX_PUSH, G_MTX_MODELVIEW,
+    gEXMatrixGroupSimple(&sStartBowStringDL[0], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
                          G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_ORDER_LINEAR, G_EX_EDIT_NONE);
 
     static Gfx sEndBowstringDL[] = {
