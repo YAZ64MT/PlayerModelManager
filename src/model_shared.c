@@ -264,6 +264,7 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_MASK_ROMERNY, object_mask_romerny_DL_0007A0, LINK_DL_MASK_ROMANI);
     setupSharedListenerDL(OBJECT_MASK_ZACHO, object_mask_zacho_DL_000700, LINK_DL_MASK_CIRCUS_LEADER);
     setupSharedListenerDL(OBJECT_MASK_POSTHAT, object_mask_posthat_DL_000290, LINK_DL_MASK_POSTMAN);
+    setupSharedListenerDL(OBJECT_MASK_MEOTO, object_mask_meoto_DL_0005A0, LINK_DL_MASK_COUPLE);
     setupSharedListenerDL(OBJECT_MASK_BIGELF, object_mask_bigelf_DL_0016F0, LINK_DL_MASK_GREAT_FAIRY);
     setupSharedListenerDL(OBJECT_MASK_GIBUDO, object_mask_gibudo_DL_000250, LINK_DL_MASK_GIBDO);
     setupSharedListenerDL(OBJECT_MASK_GERO, gDonGeroMaskDL, LINK_DL_MASK_DON_GERO);
