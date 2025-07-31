@@ -137,20 +137,6 @@ void dupStrAndFreeOld(char **dest, const char *src) {
     *dest = YAZMTCore_Utils_StrDup(src);
 }
 
-static bool sIsAdultDefaultsInitialized = false;
-static Mtx sAdultDefaultArrowMtx;
-static Mtx sAdultDefaultMaskMtx;
-// static Mtx sAdultDefaultHookshotMtx; // OOT hookshot actor position
-
-void initializeAdultDefaults() {
-    if (!sIsAdultDefaultsInitialized) {
-        sIsAdultDefaultsInitialized = true;
-        guPosition(&sAdultDefaultArrowMtx, 0.f, 0.f, 0.f, 1.f, -40.f, 400.f, 0.f);
-        guPosition(&sAdultDefaultMaskMtx, 0.f, 0.f, 0.f, 1.f, 20.f, -150.f, 0.f);
-        // guPosition(&sAdultDefaultHookshotMtx, 0, 0, 0, 1, 50, 840, 0);
-    }
-}
-
 RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType) {
     if (apiVersion > PMM_API_VERSION) {
         recomp_printf("PlayerModelManager_registerModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
@@ -184,8 +170,6 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
 
     if (modelType == PMM_MODEL_TYPE_ADULT) {
         entry->modelEntry.flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
-        ModelEntry_setMatrix(&entry->modelEntry, LINK_EQUIP_MATRIX_ARROW_DRAWN, &sAdultDefaultArrowMtx);
-        ModelEntry_setMatrix(&entry->modelEntry, LINK_EQUIP_MATRIX_MASKS, &sAdultDefaultMaskMtx);
     }
 
     entry->modelEntry.type = modelType;
@@ -303,14 +287,6 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
     }
 
     ModelEntry_setMatrix(&entry->modelEntry, mtxId, matrix);
-
-    if (!matrix && entry->modelEntry.type == PMM_MODEL_TYPE_ADULT) {
-        if (mtxId == LINK_EQUIP_MATRIX_ARROW_DRAWN) {
-            ModelEntry_setMatrix(&entry->modelEntry, LINK_EQUIP_MATRIX_ARROW_DRAWN, &sAdultDefaultArrowMtx);
-        } else if (mtxId == LINK_EQUIP_MATRIX_MASKS) {
-            ModelEntry_setMatrix(&entry->modelEntry, LINK_EQUIP_MATRIX_MASKS, &sAdultDefaultMaskMtx);
-        }
-    }
 
     refreshProxyMtxIfEntryLoaded(entry, mtxId);
 
