@@ -13,6 +13,7 @@
 #include "globalobjects_api.h"
 #include "modelreplacer_compat.h"
 #include "yazmtcorelib_api.h"
+#include "rt64_extended_gbi.h"
 
 Gfx gPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
@@ -605,12 +606,40 @@ void initFormProxySkeleton(Link_FormProxy *formProxy) {
 #undef SET_LIMB_DL
 }
 
+RECOMP_IMPORT("*", u32 z64recomp_get_bowstring_transform_id());
+
+void initBowWrapper(Link_FormProxy *formProxy) {
+    static Gfx sStartBowStringDL[] = {
+        // Two commands worth of space for the gEXMatrixGroup.
+        gsSPNoOp(),
+        gsSPNoOp(),
+
+        gsSPMatrix(&gIdentityMtx, G_MTX_MODELVIEW | G_MTX_NOPUSH | G_MTX_MUL),
+        gsSPEndDisplayList(),
+    };
+
+    gEXMatrixGroupSimple(&sStartBowStringDL[0], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
+                         G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_ORDER_LINEAR, G_EX_EDIT_NONE);
+
+    static Gfx sEndBowstringDL[] = {
+        gsSPNoOp(),
+        gsSPBranchList(sSetBilerpDL),
+    };
+
+    gEXPopMatrixGroup(&sEndBowstringDL[0], G_MTX_MODELVIEW);
+
+    gSPDisplayList(&formProxy->wrappedDisplayLists[LINK_DL_BOW_STRING].displayList[WRAPPED_DL_PREDRAW], sStartBowStringDL);
+    gSPBranchList(&formProxy->wrappedDisplayLists[LINK_DL_BOW_STRING].displayList[WRAPPED_DL_POSTDRAW], sEndBowstringDL);
+}
+
 void initFormProxyWrappers(Link_FormProxy *formProxy) {
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         gSPDisplayList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_PREDRAW], gEmptyDL);
         gSPDisplayList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
         gSPBranchList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_POSTDRAW], sSetBilerpDL);
     }
+
+    initBowWrapper(formProxy);
 }
 
 void initFormProxyDLs(Link_FormProxy *formProxy) {
@@ -659,7 +688,7 @@ void setSkeletonDLsOnModelInfo(Link_ModelInfo *info, FlexSkeletonHeader *skel) {
 
 #define SET_LIMB_DL(pLimb, dl) \
     if (!info->models[dl])     \
-    info->models[dl] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL;
+        info->models[dl] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL;
 
     if (skel) {
         LodLimb **limbs = (LodLimb **)skel->sh.segment;

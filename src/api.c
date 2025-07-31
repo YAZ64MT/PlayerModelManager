@@ -474,7 +474,6 @@ void doRegisterModels() {
 
     sIsModelsRegistered = true;
 
-    initializeAdultDefaults();
     sIsAPILocked = false;
     onRegisterModels();
     sIsAPILocked = true;
