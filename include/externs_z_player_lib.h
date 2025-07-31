@@ -41,4 +41,6 @@ extern Gfx *D_801C0ABC[]; // Zora fin (swim) DLs
 
 extern Gfx *D_8085D574[]; // Deku Pads
 
+extern Gfx *D_801C0B20[]; // Mask DLs
+
 #endif
