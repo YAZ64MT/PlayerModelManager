@@ -8,7 +8,6 @@
 #include "defines_modelinfo.h"
 #include "playermodelmanager_utils.h"
 #include "modelreplacer_api.h"
-#include "modelreplacements.h"
 #include "externs_z_player_lib.h"
 #include "model_shared.h"
 
@@ -196,13 +195,9 @@ void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
 
         Link_FormProxy *fp = &gLinkFormProxies[((Player *)thisx)->transformation];
 
-        refreshExternalDLs(fp, isMultipleLinksExist);
-
         matchFaceTexturesToProxy(fp);
 
         repointSharedModelsToProxy(fp);
-
-        D_801C0D94 = &fp->displayLists[LINK_DL_BOW_STRING];
     }
 }
 

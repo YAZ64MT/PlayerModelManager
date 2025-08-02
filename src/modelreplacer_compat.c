@@ -8,7 +8,6 @@
 #include "modelreplacer_api.h"
 #include "model_shared.h"
 #include "model_common.h"
-#include "modelreplacements.h"
 
 static U32ValueHashmapHandle sObjectIdToVanillaDLToListenerMapMap;
 static U32ValueHashmapHandle sLinkDLEntryToListeners[PLAYER_FORM_MAX];
@@ -64,7 +63,6 @@ void createListenerInfo(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, 
 }
 
 void MRC_setupListenerDL(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId) {
-    createListenerInfo(id, vanillaDL, form, linkDLId);
 
     Gfx **models = NULL;
 
