@@ -375,6 +375,12 @@ void refreshProxyDLs(Link_FormProxy *formProxy) {
         gSPDisplayList(&wDLs[LINK_DL_FPS_HOOKSHOT].displayList[WRAPPED_DL_DRAW], listenerHookDL);
     }
 
+    // first person bow workaround
+    Gfx *listenerBowDL = getListenerDL(formProxy, LINK_DL_BOW);
+    if (listenerBowDL) {
+        gSPDisplayList(&wDLs[LINK_DL_BOW].displayList[WRAPPED_DL_DRAW], listenerBowDL);
+    }
+
     // disable hilt for Great Fairy Sword if replaced
     Gfx *listenerGFSwordDL = getListenerDL(formProxy, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
     if (listenerGFSwordDL) {
