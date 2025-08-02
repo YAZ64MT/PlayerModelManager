@@ -8,10 +8,17 @@
 #include "modelreplacer_api.h"
 #include "model_shared.h"
 #include "model_common.h"
+#include "recomputils.h"
 
 static U32ValueHashmapHandle sObjectIdToVanillaDLToListenerMapMap;
 static U32ValueHashmapHandle sLinkDLEntryToListeners[PLAYER_FORM_MAX];
 static U32HashsetHandle sExcludedDisplayLists;
+
+bool sIsModelReplacerCompatEnabled;
+
+bool MRC_isMRCEnabled() {
+    return sIsModelReplacerCompatEnabled;
+}
 
 MRC_ListenerInfo *getListenerInfo(ObjectId id, Gfx *vanillaDL) {
     if (!recomputil_u32_value_hashmap_contains(sObjectIdToVanillaDLToListenerMapMap, id)) {
@@ -25,6 +32,10 @@ MRC_ListenerInfo *getListenerInfo(ObjectId id, Gfx *vanillaDL) {
 }
 
 MRC_ListenerInfo *MRC_getListenerFromFormAndDL(PlayerTransformation form, Link_DisplayList entryDLId) {
+    if (!sIsModelReplacerCompatEnabled) {
+        return NULL;
+    }
+
     unsigned long infoPtr;
 
     if (recomputil_u32_value_hashmap_get(sLinkDLEntryToListeners[form], entryDLId, &infoPtr)) {
@@ -63,6 +74,9 @@ void createListenerInfo(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, 
 }
 
 void MRC_setupListenerDL(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId) {
+    if (sIsModelReplacerCompatEnabled) {
+        createListenerInfo(id, vanillaDL, form, linkDLId);
+    }
 
     Gfx **models = NULL;
 
@@ -104,8 +118,16 @@ void updateListenerDLs_on_onModelChange(ObjectId id, Gfx *vanillaDL, Gfx *newDL)
     }
 }
 
+RECOMP_DECLARE_EVENT(_internal_onReadyModelReplacerCompat());
+
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initModelReplacerHashObjects() {
+    sIsModelReplacerCompatEnabled = recomp_is_dependency_met("yazmt_mm_modelreplacer") == DEPENDENCY_STATUS_FOUND;
+
+    if (!sIsModelReplacerCompatEnabled) {
+        return;
+    }
+
     sObjectIdToVanillaDLToListenerMapMap = recomputil_create_u32_value_hashmap();
 
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
@@ -120,8 +142,6 @@ void initModelReplacerHashObjects() {
         }
     }
 }
-
-RECOMP_DECLARE_EVENT(_internal_onReadyModelReplacerCompat())
 
 RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, onBeforeRegisterReplacers)
 void initReplacerCompat_on_event() {

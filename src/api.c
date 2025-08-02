@@ -9,6 +9,7 @@
 #include "yazmtcorelib_api.h"
 #include "modelreplacer_api.h"
 #include "globalobjects_api.h"
+#include "modelreplacer_compat.h"
 
 #define ENTRY_FORM(entry) (getFormFromModelType(entry->modelEntry.type))
 #define ENTRY_LOADED_PROXY(entry) (isEntryLoaded(entry) ? &gLinkFormProxies[ENTRY_FORM(entry)] : NULL)
@@ -468,7 +469,7 @@ void doRegisterModels() {
         return;
     }
 
-    if (!sIsCMEMReady || !sIsModelReplacerReady || !sIsGlobalObjectsReady) {
+    if (!sIsCMEMReady || (!sIsModelReplacerReady && MRC_isMRCEnabled()) || !sIsGlobalObjectsReady) {
         return;
     }
 

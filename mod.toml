@@ -37,9 +37,15 @@ dependencies = [
 # Example dependency:
 #    "modname:1.0.0"
     "yazmt_mm_global_objects",
-    "yazmt_mm_modelreplacer",
     "ProxyMM_KV:0.0.5",
-    "yazmt_mm_corelib:0.1.1"
+    "yazmt_mm_corelib:0.1.1",
+]
+
+# Optional dependency mods. This has the same format as `dependencies`, but the game will still start if dependencies in this
+# list aren't present. You can query the presence of a given dependency by using `recomp_is_dependency_met` in recomputils.h.
+# Calling a function imported from an optional dependency that isn't present will trigger an error.
+optional_dependencies = [
+    "yazmt_mm_modelreplacer",
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.

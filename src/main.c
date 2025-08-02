@@ -8,6 +8,8 @@
 #include "defines_modelinfo.h"
 #include "playermodelmanager_utils.h"
 #include "modelreplacer_api.h"
+#include "modelreplacer_compat.h"
+#include "globalobjects_api.h"
 #include "externs_z_player_lib.h"
 #include "model_shared.h"
 
@@ -203,10 +205,26 @@ void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
 
 RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
 
+static bool sIsFormProxiesInitialized = false;
+
+void doInitFormProxies() {
+    if (!sIsFormProxiesInitialized) {
+        sIsFormProxiesInitialized = true;
+        initFormProxies();
+        _internal_onReadyFormProxies();
+    }
+}
+
 RECOMP_CALLBACK(".", _internal_onReadyModelReplacerCompat)
-void initFormProxies_on_event() {
-    initFormProxies();
-    _internal_onReadyFormProxies();
+void initFormProxies_on_mrc() {
+    doInitFormProxies();
+}
+
+GLOBAL_OBJECTS_CALLBACK_ON_READY
+void initFormProxies_on_go() {
+    if (!MRC_isMRCEnabled()) {
+        doInitFormProxies();
+    }
 }
 
 RECOMP_CALLBACK(".", _internal_onModelApplied)
