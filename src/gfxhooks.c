@@ -82,6 +82,7 @@ static GfxHookDisplayList sLinkFormsDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(gLinkZoraLeftHandOpenDL, LINK_DL_LHAND),
     DECLARE_GFX_HOOK_DL(gLinkZoraRightHandOpenDL, LINK_DL_RHAND),
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_00E088, LINK_DL_LHAND_GUITAR),
+    DECLARE_GFX_HOOK_DL(object_link_zora_DL_00E2A0, LINK_DL_GUITAR),
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_0110A8, LINK_DL_FIN_SHIELD),
 };
 static GfxHookLookup sLinkFormsDLMap = DECLARE_GFX_HOOK_LUT(sLinkFormsDLReplacements);
