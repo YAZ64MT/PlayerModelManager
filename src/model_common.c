@@ -14,16 +14,48 @@
 #include "modelreplacer_compat.h"
 #include "yazmtcorelib_api.h"
 #include "rt64_extended_gbi.h"
+#include "colorfixes.h"
+
+RECOMP_IMPORT("*", u32 z64recomp_get_bowstring_transform_id());
 
 Gfx gPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
     gsSPEndDisplayList(),
 };
 
-static Gfx sSetBilerpDL[] = {
+static Gfx sStartDLWrapper[] = {
+    gsSPNoOp(), // gEXPushEnvColor
+    gsSPEndDisplayList(),
+};
+
+static Gfx sEndDLWrapper[] = {
+    gsSPNoOp(), // gEXPopEnvColor
     gsDPSetTextureFilter(G_TF_BILERP),
     gsSPEndDisplayList(),
 };
+
+static Gfx sStartBowStringDL[] = {
+    // Two commands worth of space for the gEXMatrixGroup.
+    gsSPNoOp(),
+    gsSPNoOp(),
+
+    gsSPMatrix(&gIdentityMtx, G_MTX_MODELVIEW | G_MTX_NOPUSH | G_MTX_MUL),
+    gsSPEndDisplayList(),
+};
+
+static Gfx sEndBowstringDL[] = {
+    gsSPNoOp(),
+    gsSPBranchList(sEndDLWrapper),
+};
+
+RECOMP_CALLBACK("*", recomp_on_init)
+void initExDLs() {
+    gEXPushEnvColor(&sStartDLWrapper[0]);
+    gEXPopEnvColor(&sEndDLWrapper[0]);
+    gEXMatrixGroupSimple(&sStartBowStringDL[0], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
+                         G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_ORDER_LINEAR, G_EX_EDIT_NONE);
+    gEXPopMatrixGroup(&sEndBowstringDL[0], G_MTX_MODELVIEW);
+}
 
 void initFormProxyShims(Link_FormProxy *formProxy) {
 
@@ -612,37 +644,16 @@ void initFormProxySkeleton(Link_FormProxy *formProxy) {
 #undef SET_LIMB_DL
 }
 
-RECOMP_IMPORT("*", u32 z64recomp_get_bowstring_transform_id());
-
 void initBowWrapper(Link_FormProxy *formProxy) {
-    static Gfx sStartBowStringDL[] = {
-        // Two commands worth of space for the gEXMatrixGroup.
-        gsSPNoOp(),
-        gsSPNoOp(),
-
-        gsSPMatrix(&gIdentityMtx, G_MTX_MODELVIEW | G_MTX_NOPUSH | G_MTX_MUL),
-        gsSPEndDisplayList(),
-    };
-
-    gEXMatrixGroupSimple(&sStartBowStringDL[0], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
-                         G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_ORDER_LINEAR, G_EX_EDIT_NONE);
-
-    static Gfx sEndBowstringDL[] = {
-        gsSPNoOp(),
-        gsSPBranchList(sSetBilerpDL),
-    };
-
-    gEXPopMatrixGroup(&sEndBowstringDL[0], G_MTX_MODELVIEW);
-
     gSPDisplayList(&formProxy->wrappedDisplayLists[LINK_DL_BOW_STRING].displayList[WRAPPED_DL_PREDRAW], sStartBowStringDL);
     gSPBranchList(&formProxy->wrappedDisplayLists[LINK_DL_BOW_STRING].displayList[WRAPPED_DL_POSTDRAW], sEndBowstringDL);
 }
 
 void initFormProxyWrappers(Link_FormProxy *formProxy) {
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        gSPDisplayList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_PREDRAW], gEmptyDL);
+        gSPDisplayList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_PREDRAW], sStartDLWrapper);
         gSPDisplayList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
-        gSPBranchList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_POSTDRAW], sSetBilerpDL);
+        gSPBranchList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_POSTDRAW], sEndDLWrapper);
     }
 
     initBowWrapper(formProxy);
