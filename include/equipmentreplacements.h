@@ -12,13 +12,13 @@ typedef struct {
 typedef struct {
     Link_EquipmentMatrix target;
     Mtx *replacement;
-} Link_EquipmentMatrixtOverride;
+} Link_EquipmentMatrixOverride;
 
 typedef struct {
     size_t numDLOverrides;
     Link_DisplayListOverride *DLOverrides;
     size_t *numMtxOverrides;
-    Link_EquipmentMatrixtOverride *mtxOverrides;
+    Link_EquipmentMatrixOverride *mtxOverrides;
 } Link_EquipmentReplacement;
 
 typedef struct {
