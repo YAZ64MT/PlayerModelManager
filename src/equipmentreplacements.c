@@ -43,6 +43,20 @@ void createSwordOverride(Link_EquipmentReplacement *equipRepl, Link_DisplayList 
     Link_EquipmentMatrixOverride_init(&equipRepl->mtxOverrides[0], hiltBackMtx);
 }
 
+void createBgsOverride(Link_EquipmentReplacement *equipRepl) {
+    equipRepl->numDLOverrides = 5;
+    equipRepl->DLOverrides = allocDLOverrides(equipRepl->numDLOverrides);
+    Link_DisplayListOverride_init(&equipRepl->DLOverrides[0], LINK_DL_SWORD4_HILT);
+    Link_DisplayListOverride_init(&equipRepl->DLOverrides[1], LINK_DL_SWORD4_BLADE);
+    Link_DisplayListOverride_init(&equipRepl->DLOverrides[2], LINK_DL_SWORD4_SHEATH);
+    Link_DisplayListOverride_init(&equipRepl->DLOverrides[2], LINK_DL_SWORD4_BLADE_BROKEN);
+    Link_DisplayListOverride_init(&equipRepl->DLOverrides[2], LINK_DL_SWORD4_BLADE_FRAGMENT);
+
+    equipRepl->numMtxOverrides = 1;
+    equipRepl->mtxOverrides = allocMtxOverrides(equipRepl->numMtxOverrides);
+    Link_EquipmentMatrixOverride_init(&equipRepl->mtxOverrides[0], LINK_EQUIP_MATRIX_SWORD4_BACK);
+}
+
 void createShieldOverride(Link_EquipmentReplacement *equipRepl, Link_DisplayList shield, Link_EquipmentMatrix backMtx) {
     equipRepl->numDLOverrides = 1;
     equipRepl->DLOverrides = allocDLOverrides(equipRepl->numDLOverrides);
@@ -91,7 +105,7 @@ void Link_EquipmentReplacements_init(Link_EquipmentReplacements *equipRepls) {
     CREATE_SWORD_OVERRIDE(1);
     CREATE_SWORD_OVERRIDE(2);
     CREATE_SWORD_OVERRIDE(3);
-    CREATE_SWORD_OVERRIDE(4);
+    createBgsOverride(&equipRepls[LINK_DL_REPLACE_SWORD4]);
     CREATE_SWORD_OVERRIDE(5);
 #undef CREATE_SWORD_OVERRIDE
 
