@@ -17,7 +17,7 @@ typedef struct {
 typedef struct {
     size_t numDLOverrides;
     Link_DisplayListOverride *DLOverrides;
-    size_t *numMtxOverrides;
+    size_t numMtxOverrides;
     Link_EquipmentMatrixOverride *mtxOverrides;
 } Link_EquipmentReplacement;
 
