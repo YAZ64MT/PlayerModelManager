@@ -68,7 +68,8 @@ void createShieldOverride(Link_EquipmentReplacement *equipRepl, Link_DisplayList
 }
 
 void createBowOverride(Link_EquipmentReplacement *equipRepl) {
-    equipRepl->DLOverrides = allocDLOverrides(4);
+    equipRepl->numDLOverrides = 4;
+    equipRepl->DLOverrides = allocDLOverrides(equipRepl->numDLOverrides);
     Link_DisplayListOverride_init(&equipRepl->DLOverrides[0], LINK_DL_BOW);
     Link_DisplayListOverride_init(&equipRepl->DLOverrides[1], LINK_DL_FPS_BOW);
     Link_DisplayListOverride_init(&equipRepl->DLOverrides[2], LINK_DL_BOW_STRING);
@@ -79,7 +80,8 @@ void createBowOverride(Link_EquipmentReplacement *equipRepl) {
 }
 
 void createSlingshotOverride(Link_EquipmentReplacement *equipRepl) {
-    equipRepl->DLOverrides = allocDLOverrides(2);
+    equipRepl->numDLOverrides = 2;
+    equipRepl->DLOverrides = allocDLOverrides(equipRepl->numDLOverrides);
     Link_DisplayListOverride_init(&equipRepl->DLOverrides[0], LINK_DL_SLINGSHOT);
     Link_DisplayListOverride_init(&equipRepl->DLOverrides[1], LINK_DL_SLINGSHOT_STRING);
 
@@ -88,7 +90,8 @@ void createSlingshotOverride(Link_EquipmentReplacement *equipRepl) {
 }
 
 void createHookshotOverride(Link_EquipmentReplacement *equipRepl) {
-    equipRepl->DLOverrides = allocDLOverrides(5);
+    equipRepl->numDLOverrides = 5;
+    equipRepl->DLOverrides = allocDLOverrides(equipRepl->numDLOverrides);
     Link_DisplayListOverride_init(&equipRepl->DLOverrides[0], LINK_DL_HOOKSHOT);
     Link_DisplayListOverride_init(&equipRepl->DLOverrides[1], LINK_DL_FPS_HOOKSHOT);
     Link_DisplayListOverride_init(&equipRepl->DLOverrides[2], LINK_DL_HOOKSHOT_CHAIN);
