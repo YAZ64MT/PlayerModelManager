@@ -116,14 +116,14 @@ typedef enum {
     LINK_DL_MASK_BLAST_COOLING_DOWN,
     LINK_DL_MASK_SCENTS,
     LINK_DL_MASK_GIANT,
-    LINK_DL_MASK_DEKU,         // Only used if model is Deku
-    LINK_DL_MASK_GORON,        // Only used if model is Goron
-    LINK_DL_MASK_ZORA,         // Only used if model is Zora
-    LINK_DL_MASK_FIERCE_DEITY, // Only used if model is Fierce Deity
-    LINK_DL_MASK_DEKU_SCREAM,  // Only used if model is Deku
-    LINK_DL_MASK_GORON_SCREAM, // Only used if model is Goron
-    LINK_DL_MASK_ZORA_SCREAM,  // Only used if model is Zora
-    LINK_DL_MASK_FIERCE_DEITY_SCREAM,
+    LINK_DL_MASK_DEKU,                // Only used if model is Deku
+    LINK_DL_MASK_GORON,               // Only used if model is Goron
+    LINK_DL_MASK_ZORA,                // Only used if model is Zora
+    LINK_DL_MASK_FIERCE_DEITY,        // Only used if model is Fierce Deity
+    LINK_DL_MASK_DEKU_SCREAM,         // Only used if model is Deku
+    LINK_DL_MASK_GORON_SCREAM,        // Only used if model is Goron
+    LINK_DL_MASK_ZORA_SCREAM,         // Only used if model is Zora
+    LINK_DL_MASK_FIERCE_DEITY_SCREAM, // Only used if model is Fierce Deity
 
     // Elegy of Emptiness statues
     LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN, // Only used if model is human
@@ -488,9 +488,12 @@ typedef enum {
     LINK_DL_REPLACE_MASK_STONE,
     LINK_DL_REPLACE_MASK_BREMEN,
     LINK_DL_REPLACE_MASK_BLAST,
-    LINK_DL_REPLACE_MASK_BLAST_COOLING_DOWN,
     LINK_DL_REPLACE_MASK_SCENTS,
     LINK_DL_REPLACE_MASK_GIANT,
+    LINK_DL_REPLACE_MASK_DEKU,
+    LINK_DL_REPLACE_MASK_GORON,
+    LINK_DL_REPLACE_MASK_ZORA,
+    LINK_DL_REPLACE_MASK_FIERCE_DEITY,
     LINK_DL_REPLACE_MAX,
 } Link_DLReplacementId;
 
