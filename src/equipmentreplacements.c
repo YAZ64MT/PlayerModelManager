@@ -103,6 +103,16 @@ void createHookshotOverride(Link_EquipmentReplacement *equipRepl) {
     Link_EquipmentMatrixOverride_init(&equipRepl->mtxOverrides[0], LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK);
 }
 
+void createBottleOverride(Link_EquipmentReplacement *equipRepl) {
+    equipRepl->numDLOverrides = 2;
+    equipRepl->DLOverrides = allocDLOverrides(equipRepl->numDLOverrides);
+    Link_DisplayListOverride_init(&equipRepl->DLOverrides[0], LINK_DL_BOTTLE_GLASS);
+    Link_DisplayListOverride_init(&equipRepl->DLOverrides[1], LINK_DL_BOTTLE_CONTENTS);
+
+    equipRepl->numMtxOverrides = 0;
+    equipRepl->mtxOverrides = NULL;
+}
+
 void Link_EquipmentReplacements_init(Link_EquipmentReplacements *equipRepls) {
 #define CREATE_SWORD_OVERRIDE(swordNum) createSwordOverride(&equipRepls[LINK_DL_REPLACE_SWORD##swordNum], LINK_DL_SWORD##swordNum##_HILT, LINK_DL_SWORD##swordNum##_BLADE, LINK_DL_SWORD##swordNum##_SHEATH, LINK_EQUIP_MATRIX_SWORD##swordNum##_BACK);
     CREATE_SWORD_OVERRIDE(1);
@@ -121,4 +131,5 @@ void Link_EquipmentReplacements_init(Link_EquipmentReplacements *equipRepls) {
     createBowOverride(&equipRepls[LINK_DL_REPLACE_BOW]);
     createHookshotOverride(&equipRepls[LINK_DL_REPLACE_HOOKSHOT]);
     createSlingshotOverride(&equipRepls[LINK_DL_REPLACE_SLINGSHOT]);
+    createBottleOverride(&equipRepls[LINK_DL_REPLACE_BOTTLE]);
 }
