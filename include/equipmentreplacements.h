@@ -10,8 +10,19 @@ typedef struct {
 } Link_DisplayListOverride;
 
 typedef struct {
-    size_t numOverrides;
-    Link_DisplayListOverride* overrides;
+    Link_EquipmentMatrix target;
+    Mtx *replacement;
+} Link_EquipmentMatrixtOverride;
+
+typedef struct {
+    size_t numDLOverrides;
+    Link_DisplayListOverride *DLOverrides;
+    size_t *numMtxOverrides;
+    Link_EquipmentMatrixtOverride *mtxOverrides;
 } Link_EquipmentReplacement;
+
+typedef struct {
+    Link_EquipmentReplacement replacements[LINK_DL_REPLACE_MAX];
+} Link_EquipmentReplacements;
 
 #endif
