@@ -90,4 +90,8 @@ void Link_EquipmentReplacements_init(Link_EquipmentReplacements *equipRepls) {
     CREATE_SHIELD_OVERRIDE(1);
     CREATE_SHIELD_OVERRIDE(2);
     CREATE_SHIELD_OVERRIDE(3);
+#undef CREATE_SHIELD_OVERRIDE
+
+    createBowOverride(&equipRepls[LINK_DL_REPLACE_BOW]);
+    createHookshotOverride(&equipRepls[LINK_DL_REPLACE_HOOKSHOT]);
 }
