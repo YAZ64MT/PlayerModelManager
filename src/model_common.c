@@ -305,6 +305,30 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
         dl = formProxy->current.models[target];
     }
 
+    // Use third person models in first person if third person model exists but not first person
+    if (!dl) {
+        Link_DisplayList thirdPersonTarget = target;
+
+        switch (target) {
+            case LINK_DL_FPS_HOOKSHOT:
+                thirdPersonTarget = LINK_DL_HOOKSHOT;
+                break;
+            
+            case LINK_DL_FPS_BOW:
+                thirdPersonTarget = LINK_DL_BOW;
+                break;
+
+            case LINK_DL_FPS_SLINGSHOT:
+                thirdPersonTarget = LINK_DL_SLINGSHOT;
+                break;
+
+            default:
+                break;
+        }
+
+        dl = formProxy->current.models[thirdPersonTarget];
+    }
+
     if (!dl) {
         dl = formProxy->vanilla.models[target];
     }
