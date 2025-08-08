@@ -1,6 +1,8 @@
 #include "global.h"
 #include "modding.h"
 #include "recompconfig.h"
+#include "rt64_extended_gbi.h"
+#include "colorfixes.h"
 
 typedef struct {
     u8 r;
@@ -31,16 +33,6 @@ void setTunicColor(u8 r, u8 g, u8 b, u8 a) {
     sRequestedTunicColor.g = g;
     sRequestedTunicColor.b = b;
     sRequestedTunicColor.a = a;
-}
-
-void fixTunicColor(PlayState *play) {
-    if (recomp_get_config_u32("is_modify_tunic_color")) {
-        OPEN_DISPS(play->state.gfxCtx);
-
-        gDPSetEnvColor(POLY_OPA_DISP++, sTunicColor.r, sTunicColor.g, sTunicColor.b, sTunicColor.a);
-
-        CLOSE_DISPS(play->state.gfxCtx);
-    }
 }
 
 // Convert char to its numeric value
@@ -88,7 +80,7 @@ typedef enum {
 } TunicColorConfigOption;
 
 RECOMP_HOOK("Player_Draw")
-void readTunicColor_on_Player_DrawGameplay(PlayState *play, Player *this, s32 lod, Gfx *cullDList, OverrideLimbDrawFlex overrideLimbDraw) {
+void readTunicColor_on_Player_Draw(Actor *thisx, PlayState *play) {
     TunicColorConfigOption tunicColorOpt = recomp_get_config_u32("is_modify_tunic_color");
 
     bool shouldPullFromConfig = false;
@@ -104,6 +96,7 @@ void readTunicColor_on_Player_DrawGameplay(PlayState *play, Player *this, s32 lo
 
         case TUNIC_COLOR_FORCE:
             shouldPullFromConfig = true;
+            break;
 
         default:
             break;
@@ -122,16 +115,10 @@ void readTunicColor_on_Player_DrawGameplay(PlayState *play, Player *this, s32 lo
             recomp_free_config_string(color);
         }
     }
-}
 
-RECOMP_HOOK("Player_OverrideLimbDrawGameplayDefault")
-void Recolor_OverrideLimbDrawDefault(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
-    fixTunicColor(play);
-}
-
-RECOMP_HOOK("Player_OverrideLimbDrawGameplayFirstPerson")
-void Recolor_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
-    fixTunicColor(play);
+    OPEN_DISPS(play->state.gfxCtx);
+    gDPSetEnvColor(POLY_OPA_DISP++, sTunicColor.r, sTunicColor.g, sTunicColor.b, sTunicColor.a);
+    CLOSE_DISPS(play->state.gfxCtx);
 }
 
 extern Color_RGB8 sPlayerBottleColors[];
