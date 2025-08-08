@@ -28,3 +28,7 @@ static Link_DisplayList sBowDLs[] = {LINK_DL_BOW, LINK_DL_FPS_BOW, LINK_DL_BOW_S
 static Link_DisplayList sSlingshotDLs[] = {LINK_DL_SLINGSHOT, LINK_DL_FPS_SLINGSHOT, LINK_DL_SLINGSHOT_STRING};
 
 static Link_DisplayList sBottleDLs[] = {LINK_DL_BOTTLE_GLASS, LINK_DL_BOTTLE_CONTENTS};
+
+static Link_DisplayList sOcarinaFairyDLs[] = {LINK_DL_OCARINA_FAIRY};
+
+static Link_DisplayList sOcarinaTimeDLs[] = {LINK_DL_OCARINA_TIME};
