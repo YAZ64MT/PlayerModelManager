@@ -32,3 +32,5 @@ static Link_DisplayList sBottleDLs[] = {LINK_DL_BOTTLE_GLASS, LINK_DL_BOTTLE_CON
 static Link_DisplayList sOcarinaFairyDLs[] = {LINK_DL_OCARINA_FAIRY};
 
 static Link_DisplayList sOcarinaTimeDLs[] = {LINK_DL_OCARINA_TIME};
+
+static Link_DisplayList sBoomerangDLs[] = {LINK_DL_BOOMERANG, LINK_DL_BOOMERANG_FLYING};
