@@ -19,6 +19,6 @@ typedef struct {
     EquipmentOverrideMtxs mtx;
 } EquipmentOverride;
 
-extern EquipmentOverride gEquipmentOverrideTable[LINK_DL_REPLACE_MAX];
+extern const EquipmentOverride gEquipmentOverrideTable[LINK_DL_REPLACE_MAX];
 
 #endif
