@@ -313,6 +313,9 @@ typedef enum {
     // First Person Bow
     PMM_DL_FPS_BOW,
 
+    // First Person Slingshot
+    PMM_DL_FPS_SLINGSHOT,
+
     PMM_DL_MAX
 } PlayerModelManagerDisplayListId;
 

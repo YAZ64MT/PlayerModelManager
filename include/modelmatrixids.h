@@ -309,6 +309,9 @@ typedef enum {
     // First Person Bow
     LINK_DL_FPS_BOW,
 
+    // First Person Slingshot
+    LINK_DL_FPS_SLINGSHOT,
+
     LINK_DL_MAX
 } Link_DisplayList;
 
