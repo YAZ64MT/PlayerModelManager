@@ -34,3 +34,67 @@ static Link_DisplayList sOcarinaFairyDLs[] = {LINK_DL_OCARINA_FAIRY};
 static Link_DisplayList sOcarinaTimeDLs[] = {LINK_DL_OCARINA_TIME};
 
 static Link_DisplayList sBoomerangDLs[] = {LINK_DL_BOOMERANG, LINK_DL_BOOMERANG_FLYING};
+
+static Link_DisplayList sHammerDLs[] = {LINK_DL_HAMMER};
+
+static Link_DisplayList sDekuStickDLs[] = {LINK_DL_DEKU_STICK};
+
+static Link_DisplayList sPipesDLs[] = {LINK_DL_PIPE_MOUTH, LINK_DL_PIPE_A, LINK_DL_PIPE_DOWN, LINK_DL_PIPE_LEFT, LINK_DL_PIPE_RIGHT, LINK_DL_PIPE_UP};
+
+static Link_DisplayList sDrumsDLs[] = {LINK_DL_DRUM_STRAP, LINK_DL_DRUM_A, LINK_DL_DRUM_DOWN, LINK_DL_DRUM_LEFT, LINK_DL_DRUM_RIGHT, LINK_DL_DRUM_UP};
+
+static Link_DisplayList sGuitarDLs[] = {LINK_DL_GUITAR};
+
+static Link_DisplayList sMaskSkullDLs[] = {LINK_DL_MASK_SKULL};
+
+static Link_DisplayList sMaskSpookyDLs[] = {LINK_DL_MASK_SPOOKY};
+
+static Link_DisplayList sMaskGerudoDLs[] = {LINK_DL_MASK_GERUDO};
+
+static Link_DisplayList sMaskTruthDLs[] = {LINK_DL_MASK_TRUTH};
+
+static Link_DisplayList sMaskKafeisMaskDLs[] = {LINK_DL_MASK_KAFEIS_MASK};
+
+static Link_DisplayList sMaskAllNightDLs[] = {LINK_DL_MASK_ALL_NIGHT};
+
+static Link_DisplayList sMaskBunnyDLs[] = {LINK_DL_MASK_BUNNY};
+
+static Link_DisplayList sMaskKeatonDLs[] = {LINK_DL_MASK_KEATON};
+
+static Link_DisplayList sMaskGaroDLs[] = {LINK_DL_MASK_GARO};
+
+static Link_DisplayList sMaskRomaniDLs[] = {LINK_DL_MASK_ROMANI};
+
+static Link_DisplayList sMaskCircusLeaderDLs[] = {LINK_DL_MASK_CIRCUS_LEADER};
+
+static Link_DisplayList sMaskCoupleDLs[] = {LINK_DL_MASK_COUPLE};
+
+static Link_DisplayList sMaskPostmanDLs[] = {LINK_DL_MASK_POSTMAN};
+
+static Link_DisplayList sMaskGreatFairyDLs[] = {LINK_DL_MASK_GREAT_FAIRY};
+
+static Link_DisplayList sMaskGibdoDLs[] = {LINK_DL_MASK_GIBDO};
+
+static Link_DisplayList sMaskDonGeroDLs[] = {LINK_DL_MASK_DON_GERO};
+
+static Link_DisplayList sMaskKamaroDLs[] = {LINK_DL_MASK_KAMARO};
+
+static Link_DisplayList sMaskCaptainDLs[] = {LINK_DL_MASK_CAPTAIN};
+
+static Link_DisplayList sMaskStoneDLs[] = {LINK_DL_MASK_STONE};
+
+static Link_DisplayList sMaskBremenDLs[] = {LINK_DL_MASK_BREMEN};
+
+static Link_DisplayList sMaskBlastDLs[] = {LINK_DL_MASK_BLAST, LINK_DL_MASK_BLAST_COOLING_DOWN};
+
+static Link_DisplayList sMaskScentsDLs[] = {LINK_DL_MASK_SCENTS};
+
+static Link_DisplayList sMaskGiantDLs[] = {LINK_DL_MASK_GIANT};
+
+static Link_DisplayList sMaskDekuDLs[] = {LINK_DL_MASK_DEKU, LINK_DL_MASK_DEKU_SCREAM};
+
+static Link_DisplayList sMaskGoronDLs[] = {LINK_DL_MASK_GORON, LINK_DL_MASK_GORON_SCREAM};
+
+static Link_DisplayList sMaskZoraDLs[] = {LINK_DL_MASK_ZORA, LINK_DL_MASK_ZORA_SCREAM};
+
+static Link_DisplayList sMaskFierceDeityDLs[] = {LINK_DL_MASK_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY_SCREAM};
