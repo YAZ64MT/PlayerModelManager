@@ -24,3 +24,5 @@ static Link_DisplayList sHookshotDLs[] = {LINK_DL_HOOKSHOT, LINK_DL_FPS_HOOKSHOT
 static Link_EquipmentMatrix sHookshotMtxs[] = {LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK};
 
 static Link_DisplayList sBowDLs[] = {LINK_DL_BOW, LINK_DL_FPS_BOW, LINK_DL_BOW_STRING, LINK_DL_BOW_ARROW};
+
+static Link_DisplayList sSlingshotDLs[] = {LINK_DL_SLINGSHOT, LINK_DL_FPS_SLINGSHOT, LINK_DL_SLINGSHOT_STRING};
