@@ -49,4 +49,6 @@ void ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx);
 
 void ModelEntryForm_init(ModelEntryForm *this);
 
+void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacement type);
+
 #endif

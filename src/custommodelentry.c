@@ -69,6 +69,12 @@ void ModelEntryForm_init(ModelEntryForm *this) {
     Lib_MemSet(this->eyesTex, 0, sizeof(this->eyesTex));
 }
 
+void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacement type) {
+    ModelEntry_init(&entry->modelEntry);
+
+    entry->equipType = type;
+}
+
 Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
     uintptr_t ret = 0;
     recomputil_u32_value_hashmap_get(entry->displayListPtrs, id, &ret);
