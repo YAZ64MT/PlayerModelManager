@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "modelmatrixids.h"
+#include "recompdata.h"
 
 #define PLAYER_LIMB_COUNT 21
 #define PLAYER_BODY_SHIELD_LIMB_COUNT 4
@@ -41,6 +42,8 @@ typedef struct {
     PlayerTransformation form;
     Link_ModelInfo current;
     Link_ModelInfo vanilla;
+    U32ValueHashmapHandle gfxOverrides;
+    U32ValueHashmapHandle mtxOverrides;
     Link_SkeletonProxy skeleton;
     Link_ShieldingSkeletonProxy shieldingSkeleton;
     Gfx *shimDisplayListPtrs[LINK_SHIMDL_MAX];

@@ -13,6 +13,9 @@
 #include "externs_z_player_lib.h"
 #include "model_shared.h"
 
+U32ValueHashmapHandle gLinkEquipmentGfxOverrides;
+U32ValueHashmapHandle gLinkEquipmentMtxOverrides;
+
 Link_FormProxy gLinkFormProxies[PLAYER_FORM_MAX];
 
 void changeFormPtrsToProxy(PlayerTransformation playerForm) {
@@ -149,8 +152,20 @@ RECOMP_DECLARE_EVENT(_internal_setupVanillaModels());
 
 // initialize player models as blank display lists
 void initFormProxies() {
+    if (!gLinkEquipmentGfxOverrides) {
+        gLinkEquipmentGfxOverrides = recomputil_create_u32_value_hashmap();
+    }
+
+    if (!gLinkEquipmentMtxOverrides) {
+        gLinkEquipmentMtxOverrides = recomputil_create_u32_value_hashmap();
+    }
+
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
         Link_FormProxy *formProxy = &gLinkFormProxies[i];
+
+        formProxy->gfxOverrides = gLinkEquipmentGfxOverrides;
+
+        formProxy->mtxOverrides = gLinkEquipmentMtxOverrides;
 
         clearLinkModelInfo(&formProxy->current);
 

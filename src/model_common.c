@@ -305,6 +305,10 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
         dl = formProxy->current.models[target];
     }
 
+    if (!dl) {
+        recomputil_u32_value_hashmap_get(formProxy->gfxOverrides, target, (uintptr_t *)&dl);
+    }
+
     // Use third person models in first person if third person model exists but not first person
     if (!dl) {
         Link_DisplayList thirdPersonTarget = target;
@@ -498,7 +502,13 @@ Mtx *getFormProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
 }
 
 void refreshProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
-    Mtx *matrix = formProxy->current.equipMtx[mtxId];
+    Mtx *matrix = NULL;
+
+    recomputil_u32_value_hashmap_get(formProxy->mtxOverrides, mtxId, (uintptr_t *)&matrix);
+
+    if (!matrix) {
+        formProxy->current.equipMtx[mtxId];
+    }
 
     if (!matrix) {
         matrix = formProxy->vanilla.equipMtx[mtxId];
