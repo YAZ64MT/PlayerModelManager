@@ -4,6 +4,7 @@
 #include "global.h"
 #include "playermodelmanager.h"
 #include "playermodelmanager_api.h"
+#include "equipmentoverrides.h"
 #include "recompdata.h"
 
 // This is the max file name length for most Linux distros and MacOS
@@ -30,6 +31,11 @@ typedef struct {
     TexturePtr eyesTex[PLAYER_EYES_MAX];
     TexturePtr mouthTex[PLAYER_MOUTH_MAX];
 } ModelEntryForm;
+
+typedef struct {
+    ModelEntry modelEntry;
+    Link_EquipmentReplacement equipType;
+} ModelEntryEquipment;
 
 void ModelEntry_init(ModelEntry *entry);
 
