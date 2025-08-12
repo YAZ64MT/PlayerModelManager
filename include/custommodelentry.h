@@ -16,6 +16,8 @@ typedef struct {
     char *internalName;
     char *authorName;
     bool (*applyToModelInfo)(void *this, Link_ModelInfo *modelInfo);
+    bool (*setDisplayList)(ModelEntry *this, Link_DisplayList id, Gfx *dl);
+    bool (*setMatrix)(ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx);
     PlayerModelManagerEventHandler* callback;
     void *callbackData;
     PlayerModelManagerHandle handle;
@@ -41,11 +43,11 @@ void ModelEntry_init(ModelEntry *entry);
 
 Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id);
 
-void ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl);
+bool ModelEntry_setDisplayList(ModelEntry *this, Link_DisplayList id, Gfx *dl);
 
 Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id);
 
-void ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx);
+bool ModelEntry_setMatrix(ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx);
 
 void ModelEntryForm_init(ModelEntryForm *this);
 
