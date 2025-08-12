@@ -20,7 +20,37 @@ void ModelEntry_init(ModelEntry *entry) {
     entry->setMatrix = ModelEntry_setMatrix;
 }
 
-bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
+Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
+    uintptr_t ret = 0;
+    recomputil_u32_value_hashmap_get(entry->displayListPtrs, id, &ret);
+    return (Gfx *)ret;
+}
+
+bool ModelEntry_setDisplayList(ModelEntry *this, Link_DisplayList id, Gfx *dl) {
+    if (id >= LINK_DL_MAX || id < 0) {
+        return false;
+    }
+
+    recomputil_u32_value_hashmap_insert(this->displayListPtrs, id, (uintptr_t)dl);
+    return true;
+}
+
+Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
+    uintptr_t ret = 0;
+    recomputil_u32_value_hashmap_get(entry->matrixPtrs, id, &ret);
+    return (Mtx *)ret;
+}
+
+void ModelEntry_setMatrix(ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx) {
+    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
+        return false;
+    }
+
+    recomputil_u32_value_hashmap_insert(this->matrixPtrs, id, (uintptr_t)mtx);
+    return true;
+}
+
+bool ModelEntryForm_applyToModelInfo(void *thisx, Link_ModelInfo *modelInfo) {
     clearLinkModelInfo(modelInfo);
 
     ModelEntryForm *this = thisx;
@@ -54,36 +84,6 @@ bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
-Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
-    uintptr_t ret = 0;
-    recomputil_u32_value_hashmap_get(entry->displayListPtrs, id, &ret);
-    return (Gfx *)ret;
-}
-
-bool ModelEntry_setDisplayList(ModelEntry *this, Link_DisplayList id, Gfx *dl) {
-    if (id >= LINK_DL_MAX || id < 0) {
-        return false;
-    }
-
-    recomputil_u32_value_hashmap_insert(this->displayListPtrs, id, (uintptr_t)dl);
-    return true;
-}
-
-Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
-    uintptr_t ret = 0;
-    recomputil_u32_value_hashmap_get(entry->matrixPtrs, id, &ret);
-    return (Mtx *)ret;
-}
-
-void ModelEntry_setMatrix(ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx) {
-    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
-        return false;
-    }
-
-    recomputil_u32_value_hashmap_insert(this->matrixPtrs, id, (uintptr_t)mtx);
-    return true;
-}
-
 void ModelEntryForm_init(ModelEntryForm *this) {
     ModelEntry_init(&this->modelEntry);
 
@@ -93,7 +93,7 @@ void ModelEntryForm_init(ModelEntryForm *this) {
         }
     }
 
-    this->modelEntry.applyToModelInfo = applyFormEntry;
+    this->modelEntry.applyToModelInfo = ModelEntryForm_applyToModelInfo;
 
     this->skel = NULL;
 
