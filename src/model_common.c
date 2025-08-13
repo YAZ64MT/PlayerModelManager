@@ -302,11 +302,11 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
     Gfx *dl = getListenerDL(formProxy, target);
 
     if (!dl) {
-        dl = formProxy->current.models[target];
+        dl = formProxy->current.modelInfo.models[target];
     }
 
     if (!dl) {
-        recomputil_u32_value_hashmap_get(formProxy->gfxOverrides, target, (uintptr_t *)&dl);
+        recomputil_u32_value_hashmap_get(formProxy->current.gfxOverrides, target, (uintptr_t *)&dl);
     }
 
     // Use third person models in first person if third person model exists but not first person
@@ -330,7 +330,7 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
                 break;
         }
 
-        dl = formProxy->current.models[thirdPersonTarget];
+        dl = formProxy->current.modelInfo.models[thirdPersonTarget];
     }
 
     if (!dl) {
@@ -412,7 +412,7 @@ void refreshProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
 
 void refreshProxyDLs(Link_FormProxy *formProxy) {
     WrappedDisplayList *wDLs = formProxy->wrappedDisplayLists;
-    Link_ModelInfo *current = &formProxy->current;
+    Link_ModelInfo *current = &formProxy->current.modelInfo;
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
@@ -473,7 +473,7 @@ extern TexturePtr sPlayerEyesTextures[];
 extern TexturePtr sPlayerMouthTextures[];
 
 void matchFaceTexturesToProxy(Link_FormProxy *formProxy) {
-    Link_ModelInfo *current = &formProxy->current;
+    Link_ModelInfo *current = &formProxy->current.modelInfo;
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
     for (u32 i = 0; i < PLAYER_EYES_MAX; ++i) {
@@ -504,10 +504,10 @@ Mtx *getFormProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
 void refreshProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
     Mtx *matrix = NULL;
 
-    recomputil_u32_value_hashmap_get(formProxy->mtxOverrides, mtxId, (uintptr_t *)&matrix);
+    recomputil_u32_value_hashmap_get(formProxy->current.mtxOverrides, mtxId, (uintptr_t *)&matrix);
 
     if (!matrix) {
-        formProxy->current.equipMtx[mtxId];
+        matrix = formProxy->current.modelInfo.equipMtx[mtxId];
     }
 
     if (!matrix) {
@@ -524,7 +524,7 @@ void refreshProxyMatrix(Link_FormProxy *formProxy, Link_EquipmentMatrix mtxId) {
 }
 
 void refreshProxyMatrixes(Link_FormProxy *formProxy) {
-    Link_ModelInfo *current = &formProxy->current;
+    Link_ModelInfo *current = &formProxy->current.modelInfo;
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
@@ -559,7 +559,7 @@ static const Link_DisplayList LIMB_TO_DL_ENTRY[PLAYER_LIMB_COUNT] = {
 };
 
 void refreshProxySkeleton(Link_FormProxy *formProxy) {
-    FlexSkeletonHeader *skel = formProxy->current.skeleton;
+    FlexSkeletonHeader *skel = formProxy->current.modelInfo.skeleton;
 
     if (!skel) {
         skel = formProxy->vanilla.skeleton;
@@ -587,7 +587,7 @@ void refreshProxySkeleton(Link_FormProxy *formProxy) {
         formProxy->skeleton.flexSkeleton.dListCount = skel->dListCount;
     }
 
-    FlexSkeletonHeader *shieldSkel = formProxy->current.shieldingSkeleton;
+    FlexSkeletonHeader *shieldSkel = formProxy->current.modelInfo.shieldingSkeleton;
 
     if (!shieldSkel) {
         shieldSkel = formProxy->vanilla.shieldingSkeleton;

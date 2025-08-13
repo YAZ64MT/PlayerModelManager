@@ -19,6 +19,12 @@ typedef struct {
 } Link_ModelInfo;
 
 typedef struct {
+    Link_ModelInfo modelInfo;
+    U32ValueHashmapHandle gfxOverrides;
+    U32ValueHashmapHandle mtxOverrides;
+} Link_ModelInfoCustom;
+
+typedef struct {
     FlexSkeletonHeader flexSkeleton;
     StandardLimb *limbPtrs[PLAYER_BODY_SHIELD_LIMB_COUNT];
     StandardLimb limbs[PLAYER_BODY_SHIELD_LIMB_COUNT];
@@ -40,10 +46,8 @@ typedef struct {
 
 typedef struct {
     PlayerTransformation form;
-    Link_ModelInfo current;
+    Link_ModelInfoCustom current;
     Link_ModelInfo vanilla;
-    U32ValueHashmapHandle gfxOverrides;
-    U32ValueHashmapHandle mtxOverrides;
     Link_SkeletonProxy skeleton;
     Link_ShieldingSkeletonProxy shieldingSkeleton;
     Gfx *shimDisplayListPtrs[LINK_SHIMDL_MAX];

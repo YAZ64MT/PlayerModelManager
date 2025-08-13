@@ -10,20 +10,20 @@
 // This is the max file name length for most Linux distros and MacOS
 #define INTERNAL_NAME_MAX_LENGTH 255
 
-typedef struct {
+typedef struct ModelEntry {
     PlayerModelManagerModelType type;
     char *displayName;
     char *internalName;
     char *authorName;
-    bool (*applyToModelInfo)(void *this, Link_ModelInfo *modelInfo);
-    bool (*setDisplayList)(ModelEntry *this, Link_DisplayList id, Gfx *dl);
-    bool (*setMatrix)(ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx);
+    bool (*applyToModelInfo)(struct ModelEntry *this, Link_ModelInfoCustom *modelInfo);
+    bool (*setDisplayList)(struct ModelEntry *this, Link_DisplayList id, Gfx *dl);
+    bool (*setMatrix)(struct ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx);
     PlayerModelManagerEventHandler* callback;
     void *callbackData;
     PlayerModelManagerHandle handle;
     u64 flags;
     U32ValueHashmapHandle displayListPtrs;
-    U32ValueHashmapHandle matrixPtrs;
+    U32ValueHashmapHandle mtxPtrs;
 } ModelEntry;
 
 typedef struct {

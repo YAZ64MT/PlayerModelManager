@@ -40,7 +40,7 @@ void refreshProxyDLIfEntryLoaded(ModelEntryForm *entry, Link_DisplayList dlId) {
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
-        fp->current.models[dlId] = ModelEntry_getDisplayList(&entry->modelEntry, dlId);
+        fp->current.modelInfo.models[dlId] = ModelEntry_getDisplayList(&entry->modelEntry, dlId);
         requestRefreshFormProxyDL(&gLinkFormProxies[ENTRY_FORM(entry)], dlId);
     }
 }
@@ -49,7 +49,7 @@ void refreshProxyMtxIfEntryLoaded(ModelEntryForm *entry, Link_EquipmentMatrix mt
     Link_FormProxy *fp = ENTRY_LOADED_PROXY(entry);
 
     if (fp) {
-        fp->current.equipMtx[mtxId] = ModelEntry_getMatrix(&entry->modelEntry, mtxId);
+        fp->current.modelInfo.equipMtx[mtxId] = ModelEntry_getMatrix(&entry->modelEntry, mtxId);
         requestRefreshFormProxyMtx(&gLinkFormProxies[getFormFromModelType(entry->modelEntry.type)], mtxId);
     }
 }
@@ -59,7 +59,7 @@ void refreshProxyEyesTexturesIfEntryLoaded(ModelEntryForm *entry) {
 
     if (fp) {
         for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
-            fp->current.eyesTextures[i] = entry->eyesTex[i];
+            fp->current.modelInfo.eyesTextures[i] = entry->eyesTex[i];
         }
     }
 }
@@ -69,7 +69,7 @@ void refreshProxyMouthTexturesIfEntryLoaded(ModelEntryForm *entry) {
 
     if (fp) {
         for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-            fp->current.mouthTextures[i] = entry->mouthTex[i];
+            fp->current.modelInfo.mouthTextures[i] = entry->mouthTex[i];
         }
     }
 }

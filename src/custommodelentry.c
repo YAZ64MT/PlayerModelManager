@@ -15,7 +15,7 @@ void ModelEntry_init(ModelEntry *entry) {
     entry->handle = 0;
     entry->applyToModelInfo = NULL;
     entry->displayListPtrs = recomputil_create_u32_value_hashmap();
-    entry->matrixPtrs = recomputil_create_u32_value_hashmap();
+    entry->mtxPtrs = recomputil_create_u32_value_hashmap();
     entry->setDisplayList = ModelEntry_setDisplayList;
     entry->setMatrix = ModelEntry_setMatrix;
 }
@@ -37,23 +37,25 @@ bool ModelEntry_setDisplayList(ModelEntry *this, Link_DisplayList id, Gfx *dl) {
 
 Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
     uintptr_t ret = 0;
-    recomputil_u32_value_hashmap_get(entry->matrixPtrs, id, &ret);
+    recomputil_u32_value_hashmap_get(entry->mtxPtrs, id, &ret);
     return (Mtx *)ret;
 }
 
-void ModelEntry_setMatrix(ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx) {
+bool ModelEntry_setMatrix(ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx) {
     if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
         return false;
     }
 
-    recomputil_u32_value_hashmap_insert(this->matrixPtrs, id, (uintptr_t)mtx);
+    recomputil_u32_value_hashmap_insert(this->mtxPtrs, id, (uintptr_t)mtx);
     return true;
 }
 
-bool ModelEntryForm_applyToModelInfo(void *thisx, Link_ModelInfo *modelInfo) {
+bool ModelEntryForm_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *modelInfoCustom) {
+    Link_ModelInfo *modelInfo = &modelInfoCustom->modelInfo;
+
     clearLinkModelInfo(modelInfo);
 
-    ModelEntryForm *this = thisx;
+    ModelEntryForm *this = (ModelEntryForm *)((void *)thisx);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         modelInfo->models[i] = ModelEntry_getDisplayList(&this->modelEntry, i);
@@ -102,10 +104,10 @@ void ModelEntryForm_init(ModelEntryForm *this) {
     Lib_MemSet(this->eyesTex, 0, sizeof(this->eyesTex));
 }
 
-void ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
+bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-    EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
 
     // Count generally is very small (count < 10), so a simple linear search will do
     for (size_t i = 0; i < override->dl.count; ++i) {
@@ -117,10 +119,10 @@ void ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, 
     return false;
 }
 
-void ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *mtx) {
+bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *mtx) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-    EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
 
     // Count generally is very small (count < 10), so a simple linear search will do
     for (size_t i = 0; i < override->mtx.count; ++i) {
@@ -130,6 +132,29 @@ void ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, M
     }
 
     return false;
+}
+
+bool ModelEntryEquipment_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *modelInfoCustom) {
+    ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
+
+    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+
+    for (size_t i = 0; i < override->dl.count; ++i) {
+        Link_DisplayList id = override->dl.overrides[i];
+        uintptr_t dl = 0;
+        recomputil_u32_value_hashmap_get(this->modelEntry.displayListPtrs, id, &dl);
+        recomputil_u32_value_hashmap_insert(modelInfoCustom->gfxOverrides, id, dl);
+        
+    }
+
+    for (size_t i = 0; i < override->mtx.count; ++i) {
+        Link_EquipmentMatrix id = override->mtx.overrides[i];
+        uintptr_t dl = 0;
+        recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &dl);
+        recomputil_u32_value_hashmap_insert(modelInfoCustom->mtxOverrides, id, dl);
+    }
+
+    return true;
 }
 
 void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacement type) {

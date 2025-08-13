@@ -152,22 +152,14 @@ RECOMP_DECLARE_EVENT(_internal_setupVanillaModels());
 
 // initialize player models as blank display lists
 void initFormProxies() {
-    if (!gLinkEquipmentGfxOverrides) {
-        gLinkEquipmentGfxOverrides = recomputil_create_u32_value_hashmap();
-    }
-
-    if (!gLinkEquipmentMtxOverrides) {
-        gLinkEquipmentMtxOverrides = recomputil_create_u32_value_hashmap();
-    }
-
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
         Link_FormProxy *formProxy = &gLinkFormProxies[i];
 
-        formProxy->gfxOverrides = gLinkEquipmentGfxOverrides;
+        formProxy->current.gfxOverrides = recomputil_create_u32_value_hashmap();
 
-        formProxy->mtxOverrides = gLinkEquipmentMtxOverrides;
+        formProxy->current.mtxOverrides = recomputil_create_u32_value_hashmap();
 
-        clearLinkModelInfo(&formProxy->current);
+        clearLinkModelInfo(&formProxy->current.modelInfo);
 
         initFormProxy(formProxy, i);
 
