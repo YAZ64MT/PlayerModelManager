@@ -102,7 +102,7 @@ static Link_DisplayList sMaskFierceDeityDLs[] = {LINK_DL_MASK_FIERCE_DEITY, LINK
 static Link_EquipmentMatrix sEmptyMtxs[] = {};
 
 // clang-format off
-#define DECLARE_OVERRIDE_TABLE_ENTRY(disps, mtxs) {.dl = {.overrides = &disps, .count = ARRAY_COUNT(disps)}, .mtx = {.overrides = &mtxs, .count = ARRAY_COUNT(mtxs)}}
+#define DECLARE_OVERRIDE_TABLE_ENTRY(disps, mtxs) {.dl = {.overrides = disps, .count = ARRAY_COUNT(disps)}, .mtx = {.overrides = mtxs, .count = ARRAY_COUNT(mtxs)}}
 // clang-format on
 
 const EquipmentOverride gEquipmentOverrideTable[LINK_DL_REPLACE_MAX] = {
