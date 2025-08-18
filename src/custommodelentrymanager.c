@@ -17,12 +17,6 @@ static MemorySlotmapHandle sHandleToMemoryEntry;
 
 static YAZMTCore_StringU32Dictionary *sInternalNamesToEntries;
 
-typedef struct {
-    void **entries;
-    size_t count;
-    size_t capacity;
-} FormModelEntries;
-
 static YAZMTCore_DynamicU32Array *sMemoryEntries[PLAYER_FORM_MAX];
 
 static ModelEntry *sCurrentModelEntries[PLAYER_FORM_MAX];
