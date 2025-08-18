@@ -100,7 +100,7 @@ bool CMEM_forceApplyEntry(PlayerTransformation form, ModelEntry *newEntry) {
         return true;
     }
 
-    if (newEntry->applyToModelInfo(newEntry, &proxy->current.modelInfo)) {
+    if (newEntry->applyToModelInfo(newEntry, &proxy->current)) {
         if (currEntry && currEntry->callback) {
             currEntry->callback(currEntry->handle, PMM_EVENT_MODEL_REMOVED, currEntry->callbackData);
         }
