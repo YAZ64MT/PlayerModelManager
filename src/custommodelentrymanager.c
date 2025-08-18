@@ -11,9 +11,6 @@
 #include "yazmtcorelib_api.h"
 #include "z64recomp_interpolation.h"
 
-#define ARRAY_GROWTH_FACTOR 3 / 2
-#define ARRAY_STARTING_SIZE 16
-
 static bool sShouldSkipInterpolation[PLAYER_FORM_MAX];
 
 static MemorySlotmapHandle sHandleToMemoryEntry;
