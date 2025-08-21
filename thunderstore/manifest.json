@@ -1,6 +1,6 @@
 {
     "name": "Player_Model_Manager",
-    "version_number": "0.2.1",
+    "version_number": "0.3.0",
     "website_url": "https://github.com/YAZ64MT/PlayerModelManager",
     "description": "Easily swap Link's models.",
     "dependencies": [
