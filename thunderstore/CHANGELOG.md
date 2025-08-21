@@ -1,3 +1,12 @@
+### 0.3.0
+* ModelReplacer is now an optional dependency
+* Add first person bow/slingshot replacement options
+* Adult bow and arrow positions now match OoT
+* Bump required version of YAZMT Core
+* Fix Fierce Deity vanilla model using wrong bottle hand
+* Fix Kafei using adult door animation when adult model is equipped
+* More consistently use the right models when multiple Links are being drawn
+
 ### 0.2.1 (Pre-Thunderstore)
 * Fix player form properties being applied too early when removing a transformation mask
 * Fix equipment being drawn on the wrong limb if a custom model's fists were connected to the forearm
