@@ -4,6 +4,8 @@
     "website_url": "https://github.com/YAZ64MT/PlayerModelManager",
     "description": "Easily swap Link's models.",
     "dependencies": [
+        "YAZMT-YAZMT_Core-0.1.1",
+        "YAZMT-Global_Objects-0.1.1",
         "ProxyMM-KV-0.0.5"
     ]
 }
