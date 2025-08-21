@@ -13,16 +13,49 @@
 #include "globalobjects_api.h"
 #include "modelreplacer_compat.h"
 #include "yazmtcorelib_api.h"
+#include "rt64_extended_gbi.h"
+#include "colorfixes.h"
+
+RECOMP_IMPORT("*", u32 z64recomp_get_bowstring_transform_id());
 
 Gfx gPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
     gsSPEndDisplayList(),
 };
 
-static Gfx sSetBilerpDL[] = {
+static Gfx sStartDLWrapper[] = {
+    gsSPNoOp(), // gEXPushEnvColor
+    gsSPEndDisplayList(),
+};
+
+static Gfx sEndDLWrapper[] = {
+    gsSPNoOp(), // gEXPopEnvColor
     gsDPSetTextureFilter(G_TF_BILERP),
     gsSPEndDisplayList(),
 };
+
+static Gfx sStartBowStringDL[] = {
+    // Two commands worth of space for the gEXMatrixGroup.
+    gsSPNoOp(),
+    gsSPNoOp(),
+
+    gsSPMatrix(&gIdentityMtx, G_MTX_MODELVIEW | G_MTX_NOPUSH | G_MTX_MUL),
+    gsSPEndDisplayList(),
+};
+
+static Gfx sEndBowstringDL[] = {
+    gsSPNoOp(),
+    gsSPBranchList(sEndDLWrapper),
+};
+
+RECOMP_CALLBACK("*", recomp_on_init)
+void initExDLs() {
+    gEXPushEnvColor(&sStartDLWrapper[0]);
+    gEXPopEnvColor(&sEndDLWrapper[0]);
+    gEXMatrixGroupSimple(&sStartBowStringDL[0], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
+                         G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_ORDER_LINEAR, G_EX_EDIT_NONE);
+    gEXPopMatrixGroup(&sEndBowstringDL[0], G_MTX_MODELVIEW);
+}
 
 void initFormProxyShims(Link_FormProxy *formProxy) {
 
@@ -126,7 +159,7 @@ void initFormProxyShims(Link_FormProxy *formProxy) {
     SHIM_ITEM_LFIST(BOOMERANG);
 
     shims[LINK_SHIMDL_FPS_RHAND_SLINGSHOT] = createShimDisplayList(2, &dls[LINK_DL_SLINGSHOT], &dls[LINK_DL_FPS_RHAND]);
-    shims[LINK_SHIMDL_FPS_RHAND_BOW] = createShimDisplayList(2, &dls[LINK_DL_BOW], &dls[LINK_DL_FPS_RHAND]);
+    shims[LINK_SHIMDL_FPS_RHAND_BOW] = createShimDisplayList(2, &dls[LINK_DL_FPS_BOW], &dls[LINK_DL_FPS_RHAND]);
     shims[LINK_SHIMDL_FPS_RHAND_HOOKSHOT] = createShimDisplayList(2, &dls[LINK_DL_FPS_HOOKSHOT], &dls[LINK_DL_FPS_RHAND]);
 
     shims[LINK_SHIMDL_SHIELD1_ITEM] = createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD1_ITEM], &dls[LINK_DL_SHIELD1], gPopModelViewMtx);
@@ -272,6 +305,30 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
         dl = formProxy->current.models[target];
     }
 
+    // Use third person models in first person if third person model exists but not first person
+    if (!dl) {
+        Link_DisplayList thirdPersonTarget = target;
+
+        switch (target) {
+            case LINK_DL_FPS_HOOKSHOT:
+                thirdPersonTarget = LINK_DL_HOOKSHOT;
+                break;
+            
+            case LINK_DL_FPS_BOW:
+                thirdPersonTarget = LINK_DL_BOW;
+                break;
+
+            case LINK_DL_FPS_SLINGSHOT:
+                thirdPersonTarget = LINK_DL_SLINGSHOT;
+                break;
+
+            default:
+                break;
+        }
+
+        dl = formProxy->current.models[thirdPersonTarget];
+    }
+
     if (!dl) {
         dl = formProxy->vanilla.models[target];
     }
@@ -372,6 +429,12 @@ void refreshProxyDLs(Link_FormProxy *formProxy) {
     Gfx *listenerHookDL = getListenerDL(formProxy, LINK_DL_HOOKSHOT);
     if (listenerHookDL) {
         gSPDisplayList(&wDLs[LINK_DL_FPS_HOOKSHOT].displayList[WRAPPED_DL_DRAW], listenerHookDL);
+    }
+
+    // first person bow workaround
+    Gfx *listenerBowDL = getListenerDL(formProxy, LINK_DL_BOW);
+    if (listenerBowDL) {
+        gSPDisplayList(&wDLs[LINK_DL_BOW].displayList[WRAPPED_DL_DRAW], listenerBowDL);
     }
 
     // disable hilt for Great Fairy Sword if replaced
@@ -605,12 +668,19 @@ void initFormProxySkeleton(Link_FormProxy *formProxy) {
 #undef SET_LIMB_DL
 }
 
+void initBowWrapper(Link_FormProxy *formProxy) {
+    gSPDisplayList(&formProxy->wrappedDisplayLists[LINK_DL_BOW_STRING].displayList[WRAPPED_DL_PREDRAW], sStartBowStringDL);
+    gSPBranchList(&formProxy->wrappedDisplayLists[LINK_DL_BOW_STRING].displayList[WRAPPED_DL_POSTDRAW], sEndBowstringDL);
+}
+
 void initFormProxyWrappers(Link_FormProxy *formProxy) {
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        gSPDisplayList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_PREDRAW], gEmptyDL);
+        gSPDisplayList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_PREDRAW], sStartDLWrapper);
         gSPDisplayList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
-        gSPBranchList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_POSTDRAW], sSetBilerpDL);
+        gSPBranchList(&formProxy->wrappedDisplayLists[i].displayList[WRAPPED_DL_POSTDRAW], sEndDLWrapper);
     }
+
+    initBowWrapper(formProxy);
 }
 
 void initFormProxyDLs(Link_FormProxy *formProxy) {
@@ -659,7 +729,7 @@ void setSkeletonDLsOnModelInfo(Link_ModelInfo *info, FlexSkeletonHeader *skel) {
 
 #define SET_LIMB_DL(pLimb, dl) \
     if (!info->models[dl])     \
-    info->models[dl] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL;
+        info->models[dl] = (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL;
 
     if (skel) {
         LodLimb **limbs = (LodLimb **)skel->sh.segment;

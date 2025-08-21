@@ -4,7 +4,7 @@
 #include "playermodelmanager_utils.h"
 #include "custommodelentrymanager.h"
 
-void FormModelEntry_init(FormModelEntry *entry) {
+void ModelEntry_init(ModelEntry *entry) {
     entry->displayName = NULL;
     entry->internalName = NULL;
     entry->authorName = NULL;
@@ -13,19 +13,21 @@ void FormModelEntry_init(FormModelEntry *entry) {
     entry->callbackData = NULL;
     entry->handle = 0;
     entry->applyToModelInfo = NULL;
+    entry->displayListPtrs = recomputil_create_u32_value_hashmap();
+    entry->matrixPtrs = recomputil_create_u32_value_hashmap();
 }
 
-bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
+bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
     clearLinkModelInfo(modelInfo);
 
-    FormModelMemoryEntry *this = thisx;
+    ModelEntryForm *this = thisx;
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
-        modelInfo->models[i] = this->displayListPtrs[i];
+        modelInfo->models[i] = ModelEntry_getDisplayList(&this->modelEntry, i);
     }
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        modelInfo->equipMtx[i] = this->matrixPtrs[i];
+        modelInfo->equipMtx[i] = ModelEntry_getMatrix(&this->modelEntry, i);
     }
 
     modelInfo->flags = this->modelEntry.flags;
@@ -49,22 +51,48 @@ bool applyFormModelMemoryEntry(void *thisx, Link_ModelInfo *modelInfo) {
     return true;
 }
 
-void FormModelMemoryEntry_init(FormModelMemoryEntry *this) {
-    FormModelEntry_init(&this->modelEntry);
-
-    for (int i = 0; i < LINK_DL_MAX; ++i) {
-        this->displayListPtrs[i] = NULL;
-    }
+void ModelEntryForm_init(ModelEntryForm *this) {
+    ModelEntry_init(&this->modelEntry);
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        this->matrixPtrs[i] = NULL;
+        if (ModelEntry_getMatrix(&this->modelEntry, i)) {
+            ModelEntry_setMatrix(&this->modelEntry, i, NULL);
+        }
     }
 
-    this->modelEntry.applyToModelInfo = applyFormModelMemoryEntry;
+    this->modelEntry.applyToModelInfo = applyFormEntry;
 
     this->skel = NULL;
 
     Lib_MemSet(this->mouthTex, 0, sizeof(this->mouthTex));
 
     Lib_MemSet(this->eyesTex, 0, sizeof(this->eyesTex));
+}
+
+Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
+    uintptr_t ret = 0;
+    recomputil_u32_value_hashmap_get(entry->displayListPtrs, id, &ret);
+    return (Gfx *)ret;
+}
+
+void ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) {
+    if (id >= LINK_DL_MAX || id < 0) {
+        return;
+    }
+
+    recomputil_u32_value_hashmap_insert(entry->displayListPtrs, id, (uintptr_t)dl);
+}
+
+Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
+    uintptr_t ret = 0;
+    recomputil_u32_value_hashmap_get(entry->matrixPtrs, id, &ret);
+    return (Mtx *)ret;
+}
+
+void ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) {
+    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
+        return;
+    }
+
+    recomputil_u32_value_hashmap_insert(entry->matrixPtrs, id, (uintptr_t)mtx);
 }

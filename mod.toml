@@ -8,7 +8,7 @@
 id = "yazmt_mm_playermodelmanager"
 
 # Version of this mod.
-version = "0.2.1"
+version = "0.3.0"
 
 # The name that will show up for this mod in the mod menu. This should be human readable.
 display_name = "Player Model Manager"
@@ -37,9 +37,15 @@ dependencies = [
 # Example dependency:
 #    "modname:1.0.0"
     "yazmt_mm_global_objects",
-    "yazmt_mm_modelreplacer",
     "ProxyMM_KV:0.0.5",
-    "yazmt_mm_corelib"
+    "yazmt_mm_corelib:0.1.1",
+]
+
+# Optional dependency mods. This has the same format as `dependencies`, but the game will still start if dependencies in this
+# list aren't present. You can query the presence of a given dependency by using `recomp_is_dependency_met` in recomputils.h.
+# Calling a function imported from an optional dependency that isn't present will trigger an error.
+optional_dependencies = [
+    "yazmt_mm_modelreplacer",
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.
@@ -59,7 +65,7 @@ mod_filename = "yazmt_mm_playermodelmanager"
 
 # Reference symbol files.
 func_reference_syms_file = "Zelda64RecompSyms/mm.us.rev1.syms.toml"
-data_reference_syms_files = [ "Zelda64RecompSyms/mm.us.rev1.datasyms.toml", "Zelda64RecompSyms/mm.us.rev1.datasyms_static.toml" ]
+data_reference_syms_files = [ "Zelda64RecompSyms/mm.us.rev1.datasyms.toml", "Zelda64RecompSyms/mm.us.rev1.datasyms_static.toml", "LocalZelda64RecompSyms/mm.us.rev1.datasyms_static.toml" ]
 
 # Additional files to include in the mod.
 additional_files = [ "thumb.png" ]

@@ -11,7 +11,7 @@ void refreshFileList();
 void refreshButtonEntryColors();
 
 typedef struct {
-    FormModelEntry *modelEntry;
+    ModelEntry *modelEntry;
     RecompuiResource button;
 } ListEntry;
 
@@ -45,7 +45,7 @@ RecompuiResource labelUiTitle;
 RecompuiResource labellabelModelAuthorPrefix;
 RecompuiResource labelModelAuthor;
 
-static FormModelEntry *sRealEntries[PLAYER_FORM_MAX];
+static ModelEntry *sRealEntries[PLAYER_FORM_MAX];
 
 static bool sIsDiskSaveNeeded = false;
 
@@ -422,7 +422,7 @@ static const ButtonColor sModelSelectedButtonColor = {
 };
 
 typedef struct {
-    FormModelEntry **entries;
+    ModelEntry **entries;
     RecompuiResource *buttons;
     size_t count;
     size_t capacity;
@@ -444,7 +444,7 @@ void refreshButtonEntryColors() {
 }
 
 void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
-    FormModelEntry *entry = userdata;
+    ModelEntry *entry = userdata;
 
     if (entry->type != PMM_MODEL_TYPE_NONE) {
         PlayerTransformation form = getFormFromModelType(entry->type);

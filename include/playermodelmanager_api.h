@@ -77,7 +77,7 @@ typedef enum {
     PMM_DL_OCARINA_FAIRY,
     PMM_DL_OCARINA_TIME,
     PMM_DL_DEKU_STICK,
-    PMM_DL_BOW,
+    PMM_DL_BOW, // Also has a first person variant
     PMM_DL_BOW_STRING,
     PMM_DL_BOW_ARROW,
     PMM_DL_SLINGSHOT,
@@ -309,6 +309,13 @@ typedef enum {
     // Deku Link flower propellers
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_OPEN,
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_CLOSED,
+
+    // First Person Bow
+    PMM_DL_FPS_BOW,
+
+    // First Person Slingshot
+    PMM_DL_FPS_SLINGSHOT,
+
     PMM_DL_MAX
 } PlayerModelManagerDisplayListId;
 

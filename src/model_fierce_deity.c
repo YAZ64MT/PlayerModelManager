@@ -31,7 +31,7 @@ void setupVanillaFierceDeity() {
     // hands
     models[LINK_DL_LHAND] = getFierceDeityDL(gLinkFierceDeityLeftHandDL);
     models[LINK_DL_LFIST] = getFierceDeityDL(gLinkFierceDeityLeftHandDL);
-    models[LINK_DL_LHAND_BOTTLE] = getFierceDeityDL(gLinkFierceDeityLeftHandHoldBottleDL);
+    models[LINK_DL_LHAND_BOTTLE] = getFierceDeityDL(gLinkFierceDeityLeftHandDL);
     models[LINK_DL_LHAND_GUITAR] = getFierceDeityDL(gLinkFierceDeityLeftHandDL);
     models[LINK_DL_RHAND] = getFierceDeityDL(gLinkFierceDeityRightHandDL);
     models[LINK_DL_RFIST] = getFierceDeityDL(gLinkFierceDeityRightHandDL);
