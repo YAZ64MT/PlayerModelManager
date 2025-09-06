@@ -237,3 +237,28 @@ void hookGfx_on_return_ArmsHook_Draw() {
     replaceHookedOpaGfxCommands(&sHookshotGfxHook);
     replaceHookedXluGfxCommands(&sHookshotGfxHook);
 }
+
+static GfxHookData sArrowGfxHook;
+
+RECOMP_HOOK("EnArrow_Draw")
+void hookGfx_on_EnArrow_Draw(Actor *thisx, PlayState *play) {
+    Player *player = GET_PLAYER(play);
+
+    PlayerTransformation tf;
+
+    // Account for possibility form has a custom arrow model
+    // otherwise default to human
+    if (gLinkFormProxies[player->transformation].current.models[LINK_DL_BOW_ARROW]) {
+        tf = player->transformation;
+    } else {
+        tf = PLAYER_FORM_HUMAN;
+    }
+
+    fillGfxHookData(&sArrowGfxHook, play, &gLinkFormProxies[tf]);
+}
+
+RECOMP_HOOK_RETURN("EnArrow_Draw")
+void hookGfx_on_return_EnArrow_Draw() {
+    replaceHookedOpaGfxCommands(&sArrowGfxHook);
+    replaceHookedXluGfxCommands(&sArrowGfxHook);
+}
