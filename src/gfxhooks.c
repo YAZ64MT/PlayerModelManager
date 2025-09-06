@@ -66,8 +66,8 @@ static GfxHookDisplayList sLinkFormsDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_link_nuts_DL_009DB8, LINK_DL_PAD_OPENING),
     DECLARE_GFX_HOOK_DL(object_link_nuts_DL_008860, LINK_DL_PETAL_PARTICLE),
     DECLARE_GFX_HOOK_DL(object_link_nuts_DL_00A348, LINK_DL_DEKU_GUARD),
-    DECLARE_GFX_HOOK_DL(gLinkDekuOpenFlowerDL, LINK_DL_FLOWER_PROPELLER_OPEN),
-    DECLARE_GFX_HOOK_DL(gLinkDekuClosedFlowerDL, LINK_DL_FLOWER_PROPELLER_CLOSED),
+    DECLARE_GFX_HOOK_DL(gLinkDekuOpenFlowerDL, LINK_DL_CENTER_FLOWER_PROPELLER_OPEN),
+    DECLARE_GFX_HOOK_DL(gLinkDekuClosedFlowerDL, LINK_DL_CENTER_FLOWER_PROPELLER_CLOSED),
     DECLARE_GFX_HOOK_DL(object_link_goron_DL_00FC18, LINK_DL_DRUM_STRAP),
     DECLARE_GFX_HOOK_DL(object_link_goron_DL_00FCF0, LINK_DL_DRUM_UP),
     DECLARE_GFX_HOOK_DL(object_link_goron_DL_00FF18, LINK_DL_DRUM_LEFT),
@@ -236,4 +236,29 @@ RECOMP_HOOK_RETURN("ArmsHook_Draw")
 void hookGfx_on_return_ArmsHook_Draw() {
     replaceHookedOpaGfxCommands(&sHookshotGfxHook);
     replaceHookedXluGfxCommands(&sHookshotGfxHook);
+}
+
+static GfxHookData sArrowGfxHook;
+
+RECOMP_HOOK("EnArrow_Draw")
+void hookGfx_on_EnArrow_Draw(Actor *thisx, PlayState *play) {
+    Player *player = GET_PLAYER(play);
+
+    PlayerTransformation tf;
+
+    // Account for possibility form has a custom arrow model
+    // otherwise default to human
+    if (gLinkFormProxies[player->transformation].current.models[LINK_DL_BOW_ARROW]) {
+        tf = player->transformation;
+    } else {
+        tf = PLAYER_FORM_HUMAN;
+    }
+
+    fillGfxHookData(&sArrowGfxHook, play, &gLinkFormProxies[tf]);
+}
+
+RECOMP_HOOK_RETURN("EnArrow_Draw")
+void hookGfx_on_return_EnArrow_Draw() {
+    replaceHookedOpaGfxCommands(&sArrowGfxHook);
+    replaceHookedXluGfxCommands(&sArrowGfxHook);
 }
