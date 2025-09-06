@@ -1,0 +1,11 @@
+{
+    "name": "Player_Model_Manager",
+    "version_number": "0.3.1",
+    "website_url": "https://github.com/YAZ64MT/PlayerModelManager",
+    "description": "Link model replacement API.",
+    "dependencies": [
+        "YAZMT-YAZMT_Core-0.1.1",
+        "YAZMT-Global_Objects-0.1.1",
+        "ProxyMM-KV-0.0.5"
+    ]
+}

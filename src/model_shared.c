@@ -198,6 +198,7 @@ void initSharedDLs() {
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL_GRABBED] = &gIdentityMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_ARROW_DRAWN] = &gIdentityMtx;
     equipMatrixes[LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK] = &gIdentityMtx;
+    equipMatrixes[LINK_EQUIP_MATRIX_MASKS] = &gIdentityMtx;
 
     Gfx **models = gSharedDisplayLists;
 
