@@ -1,3 +1,7 @@
+### 0.3.1
+* Fix vanilla Deku Link's flower propellers using the wrong model
+* Fix mask matrix not being properly reset when changing models 
+
 ### 0.3.0
 * ModelReplacer is now an optional dependency
 * Add first person bow/slingshot replacement options
