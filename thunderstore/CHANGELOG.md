@@ -1,6 +1,7 @@
 ### 0.3.1
 * Fix vanilla Deku Link's flower propellers using the wrong model
-* Fix mask matrix not being properly reset when changing models 
+* Fix mask matrix not being properly reset when changing models
+* Fix custom arrow display lists not being used
 
 ### 0.3.0
 * ModelReplacer is now an optional dependency
