@@ -38,11 +38,18 @@ typedef struct {
 #define WRAPPED_DL_POSTDRAW 2
 
 typedef struct {
+    Color_RGBA8 current;
+    Color_RGBA8 requested;
+    bool isOverrideRequested;
+} Link_TunicColor;
+
+typedef struct {
     PlayerTransformation form;
     Link_ModelInfo current;
     Link_ModelInfo vanilla;
     Link_SkeletonProxy skeleton;
     Link_ShieldingSkeletonProxy shieldingSkeleton;
+    Link_TunicColor tunicColor;
     Gfx *shimDisplayListPtrs[LINK_SHIMDL_MAX];
     Gfx *mtxDisplayLists[LINK_EQUIP_MATRIX_MAX];
     Gfx displayLists[LINK_DL_MAX];
