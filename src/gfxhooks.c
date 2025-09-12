@@ -199,19 +199,6 @@ void hookGfx_on_return_Player_Draw() {
     replaceHookedXluGfxCommands(&sPlayerDrawGfxHook);
 }
 
-static GfxHookData sBoomerangDrawGfxHook;
-
-RECOMP_HOOK("EnBoom_Draw")
-void hookGfx_on_EnBoom_Draw(Actor *thisx, PlayState *play) {
-    fillGfxHookData(&sBoomerangDrawGfxHook, play, &gLinkFormProxies[PLAYER_FORM_ZORA]);
-}
-
-RECOMP_HOOK_RETURN("EnBoom_Draw")
-void hookGfx_on_return_EnBoom_Draw() {
-    replaceHookedOpaGfxCommands(&sBoomerangDrawGfxHook);
-    replaceHookedXluGfxCommands(&sBoomerangDrawGfxHook);
-}
-
 static GfxHookData sElegyShellDrawGfxHook;
 
 RECOMP_HOOK("EnTorch2_Draw")

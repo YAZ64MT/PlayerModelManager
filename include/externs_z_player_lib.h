@@ -43,4 +43,12 @@ extern Gfx *D_8085D574[]; // Deku Pads
 
 extern Gfx *D_801C0B20[]; // Mask DLs
 
+typedef struct {
+    /* 0x00 */ Gfx *unk_00;
+    /* 0x04 */ Vec3f unk_04;
+    /* 0x10 */ Vec3f unk_10;
+} EnBoomStruct; // size = 0x1C
+
+extern EnBoomStruct D_808A3078[]; // Zora Boomerang struct
+
 #endif

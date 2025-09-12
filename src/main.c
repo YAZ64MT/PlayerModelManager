@@ -70,6 +70,8 @@ static Gfx **sPlayerPads = D_8085D574;
 
 static Gfx **sPlayerMaskDLs = D_801C0B20;
 
+static EnBoomStruct *sPlayerBoomerangInfo = D_808A3078;
+
 void repointSharedModelsToProxy(Link_FormProxy *proxy) {
     sPlayerHandHoldingSwords[0] = &proxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
     sPlayerHandHoldingSwords[1] = &proxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
@@ -111,6 +113,9 @@ void repointSharedModelsToProxy(Link_FormProxy *proxy) {
     sPlayerPads[0] = &proxy->displayLists[LINK_DL_PAD_GRASS];
     sPlayerPads[1] = &proxy->displayLists[LINK_DL_PAD_WOOD];
     sPlayerPads[2] = &proxy->displayLists[LINK_DL_PAD_OPENING];
+
+    sPlayerBoomerangInfo[0].unk_00 = &proxy->displayLists[LINK_DL_LFIN_BOOMERANG];
+    sPlayerBoomerangInfo[1].unk_00 = &proxy->displayLists[LINK_DL_RFIN_BOOMERANG];
 
 #define SET_MASK_DL(playerMaskIndex, linkDLIndex) (sPlayerMaskDLs[playerMaskIndex - 1] = &proxy->displayLists[linkDLIndex])
 
@@ -173,34 +178,11 @@ void initFormProxies() {
     _internal_setupVanillaModels();
 }
 
-bool sPlayerAppearanceNeedsUpdate = false;
-
-RECOMP_HOOK("Player_Init")
-void refreshDLs_on_PlayerInit(Actor *thisx, PlayState *play) {
-    Player *player = (Player *)thisx;
-
-    if (thisx->id == ACTOR_PLAYER) {
-        sPlayerAppearanceNeedsUpdate = true;
-    }
-}
-
-extern Gfx *D_801C0D94; // Bow string DL ptr
-
 RECOMP_HOOK("Player_Draw")
-void fixFaceTextures_on_Player_Draw(Actor *thisx, PlayState *play) {
-
-    // Multiple Link actors appear in Milk Bar sound check cutscene
-    bool isMultipleLinksExist = GET_PLAYER(play)->actor.next;
-
-    if (isMultipleLinksExist || sPlayerAppearanceNeedsUpdate) {
-        sPlayerAppearanceNeedsUpdate = isMultipleLinksExist;
-
-        Link_FormProxy *fp = &gLinkFormProxies[((Player *)thisx)->transformation];
-
-        matchFaceTexturesToProxy(fp);
-
-        repointSharedModelsToProxy(fp);
-    }
+void updateAssets_on_Player_Draw(Actor *thisx, PlayState *play) {
+    Link_FormProxy *fp = &gLinkFormProxies[((Player *)thisx)->transformation];
+    matchFaceTexturesToProxy(fp);
+    repointSharedModelsToProxy(fp);
 }
 
 RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
@@ -230,10 +212,6 @@ void initFormProxies_on_go() {
 RECOMP_CALLBACK(".", _internal_onModelApplied)
 void refreshSharedModelsOnModelApply(PlayerTransformation form) {
     requestRefreshFormProxy(&gLinkFormProxies[form]);
-
-    if (form == GET_PLAYER_FORM) {
-        sPlayerAppearanceNeedsUpdate = true;
-    }
 }
 
 RECOMP_DECLARE_EVENT(_internal_initHashObjects());
