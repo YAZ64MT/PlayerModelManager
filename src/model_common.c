@@ -585,13 +585,13 @@ void refreshProxySkeleton(Link_FormProxy *formProxy) {
 
     if (shieldSkel) {
         for (int i = 0; i < PLAYER_BODY_SHIELD_LIMB_COUNT; ++i) {
-            StandardLimb *limb = skel->sh.segment[i];
+            StandardLimb *limb = shieldSkel->sh.segment[i];
             formProxy->shieldingSkeleton.limbs[i].child = limb->child;
             formProxy->shieldingSkeleton.limbs[i].sibling = limb->sibling;
             formProxy->shieldingSkeleton.limbs[i].jointPos = limb->jointPos;
         }
 
-        formProxy->shieldingSkeleton.flexSkeleton.dListCount = skel->dListCount;
+        formProxy->shieldingSkeleton.flexSkeleton.dListCount = shieldSkel->dListCount;
     }
 }
 
