@@ -95,10 +95,6 @@ static GfxHookDisplayList sGameplayKeepDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(gameplay_keep_DL_014370, LINK_DL_BOW_ARROW),
     DECLARE_GFX_HOOK_DL(gHookshotChainDL, LINK_DL_HOOKSHOT_CHAIN),
     DECLARE_GFX_HOOK_DL(gHookshotReticleDL, LINK_DL_HOOKSHOT_RETICLE),
-    DECLARE_GFX_HOOK_DL(gElegyShellHumanDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN),
-    DECLARE_GFX_HOOK_DL(gElegyShellDekuDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU),
-    DECLARE_GFX_HOOK_DL(gElegyShellGoronDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON),
-    DECLARE_GFX_HOOK_DL(gElegyShellZoraDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA),
 };
 static GfxHookLookup sGameplayKeepDLMap = DECLARE_GFX_HOOK_LUT(sGameplayKeepDLReplacements);
 
@@ -197,19 +193,6 @@ RECOMP_HOOK_RETURN("Player_Draw")
 void hookGfx_on_return_Player_Draw() {
     replaceHookedOpaGfxCommands(&sPlayerDrawGfxHook);
     replaceHookedXluGfxCommands(&sPlayerDrawGfxHook);
-}
-
-static GfxHookData sElegyShellDrawGfxHook;
-
-RECOMP_HOOK("EnTorch2_Draw")
-void hookGfx_on_EnTorch2_Draw(Actor *thisx, PlayState *play) {
-    fillGfxHookData(&sElegyShellDrawGfxHook, play, &gLinkFormProxies[thisx->params]);
-}
-
-RECOMP_HOOK_RETURN("EnTorch2_Draw")
-void hookGfx_on_return_EnTorch2_Draw() {
-    replaceHookedOpaGfxCommands(&sElegyShellDrawGfxHook);
-    replaceHookedXluGfxCommands(&sElegyShellDrawGfxHook);
 }
 
 static GfxHookData sHookshotGfxHook;

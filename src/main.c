@@ -117,6 +117,12 @@ void repointSharedModelsToProxy(Link_FormProxy *proxy) {
     sPlayerBoomerangInfo[0].unk_00 = &proxy->displayLists[LINK_DL_LFIN_BOOMERANG];
     sPlayerBoomerangInfo[1].unk_00 = &proxy->displayLists[LINK_DL_RFIN_BOOMERANG];
 
+    sShellDLists[PLAYER_FORM_HUMAN] = &proxy->displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN];
+    sShellDLists[PLAYER_FORM_DEKU] = &proxy->displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU];
+    sShellDLists[PLAYER_FORM_GORON] = &proxy->displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON];
+    sShellDLists[PLAYER_FORM_ZORA] = &proxy->displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA];
+    sShellDLists[PLAYER_FORM_FIERCE_DEITY] = &proxy->displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY];
+
 #define SET_MASK_DL(playerMaskIndex, linkDLIndex) (sPlayerMaskDLs[playerMaskIndex - 1] = &proxy->displayLists[linkDLIndex])
 
     SET_MASK_DL(PLAYER_MASK_TRUTH, LINK_DL_MASK_TRUTH);

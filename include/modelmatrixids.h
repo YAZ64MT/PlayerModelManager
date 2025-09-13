@@ -312,6 +312,9 @@ typedef enum {
     // First Person Slingshot
     LINK_DL_FPS_SLINGSHOT,
 
+    // Fierce Deity Elegy of Emptiness Statue
+    LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY,
+
     LINK_DL_MAX
 } Link_DisplayList;
 

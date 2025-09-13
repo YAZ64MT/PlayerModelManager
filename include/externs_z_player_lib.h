@@ -43,6 +43,10 @@ extern Gfx *D_8085D574[]; // Deku Pads
 
 extern Gfx *D_801C0B20[]; // Mask DLs
 
+// These aren't in z_player_lib.c or z_player.c
+// But it's convenient to keep them in this file
+// TODO: Give this file a more fitting name?
+
 typedef struct {
     /* 0x00 */ Gfx *unk_00;
     /* 0x04 */ Vec3f unk_04;
@@ -50,5 +54,7 @@ typedef struct {
 } EnBoomStruct; // size = 0x1C
 
 extern EnBoomStruct D_808A3078[]; // Zora Boomerang struct
+
+extern Gfx *sShellDLists[]; // Elegy of emptiness statues
 
 #endif
