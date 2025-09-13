@@ -5,7 +5,7 @@ typedef unsigned long PlayerModelManagerHandle;
 
 // Used for keeping compatibility between versions
 // DO NOT EDIT
-#define PMM_API_VERSION 1UL
+#define PMM_API_VERSION 2UL
 
 #define YAZMT_PMM_MOD_NAME "yazmt_mm_playermodelmanager"
 
@@ -488,7 +488,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, void PlayerModelManager_requestOverrideTunicCo
 // This returns true on successful override, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManager_overrideVanillaDisplayList(unsigned long apiVersion, PlayerTransformation form, PlayerModelManagerDisplayListId displayListId, Gfx *displayList))
 
-
+// Helper define for PlayerModelManager_overrideVanillaDisplayList. See PlayerModelManager_overrideVanillaDisplayList description for functionality.
 #define PLAYERMODELMANAGER_OVERRIDE_VANILLA_DISPLAY_LIST(form, displayListId, displayList) PlayerModelManager_overrideVanillaDisplayList(PMM_API_VERSION, form, displayListId, displayList)
 
 #define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
