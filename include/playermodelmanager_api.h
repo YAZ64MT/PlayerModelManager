@@ -474,6 +474,20 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isApplied(PlayerModelM
 // Allows the tunic color to be set by other mods.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a));
 
+// Allows mods to override display lists used by the models used when no custom model is found.
+// This should be used sparingly, but there are some use cases, like if you are exchanging
+// the first person models for non-human forms.
+//
+// Attempts to override shim DLs will be ignored.
+//
+// This function can only be used during the PlayerModelManager_onRegisterModels event.
+//
+// This returns true on successful override, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManager_overrideVanillaDisplayList(unsigned long apiVersion, PlayerTransformation form, PlayerModelManagerDisplayListId displayListId, Gfx *displayList))
+
+
+#define PLAYERMODELMANAGER_OVERRIDE_VANILLA_DISPLAY_LIST(form, displayListId, displayList) PlayerModelManager_overrideVanillaDisplayList(PMM_API_VERSION, form, displayListId, displayList)
+
 #define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
 
 #endif

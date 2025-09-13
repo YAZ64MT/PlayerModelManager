@@ -432,6 +432,39 @@ RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersio
     return &gLinkFormProxies[form].displayLists[dlId];
 }
 
+RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dlId, Gfx *dl) {
+    if (sIsAPILocked) {
+        recomp_printf("PlayerModelManager: %s called while API locked. "
+                      "Please only call these functions during a onRegisterModels callback.\n",
+                      "PlayerModelManager_overrideVanillaDisplayList");
+
+        return false;
+    }
+
+    if (apiVersion > PMM_API_VERSION) {
+        recomp_printf("PlayerModelManager_overrideVanillaDisplayList: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
+        return false;
+    }
+
+    if (form >= PLAYER_FORM_MAX) {
+        recomp_printf("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid player form %d!\n", form);
+        return false;
+    }
+
+    if (dlId >= LINK_DL_MAX) {
+        recomp_printf("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid display list ID %d! (ID too high!)\n", form);
+        return false;
+    }
+
+    if (dlId >= PMM_DL_SHIM_SWORD1 && dlId <= PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_CLOSED) {
+        recomp_printf("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid display list ID %d! (ID was a shim!)\n", form);
+    }
+
+    gLinkFormProxies[form].vanilla.models[dlId] = dl;
+    requestRefreshFormProxyDL(&gLinkFormProxies[form], dlId);
+    return true;
+}
+
 RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
     ModelEntryForm *entry = getEntryOrPrintErr(h, "PlayerModelManager_isApplied");
 
