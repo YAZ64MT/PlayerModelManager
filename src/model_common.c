@@ -368,6 +368,11 @@ void refreshProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
 
         case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA:
             overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA);
+            break;
+
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY:
+            overrideFormDL(formProxy, PLAYER_FORM_FIERCE_DEITY, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY);
+            break;
 
         case LINK_DL_MASK_DEKU:
             overrideFormDL(formProxy, PLAYER_FORM_DEKU, LINK_DL_MASK_DEKU);

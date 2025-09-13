@@ -136,6 +136,7 @@ typedef enum {
     PMM_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,  // Only used if model is Deku
     PMM_DL_ELEGY_OF_EMPTINESS_SHELL_GORON, // Only used if model is Goron
     PMM_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,  // Only used if model is Zora
+    // PMM_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY also exists
 
     // Strength Upgrades (OoT)
     PMM_DL_BRACELET_LFOREARM,
@@ -315,6 +316,9 @@ typedef enum {
 
     // First Person Slingshot
     PMM_DL_FPS_SLINGSHOT,
+
+    // Elegy of Emptiness Statue (Fierce Deity)
+    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY, // Only used if model is Fierce Deity
 
     PMM_DL_MAX
 } PlayerModelManagerDisplayListId;
