@@ -10,7 +10,7 @@ to your mod's includes and the mod to your dependencies in your toml:
 
 ```toml
 dependencies = [
-    "yazmt_mm_playermodelmanager:0.3.1",
+    "yazmt_mm_playermodelmanager:0.4.0",
 ]
 ```
 
