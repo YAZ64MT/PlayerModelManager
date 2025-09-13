@@ -400,6 +400,14 @@ void refreshProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
         case LINK_DL_MASK_FIERCE_DEITY_SCREAM:
             overrideFormDL(formProxy, PLAYER_FORM_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY_SCREAM);
             break;
+        
+        case LINK_DL_LFIN_BOOMERANG:
+            overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_LFIN_BOOMERANG);
+            break;
+
+        case LINK_DL_RFIN_BOOMERANG:
+            overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_RFIN_BOOMERANG);
+            break;
 
         default:
             break;
