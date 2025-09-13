@@ -13,7 +13,7 @@ Add [this header file](https://github.com/YAZ64MT/PlayerModelManager/blob/main/i
 
 ```toml
 dependencies = [
-    "yazmt_mm_playermodelmanager",
+    "yazmt_mm_playermodelmanager:0.4.0",
 ]
 
 ```
