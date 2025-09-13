@@ -413,17 +413,23 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle 
     return true;
 }
 
-RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dl) {
+RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dlId) {
     if (apiVersion > PMM_API_VERSION) {
         recomp_printf("PlayerModelManager_getFormDisplayList: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
         return NULL;
     }
 
-    if (form >= PLAYER_FORM_MAX || dl >= LINK_DL_MAX) {
+    if (form >= PLAYER_FORM_MAX) {
+        recomp_printf("PlayerModelManager_getFormDisplayList: Mod requesting invalid player form %d!\n", form);
         return NULL;
     }
 
-    return &gLinkFormProxies[form].displayLists[dl];
+    if (dlId >= LINK_DL_MAX) {
+        recomp_printf("PlayerModelManager_getFormDisplayList: Mod requesting display list ID %d!\n", form);
+        return NULL;
+    }
+
+    return &gLinkFormProxies[form].displayLists[dlId];
 }
 
 RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
