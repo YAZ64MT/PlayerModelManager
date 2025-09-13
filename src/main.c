@@ -173,6 +173,11 @@ void initFormProxies() {
         requestRefreshFormProxy(&gLinkFormProxies[i]);
 
         changeFormPtrsToProxy(i);
+
+        gLinkFormProxies[i].tunicColor.current.r = 30;
+        gLinkFormProxies[i].tunicColor.current.g = 105;
+        gLinkFormProxies[i].tunicColor.current.b = 27;
+        gLinkFormProxies[i].tunicColor.current.a = 0;
     }
 
     _internal_setupVanillaModels();

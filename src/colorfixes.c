@@ -3,36 +3,27 @@
 #include "recompconfig.h"
 #include "rt64_extended_gbi.h"
 #include "colorfixes.h"
+#include "model_common.h"
 
-typedef struct {
-    u8 r;
-    u8 g;
-    u8 b;
-    u8 a;
-} TunicColor;
+void setFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a) {
+    if (form >= PLAYER_FORM_MAX) {
+        return;
+    }
 
-static TunicColor sTunicColor = {
-    .r = 30,
-    .g = 105,
-    .b = 27,
-    .a = 0,
-};
+    Link_TunicColor *tunicColor = &gLinkFormProxies[form].tunicColor;
 
-static TunicColor sRequestedTunicColor = {
-    .r = 30,
-    .g = 105,
-    .b = 27,
-    .a = 0,
-};
+    tunicColor->isOverrideRequested = true;
 
-static bool sIsTunicOverrideRequested = false;
+    tunicColor->requested.r = r;
+    tunicColor->requested.g = g;
+    tunicColor->requested.b = b;
+    tunicColor->requested.a = a;
+}
 
 void setTunicColor(u8 r, u8 g, u8 b, u8 a) {
-    sIsTunicOverrideRequested = true;
-    sRequestedTunicColor.r = r;
-    sRequestedTunicColor.g = g;
-    sRequestedTunicColor.b = b;
-    sRequestedTunicColor.a = a;
+    for (PlayerTransformation i = 0; i < PLAYER_FORM_MAX; ++i) {
+        setFormTunicColor(i, r, g, b, a);
+    }
 }
 
 // Convert char to its numeric value
@@ -81,16 +72,20 @@ typedef enum {
 
 RECOMP_HOOK("Player_Draw")
 void readTunicColor_on_Player_Draw(Actor *thisx, PlayState *play) {
+    Player *player = (Player *)thisx;
+
+    Link_TunicColor *playerTunic = &gLinkFormProxies[player->transformation].tunicColor;
+
     TunicColorConfigOption tunicColorOpt = recomp_get_config_u32("is_modify_tunic_color");
 
     bool shouldPullFromConfig = false;
 
     switch (tunicColorOpt) {
         case TUNIC_COLOR_AUTO:
-            shouldPullFromConfig = !sIsTunicOverrideRequested;
+            shouldPullFromConfig = !playerTunic->isOverrideRequested;
 
-            if (sIsTunicOverrideRequested) {
-                sTunicColor = sRequestedTunicColor;
+            if (!shouldPullFromConfig) {
+                playerTunic->current = playerTunic->requested;
             }
             break;
 
@@ -107,9 +102,9 @@ void readTunicColor_on_Player_Draw(Actor *thisx, PlayState *play) {
 
         if (color) {
             if (isValidHexString(color)) {
-                sTunicColor.r = sToU8(color);
-                sTunicColor.g = sToU8(color + 2);
-                sTunicColor.b = sToU8(color + 4);
+                playerTunic->current.r = sToU8(color);
+                playerTunic->current.g = sToU8(color + 2);
+                playerTunic->current.b = sToU8(color + 4);
             }
 
             recomp_free_config_string(color);
@@ -117,7 +112,7 @@ void readTunicColor_on_Player_Draw(Actor *thisx, PlayState *play) {
     }
 
     OPEN_DISPS(play->state.gfxCtx);
-    gDPSetEnvColor(POLY_OPA_DISP++, sTunicColor.r, sTunicColor.g, sTunicColor.b, sTunicColor.a);
+    gDPSetEnvColor(POLY_OPA_DISP++, playerTunic->current.r, playerTunic->current.g, playerTunic->current.b, playerTunic->current.a);
     CLOSE_DISPS(play->state.gfxCtx);
 }
 

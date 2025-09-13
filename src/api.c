@@ -483,6 +483,10 @@ RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b
     setTunicColor(r, g, b, a);
 }
 
+RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a) {
+    setFormTunicColor(form, r, g, b, a);
+}
+
 RECOMP_DECLARE_EVENT(onRegisterModels());
 RECOMP_DECLARE_EVENT(onReady());
 
