@@ -1,3 +1,9 @@
+### 0.4.0
+* Add API call for changing the tunic color per-form
+* Add API call for overriding display lists used when no custom model is present
+* Fix Zora boomerangs not being replaced
+* Fix Goron shielding skeleton not being replaced
+
 ### 0.3.1
 * Fix vanilla Deku Link's flower propellers using the wrong model
 * Fix mask matrix not being properly reset when changing models
