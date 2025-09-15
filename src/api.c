@@ -465,6 +465,35 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long a
     return true;
 }
 
+RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVersion, PlayerTransformation form, Link_EquipmentMatrix mtxId, Mtx *mtx) {
+    if (sIsAPILocked) {
+        recomp_printf("PlayerModelManager: %s called while API locked. "
+                      "Please only call these functions during a onRegisterModels callback.\n",
+                      "PlayerModelManager_overrideVanillaMatrix");
+
+        return false;
+    }
+
+    if (apiVersion > PMM_API_VERSION) {
+        recomp_printf("PlayerModelManager_overrideVanillaMatrix: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
+        return false;
+    }
+
+    if (form >= PLAYER_FORM_MAX) {
+        recomp_printf("PlayerModelManager_overrideVanillaMatrix: Mod requesting invalid player form %d!\n", form);
+        return false;
+    }
+
+    if (mtxId >= LINK_DL_MAX) {
+        recomp_printf("PlayerModelManager_overrideVanillaMatrix: Mod requesting invalid matrix ID %d! (ID too high!)\n", form);
+        return false;
+    }
+
+    gLinkFormProxies[form].vanilla.equipMtx[mtxId] = mtx;
+    requestRefreshFormProxyMtx(&gLinkFormProxies[form], mtxId);
+    return true;
+}
+
 RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
     ModelEntryForm *entry = getEntryOrPrintErr(h, "PlayerModelManager_isApplied");
 

@@ -490,13 +490,27 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, void PlayerModelManager_requestOverrideTunicCo
 // This function can only be used during the PlayerModelManager_onRegisterModels event.
 //
 // This returns true on successful override, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_overrideVanillaDisplayList(unsigned long apiVersion, PlayerTransformation form, PlayerModelManagerDisplayListId displayListId, Gfx *displayList))
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_overrideVanillaDisplayList(unsigned long apiVersion, PlayerTransformation form, PlayerModelManagerDisplayListId displayListId, Gfx *displayList));
 
 // Helper define for PlayerModelManager_overrideVanillaDisplayList. See PlayerModelManager_overrideVanillaDisplayList description for functionality.
 #define PLAYERMODELMANAGER_OVERRIDE_VANILLA_DISPLAY_LIST(form, displayListId, displayList) PlayerModelManager_overrideVanillaDisplayList(PMM_API_VERSION, form, displayListId, displayList)
 
+// Allows mods to override matrixes used by the models used when no custom matrix is found.
+// This should be used sparingly, but there are some use cases, like if you are exchanging
+// equipment models with PlayerModelManager_overrideVanillaDisplayList.
+//
+// This function can only be used during the PlayerModelManager_onRegisterModels event.
+//
+// This returns true on successful override, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVersion, PlayerTransformation form, PlayerModelManagerMatrixId displayListId, Mtx *mtx));
+
+// Helper define for PlayerModelManager_overrideVanillaDisplayList. See PlayerModelManager_overrideVanillaDisplayList description for functionality.
+#define PLAYERMODELMANAGER_OVERRIDE_VANILLA_MATRIX(form, matrixId, matrix) PlayerModelManager_overrideVanillaMatrix(PMM_API_VERSION, form, matrixId, matrix)
+
 // Returns true if there is a custom player model applied to the passed in form, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form));
+
+// Helper define for register models event.
 #define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
 
 #endif
