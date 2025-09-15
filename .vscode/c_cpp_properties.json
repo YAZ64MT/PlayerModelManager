@@ -4,6 +4,7 @@
             "name": "Mod",
             "includePath": [
                 "${workspaceFolder}/include",
+                "${workspaceFolder}/include/libc",
                 "${workspaceFolder}/include/dummy_headers",
                 "${workspaceFolder}/mm-decomp/include",
                 "${workspaceFolder}/mm-decomp/src",
@@ -13,10 +14,12 @@
                 "F3DEX_GBI_2",
                 "_LANGUAGE_C",
                 "MIPS",
-                "YAZMT_PMM_NO_API_IMPORTS"
+                "YAZMT_PMM_NO_API_IMPORTS",
+                "_HAS_EXCEPTIONS=0"
             ],
             "compilerPath": "clang",
             "cStandard": "c99",
+            "cppStandard": "c++20",
             "intelliSenseMode": "clang-x86"
         }
     ],
