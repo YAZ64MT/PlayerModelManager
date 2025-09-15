@@ -487,6 +487,10 @@ RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransf
     setFormTunicColor(form, r, g, b, a);
 }
 
+RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form) {
+    return !!CMEM_getCurrentEntry(form);
+}
+
 RECOMP_DECLARE_EVENT(onRegisterModels());
 RECOMP_DECLARE_EVENT(onReady());
 

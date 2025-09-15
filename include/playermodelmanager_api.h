@@ -495,6 +495,8 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_overrideVanillaDisplay
 // Helper define for PlayerModelManager_overrideVanillaDisplayList. See PlayerModelManager_overrideVanillaDisplayList description for functionality.
 #define PLAYERMODELMANAGER_OVERRIDE_VANILLA_DISPLAY_LIST(form, displayListId, displayList) PlayerModelManager_overrideVanillaDisplayList(PMM_API_VERSION, form, displayListId, displayList)
 
+// Returns true if there is a custom player model applied to the passed in form, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form));
 #define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
 
 #endif
