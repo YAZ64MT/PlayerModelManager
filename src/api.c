@@ -415,17 +415,85 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle 
     return true;
 }
 
-RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dl) {
+RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dlId) {
     if (apiVersion > PMM_API_VERSION) {
         recomp_printf("PlayerModelManager_getFormDisplayList: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
         return NULL;
     }
 
-    if (form >= PLAYER_FORM_MAX || dl >= LINK_DL_MAX) {
+    if (form >= PLAYER_FORM_MAX) {
+        recomp_printf("PlayerModelManager_getFormDisplayList: Mod requesting invalid player form %d!\n", form);
         return NULL;
     }
 
-    return &gLinkFormProxies[form].displayLists[dl];
+    if (dlId >= LINK_DL_MAX) {
+        recomp_printf("PlayerModelManager_getFormDisplayList: Mod requesting display list ID %d!\n", form);
+        return NULL;
+    }
+
+    return &gLinkFormProxies[form].displayLists[dlId];
+}
+
+RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dlId, Gfx *dl) {
+    if (sIsAPILocked) {
+        recomp_printf("PlayerModelManager: %s called while API locked. "
+                      "Please only call these functions during a onRegisterModels callback.\n",
+                      "PlayerModelManager_overrideVanillaDisplayList");
+
+        return false;
+    }
+
+    if (apiVersion > PMM_API_VERSION) {
+        recomp_printf("PlayerModelManager_overrideVanillaDisplayList: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
+        return false;
+    }
+
+    if (form >= PLAYER_FORM_MAX) {
+        recomp_printf("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid player form %d!\n", form);
+        return false;
+    }
+
+    if (dlId >= LINK_DL_MAX) {
+        recomp_printf("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid display list ID %d! (ID too high!)\n", form);
+        return false;
+    }
+
+    if (dlId >= PMM_DL_SHIM_SWORD1 && dlId <= PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_CLOSED) {
+        recomp_printf("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid display list ID %d! (ID was a shim!)\n", form);
+    }
+
+    gLinkFormProxies[form].vanilla.models[dlId] = dl;
+    requestRefreshFormProxyDL(&gLinkFormProxies[form], dlId);
+    return true;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVersion, PlayerTransformation form, Link_EquipmentMatrix mtxId, Mtx *mtx) {
+    if (sIsAPILocked) {
+        recomp_printf("PlayerModelManager: %s called while API locked. "
+                      "Please only call these functions during a onRegisterModels callback.\n",
+                      "PlayerModelManager_overrideVanillaMatrix");
+
+        return false;
+    }
+
+    if (apiVersion > PMM_API_VERSION) {
+        recomp_printf("PlayerModelManager_overrideVanillaMatrix: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!\n");
+        return false;
+    }
+
+    if (form >= PLAYER_FORM_MAX) {
+        recomp_printf("PlayerModelManager_overrideVanillaMatrix: Mod requesting invalid player form %d!\n", form);
+        return false;
+    }
+
+    if (mtxId >= LINK_DL_MAX) {
+        recomp_printf("PlayerModelManager_overrideVanillaMatrix: Mod requesting invalid matrix ID %d! (ID too high!)\n", form);
+        return false;
+    }
+
+    gLinkFormProxies[form].vanilla.equipMtx[mtxId] = mtx;
+    requestRefreshFormProxyMtx(&gLinkFormProxies[form], mtxId);
+    return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
@@ -444,6 +512,14 @@ RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {
     setTunicColor(r, g, b, a);
+}
+
+RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a) {
+    setFormTunicColor(form, r, g, b, a);
+}
+
+RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form) {
+    return !!CMEM_getCurrentEntry(form);
 }
 
 RECOMP_DECLARE_EVENT(onRegisterModels());

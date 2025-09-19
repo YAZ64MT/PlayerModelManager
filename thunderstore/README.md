@@ -10,7 +10,7 @@ to your mod's includes and the mod to your dependencies in your toml:
 
 ```toml
 dependencies = [
-    "yazmt_mm_playermodelmanager:0.3.1",
+    "yazmt_mm_playermodelmanager:0.4.0",
 ]
 ```
 
@@ -19,3 +19,9 @@ read in directly from the user's PC. If you have no mods that use this mod
 as a dependency, then no models will appear in the menu.
 
 ![](https://github.com/YAZ64MT/PlayerModelManager/blob/main/images/menu_demo.gif?raw=true)
+
+THIS MOD DOES NOT PROVIDE ANY MODELS ON ITS OWN. YOU MUST SOURCE YOUR MODELS
+FROM OTHER MODS.
+
+If you are looking to load ".zobj" models, then see this mod's [filesystem
+addon](https://thunderstore.io/c/zelda-64-recompiled/p/YAZMT/Player_Model_Manager_Filesystem_Addon/).

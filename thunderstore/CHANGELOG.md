@@ -1,3 +1,13 @@
+### 0.4.0
+* Add support for custom Fierce Deity Elegy of Emptiness statues
+* Add API call for changing the tunic color on a per form basis
+* Add API call for overriding display lists used when no custom model is present
+* Add API call for overriding matrixes when no custom matrix is present
+* Add API call for checking if a custom player model is equipped to a particular form
+* Bumped API version
+* Fix Zora boomerangs not being replaced
+* Fix Goron shielding skeleton not being replaced
+
 ### 0.3.1
 * Fix vanilla Deku Link's flower propellers using the wrong model
 * Fix mask matrix not being properly reset when changing models

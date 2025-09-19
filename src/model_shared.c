@@ -217,6 +217,7 @@ void initSharedDLs() {
     setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellDekuDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU);
     setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellGoronDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON);
     setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellZoraDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA);
+    gSharedDisplayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY] = &gLinkFormProxies[PLAYER_FORM_HUMAN].displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN];
     setupSharedListenerDL(GAMEPLAY_KEEP, gDekuMaskDL, LINK_DL_MASK_DEKU);
     setupSharedListenerDL(GAMEPLAY_KEEP, gGoronMaskDL, LINK_DL_MASK_GORON);
     setupSharedListenerDL(GAMEPLAY_KEEP, gZoraMaskDL, LINK_DL_MASK_ZORA);

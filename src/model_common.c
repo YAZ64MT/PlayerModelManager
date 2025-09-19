@@ -372,6 +372,11 @@ void refreshProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
 
         case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA:
             overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA);
+            break;
+
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY:
+            overrideFormDL(formProxy, PLAYER_FORM_FIERCE_DEITY, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY);
+            break;
 
         case LINK_DL_MASK_DEKU:
             overrideFormDL(formProxy, PLAYER_FORM_DEKU, LINK_DL_MASK_DEKU);
@@ -403,6 +408,14 @@ void refreshProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
 
         case LINK_DL_MASK_FIERCE_DEITY_SCREAM:
             overrideFormDL(formProxy, PLAYER_FORM_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY_SCREAM);
+            break;
+        
+        case LINK_DL_LFIN_BOOMERANG:
+            overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_LFIN_BOOMERANG);
+            break;
+
+        case LINK_DL_RFIN_BOOMERANG:
+            overrideFormDL(formProxy, PLAYER_FORM_ZORA, LINK_DL_RFIN_BOOMERANG);
             break;
 
         default:
@@ -595,13 +608,13 @@ void refreshProxySkeleton(Link_FormProxy *formProxy) {
 
     if (shieldSkel) {
         for (int i = 0; i < PLAYER_BODY_SHIELD_LIMB_COUNT; ++i) {
-            StandardLimb *limb = skel->sh.segment[i];
+            StandardLimb *limb = shieldSkel->sh.segment[i];
             formProxy->shieldingSkeleton.limbs[i].child = limb->child;
             formProxy->shieldingSkeleton.limbs[i].sibling = limb->sibling;
             formProxy->shieldingSkeleton.limbs[i].jointPos = limb->jointPos;
         }
 
-        formProxy->shieldingSkeleton.flexSkeleton.dListCount = skel->dListCount;
+        formProxy->shieldingSkeleton.flexSkeleton.dListCount = shieldSkel->dListCount;
     }
 }
 
