@@ -682,6 +682,10 @@ bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, ModelEntry *newEntry) {
 
         _internal_onEquipmentModelApplied(((ModelEntryEquipment *)(newEntry))->equipType);
 
+        for (int i = 0; i < ARRAY_COUNT(sShouldSkipInterpolation); ++i) {
+            sShouldSkipInterpolation[i] = true;
+        }
+
         return true;
     }
 
@@ -759,6 +763,10 @@ void CMEM_removeModel(Link_CustomModelCategory cat) {
             }
 
             _internal_onEquipmentModelApplied(entry->equipType);
+
+            for (int i = 0; i < ARRAY_COUNT(sShouldSkipInterpolation); ++i) {
+                sShouldSkipInterpolation[i] = true;
+            }
         }
     }
 }
