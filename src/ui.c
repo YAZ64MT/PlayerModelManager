@@ -7,8 +7,8 @@
 #include "custommodelentrymanager.h"
 #include "model_common.h"
 
-void refreshFileList();
-void refreshButtonEntryColors();
+static void refreshFileList();
+static void refreshButtonEntryColors();
 
 typedef struct {
     ModelEntry *modelEntry;
@@ -27,42 +27,105 @@ RecompuiResource labelCategory;
 RecompuiResource buttonClose;
 RecompuiResource buttonRemoveModel;
 
-RecompuiResource imageview;
-RecompuiTextureHandle bomb_texture_handle;
-u8 bomb_texture_data[ICON_ITEM_TEX_SIZE];
-RecompuiTextureHandle bow_texture_handle;
-u8 bow_texture_data[ICON_ITEM_TEX_SIZE];
-
-RecompuiResource passwordinput;
-RecompuiResource slider;
-RecompuiResource labelradio;
-
 bool context_shown = false;
-bool showing_bow = false;
 
 RecompuiResource containerModelList;
 RecompuiResource labelUiTitle;
 RecompuiResource labellabelModelAuthorPrefix;
 RecompuiResource labelModelAuthor;
 
-static ModelEntry *sRealEntries[PLAYER_FORM_MAX];
-
-static bool sIsDiskSaveNeeded = false;
-
 static bool sIsLivePreviewEnabled = false;
 
-static PlayerTransformation sSelectionOrder[] = {
-    PLAYER_FORM_HUMAN,
-    PLAYER_FORM_DEKU,
-    PLAYER_FORM_GORON,
-    PLAYER_FORM_ZORA,
-    PLAYER_FORM_FIERCE_DEITY,
+typedef struct {
+    const char *displayName;
+    bool isVisible;
+    bool isUsedByCurrentGame;
+    ModelEntry *realEntry;
+    Link_CustomModelCategory category;
+    bool isNeedsDiskSave;
+} CategoryInfo;
+
+static bool sIsForceAllCategoriesVisible = false;
+
+#define DECLARE_DEFAULT_CAT_INFO(name, isUsed, cat, isVisibleByDefault) {.displayName = name, .isVisible = isVisibleByDefault, .isUsedByCurrentGame = isUsed, .realEntry = NULL, .category = cat, .isNeedsDiskSave = false}
+#define DECLARE_CAT_INFO(name, isUsed, cat) DECLARE_DEFAULT_CAT_INFO(name, isUsed, cat, false)
+
+#define CAT_USED_MM true
+
+// Always opposite of MM
+#define CAT_USED_OOT (!CAT_USED_MM)
+
+// used by both games
+#define CAT_USED_Z64 true
+
+static CategoryInfo sCategoryInfos[] = {
+    // At least one category must be visible or the category selector goes into an infinite loop
+    DECLARE_DEFAULT_CAT_INFO("Young Link", CAT_USED_OOT, LINK_CMC_CHILD, CAT_USED_OOT),
+    DECLARE_DEFAULT_CAT_INFO("Adult Link", CAT_USED_OOT, LINK_CMC_ADULT, CAT_USED_OOT),
+    DECLARE_DEFAULT_CAT_INFO("Human", CAT_USED_MM, LINK_CMC_HUMAN, CAT_USED_MM),
+    DECLARE_DEFAULT_CAT_INFO("Deku", CAT_USED_MM, LINK_CMC_DEKU, CAT_USED_MM),
+    DECLARE_DEFAULT_CAT_INFO("Goron", CAT_USED_MM, LINK_CMC_GORON, CAT_USED_MM),
+    DECLARE_DEFAULT_CAT_INFO("Zora", CAT_USED_MM, LINK_CMC_ZORA, CAT_USED_MM),
+    DECLARE_DEFAULT_CAT_INFO("Fierce Deity", CAT_USED_MM, LINK_CMC_FIERCE_DEITY, CAT_USED_MM),
+    DECLARE_CAT_INFO("Kokiri Sword", CAT_USED_Z64, LINK_CMC_SWORD1),
+    DECLARE_CAT_INFO("Razor Sword", CAT_USED_MM, LINK_CMC_SWORD2),
+    DECLARE_CAT_INFO("Gilded Sword", CAT_USED_Z64, LINK_CMC_SWORD3),
+    DECLARE_CAT_INFO("Fierce Deity's Sword", CAT_USED_Z64, LINK_CMC_SWORD4),
+    DECLARE_CAT_INFO("Great Fairy Sword", CAT_USED_MM, LINK_CMC_SWORD5),
+    DECLARE_CAT_INFO("Deku Shield", CAT_USED_OOT, LINK_CMC_SHIELD1),
+    DECLARE_CAT_INFO("Hero's Shield", CAT_USED_Z64, LINK_CMC_SHIELD2),
+    DECLARE_CAT_INFO("Mirror Shield", CAT_USED_Z64, LINK_CMC_SHIELD3),
+    DECLARE_CAT_INFO("Hookshot", CAT_USED_Z64, LINK_CMC_HOOKSHOT),
+    DECLARE_CAT_INFO("Bow", CAT_USED_Z64, LINK_CMC_BOW),
+    DECLARE_CAT_INFO("Slingshot", CAT_USED_OOT, LINK_CMC_SLINGSHOT),
+    DECLARE_CAT_INFO("Bottle", CAT_USED_Z64, LINK_CMC_BOTTLE),
+    DECLARE_CAT_INFO("Fairy Ocarina", CAT_USED_OOT, LINK_CMC_OCARINA_FAIRY),
+    DECLARE_CAT_INFO("Ocarina of Time", CAT_USED_Z64, LINK_CMC_OCARINA_TIME),
+    DECLARE_CAT_INFO("Boomerang", CAT_USED_OOT, LINK_CMC_BOOMERANG),
+    DECLARE_CAT_INFO("Hammer", CAT_USED_OOT, LINK_CMC_HAMMER),
+    DECLARE_CAT_INFO("Deku Stick", CAT_USED_Z64, LINK_CMC_DEKU_STICK),
+    DECLARE_CAT_INFO("Deku Pipes", CAT_USED_MM, LINK_CMC_PIPES),
+    DECLARE_CAT_INFO("Goron Drums", CAT_USED_MM, LINK_CMC_DRUMS),
+    DECLARE_CAT_INFO("Zora Guitar", CAT_USED_MM, LINK_CMC_GUITAR),
+    DECLARE_CAT_INFO("Skull Mask", CAT_USED_OOT, LINK_CMC_MASK_SKULL),
+    DECLARE_CAT_INFO("Spooky Mask", CAT_USED_OOT, LINK_CMC_MASK_SPOOKY),
+    DECLARE_CAT_INFO("Gerudo Mask", CAT_USED_OOT, LINK_CMC_MASK_GERUDO),
+    DECLARE_CAT_INFO("Mask of Truth", CAT_USED_Z64, LINK_CMC_MASK_TRUTH),
+    DECLARE_CAT_INFO("Kafei's Mask", CAT_USED_MM, LINK_CMC_MASK_KAFEIS_MASK),
+    DECLARE_CAT_INFO("All Night Mask", CAT_USED_MM, LINK_CMC_MASK_ALL_NIGHT),
+    DECLARE_CAT_INFO("Bunny Hood", CAT_USED_Z64, LINK_CMC_MASK_BUNNY),
+    DECLARE_CAT_INFO("Keaton Mask", CAT_USED_Z64, LINK_CMC_MASK_KEATON),
+    DECLARE_CAT_INFO("Garo Mask", CAT_USED_MM, LINK_CMC_MASK_GARO),
+    DECLARE_CAT_INFO("Romani Mask", CAT_USED_MM, LINK_CMC_MASK_ROMANI),
+    DECLARE_CAT_INFO("Circus Leader's Mask", CAT_USED_MM, LINK_CMC_MASK_CIRCUS_LEADER),
+    DECLARE_CAT_INFO("Couple's Mask", CAT_USED_MM, LINK_CMC_MASK_COUPLE),
+    DECLARE_CAT_INFO("Postman's Hat", CAT_USED_MM, LINK_CMC_MASK_POSTMAN),
+    DECLARE_CAT_INFO("Great Fairy Mask", CAT_USED_MM, LINK_CMC_MASK_GREAT_FAIRY),
+    DECLARE_CAT_INFO("Gibdo Mask", CAT_USED_MM, LINK_CMC_MASK_GIBDO),
+    DECLARE_CAT_INFO("Don Gero's Mask", CAT_USED_MM, LINK_CMC_MASK_DON_GERO),
+    DECLARE_CAT_INFO("Kamaro Mask", CAT_USED_MM, LINK_CMC_MASK_KAMARO),
+    DECLARE_CAT_INFO("Captain's Hat", CAT_USED_MM, LINK_CMC_MASK_CAPTAIN),
+    DECLARE_CAT_INFO("Stone Mask", CAT_USED_MM, LINK_CMC_MASK_STONE),
+    DECLARE_CAT_INFO("Bremen Mask", CAT_USED_MM, LINK_CMC_MASK_BREMEN),
+    DECLARE_CAT_INFO("Blast Mask", CAT_USED_MM, LINK_CMC_MASK_BLAST),
+    DECLARE_CAT_INFO("Mask of Scents", CAT_USED_MM, LINK_CMC_MASK_SCENTS),
+    DECLARE_CAT_INFO("Giant's Mask", CAT_USED_MM, LINK_CMC_MASK_GIANT),
+    DECLARE_CAT_INFO("Deku Mask", CAT_USED_MM, LINK_CMC_MASK_DEKU),
+    DECLARE_CAT_INFO("Goron Mask", CAT_USED_Z64, LINK_CMC_MASK_GORON),
+    DECLARE_CAT_INFO("Zora Mask", CAT_USED_Z64, LINK_CMC_MASK_ZORA),
+    DECLARE_CAT_INFO("Fierce Deity Mask", CAT_USED_MM, LINK_CMC_MASK_FIERCE_DEITY),
 };
 
-static PlayerTransformation sCurrentMenuIndex = 0;
+static int sCurrentCategoryInfo = 0;
 
-PlayerTransformation getSelectedForm() {
-    return sSelectionOrder[sCurrentMenuIndex];
+static CategoryInfo *getCurrentCategoryInfo() {
+    if (sCurrentCategoryInfo >= 0 && sCurrentCategoryInfo < ARRAY_COUNT(sCategoryInfos)) {
+        return &sCategoryInfos[sCurrentCategoryInfo];
+    } else {
+        recomp_printf("PlayerModelManager: getCurrentCategoryInfo found invalid sCurrentCategoryInfo value %d\n", sCurrentCategoryInfo);
+    }
+
+    return NULL;
 }
 
 bool shouldLivePreview() {
@@ -88,116 +151,150 @@ void setAuthor(const char *author) {
     labelModelAuthor = recompui_create_label(context, row2, author, LABELSTYLE_NORMAL);
 }
 
-void applyRealEntries() {
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        CMEM_tryApplyEntry(i, sRealEntries[i]);
+static void applyRealEntry(int entryIndex) {
+    if (entryIndex >= 0 && entryIndex < ARRAY_COUNT(sCategoryInfos)) {
+        CMEM_tryApplyEntry(sCategoryInfos[entryIndex].category, sCategoryInfos[entryIndex].realEntry);
+    } else {
+        recomp_printf("PlayerModelManager: applyRealEntry received invalid entryIndex %d\n", entryIndex);
     }
 }
 
-void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
-    if (data->type == UI_EVENT_CLICK) {
-        Audio_PlaySfx(NA_SE_SY_DECIDE);
-        sRealEntries[getSelectedForm()] = NULL;
-        CMEM_tryApplyEntry(getSelectedForm(), NULL);
-        refreshButtonEntryColors();
-        sIsDiskSaveNeeded = true;
-    } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
-        destroyAuthor();
-
-        if (shouldLivePreview()) {
-            applyRealEntries();
-        }
+static void applyRealEntries() {
+    for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
+        applyRealEntry(i);
     }
 }
 
-void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
-    if (data->type == UI_EVENT_CLICK) {
-        applyRealEntries();
-        recompui_hide_context(context);
-        context_shown = false;
-        if (sIsDiskSaveNeeded) {
-            for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-                CMEM_tryApplyEntry(i, sRealEntries[i]);
-                CMEM_saveCurrentEntry(i);
+static void clearRealEntries() {
+    for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
+        sCategoryInfos[i].realEntry = NULL;
+    }
+}
+
+static void fillRealEntries() {
+    for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
+        sCategoryInfos[i].realEntry = CMEM_getCurrentEntry(sCategoryInfos[i].category);
+    }
+}
+
+static void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    if (context_shown) {
+        if (data->type == UI_EVENT_CLICK) {
+            CategoryInfo *catInf = getCurrentCategoryInfo();
+            if (catInf) {
+                Audio_PlaySfx(NA_SE_SY_DECIDE);
+                catInf->realEntry = NULL;
+                CMEM_tryApplyEntry(catInf->category, NULL);
+                refreshButtonEntryColors();
+                catInf->isNeedsDiskSave = true;
+            } else {
+                Audio_PlaySfx(NA_SE_SY_ERROR);
             }
-            Audio_PlaySfx(NA_SE_SY_PIECE_OF_HEART);
-        } else {
-            Audio_PlaySfx(NA_SE_SY_DECIDE);
-        }
-    } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
-        destroyAuthor();
+        } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+            destroyAuthor();
 
-        if (shouldLivePreview()) {
+            if (shouldLivePreview()) {
+                applyRealEntry(sCurrentCategoryInfo);
+            }
+        }
+    }
+}
+
+static void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    if (context_shown) {
+        if (data->type == UI_EVENT_CLICK) {
             applyRealEntries();
+            recompui_hide_context(context);
+            context_shown = false;
+            bool wasModelChanged = false;
+
+            for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
+                CategoryInfo *catInf = &sCategoryInfos[i];
+
+                if (catInf->isNeedsDiskSave) {
+                    catInf->isNeedsDiskSave = false;
+                    wasModelChanged = true;
+                    CMEM_saveCurrentEntry(catInf->category);
+                }
+            }
+
+            if (wasModelChanged) {
+                Audio_PlaySfx(NA_SE_SY_PIECE_OF_HEART);
+            } else {
+                Audio_PlaySfx(NA_SE_SY_DECIDE);
+            }
+
+            clearRealEntries();
+        } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+            destroyAuthor();
+
+            if (shouldLivePreview()) {
+                applyRealEntries();
+            }
         }
     }
 }
 
-void clearRealEntries() {
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        sRealEntries[i] = NULL;
-    }
-}
-
-void fillRealEntries() {
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        sRealEntries[i] = CMEM_getCurrentEntry(i);
-    }
-}
-
-void destroyModelButtons();
-void createModelButtons();
-void refreshButtonEntryColors();
+static void destroyModelButtons();
+static void createModelButtons();
+static void refreshButtonEntryColors();
 
 static bool sTrue = true;
 static bool sFalse = false;
 
 static bool sIsCategoryRowExist = false;
 
-static const char *sCategoryNames[] = {
-    "Fierce Deity",
-    "Goron",
-    "Zora",
-    "Deku",
-    "Human",
-};
-
 void refreshCategoryName() {
     if (sIsCategoryRowExist) {
         recompui_destroy_element(rowCategory, labelCategory);
     }
 
-    labelCategory = recompui_create_label(context, rowCategory, sCategoryNames[getSelectedForm()], LABELSTYLE_LARGE);
+    CategoryInfo *catInf = getCurrentCategoryInfo();
 
-    sIsCategoryRowExist = true;
+    if (catInf) {
+        labelCategory = recompui_create_label(context, rowCategory, catInf->displayName, LABELSTYLE_LARGE);
+
+        sIsCategoryRowExist = true;
+    }
 }
 
-void changeCategoryButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
-    if (data->type == UI_EVENT_CLICK) {
-        Audio_PlaySfx(NA_SE_SY_DECIDE);
+static void incrementCurrentCategory() {
+    CategoryInfo *currInf;
 
-        bool *isNextButton = userdata;
+    do {
+        sCurrentCategoryInfo = (sCurrentCategoryInfo + 1) % ARRAY_COUNT(sCategoryInfos);
 
-        if (*isNextButton) {
-            sCurrentMenuIndex++;
+        currInf = &sCategoryInfos[sCurrentCategoryInfo];
+    } while (!(currInf->isVisible || sIsForceAllCategoriesVisible));
+}
 
-            while (sCurrentMenuIndex >= ARRAY_COUNT(sSelectionOrder)) {
-                sCurrentMenuIndex -= ARRAY_COUNT(sSelectionOrder);
+static void decrementCurrentCategory() {
+    CategoryInfo *currInf;
+
+    do {
+        sCurrentCategoryInfo = (sCurrentCategoryInfo - 1 + ARRAY_COUNT(sCategoryInfos)) % ARRAY_COUNT(sCategoryInfos);
+
+        currInf = &sCategoryInfos[sCurrentCategoryInfo];
+    } while (!(currInf->isVisible || sIsForceAllCategoriesVisible));
+}
+
+static void changeCategoryButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    if (context_shown) {
+        if (data->type == UI_EVENT_CLICK) {
+            Audio_PlaySfx(NA_SE_SY_DECIDE);
+
+            bool *isNextButton = userdata;
+
+            if (*isNextButton) {
+                incrementCurrentCategory();
+            } else {
+                decrementCurrentCategory();
             }
-        } else {
-            sCurrentMenuIndex--;
 
-            while ((signed)sCurrentMenuIndex < 0) {
-                sCurrentMenuIndex += ARRAY_COUNT(sSelectionOrder);
-            }
+            refreshFileList();
+            refreshButtonEntryColors();
+            refreshCategoryName();
         }
-
-        sCurrentMenuIndex = (sCurrentMenuIndex % ARRAY_COUNT(sSelectionOrder) + ARRAY_COUNT(sSelectionOrder)) % ARRAY_COUNT(sSelectionOrder);
-
-        destroyModelButtons();
-        createModelButtons();
-        refreshButtonEntryColors();
-        refreshCategoryName();
     }
 }
 
@@ -299,19 +396,6 @@ void on_init() {
 
     // Bind the shared callback to the two buttons.
     recompui_register_callback(buttonClose, closeButtonPressed, NULL);
-
-    /*
-    // Load the texture data and create UI textures for the bomb and bow icons.
-    CmpDma_LoadFile(SEGMENT_ROM_START(icon_item_static_yar), ITEM_BOMB, bomb_texture_data, sizeof(bomb_texture_data));
-    bomb_texture_handle = recompui_create_texture_rgba32(bomb_texture_data, ICON_ITEM_TEX_WIDTH, ICON_ITEM_TEX_HEIGHT);
-    CmpDma_LoadFile(SEGMENT_ROM_START(icon_item_static_yar), ITEM_BOW, bow_texture_data, sizeof(bow_texture_data));
-    bow_texture_handle = recompui_create_texture_rgba32(bow_texture_data, ICON_ITEM_TEX_WIDTH, ICON_ITEM_TEX_HEIGHT);
-
-    // Create an imageview for the item icon.
-    imageview = recompui_create_imageview(context, row1, bomb_texture_handle);
-    recompui_set_min_width(imageview, 100.0f, UNIT_DP);
-    recompui_set_min_height(imageview, 100.0f, UNIT_DP);
-    */
 
     // set up scrolling container for models
     containerModelList = recompui_create_element(context, container);
@@ -430,8 +514,8 @@ typedef struct {
 
 static ModelButtonEntries sButtonEntries;
 
-void refreshButtonEntryColors() {
-    void *entry = (void *)CMEM_getCurrentEntry(getSelectedForm());
+static void refreshButtonEntryColors() {
+    void *entry = (void *)CMEM_getCurrentEntry(getCurrentCategoryInfo()->category);
     for (size_t i = 0; i < sButtonEntries.count; ++i) {
         if (entry == sButtonEntries.entries[i]) {
             recompui_set_background_color(sButtonEntries.buttons[i], &sModelSelectedButtonColor.bgColor);
@@ -443,121 +527,124 @@ void refreshButtonEntryColors() {
     }
 }
 
-void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
-    ModelEntry *entry = userdata;
+static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    if (context_shown) {
+        ModelEntry *entry = userdata;
 
-    if (entry->type != PMM_MODEL_TYPE_NONE) {
-        PlayerTransformation form = getFormFromModelType(entry->type);
+        CategoryInfo *catInf = getCurrentCategoryInfo();
 
-        if (form < PLAYER_FORM_MAX) {
+        if (catInf) {
+            Link_CustomModelCategory cat = getCategoryFromModelType(entry->type);
+
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
 
-                CMEM_tryApplyEntry(form, entry);
+                CMEM_tryApplyEntry(cat, entry);
 
-                sRealEntries[getSelectedForm()] = entry;
+                catInf->realEntry = entry;
 
                 refreshButtonEntryColors();
 
-                sIsDiskSaveNeeded = true;
+                catInf->isNeedsDiskSave = true;
             } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
                 destroyAuthor();
 
                 setAuthor(entry->authorName);
 
                 if (shouldLivePreview()) {
-                    CMEM_tryApplyEntry(form, entry);
+                    CMEM_tryApplyEntry(cat, entry);
                 }
             }
-        }
-        else {
+        } else {
             Audio_PlaySfx(NA_SE_SY_ERROR);
         }
     }
 }
 
-void destroyModelButtons() {
+static void destroyModelButtons() {
     if (sButtonEntries.entries) {
-        recomp_free(sButtonEntries.entries);
         sButtonEntries.entries = NULL;
-
         for (size_t i = 0; i < sButtonEntries.count; ++i) {
             recompui_destroy_element(containerModelList, sButtonEntries.buttons[i]);
         }
     }
 }
 
-void createModelButtons() {
+static void createModelButtons() {
     // MUST CALL INSIDE UI CONTEXT
 
-    sButtonEntries.entries = CMEM_getCombinedEntries(getSelectedForm(), &sButtonEntries.count);
+    CategoryInfo *catInf = getCurrentCategoryInfo();
 
-    if (sButtonEntries.count > sButtonEntries.capacity) {
-        recomp_free(sButtonEntries.buttons);
-        sButtonEntries.buttons = recomp_alloc(sizeof(*sButtonEntries.buttons) * sButtonEntries.count);
-        sButtonEntries.capacity = sButtonEntries.count;
-    }
+    if (catInf) {
+        sButtonEntries.count = 0;
+        sButtonEntries.entries = CMEM_getCategoryEntryData(catInf->category, &sButtonEntries.count);
 
-    for (size_t i = 0; i < sButtonEntries.count; ++i) {
-        const char *name = sButtonEntries.entries[i]->displayName;
-        if (!name) {
-            name = sButtonEntries.entries[i]->internalName;
+        if (sButtonEntries.count > sButtonEntries.capacity) {
+            recomp_free(sButtonEntries.buttons);
+            sButtonEntries.buttons = recomp_alloc(sizeof(*sButtonEntries.buttons) * sButtonEntries.count);
+            sButtonEntries.capacity = sButtonEntries.count;
         }
 
-        RecompuiResource button = recompui_create_button(context, containerModelList, name, BUTTONSTYLE_PRIMARY);
-
-        recompui_set_text_align(button, TEXT_ALIGN_CENTER);
-
-        recompui_set_width(button, 100.0f, UNIT_PERCENT);
-
-        recompui_register_callback(button, onModelButtonPressed, sButtonEntries.entries[i]);
-
-        recompui_set_flex_shrink(button, 0.0f);
-
-        sButtonEntries.buttons[i] = button;
-    }
-
-    if (sButtonEntries.count > 0) {
-        RecompuiResource buttonFirst = sButtonEntries.buttons[0];
-        RecompuiResource buttonLast = sButtonEntries.buttons[sButtonEntries.count - 1];
-
-        recompui_set_nav(buttonClose, NAVDIRECTION_UP, buttonLast);
-        recompui_set_nav(buttonRemoveModel, NAVDIRECTION_RIGHT, buttonLast);
-        recompui_set_nav(buttonRemoveModel, NAVDIRECTION_DOWN, buttonFirst);
-
-        recompui_set_nav(buttonFirst, NAVDIRECTION_UP, buttonRemoveModel);
-        recompui_set_nav(buttonFirst, NAVDIRECTION_LEFT, buttonRemoveModel);
-
-        recompui_set_nav(buttonLast, NAVDIRECTION_LEFT, buttonRemoveModel);
-
-        if (sButtonEntries.count > 1) {
-            recompui_set_nav(buttonFirst, NAVDIRECTION_DOWN, sButtonEntries.buttons[1]);
-            recompui_set_nav(buttonFirst, NAVDIRECTION_RIGHT, buttonLast);
-
-            recompui_set_nav(buttonLast, NAVDIRECTION_UP, sButtonEntries.buttons[sButtonEntries.count - 2]);
-
-            for (size_t i = 1; i < sButtonEntries.count - 1; ++i) {
-                RecompuiResource button = sButtonEntries.buttons[i];
-                recompui_set_nav(button, NAVDIRECTION_UP, sButtonEntries.buttons[i - 1]);
-                recompui_set_nav(button, NAVDIRECTION_DOWN, sButtonEntries.buttons[i + 1]);
-                recompui_set_nav(button, NAVDIRECTION_LEFT, buttonRemoveModel);
-                recompui_set_nav(button, NAVDIRECTION_RIGHT, buttonLast);
+        for (size_t i = 0; i < sButtonEntries.count; ++i) {
+            const char *name = sButtonEntries.entries[i]->displayName;
+            if (!name) {
+                name = sButtonEntries.entries[i]->internalName;
             }
+
+            RecompuiResource button = recompui_create_button(context, containerModelList, name, BUTTONSTYLE_PRIMARY);
+
+            recompui_set_text_align(button, TEXT_ALIGN_CENTER);
+
+            recompui_set_width(button, 100.0f, UNIT_PERCENT);
+
+            recompui_register_callback(button, onModelButtonPressed, sButtonEntries.entries[i]);
+
+            recompui_set_flex_shrink(button, 0.0f);
+
+            sButtonEntries.buttons[i] = button;
         }
 
-        recompui_set_nav(buttonLast, NAVDIRECTION_DOWN, buttonClose);
-        recompui_set_nav_none(buttonLast, NAVDIRECTION_RIGHT);
-    } else {
-        recompui_set_nav(buttonClose, NAVDIRECTION_UP, buttonRemoveModel);
-        recompui_set_nav_none(buttonRemoveModel, NAVDIRECTION_RIGHT);
-        recompui_set_nav(buttonRemoveModel, NAVDIRECTION_DOWN, buttonClose);
+        if (sButtonEntries.count > 0) {
+            RecompuiResource buttonFirst = sButtonEntries.buttons[0];
+            RecompuiResource buttonLast = sButtonEntries.buttons[sButtonEntries.count - 1];
+
+            recompui_set_nav(buttonClose, NAVDIRECTION_UP, buttonLast);
+            recompui_set_nav(buttonRemoveModel, NAVDIRECTION_RIGHT, buttonLast);
+            recompui_set_nav(buttonRemoveModel, NAVDIRECTION_DOWN, buttonFirst);
+
+            recompui_set_nav(buttonFirst, NAVDIRECTION_UP, buttonRemoveModel);
+            recompui_set_nav(buttonFirst, NAVDIRECTION_LEFT, buttonRemoveModel);
+
+            recompui_set_nav(buttonLast, NAVDIRECTION_LEFT, buttonRemoveModel);
+
+            if (sButtonEntries.count > 1) {
+                recompui_set_nav(buttonFirst, NAVDIRECTION_DOWN, sButtonEntries.buttons[1]);
+                recompui_set_nav(buttonFirst, NAVDIRECTION_RIGHT, buttonLast);
+
+                recompui_set_nav(buttonLast, NAVDIRECTION_UP, sButtonEntries.buttons[sButtonEntries.count - 2]);
+
+                for (size_t i = 1; i < sButtonEntries.count - 1; ++i) {
+                    RecompuiResource button = sButtonEntries.buttons[i];
+                    recompui_set_nav(button, NAVDIRECTION_UP, sButtonEntries.buttons[i - 1]);
+                    recompui_set_nav(button, NAVDIRECTION_DOWN, sButtonEntries.buttons[i + 1]);
+                    recompui_set_nav(button, NAVDIRECTION_LEFT, buttonRemoveModel);
+                    recompui_set_nav(button, NAVDIRECTION_RIGHT, buttonLast);
+                }
+            }
+
+            recompui_set_nav(buttonLast, NAVDIRECTION_DOWN, buttonClose);
+            recompui_set_nav_none(buttonLast, NAVDIRECTION_RIGHT);
+        } else {
+            recompui_set_nav(buttonClose, NAVDIRECTION_UP, buttonRemoveModel);
+            recompui_set_nav_none(buttonRemoveModel, NAVDIRECTION_RIGHT);
+            recompui_set_nav(buttonRemoveModel, NAVDIRECTION_DOWN, buttonClose);
+        }
     }
 }
 
-void refreshFileList() {
+static void refreshFileList() {
     // MUST CALL INSIDE UI CONTEXT
     destroyModelButtons();
-    //CMEM_refreshDiskEntries();
     createModelButtons();
 }
 
@@ -567,7 +654,7 @@ typedef enum {
     MODCFG_BUTTON_COMBO_LA,
 } ModConfig_ButtonCombo;
 
-bool isOpenMenuComboPressed(PlayState *play) {
+static bool isOpenMenuComboPressed(PlayState *play) {
     Input *input = CONTROLLER1(&play->state);
 
     switch (recomp_get_config_u32("open_menu_buttons")) {
@@ -590,7 +677,6 @@ bool isOpenMenuComboPressed(PlayState *play) {
 
 void openModelMenu() {
     if (!context_shown) {
-        sIsDiskSaveNeeded = false;
         sIsLivePreviewEnabled = recomp_get_config_u32("is_live_preview_enabled");
         fillRealEntries();
         recompui_show_context(context);
@@ -608,8 +694,21 @@ void on_play_update(PlayState *play) {
 
 RECOMP_CALLBACK(".", _internal_onFinishedRegisterModels)
 void populateFirstFileList() {
+    for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
+        CategoryInfo *catInf = &sCategoryInfos[i];
+        size_t count = 0;
+        CMEM_getCategoryEntryData(catInf->category, &count);
+        catInf->isVisible = catInf->isVisible || (catInf->isUsedByCurrentGame && count > 0);
+    }
+
+    if (!getCurrentCategoryInfo()->isVisible) {
+        incrementCurrentCategory();
+    }
+
     recompui_open_context(context);
     refreshFileList();
+    refreshButtonEntryColors();
+    refreshCategoryName();
     recompui_close_context(context);
 }
 

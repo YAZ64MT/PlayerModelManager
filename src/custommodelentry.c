@@ -137,6 +137,11 @@ bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, M
 bool ModelEntryEquipment_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *modelInfoCustom) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
+    if (this->equipType >= LINK_DL_REPLACE_MAX) {
+        recomp_printf("Passed in invalid equipment type %u\n", this->equipType);
+        return false;
+    }
+
     const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
 
     for (size_t i = 0; i < override->dl.count; ++i) {
@@ -149,9 +154,9 @@ bool ModelEntryEquipment_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCusto
 
     for (size_t i = 0; i < override->mtx.count; ++i) {
         Link_EquipmentMatrix id = override->mtx.overrides[i];
-        uintptr_t dl = 0;
-        recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &dl);
-        recomputil_u32_value_hashmap_insert(modelInfoCustom->mtxOverrides, id, dl);
+        uintptr_t mtx = 0;
+        recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &mtx);
+        recomputil_u32_value_hashmap_insert(modelInfoCustom->mtxOverrides, id, mtx);
     }
 
     return true;
@@ -163,4 +168,5 @@ void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacem
     entry->equipType = type;
     entry->modelEntry.setDisplayList = ModelEntryEquipment_setDisplayList;
     entry->modelEntry.setMatrix = ModelEntryEquipment_setMatrix;
+    entry->modelEntry.applyToModelInfo = ModelEntryEquipment_applyToModelInfo;
 }

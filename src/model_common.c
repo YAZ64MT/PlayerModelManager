@@ -302,11 +302,11 @@ Gfx *getFormProxyDL(Link_FormProxy *formProxy, Link_DisplayList target) {
     Gfx *dl = getListenerDL(formProxy, target);
 
     if (!dl) {
-        dl = formProxy->current.modelInfo.models[target];
+        recomputil_u32_value_hashmap_get(formProxy->current.gfxOverrides, target, (uintptr_t *)&dl);
     }
 
     if (!dl) {
-        recomputil_u32_value_hashmap_get(formProxy->current.gfxOverrides, target, (uintptr_t *)&dl);
+        dl = formProxy->current.modelInfo.models[target];
     }
 
     // Use third person models in first person if third person model exists but not first person

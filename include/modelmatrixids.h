@@ -504,6 +504,8 @@ typedef enum {
 } Link_EquipmentReplacement;
 
 typedef enum {
+    LINK_CMC_CHILD,
+    LINK_CMC_ADULT,
     LINK_CMC_HUMAN,
     LINK_CMC_DEKU,
     LINK_CMC_GORON,

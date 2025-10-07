@@ -218,7 +218,7 @@ void hookGfx_on_EnArrow_Draw(Actor *thisx, PlayState *play) {
 
     // Account for possibility form has a custom arrow model
     // otherwise default to human
-    if (gLinkFormProxies[player->transformation].current.models[LINK_DL_BOW_ARROW]) {
+    if (gLinkFormProxies[player->transformation].current.modelInfo.models[LINK_DL_BOW_ARROW]) {
         tf = player->transformation;
     } else {
         tf = PLAYER_FORM_HUMAN;

@@ -12,6 +12,7 @@
 #include "globalobjects_api.h"
 #include "externs_z_player_lib.h"
 #include "model_shared.h"
+#include "equipmentoverrides.h"
 
 U32ValueHashmapHandle gLinkEquipmentGfxOverrides;
 U32ValueHashmapHandle gLinkEquipmentMtxOverrides;
@@ -227,9 +228,26 @@ void initFormProxies_on_go() {
     }
 }
 
-RECOMP_CALLBACK(".", _internal_onModelApplied)
-void refreshSharedModelsOnModelApply(PlayerTransformation form) {
+RECOMP_CALLBACK(".", _internal_onFormModelApplied)
+void refreshSharedModelsOnFormModelApply(Link_CustomModelCategory form) {
     requestRefreshFormProxy(&gLinkFormProxies[form]);
+}
+
+RECOMP_CALLBACK(".", _internal_onEquipmentModelApplied)
+void refreshEquipmentOnEquipmentModelApplied(Link_EquipmentReplacement eq){
+    const EquipmentOverride *override = &gEquipmentOverrideTable[eq];
+
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        Link_FormProxy *fp = &gLinkFormProxies[i];
+
+        for (size_t j = 0; j < override->dl.count; ++j) {
+            requestRefreshFormProxyDL(fp, override->dl.overrides[j]);
+        }
+        
+        for (size_t j = 0; j < override->mtx.count; ++j) {
+            requestRefreshFormProxyMtx(fp, override->mtx.overrides[j]);
+        }
+    }
 }
 
 RECOMP_DECLARE_EVENT(_internal_initHashObjects());
