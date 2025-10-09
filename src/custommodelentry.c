@@ -69,6 +69,8 @@ bool ModelEntryForm_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *mo
 
     modelInfo->skeleton = this->skel;
 
+    modelInfo->shieldingSkeleton = this->shieldingSkel;
+
     for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
         if (this->eyesTex[i]) {
             modelInfo->mouthTextures[i] = this->mouthTex[i];
@@ -80,8 +82,6 @@ bool ModelEntryForm_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *mo
             modelInfo->eyesTextures[i] = this->eyesTex[i];
         }
     }
-
-    modelInfo->shieldingSkeleton = this->shieldingSkel;
 
     return true;
 }
@@ -98,6 +98,8 @@ void ModelEntryForm_init(ModelEntryForm *this) {
     this->modelEntry.applyToModelInfo = ModelEntryForm_applyToModelInfo;
 
     this->skel = NULL;
+
+    this->shieldingSkel = NULL;
 
     Lib_MemSet(this->mouthTex, 0, sizeof(this->mouthTex));
 
