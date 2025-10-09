@@ -547,16 +547,12 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
 
                 catInf->isNeedsDiskSave = true;
             } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
-                destroyAuthor();
-
                 setAuthor(entry->authorName);
 
                 if (shouldLivePreview()) {
                     CMEM_tryApplyEntry(cat, entry);
                 }
             }
-        } else {
-            Audio_PlaySfx(NA_SE_SY_ERROR);
         }
     }
 }
