@@ -771,7 +771,13 @@ void CMEM_removeModel(Link_CustomModelCategory cat) {
     }
 }
 
-PlayerModelManagerHandle CMEM_createMemoryHandle(Link_CustomModelCategory cat, char *internalName) {
+PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType type, char *internalName) {
+    Link_CustomModelCategory cat = getCategoryFromModelType(type);
+
+    if (!isValidCategory(cat)) {
+        return 0;
+    }
+
     size_t handleSize;
     bool isFormEntry = isFormCategory(cat);
     bool isEquipmentEntry = isEquipmentCategory(cat);
@@ -804,6 +810,7 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(Link_CustomModelCategory cat, c
 
     entry->internalName = internalName;
     entry->handle = handle;
+    entry->type = type;
 
     recomputil_u32_hashset_insert(sValidModelEntries, handle);
 

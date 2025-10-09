@@ -144,7 +144,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
         return 0;
     }
 
-    PlayerModelManagerHandle h = CMEM_createMemoryHandle(cat, YAZMTCore_Utils_StrDup(internalName));
+    PlayerModelManagerHandle h = CMEM_createMemoryHandle(modelType, YAZMTCore_Utils_StrDup(internalName));
 
     ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_registerModel");
 
@@ -155,8 +155,6 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
     if (modelType == PMM_MODEL_TYPE_ADULT) {
         entry->flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
     }
-
-    entry->type = modelType;
 
     return h;
 }
