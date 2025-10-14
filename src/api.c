@@ -10,8 +10,9 @@
 #include "modelreplacer_api.h"
 #include "globalobjects_api.h"
 #include "modelreplacer_compat.h"
+#include "apilocal.h"
 
-bool isEntryLoaded(ModelEntry *entry) {
+static bool isEntryLoaded(ModelEntry *entry) {
     if (entry) {
         return CMEM_getCurrentEntry(getCategoryFromModelType(entry->type)) == entry;
     }
@@ -19,7 +20,7 @@ bool isEntryLoaded(ModelEntry *entry) {
     return false;
 }
 
-void refreshProxyIfEntryLoaded(ModelEntry *entry) {
+static void refreshProxyIfEntryLoaded(ModelEntry *entry) {
     Link_CustomModelCategory cat = getCategoryFromModelType(entry->type);
 
     if (isEntryLoaded(entry)) {
@@ -27,19 +28,19 @@ void refreshProxyIfEntryLoaded(ModelEntry *entry) {
     }
 }
 
-void refreshProxyDLIfEntryLoaded(ModelEntry *entry, Link_DisplayList dlId) {
+static void refreshProxyDLIfEntryLoaded(ModelEntry *entry, Link_DisplayList dlId) {
     refreshProxyIfEntryLoaded(entry);
 }
 
-void refreshProxyMtxIfEntryLoaded(ModelEntry *entry, Link_EquipmentMatrix mtxId) {
+static void refreshProxyMtxIfEntryLoaded(ModelEntry *entry, Link_EquipmentMatrix mtxId) {
     refreshProxyIfEntryLoaded(entry);
 }
 
-void refreshProxyEyesTexturesIfEntryLoaded(ModelEntry *entry) {
+static void refreshProxyEyesTexturesIfEntryLoaded(ModelEntry *entry) {
     refreshProxyIfEntryLoaded(entry);
 }
 
-void refreshProxyMouthTexturesIfEntryLoaded(ModelEntry *entry) {
+static void refreshProxyMouthTexturesIfEntryLoaded(ModelEntry *entry) {
     refreshProxyIfEntryLoaded(entry);
 }
 
@@ -58,7 +59,7 @@ static bool isStrTooLong(const char *s, size_t maxLen) {
     return false;
 }
 
-bool isStrValid(const char *callerName, const char *strToVerify, size_t maxLen) {
+static bool isStrValid(const char *callerName, const char *strToVerify, size_t maxLen) {
     if (!strToVerify) {
         recomp_printf("%s: String passed in was NULL! Aborting!\n", callerName);
         return false;
