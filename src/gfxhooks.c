@@ -12,6 +12,7 @@
 #include "assets/objects/object_link_nuts/object_link_nuts.h"
 #include "assets/objects/object_link_goron/object_link_goron.h"
 #include "assets/objects/object_link_zora/object_link_zora.h"
+#include "assets/objects/object_mir_ray/object_mir_ray.h"
 
 typedef struct {
     Gfx *target;
@@ -84,6 +85,7 @@ static GfxHookDisplayList sLinkFormsDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_00E088, LINK_DL_LHAND_GUITAR),
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_00E2A0, LINK_DL_GUITAR),
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_0110A8, LINK_DL_FIN_SHIELD),
+    DECLARE_GFX_HOOK_DL(object_mir_ray_DL_0004B0, LINK_DL_SHIELD3_RAY),
 };
 static GfxHookLookup sLinkFormsDLMap = DECLARE_GFX_HOOK_LUT(sLinkFormsDLReplacements);
 
@@ -231,4 +233,19 @@ RECOMP_HOOK_RETURN("EnArrow_Draw")
 void hookGfx_on_return_EnArrow_Draw() {
     replaceHookedOpaGfxCommands(&sArrowGfxHook);
     replaceHookedXluGfxCommands(&sArrowGfxHook);
+}
+
+static GfxHookData sMirrorRayGfxHook;
+
+RECOMP_HOOK("MirRay3_Draw")
+void hookGfx_on_MirRay_Draw(Actor *thisx, PlayState *play) {
+    Player *player = GET_PLAYER(play);
+
+    fillGfxHookData(&sMirrorRayGfxHook, play, &gLinkFormProxies[player->transformation]);
+}
+
+RECOMP_HOOK_RETURN("MirRay3_Draw")
+void hookGfx_on_return_MirRay_Draw() {
+    replaceHookedOpaGfxCommands(&sMirrorRayGfxHook);
+    replaceHookedXluGfxCommands(&sMirrorRayGfxHook);
 }
