@@ -8,6 +8,7 @@
 #include "assets/objects/object_link_goron/object_link_goron.h"
 #include "assets/objects/object_link_zora/object_link_zora.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
+#include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "apilocal.h"
 
 extern Gfx gLinkHumanFirstPersonHookshotDL[];
@@ -33,6 +34,12 @@ static Gfx sCallMirrorShield[] = {
 };
 
 DECLARE_STATIC_MATRIX_WRAPPED_DL(sMirrorShieldAdult, sMirrorShieldResizer, sCallMirrorShield);
+
+static Gfx sCallMirrorShieldRay[] = {
+    gsSPEndDisplayList(),
+};
+
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sMirrorShieldRayAdult, sMirrorShieldRayResizer, sCallMirrorShieldRay);
 
 static Gfx sCallKokiriSwordHilt[] = {
     gsSPEndDisplayList(),
@@ -96,9 +103,25 @@ static Gfx sCallHookshotReticle[] = {
     gsSPEndDisplayList(),
 };
 
-static Mtx sHookshotHookAndChainAdultMtx;
+static Gfx sCallBow[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallBowFirstPerson[] = {
+    gsSPBranchList(gLinkHumanFirstPersonBowDL),
+};
+
+static Gfx sCallBowString[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallArrow[] = {
+    gsSPEndDisplayList(),
+};
 
 #undef DECLARE_STATIC_MATRIX_WRAPPED_DL
+
+static Mtx sHookshotHookAndChainAdultMtx;
 
 static Mtx sAdultShieldMatrix;
 
@@ -112,6 +135,9 @@ static void initCustomDLs() {
 
     gSPBranchList(sCallMirrorShield, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanMirrorShieldDL));
     guPosition(&sMirrorShieldResizer, 0.f, 0.f, 0.f, 1.3f, 0.f, 0.f, 0.f);
+
+    gSPBranchList(sCallMirrorShieldRay, GlobalObjects_getGlobalGfxPtr(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0));
+    guPosition(&sMirrorShieldRayResizer, 0.f, 0.f, 0.f, 1.3f, 0.f, 0.f, 0.f);
 
     gSPBranchList(sCallKokiriSwordHilt, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gKokiriSwordHandleDL));
     gSPBranchList(sCallKokiriSwordBlade, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gKokiriSwordBladeDL));
@@ -138,6 +164,10 @@ static void initCustomDLs() {
     gSPBranchList(sCallHookshotReticle, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gHookshotReticleDL));
 
     guPosition(&sHookshotHookAndChainAdultMtx, 0.f, 0.f, 0.f, 1.f, 50.f, 420.f, 0.f);
+
+    gSPBranchList(sCallBow, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanBowDL));
+    gSPBranchList(sCallBowString, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanBowDL));
+    gSPBranchList(sCallArrow, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0));
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
@@ -174,6 +204,7 @@ void registerMMEquipment() {
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setMatrix(h, LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanMirrorShieldMtx));
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR, sCallMirrorShield);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR_RAY, sCallMirrorShieldRay);
     }
 
     {
@@ -182,6 +213,7 @@ void registerMMEquipment() {
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setMatrix(h, LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, &sAdultShieldMatrix);
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR, sMirrorShieldAdult);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR_RAY, sMirrorShieldRayAdult);
     }
 
     // Kokiri Sword (MM)
