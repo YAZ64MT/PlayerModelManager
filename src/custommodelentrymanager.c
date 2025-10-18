@@ -795,6 +795,7 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType typ
     }
 
     ModelEntry *entry = recomp_alloc(handleSize);
+    memset(entry, 0, handleSize);
 
     if (!entry) {
         return 0;
