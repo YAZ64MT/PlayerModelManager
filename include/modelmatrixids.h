@@ -315,6 +315,9 @@ typedef enum {
     // Fierce Deity Elegy of Emptiness Statue
     LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY,
 
+    // Mirror Shield Projection Beam
+    LINK_DL_SHIELD3_RAY_BEAM,
+
     LINK_DL_MAX
 } Link_DisplayList;
 

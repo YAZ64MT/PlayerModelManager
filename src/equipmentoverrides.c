@@ -15,7 +15,7 @@ static Link_EquipmentMatrix sSword5Mtxs[] = {LINK_EQUIP_MATRIX_SWORD5_BACK};
 
 static Link_DisplayList sShield1DLs[] = {LINK_DL_SHIELD1};
 static Link_DisplayList sShield2DLs[] = {LINK_DL_SHIELD2};
-static Link_DisplayList sShield3DLs[] = {LINK_DL_SHIELD3, LINK_DL_SHIELD3_RAY};
+static Link_DisplayList sShield3DLs[] = {LINK_DL_SHIELD3, LINK_DL_SHIELD3_RAY, LINK_DL_SHIELD3_RAY_BEAM};
 static Link_EquipmentMatrix sShield1Mtxs[] = {LINK_EQUIP_MATRIX_SHIELD1_BACK, LINK_EQUIP_MATRIX_SHIELD1_ITEM};
 static Link_EquipmentMatrix sShield2Mtxs[] = {LINK_EQUIP_MATRIX_SHIELD2_BACK};
 static Link_EquipmentMatrix sShield3Mtxs[] = {LINK_EQUIP_MATRIX_SHIELD3_BACK};

@@ -41,6 +41,12 @@ static Gfx sCallMirrorShieldRay[] = {
 
 DECLARE_STATIC_MATRIX_WRAPPED_DL(sMirrorShieldRayAdult, sMirrorShieldRayResizer, sCallMirrorShieldRay);
 
+static Gfx sCallMirrorShieldRayBeam[] = {
+    gsSPEndDisplayList(),
+};
+
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sMirrorShieldRayBeamAdult, sMirrorShieldRayBeamResizer, sCallMirrorShieldRayBeam);
+
 static Gfx sCallKokiriSwordHilt[] = {
     gsSPEndDisplayList(),
 };
@@ -125,60 +131,71 @@ static Mtx sHookshotHookAndChainAdultMtx;
 
 static Mtx sAdultShieldMatrix;
 
+static Gfx *getRepointedMMDL(ObjectId id, Gfx *g) {
+    return GlobalObjects_getGlobalGfxPtr(id, g);
+}
+
+static void *getMMObject(ObjectId id) {
+    return GlobalObjects_getGlobalObject(id);
+}
+
 static void initCustomDLs() {
-    void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
+    void *human = getMMObject(OBJECT_LINK_CHILD);
 
     guPosition(&sAdultShieldMatrix, 0.f, 0.f, 180.f, 1.f, 935.f, 94.f, 29.f);
 
-    gSPBranchList(sCallHeroShield, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanHerosShieldDL));
+    gSPBranchList(sCallHeroShield, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanHerosShieldDL));
     guPosition(&sHeroShieldResizer, 0.f, 0.f, 0.f, 1.3f, 0.f, 0.f, 0.f);
 
-    gSPBranchList(sCallMirrorShield, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanMirrorShieldDL));
+    gSPBranchList(sCallMirrorShield, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanMirrorShieldDL));
     guPosition(&sMirrorShieldResizer, 0.f, 0.f, 0.f, 1.3f, 0.f, 0.f, 0.f);
 
-    gSPBranchList(sCallMirrorShieldRay, GlobalObjects_getGlobalGfxPtr(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0));
+    gSPBranchList(sCallMirrorShieldRay, getRepointedMMDL(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0));
     guPosition(&sMirrorShieldRayResizer, 0.f, 0.f, 0.f, 1.3f, 0.f, 0.f, 0.f);
 
-    gSPBranchList(sCallKokiriSwordHilt, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gKokiriSwordHandleDL));
-    gSPBranchList(sCallKokiriSwordBlade, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gKokiriSwordBladeDL));
-    gSPBranchList(sCallKokiriSwordSheath, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanKokiriSwordSheathDL));
+    gSPBranchList(sCallMirrorShieldRayBeam, getRepointedMMDL(OBJECT_MIR_RAY, object_mir_ray_DL_000168));
+    guPosition(&sMirrorShieldRayBeamResizer, 0.f, 0.f, 0.f, 1.3f, 0.f, 0.f, 0.f);
 
-    gSPBranchList(sCallRazorSwordHilt, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gRazorSwordHandleDL));
-    gSPBranchList(sCallRazorSwordBlade, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gRazorSwordBladeDL));
-    gSPBranchList(sCallRazorSwordSheath, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanRazorSwordSheathDL));
+    gSPBranchList(sCallKokiriSwordHilt, getRepointedMMDL(GAMEPLAY_KEEP, gKokiriSwordHandleDL));
+    gSPBranchList(sCallKokiriSwordBlade, getRepointedMMDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL));
+    gSPBranchList(sCallKokiriSwordSheath, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanKokiriSwordSheathDL));
 
-    gSPBranchList(sCallGildedSwordHilt, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanGildedSwordHandleDL));
-    gSPBranchList(sCallGildedSwordBlade, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanGildedSwordBladeDL));
-    gSPBranchList(sCallGildedSwordSheath, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL));
+    gSPBranchList(sCallRazorSwordHilt, getRepointedMMDL(GAMEPLAY_KEEP, gRazorSwordHandleDL));
+    gSPBranchList(sCallRazorSwordBlade, getRepointedMMDL(GAMEPLAY_KEEP, gRazorSwordBladeDL));
+    gSPBranchList(sCallRazorSwordSheath, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanRazorSwordSheathDL));
 
-    gSPBranchList(sCallHookshot, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanHookshotDL));
+    gSPBranchList(sCallGildedSwordHilt, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordHandleDL));
+    gSPBranchList(sCallGildedSwordBlade, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordBladeDL));
+    gSPBranchList(sCallGildedSwordSheath, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL));
+
+    gSPBranchList(sCallHookshot, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanHookshotDL));
     guPosition(&sHookshotResizer, 0.f, 0.f, 0.f, 1.4f, 50.f, 105.f, 0.f);
 
     guPosition(&sHookshotFirstPersonResizer, 0.f, 0.f, 0.f, 1.4f, 50.f, 105.f, 0.f);
 
-    gSPBranchList(sCallHookshotChain, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gHookshotChainDL));
+    gSPBranchList(sCallHookshotChain, getRepointedMMDL(GAMEPLAY_KEEP, gHookshotChainDL));
 
-    gSPBranchList(sCallHookshotHook, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, object_link_child_DL_01D960));
+    gSPBranchList(sCallHookshotHook, getRepointedMMDL(OBJECT_LINK_CHILD, object_link_child_DL_01D960));
     guPosition(&sHookshotHookResizer, 0.f, 0.f, 0.f, 1.4f, 0.f, 0.f, 0.f);
 
-    gSPBranchList(sCallHookshotReticle, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gHookshotReticleDL));
+    gSPBranchList(sCallHookshotReticle, getRepointedMMDL(GAMEPLAY_KEEP, gHookshotReticleDL));
 
     guPosition(&sHookshotHookAndChainAdultMtx, 0.f, 0.f, 0.f, 1.f, 50.f, 420.f, 0.f);
 
-    gSPBranchList(sCallBow, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanBowDL));
-    gSPBranchList(sCallBowString, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanBowDL));
-    gSPBranchList(sCallArrow, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0));
+    gSPBranchList(sCallBow, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanBowDL));
+    gSPBranchList(sCallBowString, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanBowDL));
+    gSPBranchList(sCallArrow, getRepointedMMDL(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0));
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
 void registerMMEquipment() {
     initCustomDLs();
 
-    void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
-    void *deku = GlobalObjects_getGlobalObject(OBJECT_LINK_NUTS);
-    void *goron = GlobalObjects_getGlobalObject(OBJECT_LINK_GORON);
-    void *zora = GlobalObjects_getGlobalObject(OBJECT_LINK_ZORA);
-    void *deity = GlobalObjects_getGlobalObject(OBJECT_LINK_BOY);
+    void *human = getMMObject(OBJECT_LINK_CHILD);
+    void *deku = getMMObject(OBJECT_LINK_NUTS);
+    void *goron = getMMObject(OBJECT_LINK_GORON);
+    void *zora = getMMObject(OBJECT_LINK_ZORA);
+    void *deity = getMMObject(OBJECT_LINK_BOY);
 
     // Hero's Shield
     {
@@ -205,6 +222,7 @@ void registerMMEquipment() {
         PlayerModelManager_setMatrix(h, LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanMirrorShieldMtx));
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR, sCallMirrorShield);
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR_RAY, sCallMirrorShieldRay);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR_RAY_BEAM, sCallMirrorShieldRayBeam);
     }
 
     {
@@ -214,6 +232,7 @@ void registerMMEquipment() {
         PlayerModelManager_setMatrix(h, LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, &sAdultShieldMatrix);
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR, sMirrorShieldAdult);
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR_RAY, sMirrorShieldRayAdult);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR_RAY_BEAM, sMirrorShieldRayBeamAdult);
     }
 
     // Kokiri Sword (MM)

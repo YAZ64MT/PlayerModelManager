@@ -16,7 +16,7 @@ typedef unsigned long PlayerModelManagerHandle;
 typedef enum {
 
     // Main skeleton DLs
-    PMM_DL_WAIST,
+    PMM_DL_WAIST = 0,
     PMM_DL_RTHIGH,
     PMM_DL_RSHIN,
     PMM_DL_RFOOT,
@@ -66,22 +66,25 @@ typedef enum {
     PMM_DL_SWORD4_BLADE_FRAGMENT,
     PMM_DL_SWORD5_BLADE,
 
-    PMM_DL_SHIELD1,     // Deku Shield
-    PMM_DL_SHIELD2,     // Hylian Shield / Hero's Shield
-    PMM_DL_SHIELD3,     // Mirror Shield
-    PMM_DL_SHIELD3_RAY, // Mirror Shield Projection
+    PMM_DL_SHIELD1,                // Deku Shield
+    PMM_DL_SHIELD2,                // Hylian Shield / Hero's Shield
+    PMM_DL_SHIELD3,                // Mirror Shield
+    PMM_DL_SHIELD3_RAY,            // Mirror Shield projection flat image
+    PMM_DL_SHIELD3_RAY_BEAM = 229, // Mirror Shield Reflective Beam DL
 
     // Items
-    PMM_DL_BOTTLE_GLASS,
+    PMM_DL_BOTTLE_GLASS = 43,
     PMM_DL_BOTTLE_CONTENTS,
     PMM_DL_OCARINA_FAIRY,
     PMM_DL_OCARINA_TIME,
     PMM_DL_DEKU_STICK,
-    PMM_DL_BOW, // Also has a first person variant
-    PMM_DL_BOW_STRING,
+    PMM_DL_BOW,
+    PMM_DL_FPS_BOW = 226,
+    PMM_DL_BOW_STRING = 49,
     PMM_DL_BOW_ARROW,
     PMM_DL_SLINGSHOT,
-    PMM_DL_SLINGSHOT_STRING,
+    PMM_DL_FPS_SLINGSHOT = 227,
+    PMM_DL_SLINGSHOT_STRING = 52,
     PMM_DL_HOOKSHOT,
     PMM_DL_HOOKSHOT_CHAIN,
     PMM_DL_HOOKSHOT_HOOK,
@@ -132,14 +135,14 @@ typedef enum {
     PMM_DL_MASK_FIERCE_DEITY_SCREAM,
 
     // Elegy of Emptiness statues
-    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN, // Only used if model is human
-    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,  // Only used if model is Deku
-    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_GORON, // Only used if model is Goron
-    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,  // Only used if model is Zora
-    // PMM_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY also exists
+    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN,              // Only used if model is human
+    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,               // Only used if model is Deku
+    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_GORON,              // Only used if model is Goron
+    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,               // Only used if model is Zora
+    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY = 228, // Only used if model is Fierce Deity
 
     // Strength Upgrades (OoT)
-    PMM_DL_BRACELET_LFOREARM,
+    PMM_DL_BRACELET_LFOREARM = 101,
     PMM_DL_GAUNTLET_LFOREARM,
     PMM_DL_GAUNTLET_LHAND,
     PMM_DL_GAUNTLET_LFIST,
@@ -311,16 +314,7 @@ typedef enum {
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_OPEN,
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_CLOSED,
 
-    // First Person Bow
-    PMM_DL_FPS_BOW,
-
-    // First Person Slingshot
-    PMM_DL_FPS_SLINGSHOT,
-
-    // Elegy of Emptiness Statue (Fierce Deity)
-    PMM_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY, // Only used if model is Fierce Deity
-
-    PMM_DL_MAX
+    PMM_DL_MAX = 230
 } PlayerModelManagerDisplayListId;
 
 #define PMM_DL_SWORD_KOKIRI_HILT PMM_DL_SWORD1_HILT
@@ -348,6 +342,7 @@ typedef enum {
 
 #define PMM_DL_SHIELD_MIRROR PMM_DL_SHIELD3
 #define PMM_DL_SHIELD_MIRROR_RAY PMM_DL_SHIELD3_RAY
+#define PMM_DL_SHIELD_MIRROR_RAY_BEAM PMM_DL_SHIELD3_RAY_BEAM
 
 typedef enum {
     PMM_MTX_SWORD1_BACK,
