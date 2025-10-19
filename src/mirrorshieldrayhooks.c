@@ -21,19 +21,16 @@ void setMirrorShieldMtxF_on_Player_PostLimbDrawGameplay(PlayState *play, s32 lim
     if (limbIndex == PLAYER_LIMB_SHEATH) {
         Player *player = (Player *)actor;
         if (player->actor.scale.y >= 0.0f) {
-            static MtxF shieldMf;
-
-            Matrix_Push();
+            MtxF *currMf = Matrix_GetCurrent();
 
             Link_FormProxy *formProxy = &gLinkFormProxies[player->transformation];
+            Mtx *formProxyM = getFormProxyMatrix(formProxy, LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK);
+            MtxF formProxyMf;
+            Matrix_MtxToMtxF(formProxyM, &formProxyMf);
 
-            Matrix_MtxToMtxF(getFormProxyMatrix(formProxy, LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK), &shieldMf);
+            MtxF *dest = z64recomp_get_extended_actor_data(actor, gPlayerExtIdMirrorShieldBackMf);
 
-            Matrix_Mult(&shieldMf, MTXMODE_APPLY);
-
-            Matrix_Get(z64recomp_get_extended_actor_data(actor, gPlayerExtIdMirrorShieldBackMf));
-
-            Matrix_Pop();
+            SkinMatrix_MtxFMtxFMult(currMf, &formProxyMf, dest);
         }
     }
 }
