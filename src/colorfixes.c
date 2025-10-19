@@ -70,11 +70,14 @@ typedef enum {
     TUNIC_COLOR_FORCE,
 } TunicColorConfigOption;
 
+static Link_TunicColor *sCurrentTunicColor; 
+
 RECOMP_HOOK("Player_Draw")
 void readTunicColor_on_Player_Draw(Actor *thisx, PlayState *play) {
     Player *player = (Player *)thisx;
 
     Link_TunicColor *playerTunic = &gLinkFormProxies[player->transformation].tunicColor;
+    sCurrentTunicColor = playerTunic;
 
     TunicColorConfigOption tunicColorOpt = recomp_get_config_u32("is_modify_tunic_color");
 
@@ -114,6 +117,25 @@ void readTunicColor_on_Player_Draw(Actor *thisx, PlayState *play) {
     OPEN_DISPS(play->state.gfxCtx);
     gDPSetEnvColor(POLY_OPA_DISP++, playerTunic->current.r, playerTunic->current.g, playerTunic->current.b, playerTunic->current.a);
     CLOSE_DISPS(play->state.gfxCtx);
+}
+
+// Handle Masks and other DLs that might potentially set the env color
+static PlayState *sPlayStatePostLimbDraw;
+
+RECOMP_HOOK("Player_PostLimbDrawGameplay")
+void refresh_color_on_Player_PostLimbDrawGameplay(PlayState* play, s32 limbIndex, Gfx** dList1, Gfx** dList2, Vec3s* rot, Actor* actor) {
+    sPlayStatePostLimbDraw = play;
+
+    OPEN_DISPS(sPlayStatePostLimbDraw->state.gfxCtx);
+    gEXPushEnvColor(POLY_OPA_DISP++);
+    CLOSE_DISPS(sPlayStatePostLimbDraw->state.gfxCtx);
+}
+
+RECOMP_HOOK_RETURN("Player_PostLimbDrawGameplay")
+void refresh_color_on_return_Player_PostLimbDrawGameplay() {
+    OPEN_DISPS(sPlayStatePostLimbDraw->state.gfxCtx);
+    gEXPopEnvColor(POLY_OPA_DISP++);
+    CLOSE_DISPS(sPlayStatePostLimbDraw->state.gfxCtx);
 }
 
 extern Color_RGB8 sPlayerBottleColors[];
