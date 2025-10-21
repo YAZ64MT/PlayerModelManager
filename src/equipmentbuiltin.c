@@ -183,7 +183,7 @@ static void initCustomDLs() {
     guPosition(&sHookshotHookAndChainAdultMtx, 0.f, 0.f, 0.f, 1.f, 50.f, 420.f, 0.f);
 
     gSPBranchList(sCallBow, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanBowDL));
-    gSPBranchList(sCallBowString, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanBowDL));
+    gSPBranchList(sCallBowString, getRepointedMMDL(OBJECT_LINK_CHILD, object_link_child_DL_017818));
     gSPBranchList(sCallArrow, getRepointedMMDL(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0));
 }
 
@@ -291,5 +291,16 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_CHAIN, sCallHookshotChain);
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_HOOK, sHookshotHookAdult);
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_RETICLE, sCallHookshotReticle);
+    }
+
+    // Bow (MM)
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_bow_c", PMM_MODEL_TYPE_BOW);
+        PlayerModelManager_setDisplayName(h, "Bow (MM)");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOW, sCallBow);
+        PlayerModelManager_setDisplayList(h, LINK_DL_FPS_BOW, sCallBowFirstPerson);
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOW_STRING, sCallBowString);
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOW_ARROW, sCallArrow);
     }
 }
