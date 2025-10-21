@@ -25,7 +25,6 @@ static ModelEntry *sCurrentModelEntries[LINK_CMC_MAX];
 
 typedef struct {
     const char *key;
-    char internalName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
 } SavedModelName;
 
 static SavedModelName sSavedModelNames[LINK_CMC_MAX] = {
@@ -847,8 +846,11 @@ void CMEM_saveCurrentEntry(Link_CustomModelCategory cat) {
     KV_Global_Remove(key);
 
     if (sCurrentModelEntries[cat]) {
-        strcpy(sSavedModelNames[cat].internalName, sCurrentModelEntries[cat]->internalName);
-        KV_Global_Set(key, sSavedModelNames[cat].internalName, INTERNAL_NAME_MAX_LENGTH);
+        // No need to initialize this since there will be a null terminator
+        char tmpNameBuf[SAVED_INTERNAL_NAME_BUFFER_SIZE];
+
+        strcpy(tmpNameBuf, sCurrentModelEntries[cat]->internalName);
+        KV_Global_Set(key, tmpNameBuf, INTERNAL_NAME_MAX_LENGTH);
     }
 }
 
@@ -858,10 +860,8 @@ void loadSavedModels() {
     static char retrievedName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
 
     for (int i = 0; i < LINK_CMC_MAX; ++i) {
-        if (KV_Global_Has(sSavedModelNames[i].key)) {
-            if (KV_Global_Get(sSavedModelNames[i].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
-                applyByInternalName(i, retrievedName);
-            }
+        if (KV_Global_Get(sSavedModelNames[i].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
+            applyByInternalName(i, retrievedName);
         } else {
             CMEM_forceApplyEntry(i, NULL);
         }
