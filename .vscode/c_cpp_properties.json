@@ -6,6 +6,7 @@
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/include/dummy_headers",
                 "${workspaceFolder}/mm-decomp/include",
+                "${workspaceFolder}/mm-decomp/include/libc",
                 "${workspaceFolder}/mm-decomp/src",
                 "${workspaceFolder}/mm-decomp/extracted/n64-us"
             ],
@@ -13,11 +14,36 @@
                 "F3DEX_GBI_2",
                 "_LANGUAGE_C",
                 "MIPS",
-                "YAZMT_PMM_NO_API_IMPORTS"
+                "YAZMT_PMM_NO_API_IMPORTS",
+                "F3DEX_GBI_2",
+                "F3DEX_GBI_PL",
+                "GBI_DOWHILE"
             ],
             "compilerPath": "clang",
-            "cStandard": "c99",
-            "intelliSenseMode": "clang-x86"
+            "cStandard": "gnu17",
+            "intelliSenseMode": "clang-x86",
+            "compilerArgs": [
+                "\"-target\", \"mips\"",
+                "-mips2",
+                "-mabi=32",
+                "-mno-abicalls",
+                "-mno-odd-spreg",
+                "-mno-check-zero-division",
+                "-fomit-frame-pointer",
+                "-ffast-math",
+                "-fno-unsafe-math-optimizations",
+                "-fno-builtin-memset",
+                "-Wall",
+                "-Wextra",
+                "-Wno-incompatible-library-redeclaration",
+                "-Wno-unused-parameter",
+                "-Wno-unknown-pragmas",
+                "-Wno-unused-variable",
+                "-Wno-missing-braces",
+                "-Wno-unsupported-floating-point-opt",
+                "-Werror=section",
+                "-nostdinc"
+            ]
         }
     ],
     "version": 4
