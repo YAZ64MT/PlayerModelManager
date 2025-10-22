@@ -125,6 +125,14 @@ static Gfx sCallArrow[] = {
     gsSPEndDisplayList(),
 };
 
+static Gfx sCallBottleGlass[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallBottleContents[] = {
+    gsSPEndDisplayList(),
+};
+
 #undef DECLARE_STATIC_MATRIX_WRAPPED_DL
 
 static Mtx sHookshotHookAndChainAdultMtx;
@@ -185,6 +193,9 @@ static void initCustomDLs() {
     gSPBranchList(sCallBow, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanBowDL));
     gSPBranchList(sCallBowString, getRepointedMMDL(OBJECT_LINK_CHILD, object_link_child_DL_017818));
     gSPBranchList(sCallArrow, getRepointedMMDL(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0));
+
+    gSPBranchList(sCallBottleGlass, getRepointedMMDL(GAMEPLAY_KEEP, gBottleGlassDL));
+    gSPBranchList(sCallBottleContents, getRepointedMMDL(GAMEPLAY_KEEP, gBottleContentsDL));
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
@@ -302,5 +313,14 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_FPS_BOW, sCallBowFirstPerson);
         PlayerModelManager_setDisplayList(h, LINK_DL_BOW_STRING, sCallBowString);
         PlayerModelManager_setDisplayList(h, LINK_DL_BOW_ARROW, sCallArrow);
+    }
+
+    // Bottle (MM)
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_bottle_c", PMM_MODEL_TYPE_BOTTLE);
+        PlayerModelManager_setDisplayName(h, "Bottle (MM)");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_GLASS, sCallBottleGlass);
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_CONTENTS, sCallBottleContents);
     }
 }
