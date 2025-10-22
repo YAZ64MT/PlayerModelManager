@@ -168,6 +168,30 @@ static Gfx sCallPipesRightDL[] = {
     gsSPEndDisplayList(),
 };
 
+static Gfx sCallDrumStrapDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallDrumUpDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallDrumDownDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallDrumLeftDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallDrumRightDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallDrumADL[] = {
+    gsSPEndDisplayList(),
+};
+
 #undef DECLARE_STATIC_MATRIX_WRAPPED_DL
 
 static Mtx sHookshotHookAndChainAdultMtx;
@@ -241,6 +265,13 @@ static void initCustomDLs() {
     gSPBranchList(sCallPipesDownDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_0077D0));
     gSPBranchList(sCallPipesLeftDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007900));
     gSPBranchList(sCallPipesADL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007A28));
+
+    gSPBranchList(sCallDrumStrapDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_00FC18));
+    gSPBranchList(sCallDrumUpDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_00FCF0));
+    gSPBranchList(sCallDrumDownDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_010368));
+    gSPBranchList(sCallDrumLeftDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_00FF18));
+    gSPBranchList(sCallDrumRightDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_010140));
+    gSPBranchList(sCallDrumADL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_010590));
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
@@ -403,5 +434,18 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_LEFT, sCallPipesLeftDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_RIGHT, sCallPipesRightDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_A, sCallPipesADL);
+    }
+
+    // Goron Drums
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_drums_a", PMM_MODEL_TYPE_DRUMS);
+        PlayerModelManager_setDisplayName(h, "Goron Drums");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_STRAP, sCallDrumStrapDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_UP, sCallDrumUpDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_DOWN, sCallDrumDownDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_LEFT, sCallDrumLeftDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_RIGHT, sCallDrumRightDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_A, sCallDrumADL);
     }
 }
