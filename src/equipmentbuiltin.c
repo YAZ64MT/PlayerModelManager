@@ -144,6 +144,30 @@ static Gfx sCallDekuStickDL[] = {
     gsSPEndDisplayList(),
 };
 
+static Gfx sCallPipesMouthDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallPipesADL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallPipesUpDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallPipesDownDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallPipesLeftDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallPipesRightDL[] = {
+    gsSPEndDisplayList(),
+};
+
 #undef DECLARE_STATIC_MATRIX_WRAPPED_DL
 
 static Mtx sHookshotHookAndChainAdultMtx;
@@ -210,6 +234,13 @@ static void initCustomDLs() {
     guPosition(&sOcarinaResizerMtx, 7.f, -8.f, -4.f, 1.f, 72.f, 238.f, -3.f);
 
     gSPBranchList(sCallDekuStickDL, getRepointedMMDL(GAMEPLAY_KEEP, gDekuStickDL));
+
+    gSPBranchList(sCallPipesMouthDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007390));
+    gSPBranchList(sCallPipesRightDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007548));
+    gSPBranchList(sCallPipesUpDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_0076A0));
+    gSPBranchList(sCallPipesDownDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_0077D0));
+    gSPBranchList(sCallPipesLeftDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007900));
+    gSPBranchList(sCallPipesADL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007A28));
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
@@ -359,5 +390,18 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayName(h, "Deku Stick (MM)");
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_DEKU_STICK, sCallDekuStickDL);
+    }
+
+    // Deku Pipes
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_pipes_c", PMM_MODEL_TYPE_PIPES);
+        PlayerModelManager_setDisplayName(h, "Deku Pipes");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_MOUTH, sCallPipesMouthDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_UP, sCallPipesUpDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_DOWN, sCallPipesDownDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_LEFT, sCallPipesLeftDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_RIGHT, sCallPipesRightDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_A, sCallPipesADL);
     }
 }
