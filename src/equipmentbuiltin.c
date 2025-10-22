@@ -13,6 +13,7 @@
 
 extern Gfx gLinkHumanFirstPersonHookshotDL[];
 extern Gfx gLinkHumanFirstPersonBowDL[];
+extern Gfx gLinkHumanOcarinaDL[];
 
 #define DECLARE_STATIC_MATRIX_WRAPPED_DL(dlName, mtxName, dl)           \
     static Mtx mtxName;                                                 \
@@ -133,6 +134,12 @@ static Gfx sCallBottleContents[] = {
     gsSPEndDisplayList(),
 };
 
+static Gfx sCallOcarina[] = {
+    gsSPBranchList(gLinkHumanOcarinaDL),
+};
+
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sOcarinaAdult, sOcarinaResizer, sCallOcarina);
+
 #undef DECLARE_STATIC_MATRIX_WRAPPED_DL
 
 static Mtx sHookshotHookAndChainAdultMtx;
@@ -196,6 +203,8 @@ static void initCustomDLs() {
 
     gSPBranchList(sCallBottleGlass, getRepointedMMDL(GAMEPLAY_KEEP, gBottleGlassDL));
     gSPBranchList(sCallBottleContents, getRepointedMMDL(GAMEPLAY_KEEP, gBottleContentsDL));
+
+    guPosition(&sOcarinaResizer, 7.f, -8.f, -4.f, 1.f, 72.f, 238.f, -3.f);
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
@@ -322,5 +331,20 @@ void registerMMEquipment() {
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_GLASS, sCallBottleGlass);
         PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_CONTENTS, sCallBottleContents);
+    }
+
+    // Ocarina of Time
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_ocarina2_time_c", PMM_MODEL_TYPE_OCARINA_TIME);
+        PlayerModelManager_setDisplayName(h, "Ocarina of Time (Child)");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_OCARINA_TIME, sCallOcarina);
+    }
+
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_ocarina2_time_a", PMM_MODEL_TYPE_OCARINA_TIME);
+        PlayerModelManager_setDisplayName(h, "Ocarina of Time (Adult)");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_OCARINA_TIME, sOcarinaAdult);
     }
 }
