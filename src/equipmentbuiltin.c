@@ -192,6 +192,10 @@ static Gfx sCallDrumADL[] = {
     gsSPEndDisplayList(),
 };
 
+static Gfx sCallGuitarDL[] = {
+    gsSPEndDisplayList(),
+};
+
 #undef DECLARE_STATIC_MATRIX_WRAPPED_DL
 
 static Mtx sHookshotHookAndChainAdultMtx;
@@ -272,6 +276,8 @@ static void initCustomDLs() {
     gSPBranchList(sCallDrumLeftDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_00FF18));
     gSPBranchList(sCallDrumRightDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_010140));
     gSPBranchList(sCallDrumADL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_010590));
+
+    gSPBranchList(sCallGuitarDL, getRepointedMMDL(OBJECT_LINK_ZORA, object_link_zora_DL_00E2A0));
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
@@ -447,5 +453,13 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_LEFT, sCallDrumLeftDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_RIGHT, sCallDrumRightDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_A, sCallDrumADL);
+    }
+
+    // Zora Guitar
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_guitar_a", PMM_MODEL_TYPE_GUITAR);
+        PlayerModelManager_setDisplayName(h, "Zora Guitar");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_GUITAR, sCallGuitarDL);
     }
 }
