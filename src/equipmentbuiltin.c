@@ -140,6 +140,10 @@ static Gfx sCallOcarina[] = {
 
 DECLARE_STATIC_MATRIX_WRAPPED_DL(sOcarinaAdult, sOcarinaResizer, sCallOcarina);
 
+static Gfx sCallDekuStick[] = {
+    gsSPEndDisplayList(),
+};
+
 #undef DECLARE_STATIC_MATRIX_WRAPPED_DL
 
 static Mtx sHookshotHookAndChainAdultMtx;
@@ -205,6 +209,8 @@ static void initCustomDLs() {
     gSPBranchList(sCallBottleContents, getRepointedMMDL(GAMEPLAY_KEEP, gBottleContentsDL));
 
     guPosition(&sOcarinaResizer, 7.f, -8.f, -4.f, 1.f, 72.f, 238.f, -3.f);
+
+    gSPBranchList(sCallDekuStick, getRepointedMMDL(GAMEPLAY_KEEP, gDekuStickDL));
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
@@ -346,5 +352,13 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayName(h, "Ocarina of Time (Adult)");
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_OCARINA_TIME, sOcarinaAdult);
+    }
+
+    // Deku Stick (MM)
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_deku_stick_c", PMM_MODEL_TYPE_DEKU_STICK);
+        PlayerModelManager_setDisplayName(h, "Deku Stick (MM)");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_DEKU_STICK, sCallDekuStick);
     }
 }
