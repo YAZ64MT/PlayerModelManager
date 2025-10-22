@@ -441,7 +441,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long a
         return false;
     }
 
-    if (dlId >= PMM_DL_SHIM_SWORD1 && dlId <= PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_CLOSED) {
+    if (dlId >= LINK_DL_SWORD1 && dlId <= LINK_DL_CENTER_FLOWER_PROPELLER_CLOSED) {
         recomp_printf("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid display list ID %d! (ID was a shim!)\n", form);
     }
 
@@ -469,7 +469,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVer
         return false;
     }
 
-    if (mtxId >= LINK_DL_MAX) {
+    if (mtxId >= LINK_EQUIP_MATRIX_MAX) {
         recomp_printf("PlayerModelManager_overrideVanillaMatrix: Mod requesting invalid matrix ID %d! (ID too high!)\n", form);
         return false;
     }
