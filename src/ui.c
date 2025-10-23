@@ -783,6 +783,7 @@ static void refreshFileList() {
     destroyModelButtons();
     createModelButtons();
     refreshCategoryName();
+    refreshButtonEntryColors();
 }
 
 typedef enum {
