@@ -236,6 +236,7 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanHerosShieldDL, LINK_DL_SHIELD_HERO);
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanMirrorShieldDL, LINK_DL_SHIELD_MIRROR);
     setupSharedListenerDL(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0, LINK_DL_SHIELD_MIRROR_RAY);
+    setupSharedListenerDL(OBJECT_MIR_RAY, object_mir_ray_DL_000168, LINK_DL_SHIELD_MIRROR_RAY_BEAM);
 
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanBowDL, LINK_DL_BOW);
     setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_017818, LINK_DL_BOW_STRING);

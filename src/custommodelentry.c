@@ -3,6 +3,7 @@
 #include "recomputils.h"
 #include "playermodelmanager_utils.h"
 #include "custommodelentrymanager.h"
+#include "equipmentoverrides.h"
 
 void ModelEntry_init(ModelEntry *entry) {
     entry->displayName = NULL;
@@ -14,13 +15,47 @@ void ModelEntry_init(ModelEntry *entry) {
     entry->handle = 0;
     entry->applyToModelInfo = NULL;
     entry->displayListPtrs = recomputil_create_u32_value_hashmap();
-    entry->matrixPtrs = recomputil_create_u32_value_hashmap();
+    entry->mtxPtrs = recomputil_create_u32_value_hashmap();
+    entry->setDisplayList = ModelEntry_setDisplayList;
+    entry->setMatrix = ModelEntry_setMatrix;
 }
 
-bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
+Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
+    uintptr_t ret = 0;
+    recomputil_u32_value_hashmap_get(entry->displayListPtrs, id, &ret);
+    return (Gfx *)ret;
+}
+
+bool ModelEntry_setDisplayList(ModelEntry *this, Link_DisplayList id, Gfx *dl) {
+    if (id >= LINK_DL_MAX || id < 0) {
+        return false;
+    }
+
+    recomputil_u32_value_hashmap_insert(this->displayListPtrs, id, (uintptr_t)dl);
+    return true;
+}
+
+Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
+    uintptr_t ret = 0;
+    recomputil_u32_value_hashmap_get(entry->mtxPtrs, id, &ret);
+    return (Mtx *)ret;
+}
+
+bool ModelEntry_setMatrix(ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx) {
+    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
+        return false;
+    }
+
+    recomputil_u32_value_hashmap_insert(this->mtxPtrs, id, (uintptr_t)mtx);
+    return true;
+}
+
+bool ModelEntryForm_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *modelInfoCustom) {
+    Link_ModelInfo *modelInfo = &modelInfoCustom->modelInfo;
+
     clearLinkModelInfo(modelInfo);
 
-    ModelEntryForm *this = thisx;
+    ModelEntryForm *this = (ModelEntryForm *)((void *)thisx);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         modelInfo->models[i] = ModelEntry_getDisplayList(&this->modelEntry, i);
@@ -34,6 +69,8 @@ bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
 
     modelInfo->skeleton = this->skel;
 
+    modelInfo->shieldingSkeleton = this->shieldingSkel;
+
     for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
         if (this->eyesTex[i]) {
             modelInfo->mouthTextures[i] = this->mouthTex[i];
@@ -45,8 +82,6 @@ bool applyFormEntry(void *thisx, Link_ModelInfo *modelInfo) {
             modelInfo->eyesTextures[i] = this->eyesTex[i];
         }
     }
-
-    modelInfo->shieldingSkeleton = this->shieldingSkel;
 
     return true;
 }
@@ -60,39 +95,80 @@ void ModelEntryForm_init(ModelEntryForm *this) {
         }
     }
 
-    this->modelEntry.applyToModelInfo = applyFormEntry;
+    this->modelEntry.applyToModelInfo = ModelEntryForm_applyToModelInfo;
 
     this->skel = NULL;
+
+    this->shieldingSkel = NULL;
 
     Lib_MemSet(this->mouthTex, 0, sizeof(this->mouthTex));
 
     Lib_MemSet(this->eyesTex, 0, sizeof(this->eyesTex));
 }
 
-Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
-    uintptr_t ret = 0;
-    recomputil_u32_value_hashmap_get(entry->displayListPtrs, id, &ret);
-    return (Gfx *)ret;
-}
+bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
+    ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-void ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) {
-    if (id >= LINK_DL_MAX || id < 0) {
-        return;
+    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+
+    // Count generally is very small (count < 10), so a simple linear search will do
+    for (size_t i = 0; i < override->dl.count; ++i) {
+        if (id == override->dl.overrides[i]) {
+            return ModelEntry_setDisplayList(thisx, id, dl);
+        }
     }
 
-    recomputil_u32_value_hashmap_insert(entry->displayListPtrs, id, (uintptr_t)dl);
+    return false;
 }
 
-Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
-    uintptr_t ret = 0;
-    recomputil_u32_value_hashmap_get(entry->matrixPtrs, id, &ret);
-    return (Mtx *)ret;
-}
+bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *mtx) {
+    ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-void ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) {
-    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
-        return;
+    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+
+    // Count generally is very small (count < 10), so a simple linear search will do
+    for (size_t i = 0; i < override->mtx.count; ++i) {
+        if (id == override->mtx.overrides[i]) {
+            return ModelEntry_setMatrix(thisx, id, mtx);
+        }
     }
 
-    recomputil_u32_value_hashmap_insert(entry->matrixPtrs, id, (uintptr_t)mtx);
+    return false;
+}
+
+bool ModelEntryEquipment_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *modelInfoCustom) {
+    ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
+
+    if (this->equipType >= LINK_DL_REPLACE_MAX) {
+        recomp_printf("Passed in invalid equipment type %u\n", this->equipType);
+        return false;
+    }
+
+    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+
+    for (size_t i = 0; i < override->dl.count; ++i) {
+        Link_DisplayList id = override->dl.overrides[i];
+        uintptr_t dl = 0;
+        recomputil_u32_value_hashmap_get(this->modelEntry.displayListPtrs, id, &dl);
+        recomputil_u32_value_hashmap_insert(modelInfoCustom->gfxOverrides, id, dl);
+        
+    }
+
+    for (size_t i = 0; i < override->mtx.count; ++i) {
+        Link_EquipmentMatrix id = override->mtx.overrides[i];
+        uintptr_t mtx = 0;
+        recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &mtx);
+        recomputil_u32_value_hashmap_insert(modelInfoCustom->mtxOverrides, id, mtx);
+    }
+
+    return true;
+}
+
+void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacement type) {
+    ModelEntry_init(&entry->modelEntry);
+
+    entry->equipType = type;
+    entry->modelEntry.setDisplayList = ModelEntryEquipment_setDisplayList;
+    entry->modelEntry.setMatrix = ModelEntryEquipment_setMatrix;
+    entry->modelEntry.applyToModelInfo = ModelEntryEquipment_applyToModelInfo;
 }

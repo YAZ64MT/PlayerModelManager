@@ -86,6 +86,7 @@ static GfxHookDisplayList sLinkFormsDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_00E2A0, LINK_DL_GUITAR),
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_0110A8, LINK_DL_FIN_SHIELD),
     DECLARE_GFX_HOOK_DL(object_mir_ray_DL_0004B0, LINK_DL_SHIELD3_RAY),
+    DECLARE_GFX_HOOK_DL(object_mir_ray_DL_000168, LINK_DL_SHIELD3_RAY_BEAM),
 };
 static GfxHookLookup sLinkFormsDLMap = DECLARE_GFX_HOOK_LUT(sLinkFormsDLReplacements);
 
@@ -220,7 +221,7 @@ void hookGfx_on_EnArrow_Draw(Actor *thisx, PlayState *play) {
 
     // Account for possibility form has a custom arrow model
     // otherwise default to human
-    if (gLinkFormProxies[player->transformation].current.models[LINK_DL_BOW_ARROW]) {
+    if (gLinkFormProxies[player->transformation].current.modelInfo.models[LINK_DL_BOW_ARROW]) {
         tf = player->transformation;
     } else {
         tf = PLAYER_FORM_HUMAN;

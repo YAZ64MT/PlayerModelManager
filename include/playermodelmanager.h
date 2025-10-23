@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "modelmatrixids.h"
+#include "recompdata.h"
 
 #define PLAYER_LIMB_COUNT 21
 #define PLAYER_BODY_SHIELD_LIMB_COUNT 4
@@ -16,6 +17,12 @@ typedef struct {
     FlexSkeletonHeader *skeleton;
     FlexSkeletonHeader *shieldingSkeleton;
 } Link_ModelInfo;
+
+typedef struct {
+    Link_ModelInfo modelInfo;
+    U32ValueHashmapHandle gfxOverrides;
+    U32ValueHashmapHandle mtxOverrides;
+} Link_ModelInfoCustom;
 
 typedef struct {
     FlexSkeletonHeader flexSkeleton;
@@ -45,7 +52,7 @@ typedef struct {
 
 typedef struct {
     PlayerTransformation form;
-    Link_ModelInfo current;
+    Link_ModelInfoCustom current;
     Link_ModelInfo vanilla;
     Link_SkeletonProxy skeleton;
     Link_ShieldingSkeletonProxy shieldingSkeleton;
