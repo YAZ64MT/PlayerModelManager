@@ -9,6 +9,7 @@
 #include "assets/objects/object_link_zora/object_link_zora.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
+#include "maskdls.h"
 #include "apilocal.h"
 
 extern Gfx gLinkHumanFirstPersonHookshotDL[];
@@ -196,6 +197,122 @@ static Gfx sCallGuitarDL[] = {
     gsSPEndDisplayList(),
 };
 
+static Gfx sCallMaskTruthDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskKafeiDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskAllNightDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskBunnyHoodDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskKeatonDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskGaroDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskRomaniDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskCircusLeaderDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskPostmanDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskCoupleDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskGreatFairyDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskGibdoDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskDonGeroDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskKamaroDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskCaptainDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskStoneDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskBremenDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskBlastDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskBlastCooldownDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskScentsDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskGiantDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskFierceDeityDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskFierceDeityScreamDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskGoronDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskGoronScreamDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskZoraDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskZoraScreamDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskDekuDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallMaskDekuScreamDL[] = {
+    gsSPEndDisplayList(),
+};
+
 #undef DECLARE_STATIC_MATRIX_WRAPPED_DL
 
 static Mtx sHookshotHookAndChainAdultMtx;
@@ -278,6 +395,50 @@ static void initCustomDLs() {
     gSPBranchList(sCallDrumADL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_010590));
 
     gSPBranchList(sCallGuitarDL, getRepointedMMDL(OBJECT_LINK_ZORA, object_link_zora_DL_00E2A0));
+
+    gSPBranchList(sCallMaskTruthDL, getRepointedMMDL(OBJECT_MASK_TRUTH, object_mask_truth_DL_0001A0));
+    gSPBranchList(sCallMaskKafeiDL, getRepointedMMDL(OBJECT_MASK_KERFAY, gKafeisMaskDL));
+    gSPBranchList(sCallMaskAllNightDL, getRepointedMMDL(OBJECT_MASK_YOFUKASI, object_mask_yofukasi_DL_000490));
+    gSPBranchList(sCallMaskBunnyHoodDL, getRepointedMMDL(OBJECT_MASK_RABIT, object_mask_rabit_DL_000610));
+    gSPBranchList(sCallMaskKeatonDL, getRepointedMMDL(OBJECT_MASK_KI_TAN, object_mask_ki_tan_DL_0004A0));
+    gSPBranchList(sCallMaskGaroDL, getRepointedMMDL(OBJECT_MASK_JSON, object_mask_json_DL_0004C0));
+    gSPBranchList(sCallMaskRomaniDL, getRepointedMMDL(OBJECT_MASK_ROMERNY, object_mask_romerny_DL_0007A0));
+    gSPBranchList(sCallMaskCircusLeaderDL, getRepointedMMDL(OBJECT_MASK_ZACHO, object_mask_zacho_DL_000700));
+    gSPBranchList(sCallMaskPostmanDL, getRepointedMMDL(OBJECT_MASK_POSTHAT, object_mask_posthat_DL_000290));
+    gSPBranchList(sCallMaskCoupleDL, getRepointedMMDL(OBJECT_MASK_MEOTO, object_mask_meoto_DL_0005A0));
+    gSPBranchList(sCallMaskGreatFairyDL, getRepointedMMDL(OBJECT_MASK_BIGELF, object_mask_bigelf_DL_0016F0));
+    gSPBranchList(sCallMaskGibdoDL, getRepointedMMDL(OBJECT_MASK_GIBUDO, object_mask_gibudo_DL_000250));
+    gSPBranchList(sCallMaskDonGeroDL, getRepointedMMDL(OBJECT_MASK_GERO, gDonGeroMaskDL));
+    gSPBranchList(sCallMaskKamaroDL, getRepointedMMDL(OBJECT_MASK_DANCER, object_mask_dancer_DL_000EF0));
+    gSPBranchList(sCallMaskCaptainDL, getRepointedMMDL(OBJECT_MASK_SKJ, object_mask_skj_DL_0009F0));
+    gSPBranchList(sCallMaskBremenDL, getRepointedMMDL(OBJECT_MASK_BREE, object_mask_bree_DL_0003C0));
+    gSPBranchList(sCallMaskBlastDL, getRepointedMMDL(OBJECT_MASK_BAKURETU, object_mask_bakuretu_DL_0005C0));
+    gSPBranchList(sCallMaskBlastCooldownDL, getRepointedMMDL(OBJECT_MASK_BAKURETU, object_mask_bakuretu_DL_000440));
+    gSPBranchList(sCallMaskScentsDL, getRepointedMMDL(OBJECT_MASK_BU_SAN, object_mask_bu_san_DL_000710));
+    gSPBranchList(sCallMaskGiantDL, getRepointedMMDL(OBJECT_MASK_KYOJIN, object_mask_kyojin_DL_000380));
+    gSPBranchList(sCallMaskFierceDeityDL, getRepointedMMDL(GAMEPLAY_KEEP, gFierceDeityMaskDL));
+    gSPBranchList(sCallMaskFierceDeityScreamDL, getRepointedMMDL(OBJECT_MASK_BOY, object_mask_boy_DL_000900));
+    gSPBranchList(sCallMaskGoronDL, getRepointedMMDL(GAMEPLAY_KEEP, gGoronMaskDL));
+    gSPBranchList(sCallMaskGoronScreamDL, getRepointedMMDL(OBJECT_MASK_GORON, object_mask_goron_DL_0014A0));
+    gSPBranchList(sCallMaskZoraDL, getRepointedMMDL(GAMEPLAY_KEEP, gZoraMaskDL));
+    gSPBranchList(sCallMaskZoraScreamDL, getRepointedMMDL(OBJECT_MASK_ZORA, object_mask_zora_DL_000DB0));
+    gSPBranchList(sCallMaskDekuDL, getRepointedMMDL(GAMEPLAY_KEEP, gDekuMaskDL));
+    gSPBranchList(sCallMaskDekuScreamDL, getRepointedMMDL(OBJECT_MASK_NUTS, object_mask_nuts_DL_001D90));
+}
+
+static void registerMaskDL(const char *internalName, const char *displayName, PlayerModelManagerModelType modelType, Link_DisplayList dlId, Gfx *dl) {
+    PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, internalName, modelType);
+    PlayerModelManager_setDisplayName(h, displayName);
+    PlayerModelManager_setAuthor(h, "Nintendo");
+    PlayerModelManager_setDisplayList(h, dlId, dl);
+}
+
+static void registerMaskDL2(const char *internalName, const char *displayName, PlayerModelManagerModelType modelType, Link_DisplayList dlId1, Gfx *dl1, Link_DisplayList dlId2, Gfx *dl2) {
+    PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, internalName, modelType);
+    PlayerModelManager_setDisplayName(h, displayName);
+    PlayerModelManager_setAuthor(h, "Nintendo");
+    PlayerModelManager_setDisplayList(h, dlId1, dl1);
+    PlayerModelManager_setDisplayList(h, dlId2, dl2);
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
@@ -462,4 +623,30 @@ void registerMMEquipment() {
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_GUITAR, sCallGuitarDL);
     }
+
+    // Masks
+    registerMaskDL("mm_mask_truth_c", "Mask of Truth", PMM_MODEL_TYPE_MASK_TRUTH, LINK_DL_MASK_TRUTH, sCallMaskTruthDL);
+    registerMaskDL("mm_mask_kafei_c", "Kafei's Mask", PMM_MODEL_TYPE_MASK_KAFEIS_MASK, LINK_DL_MASK_KAFEIS_MASK, sCallMaskKafeiDL);
+    registerMaskDL("mm_mask_all_night_c", "All Night Mask", PMM_MODEL_TYPE_MASK_ALL_NIGHT, LINK_DL_MASK_ALL_NIGHT, sCallMaskAllNightDL);
+    registerMaskDL("mm_mask_bunny_hood_c", "Bunny Hood", PMM_MODEL_TYPE_MASK_BUNNY, LINK_DL_MASK_BUNNY, sCallMaskBunnyHoodDL);
+    registerMaskDL("mm_mask_keaton_c", "Keaton Mask", PMM_MODEL_TYPE_MASK_KEATON, LINK_DL_MASK_KEATON, sCallMaskKeatonDL);
+    registerMaskDL("mm_mask_garo_c", "Garo's Mask", PMM_MODEL_TYPE_MASK_GARO, LINK_DL_MASK_GARO, sCallMaskGaroDL);
+    registerMaskDL("mm_mask_romani_c", "Romani's Mask", PMM_MODEL_TYPE_MASK_ROMANI, LINK_DL_MASK_ROMANI, sCallMaskRomaniDL);
+    registerMaskDL("mm_mask_circus_leader_c", "Circus Leader's Mask", PMM_MODEL_TYPE_MASK_CIRCUS_LEADER, LINK_DL_MASK_CIRCUS_LEADER, sCallMaskCircusLeaderDL);
+    registerMaskDL("mm_mask_postman_c", "Postman's Hat", PMM_MODEL_TYPE_MASK_POSTMAN, LINK_DL_MASK_POSTMAN, sCallMaskPostmanDL);
+    registerMaskDL("mm_mask_couple_c", "Couple's Mask", PMM_MODEL_TYPE_MASK_COUPLE, LINK_DL_MASK_COUPLE, sCallMaskCoupleDL);
+    registerMaskDL("mm_mask_great_fairy_c", "Great Fairy Mask", PMM_MODEL_TYPE_MASK_GREAT_FAIRY, LINK_DL_MASK_GREAT_FAIRY, sCallMaskGreatFairyDL);
+    registerMaskDL("mm_mask_gibdo_c", "Gibdo Mask", PMM_MODEL_TYPE_MASK_GIBDO, LINK_DL_MASK_GIBDO, sCallMaskGibdoDL);
+    registerMaskDL("mm_mask_don_gero_c", "Don Gero's Mask", PMM_MODEL_TYPE_MASK_DON_GERO, LINK_DL_MASK_DON_GERO, sCallMaskDonGeroDL);
+    registerMaskDL("mm_mask_kamaro_c", "Kamaro's Mask", PMM_MODEL_TYPE_MASK_KAMARO, LINK_DL_MASK_KAMARO, sCallMaskKamaroDL);
+    registerMaskDL("mm_mask_captain_c", "Captain's Hat", PMM_MODEL_TYPE_MASK_CAPTAIN, LINK_DL_MASK_CAPTAIN, sCallMaskCaptainDL);
+    registerMaskDL("mm_mask_stone_c", "Stone Mask", PMM_MODEL_TYPE_MASK_STONE, LINK_DL_MASK_STONE, sCallMaskStoneDL);
+    registerMaskDL("mm_mask_bremen_c", "Bremen Mask", PMM_MODEL_TYPE_MASK_BREMEN, LINK_DL_MASK_BREMEN, sCallMaskBremenDL);
+    registerMaskDL("mm_mask_scents_c", "Mask of Scents", PMM_MODEL_TYPE_MASK_SCENTS, LINK_DL_MASK_SCENTS, sCallMaskScentsDL);
+    registerMaskDL2("mm_mask_blast", "Blast Mask", PMM_MODEL_TYPE_MASK_BLAST, LINK_DL_MASK_BLAST, sCallMaskBlastDL, LINK_DL_MASK_BLAST_COOLING_DOWN, sCallMaskBlastCooldownDL);
+    registerMaskDL("mm_mask_giant_c", "Giant's Mask", PMM_MODEL_TYPE_MASK_GIANT, LINK_DL_MASK_GIANT, sCallMaskGiantDL);
+    registerMaskDL2("mm_mask_fierce_deity_c", "Fierce Deity's Mask", PMM_MODEL_TYPE_MASK_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY, sCallMaskFierceDeityDL, LINK_DL_MASK_FIERCE_DEITY_SCREAM, sCallMaskFierceDeityScreamDL);
+    registerMaskDL2("mm_mask_goron_c", "Goron Mask", PMM_MODEL_TYPE_MASK_GORON, LINK_DL_MASK_GORON, sCallMaskGoronDL, LINK_DL_MASK_GORON_SCREAM, sCallMaskGoronScreamDL);
+    registerMaskDL2("mm_mask_zora_c", "Zora Mask", PMM_MODEL_TYPE_MASK_ZORA, LINK_DL_MASK_ZORA, sCallMaskZoraDL, LINK_DL_MASK_ZORA_SCREAM, sCallMaskZoraScreamDL);
+    registerMaskDL2("mm_mask_deku_c", "Deku Mask", PMM_MODEL_TYPE_MASK_DEKU, LINK_DL_MASK_DEKU, sCallMaskDekuDL, LINK_DL_MASK_DEKU_SCREAM, sCallMaskDekuScreamDL);
 }
