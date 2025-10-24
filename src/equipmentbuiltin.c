@@ -85,6 +85,14 @@ static Gfx sCallGildedSwordSheathDL[] = {
     gsSPEndDisplayList(),
 };
 
+static Gfx sCallGreatFairySwordDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallFierceDeitySwordDL[] = {
+    gsSPEndDisplayList(),
+};
+
 static Gfx sCallHookshotDL[] = {
     gsSPEndDisplayList(),
 };
@@ -356,6 +364,10 @@ static void initCustomDLs() {
     gSPBranchList(sCallGildedSwordBladeDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordBladeDL));
     gSPBranchList(sCallGildedSwordSheathDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL));
 
+    gSPBranchList(sCallGreatFairySwordDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL));
+
+    gSPBranchList(sCallFierceDeitySwordDL, getRepointedMMDL(OBJECT_LINK_BOY, gLinkFierceDeitySwordDL));
+
     gSPBranchList(sCallHookshotDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanHookshotDL));
     guPosition(&sHookshotResizerMtx, 0.f, 0.f, 0.f, 1.4f, 50.f, 105.f, 0.f);
     sHookshotFirstPersonResizerMtx = sHookshotResizerMtx;
@@ -520,6 +532,24 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_HILT, sCallGildedSwordHiltDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_BLADE, sCallGildedSwordBladeDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_SHEATH, sCallGildedSwordSheathDL);
+    }
+
+    // Fierce Deity Sword
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_great_fairy_sword4_a", PMM_MODEL_TYPE_SWORD_FIERCE_DIETY);
+        PlayerModelManager_setDisplayName(h, "Fierce Deity's Sword");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_FIERCE_DEITY_BLADE, sCallFierceDeitySwordDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_FIERCE_DEITY_HILT, gEmptyDL);
+    }
+
+    // Great Fairy's Sword
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_great_fairy_sword5_c", PMM_MODEL_TYPE_SWORD_GREAT_FAIRY);
+        PlayerModelManager_setDisplayName(h, "Great Fairy's Sword");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GREAT_FAIRY_BLADE, sCallGreatFairySwordDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GREAT_FAIRY_HILT, gEmptyDL);
     }
 
     // Hookshot (MM)
