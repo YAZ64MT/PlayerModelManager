@@ -364,13 +364,13 @@ typedef struct {
     RecompuiResource button;
 } ButtonEntry;
 
-YAZMTCore_DynamicDataArray *sButtonEntries;
+YAZMTCore_DynamicU32Array *sButtonEntries;
 
 RECOMP_DECLARE_EVENT(_internal_onReadyUI());
 
 RECOMP_CALLBACK("*", recomp_on_init)
 void on_init() {
-    sButtonEntries = YAZMTCore_DynamicDataArray_new(sizeof(ButtonEntry));
+    sButtonEntries = YAZMTCore_DynamicU32Array_new();
 
     RecompuiColor bg_color;
     bg_color.r = 255;
@@ -556,6 +556,10 @@ static const ButtonColor sModelSelectedButtonColor = {
     },
 };
 
+static ButtonEntry **getCurrentButtonEntries() {
+    return (ButtonEntry **)YAZMTCore_DynamicU32Array_data(sButtonEntries);
+}
+
 static void refreshButtonEntryColors() {
     if (isSelectingCategory()) {
         return;
@@ -564,12 +568,12 @@ static void refreshButtonEntryColors() {
     if (isSelectingModel()) {
         void *entry = (void *)CMEM_getCurrentEntry(getCurrentCategoryInfo()->category);
         {
-            size_t count = YAZMTCore_DynamicDataArray_size(sButtonEntries);
-            ButtonEntry *entries = YAZMTCore_DynamicDataArray_data(sButtonEntries);
+            size_t count = YAZMTCore_DynamicU32Array_size(sButtonEntries);
+            ButtonEntry **entries = getCurrentButtonEntries();
 
             for (size_t i = 0; i < count; ++i) {
-                RecompuiResource button = entries[i].button;
-                if (entry == entries[i].data.ptr) {
+                RecompuiResource button = entries[i]->button;
+                if (entry == entries[i]->data.ptr) {
                     recompui_set_background_color(button, &sModelSelectedButtonColor.bgColor);
                     recompui_set_border_color(button, &sModelSelectedButtonColor.borderColor);
                 } else {
@@ -657,15 +661,16 @@ static void createUpOneLevelButton() {
 
 static void destroyModelButtons() {
     {
-        size_t count = YAZMTCore_DynamicDataArray_size(sButtonEntries);
-        ButtonEntry *entries = YAZMTCore_DynamicDataArray_data(sButtonEntries);
+        size_t count = YAZMTCore_DynamicU32Array_size(sButtonEntries);
+        ButtonEntry **entries = getCurrentButtonEntries();
 
         for (size_t i = 0; i < count; ++i) {
-            recompui_destroy_element(containerModelList, entries[i].button);
+            recompui_destroy_element(containerModelList, entries[i]->button);
+            recomp_free(entries[i]);
         }
     }
 
-    YAZMTCore_DynamicDataArray_clear(sButtonEntries);
+    YAZMTCore_DynamicU32Array_clear(sButtonEntries);
 
     if (isSelectingCategory()) {
         destroyNextPrevCategoryButtons();
@@ -679,15 +684,14 @@ static void createModelButtons() {
     bool isCategoryMode = isSelectingCategory();
     bool isModelMode = isSelectingModel();
 
-    CategoryInfo *catInf = isModelMode ? getCurrentCategoryInfo() : NULL;
-
-    if (catInf || isCategoryMode) {
+    if (isModelMode || isCategoryMode) {
         if (isCategoryMode) {
             for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
                 CategoryInfo *curr = &sCategoryInfos[i];
 
                 if (curr->isVisible) {
-                    ButtonEntry *entry = YAZMTCore_DynamicDataArray_createElement(sButtonEntries);
+                    ButtonEntry *entry = recomp_alloc(sizeof(ButtonEntry));
+                    YAZMTCore_DynamicU32Array_push(sButtonEntries, (uintptr_t)entry);
                     entry->button = recompui_create_button(context, containerModelList, curr->displayName, BUTTONSTYLE_PRIMARY);
                     entry->data.index = i;
 
@@ -715,6 +719,8 @@ static void createModelButtons() {
             recompui_set_nav(buttonCategoryNext, NAVDIRECTION_UP, buttonUpOneMenuLevel);
             recompui_set_nav(buttonCategoryPrev, NAVDIRECTION_LEFT, buttonUpOneMenuLevel);
 
+            CategoryInfo *catInf = getCurrentCategoryInfo();
+
             size_t count = 0;
             ModelEntry **modelEntries = CMEM_getCategoryEntryData(catInf->category, &count);
 
@@ -726,7 +732,8 @@ static void createModelButtons() {
                     name = modelEntries[i]->internalName;
                 }
 
-                ButtonEntry *buttonEntry = YAZMTCore_DynamicDataArray_createElement(sButtonEntries);
+                ButtonEntry *buttonEntry = recomp_alloc(sizeof(ButtonEntry));
+                YAZMTCore_DynamicU32Array_push(sButtonEntries, (uintptr_t)buttonEntry);
                 buttonEntry->button = recompui_create_button(context, containerModelList, name, BUTTONSTYLE_PRIMARY);
                 buttonEntry->data.ptr = modelEntries[i];
 
@@ -737,12 +744,12 @@ static void createModelButtons() {
             }
         }
 
-        size_t buttonCount = YAZMTCore_DynamicDataArray_size(sButtonEntries);
+        size_t buttonCount = YAZMTCore_DynamicU32Array_size(sButtonEntries);
         if (buttonCount > 0) {
-            ButtonEntry *buttonEntries = YAZMTCore_DynamicDataArray_data(sButtonEntries);
+            ButtonEntry **buttonEntries = getCurrentButtonEntries();
 
-            RecompuiResource buttonFirst = buttonEntries[0].button;
-            RecompuiResource buttonLast = buttonEntries[buttonCount - 1].button;
+            RecompuiResource buttonFirst = buttonEntries[0]->button;
+            RecompuiResource buttonLast = buttonEntries[buttonCount - 1]->button;
 
             recompui_set_nav(buttonClose, NAVDIRECTION_UP, buttonLast);
             recompui_set_nav(buttonRemoveModel, NAVDIRECTION_RIGHT, buttonLast);
@@ -754,15 +761,15 @@ static void createModelButtons() {
             recompui_set_nav(buttonLast, NAVDIRECTION_LEFT, buttonRemoveModel);
 
             if (buttonCount > 1) {
-                recompui_set_nav(buttonFirst, NAVDIRECTION_DOWN, buttonEntries[1].button);
+                recompui_set_nav(buttonFirst, NAVDIRECTION_DOWN, buttonEntries[1]->button);
                 recompui_set_nav(buttonFirst, NAVDIRECTION_RIGHT, buttonLast);
 
-                recompui_set_nav(buttonLast, NAVDIRECTION_UP, buttonEntries[buttonCount - 2].button);
+                recompui_set_nav(buttonLast, NAVDIRECTION_UP, buttonEntries[buttonCount - 2]->button);
 
                 for (size_t i = 1; i < buttonCount - 1; ++i) {
-                    RecompuiResource button = buttonEntries[i].button;
-                    recompui_set_nav(button, NAVDIRECTION_UP, buttonEntries[i - 1].button);
-                    recompui_set_nav(button, NAVDIRECTION_DOWN, buttonEntries[i + 1].button);
+                    RecompuiResource button = buttonEntries[i]->button;
+                    recompui_set_nav(button, NAVDIRECTION_UP, buttonEntries[i - 1]->button);
+                    recompui_set_nav(button, NAVDIRECTION_DOWN, buttonEntries[i + 1]->button);
                     recompui_set_nav(button, NAVDIRECTION_LEFT, buttonRemoveModel);
                     recompui_set_nav(button, NAVDIRECTION_RIGHT, buttonLast);
                 }
