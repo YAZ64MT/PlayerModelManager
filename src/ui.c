@@ -189,6 +189,12 @@ static void fillRealEntries() {
     }
 }
 
+static void restoreCurrentCategoryModel() {
+    if (isSelectingModel()) {
+        applyRealEntry(sCurrentCategoryInfo);
+    }
+}
+
 static void removeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (context_shown) {
         if (data->type == UI_EVENT_CLICK) {
@@ -215,8 +221,8 @@ static void removeButtonPressed(RecompuiResource resource, const RecompuiEventDa
         } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
             destroyAuthor();
 
-            if (shouldLivePreview() && isSelectingModel()) {
-                applyRealEntry(sCurrentCategoryInfo);
+            if (shouldLivePreview()) {
+                restoreCurrentCategoryModel();
             }
         }
     }
@@ -305,6 +311,8 @@ static void changeCategoryButtonPressed(RecompuiResource resource, const Recompu
         if (data->type == UI_EVENT_CLICK) {
             Audio_PlaySfx(NA_SE_SY_DECIDE);
 
+            restoreCurrentCategoryModel();
+
             bool isNextButton = !!userdata;
 
             if (isNextButton) {
@@ -316,6 +324,12 @@ static void changeCategoryButtonPressed(RecompuiResource resource, const Recompu
             refreshFileList();
             refreshButtonEntryColors();
             refreshCategoryName();
+        } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+            destroyAuthor();
+
+            if (shouldLivePreview()) {
+                restoreCurrentCategoryModel();
+            }
         }
     }
 }
@@ -604,7 +618,7 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
                 refreshButtonEntryColors();
 
                 catInf->isNeedsDiskSave = true;
-            } else if (data->type == UI_EVENT_HOVER || data->type == UI_EVENT_FOCUS) {
+            } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
                 setAuthor(entry->authorName);
 
                 if (shouldLivePreview()) {
@@ -621,8 +635,11 @@ static void onCategoryButtonPressed(RecompuiResource resource, const RecompuiEve
             ButtonEntry *entry = userdata;
 
             if (entry) {
+                Audio_PlaySfx(NA_SE_SY_DECIDE);
                 sCurrentCategoryInfo = entry->data.index;
                 refreshFileList();
+            } else {
+                Audio_PlaySfx(NA_SE_SY_ERROR);
             }
         }
     }
@@ -637,6 +654,12 @@ static void onUpOneLevelButtonPressed(RecompuiResource resource, const RecompuiE
                 refreshFileList();
             } else {
                 Audio_PlaySfx(NA_SE_SY_ERROR);
+            }
+        } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+            destroyAuthor();
+
+            if (shouldLivePreview()) {
+                restoreCurrentCategoryModel();
             }
         }
     }
