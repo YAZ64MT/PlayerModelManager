@@ -402,6 +402,8 @@ static void removeSingleModelButtonPressed(RecompuiResource resource, const Reco
     }
 }
 
+static bool sShouldClearANextFrame;
+
 static void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (sIsUIContextShown) {
         if (data->type == UI_EVENT_CLICK) {
@@ -427,6 +429,8 @@ static void closeButtonPressed(RecompuiResource resource, const RecompuiEventDat
             }
 
             clearRealEntries();
+
+            sShouldClearANextFrame = true;
         } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
             destroyAuthor();
 
@@ -904,18 +908,29 @@ typedef enum {
     MODCFG_BUTTON_COMBO_LA,
 } ModConfig_ButtonCombo;
 
+static void clearPressedInputButtons(Input *input, u16 buttons) {
+    input->press.button &= (~buttons);
+}
+
 static bool isOpenMenuComboPressed(PlayState *play) {
     Input *input = CONTROLLER1(&play->state);
 
     switch (recomp_get_config_u32("open_menu_buttons")) {
         case MODCFG_BUTTON_COMBO_LR:
-            return (CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_R)) ||
-                   (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_R));
+            if ((CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_R)) ||
+                (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_R))) {
+                clearPressedInputButtons(input, BTN_L | BTN_R);
+                return true;
+            }
             break;
 
         case MODCFG_BUTTON_COMBO_LA:
-            return (CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_A)) ||
-                   (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_A));
+
+            if ((CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_A)) ||
+                (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_A))) {
+                    clearPressedInputButtons(input, BTN_L | BTN_A);
+                    return true;
+            }
             break;
 
         default:
@@ -940,6 +955,12 @@ void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play) {
     if (isOpenMenuComboPressed(play)) {
         openModelMenu();
     }
+
+    if (sShouldClearANextFrame) {
+        clearPressedInputButtons(CONTROLLER1(&play->state), BTN_A);
+    }
+
+    sShouldClearANextFrame = false;
 }
 
 RECOMP_CALLBACK(".", _internal_onFinishedRegisterModels)
