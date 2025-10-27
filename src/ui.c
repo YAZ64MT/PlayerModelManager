@@ -8,6 +8,52 @@
 #include "model_common.h"
 #include "yazmtcorelib_api.h"
 
+static void setAllNavDirsToAuto(RecompuiResource id) {
+    recompui_set_nav_auto(id, NAVDIRECTION_DOWN);
+    recompui_set_nav_auto(id, NAVDIRECTION_UP);
+    recompui_set_nav_auto(id, NAVDIRECTION_LEFT);
+    recompui_set_nav_auto(id, NAVDIRECTION_RIGHT);
+}
+
+static RecompuiResource createListBoxButton(RecompuiContext context, RecompuiResource parent, const char *text, RecompuiButtonStyle style) {
+    RecompuiResource button = recompui_create_button(context, parent, text, style);
+    recompui_set_flex_shrink(button, 0);
+    recompui_set_width(button, 100.0f, UNIT_PERCENT);
+    recompui_set_text_align(button, TEXT_ALIGN_CENTER);
+
+    return button;
+}
+
+// Connect a list of buttons vertically with the first entry at the top
+//
+// Left and right inputs will navigate to the top and bottom of the list,
+// respectively
+static void connectListBoxButtons(RecompuiResource buttons[], size_t n) {
+    if (n < 2) {
+        return;
+    }
+
+    RecompuiResource first = buttons[0];
+    RecompuiResource last = buttons[n - 1];
+
+    for (size_t i = 1; i < n - 1; ++i) {
+        RecompuiResource curr = buttons[i];
+        RecompuiResource next = buttons[i];
+
+        recompui_set_nav(buttons[i], NAVDIRECTION_DOWN, next);
+        recompui_set_nav(buttons[i], NAVDIRECTION_LEFT, first);
+        recompui_set_nav(buttons[i], NAVDIRECTION_RIGHT, last);
+
+        recompui_set_nav(next, NAVDIRECTION_UP, curr);
+    }
+
+    recompui_set_nav(first, NAVDIRECTION_DOWN, buttons[1]);
+    recompui_set_nav(first, NAVDIRECTION_RIGHT, last);
+
+    recompui_set_nav(last, NAVDIRECTION_UP, buttons[n - 2]);
+    recompui_set_nav(last, NAVDIRECTION_LEFT, first);
+}
+
 static void refreshFileList();
 static void refreshButtonEntryColors();
 
