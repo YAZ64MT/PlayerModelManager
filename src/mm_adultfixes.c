@@ -31,7 +31,7 @@ void addFPSrightForearm_on_return_OverrideLimbDrawFirstPerson() {
     }
 }
 
-PlayerAgeProperties gAdultLinkAgeProps = {};
+PlayerAgeProperties gAdultLinkAgeProps;
 
 PlayerAgeProperties gVanillaHumanLinkAgeProps;
 
@@ -186,7 +186,6 @@ static PlayerTransformation sRealPlayerFormGrab;
 
 RECOMP_HOOK("EnRd_Grab")
 void fixEnemyHeight_on_EnRd_Grab(EnRd *this, PlayState *play) {
-    Player *p = GET_PLAYER(play);
     sRealPlayerFormGrab = GET_PLAYER_FORM;
 
     if (IS_HUMAN_ADULT_LINK_MODEL && sRealPlayerFormGrab == PLAYER_FORM_HUMAN) {
