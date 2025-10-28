@@ -13,7 +13,7 @@
 
 static bool sShouldSkipInterpolation[PLAYER_FORM_MAX];
 
-static U32HashsetHandle sValidModelEntries;
+static U32SlotmapHandle sEntryHandles;
 
 static YAZMTCore_StringU32Dictionary *sInternalNamesToEntries;
 
@@ -800,19 +800,18 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType typ
         return 0;
     }
 
-    PlayerModelManagerHandle handle = (PlayerModelManagerHandle)entry;
-
     if (isFormEntry) {
         ModelEntryForm_init((ModelEntryForm *)entry);
     } else if (isEquipmentEntry) {
         ModelEntryEquipment_init((ModelEntryEquipment *)entry, getEquipmentReplacementFromCategory(cat));
     }
 
+    PlayerModelManagerHandle handle = recomputil_u32_slotmap_create(sEntryHandles);
+    recomputil_u32_slotmap_set(sEntryHandles, handle, (uintptr_t)entry);
+    
     entry->internalName = internalName;
     entry->handle = handle;
     entry->type = type;
-
-    recomputil_u32_hashset_insert(sValidModelEntries, handle);
 
     pushMemoryEntry(cat, entry);
 
@@ -820,11 +819,11 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType typ
 }
 
 ModelEntry *CMEM_getEntry(PlayerModelManagerHandle h) {
-    if (recomputil_u32_hashset_contains(sValidModelEntries, h)) {
-        return (ModelEntry *)h;
-    }
+    uintptr_t entry = 0;
 
-    return NULL;
+    recomputil_u32_slotmap_get(sEntryHandles, h, &entry);
+
+    return (ModelEntry *)entry;
 }
 
 ModelEntry **CMEM_getEntries(Link_CustomModelCategory cat, size_t *count) {
@@ -885,7 +884,7 @@ void applySavedModelOnTitleScreen() {
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initCMEMHash() {
-    sValidModelEntries = recomputil_create_u32_hashset();
+    sEntryHandles = recomputil_create_u32_slotmap();
     sInternalNamesToEntries = YAZMTCore_StringU32Dictionary_new();
 }
 
