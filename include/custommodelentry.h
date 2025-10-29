@@ -15,7 +15,8 @@ typedef struct ModelEntry {
     char *displayName;
     char *internalName;
     char *authorName;
-    bool (*applyToModelInfo)(struct ModelEntry *this, Link_ModelInfoCustom *modelInfo);
+    bool (*applyToModelInfo)(struct ModelEntry *this);
+    bool (*removeFromModelInfo)(struct ModelEntry *this);
     bool (*setDisplayList)(struct ModelEntry *this, Link_DisplayList id, Gfx *dl);
     bool (*setMatrix)(struct ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx);
     PlayerModelManagerEventHandler* callback;

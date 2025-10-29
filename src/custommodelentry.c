@@ -4,6 +4,20 @@
 #include "playermodelmanager_utils.h"
 #include "custommodelentrymanager.h"
 #include "equipmentoverrides.h"
+#include "model_common.h"
+
+RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
+RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement eq));
+
+bool ModelEntry_applyToModelInfo(ModelEntry *this) {
+    recomp_printf("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_applyToModelInfo (should have been overriden!)\n", this->internalName ? this->internalName : "[UNKNOWN]");
+    return false;
+}
+
+bool ModelEntry_removeFromModelInfo(ModelEntry *this) {
+    recomp_printf("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_removeFromModelInfo (should have been overriden!)\n", this->internalName ? this->internalName : "[UNKNOWN]");
+    return false;
+}
 
 void ModelEntry_init(ModelEntry *entry) {
     entry->displayName = NULL;
@@ -13,7 +27,8 @@ void ModelEntry_init(ModelEntry *entry) {
     entry->callback = NULL;
     entry->callbackData = NULL;
     entry->handle = 0;
-    entry->applyToModelInfo = NULL;
+    entry->applyToModelInfo = ModelEntry_applyToModelInfo;
+    entry->removeFromModelInfo = ModelEntry_removeFromModelInfo;
     entry->displayListPtrs = recomputil_create_u32_value_hashmap();
     entry->mtxPtrs = recomputil_create_u32_value_hashmap();
     entry->setDisplayList = ModelEntry_setDisplayList;
@@ -50,12 +65,18 @@ bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) 
     return true;
 }
 
-bool ModelEntryForm_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *modelInfoCustom) {
-    Link_ModelInfo *modelInfo = &modelInfoCustom->modelInfo;
+bool ModelEntryForm_applyToModelInfo(ModelEntry *thisx) {
+    PlayerTransformation form = getFormFromModelType(thisx->type);
+
+    if (form >= PLAYER_FORM_MAX) {
+        return false;
+    }
+
+    Link_ModelInfo *modelInfo = &gLinkFormProxies[form].current.modelInfo;
 
     clearLinkModelInfo(modelInfo);
 
-    ModelEntryForm *this = (ModelEntryForm *)((void *)thisx);
+    ModelEntryForm *this = (ModelEntryForm *)(thisx);
 
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         modelInfo->models[i] = ModelEntry_getDisplayList(&this->modelEntry, i);
@@ -83,6 +104,20 @@ bool ModelEntryForm_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *mo
         }
     }
 
+    _internal_onFormModelApplied(form);
+
+    return true;
+}
+
+bool ModelEntryForm_removeFromModelInfo(ModelEntry *thisx) {
+    PlayerTransformation form = getFormFromModelType(thisx->type);
+
+    Link_FormProxy *proxy = &gLinkFormProxies[form];
+
+    clearLinkModelInfo(&proxy->current.modelInfo);
+
+    _internal_onFormModelApplied(form);
+
     return true;
 }
 
@@ -96,6 +131,7 @@ void ModelEntryForm_init(ModelEntryForm *entry) {
     }
 
     entry->modelEntry.applyToModelInfo = ModelEntryForm_applyToModelInfo;
+    entry->modelEntry.removeFromModelInfo = ModelEntryForm_removeFromModelInfo;
 
     entry->skel = NULL;
 
@@ -136,7 +172,7 @@ bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, M
     return false;
 }
 
-bool ModelEntryEquipment_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *modelInfoCustom) {
+bool ModelEntryEquipment_applyToModelInfo(ModelEntry *thisx) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
     if (this->equipType >= LINK_DL_REPLACE_MAX) {
@@ -146,20 +182,47 @@ bool ModelEntryEquipment_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCusto
 
     const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
 
-    for (size_t i = 0; i < override->dl.count; ++i) {
-        Link_DisplayList id = override->dl.overrides[i];
-        uintptr_t dl = 0;
-        recomputil_u32_value_hashmap_get(this->modelEntry.displayListPtrs, id, &dl);
-        recomputil_u32_value_hashmap_insert(modelInfoCustom->gfxOverrides, id, dl);
-        
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        Link_ModelInfoCustom *modelInfoCustom = &gLinkFormProxies[i].current;
+
+        for (size_t i = 0; i < override->dl.count; ++i) {
+            Link_DisplayList id = override->dl.overrides[i];
+            uintptr_t dl = 0;
+            recomputil_u32_value_hashmap_get(this->modelEntry.displayListPtrs, id, &dl);
+            recomputil_u32_value_hashmap_insert(modelInfoCustom->gfxOverrides, id, dl);
+        }
+
+        for (size_t i = 0; i < override->mtx.count; ++i) {
+            Link_EquipmentMatrix id = override->mtx.overrides[i];
+            uintptr_t mtx = 0;
+            recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &mtx);
+            recomputil_u32_value_hashmap_insert(modelInfoCustom->mtxOverrides, id, mtx);
+        }
     }
 
-    for (size_t i = 0; i < override->mtx.count; ++i) {
-        Link_EquipmentMatrix id = override->mtx.overrides[i];
-        uintptr_t mtx = 0;
-        recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &mtx);
-        recomputil_u32_value_hashmap_insert(modelInfoCustom->mtxOverrides, id, mtx);
+    _internal_onEquipmentModelApplied(this->equipType);
+
+    return true;
+}
+
+bool ModelEntryEquipment_removeFromModelInfo(ModelEntry *thisx) {
+    ModelEntryEquipment *this = (ModelEntryEquipment *)thisx;
+
+    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        Link_FormProxy *fp = &gLinkFormProxies[i];
+
+        for (size_t j = 0; j < override->dl.count; ++j) {
+            recomputil_u32_value_hashmap_erase(fp->current.gfxOverrides, override->dl.overrides[j]);
+        }
+
+        for (size_t j = 0; j < override->mtx.count; ++j) {
+            recomputil_u32_value_hashmap_erase(fp->current.mtxOverrides, override->mtx.overrides[j]);
+        }
     }
+
+    _internal_onEquipmentModelApplied(this->equipType);
 
     return true;
 }
@@ -171,4 +234,13 @@ void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacem
     entry->modelEntry.setDisplayList = ModelEntryEquipment_setDisplayList;
     entry->modelEntry.setMatrix = ModelEntryEquipment_setMatrix;
     entry->modelEntry.applyToModelInfo = ModelEntryEquipment_applyToModelInfo;
+    entry->modelEntry.removeFromModelInfo = ModelEntryEquipment_removeFromModelInfo;
+    return true;
+}
+
+void ModelEntryPack_init(ModelEntryPack *entry) {
+    ModelEntry_init(&entry->modelEntry);
+
+    entry->modelEntry.setDisplayList = ModelEntryPack_setDisplayList;
+    entry->modelEntry.setMatrix = ModelEntryPack_setMatrix;
 }

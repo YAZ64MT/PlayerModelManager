@@ -9,9 +9,6 @@
 #include "proxymm_kv_api.h"
 #include "playermodelmanager_api.h"
 #include "yazmtcorelib_api.h"
-#include "z64recomp_interpolation.h"
-
-static bool sShouldSkipInterpolation[PLAYER_FORM_MAX];
 
 static U32SlotmapHandle sEntryHandles;
 
@@ -84,6 +81,7 @@ static SavedModelName sSavedModelNames[LINK_CMC_MAX] = {
     {.key = "pmm_saved_mask_fierce_deity"},
 };
 
+// Returns PLAYER_FORM_MAX on invalid type passed in
 PlayerTransformation getFormFromModelType(PlayerModelManagerModelType t) {
     switch (t) {
         case PMM_MODEL_TYPE_CHILD:
@@ -606,25 +604,11 @@ static void pushMemoryEntry(Link_CustomModelCategory cat, ModelEntry *entry) {
     pushEntry(sModelEntries[cat], entry);
 }
 
-RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
-RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement eq));
-
 void CMEM_reapplyEntry(Link_CustomModelCategory cat) {
     ModelEntry *currEntry = CMEM_getCurrentEntry(cat);
 
     if (currEntry) {
-        if (isFormCategory(cat)) {
-            PlayerTransformation form = getFormFromCategory(cat);
-            currEntry->applyToModelInfo(currEntry, &gLinkFormProxies[form].current);
-            _internal_onFormModelApplied(form);
-        } else if (isEquipmentCategory(cat)) {
-            for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-                currEntry->applyToModelInfo(currEntry, &gLinkFormProxies[i].current);
-            }
-
-            // TODO: Reimplement in a less fragile way
-            _internal_onEquipmentModelApplied(((ModelEntryEquipment *)currEntry)->equipType);
-        }
+        currEntry->applyToModelInfo(currEntry);
     }
 }
 
@@ -642,47 +626,15 @@ bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, ModelEntry *newEntry) {
         return true;
     }
 
-    if (isFormCategory(cat)) {
-        PlayerTransformation form = getFormFromCategory(cat);
-
-        Link_FormProxy *proxy = &gLinkFormProxies[form];
-
-        if (newEntry->applyToModelInfo(newEntry, &proxy->current)) {
-            if (currEntry && currEntry->callback) {
-                currEntry->callback(currEntry->handle, PMM_EVENT_MODEL_REMOVED, currEntry->callbackData);
-            }
-
-            CMEM_setCurrentEntry(cat, newEntry);
-
-            _internal_onFormModelApplied(form);
-
-            if (newEntry->callback) {
-                newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, newEntry->callbackData);
-            }
-
-            sShouldSkipInterpolation[form] = true;
-
-            return true;
-        }
-    } else if (isEquipmentCategory(cat)) {
+    if (newEntry->applyToModelInfo(newEntry)) {
         if (currEntry && currEntry->callback) {
             currEntry->callback(currEntry->handle, PMM_EVENT_MODEL_REMOVED, currEntry->callbackData);
         }
 
         CMEM_setCurrentEntry(cat, newEntry);
 
-        for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-            newEntry->applyToModelInfo(newEntry, &gLinkFormProxies[i].current);
-        }
-
         if (newEntry->callback) {
-            newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, newEntry->callbackData);
-        }
-
-        _internal_onEquipmentModelApplied(((ModelEntryEquipment *)(newEntry))->equipType);
-
-        for (int i = 0; i < ARRAY_COUNT(sShouldSkipInterpolation); ++i) {
-            sShouldSkipInterpolation[i] = true;
+            newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, currEntry->callbackData);
         }
 
         return true;
@@ -724,49 +676,16 @@ void CMEM_removeModel(Link_CustomModelCategory cat) {
         return;
     }
 
-    ModelEntry *entryx = sCurrentModelEntries[cat];
+    ModelEntry *entry = sCurrentModelEntries[cat];
 
-    if (entryx) {
-        if (entryx->callback) {
-            entryx->callback(entryx->handle, PMM_EVENT_MODEL_REMOVED, entryx->callbackData);
+    if (entry) {
+        if (entry->callback) {
+            entry->callback(entry->handle, PMM_EVENT_MODEL_REMOVED, entry->callbackData);
         }
 
         CMEM_setCurrentEntry(cat, NULL);
 
-        if (isFormCategory(cat)) {
-            PlayerTransformation form = getFormFromCategory(cat);
-
-            Link_FormProxy *proxy = &gLinkFormProxies[form];
-
-            clearLinkModelInfo(&proxy->current.modelInfo);
-
-            _internal_onFormModelApplied(form);
-
-            sShouldSkipInterpolation[form] = true;
-
-        } else if (isEquipmentCategory(cat)) {
-            ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
-
-            const EquipmentOverride *override = &gEquipmentOverrideTable[entry->equipType];
-
-            for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-                Link_FormProxy *fp = &gLinkFormProxies[i];
-
-                for (size_t j = 0; j < override->dl.count; ++j) {
-                    recomputil_u32_value_hashmap_erase(fp->current.gfxOverrides, override->dl.overrides[j]);
-                }
-
-                for (size_t j = 0; j < override->mtx.count; ++j) {
-                    recomputil_u32_value_hashmap_erase(fp->current.mtxOverrides, override->mtx.overrides[j]);
-                }
-            }
-
-            _internal_onEquipmentModelApplied(entry->equipType);
-
-            for (int i = 0; i < ARRAY_COUNT(sShouldSkipInterpolation); ++i) {
-                sShouldSkipInterpolation[i] = true;
-            }
-        }
+        entry->removeFromModelInfo(entry);
     }
 }
 
@@ -886,21 +805,4 @@ RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initCMEMHash() {
     sEntryHandles = recomputil_create_u32_slotmap();
     sInternalNamesToEntries = YAZMTCore_StringU32Dictionary_new();
-}
-
-RECOMP_CALLBACK("*", recomp_on_play_main)
-void skipInterpolationOnPlay(PlayState *play) {
-    Player *player = GET_PLAYER(play);
-
-    while (player) {
-        if (sShouldSkipInterpolation[player->transformation] && player->actor.scale.y >= 0.0f) {
-            actor_set_interpolation_skipped(&player->actor);
-        }
-
-        player = (Player *)player->actor.next;
-    }
-
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        sShouldSkipInterpolation[i] = false;
-    }
 }

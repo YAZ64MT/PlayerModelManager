@@ -25,4 +25,8 @@ RECOMP_IMPORT("*", void* z64recomp_get_extended_actor_data(Actor* actor, ActorEx
 // before the scene's spawn list is processed.
 RECOMP_IMPORT("*", u32 z64recomp_get_actor_spawn_index(Actor* actor));
 
+RECOMP_IMPORT("*", u32 actor_get_interpolation_skipped(Actor *actor));
+RECOMP_IMPORT("*", void actor_set_interpolation_skipped(Actor *actor));
+RECOMP_IMPORT("*", void actor_clear_interpolation_skipped(Actor *actor));
+
 #endif

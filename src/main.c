@@ -13,6 +13,10 @@
 #include "externs_z_player_lib.h"
 #include "model_shared.h"
 #include "equipmentoverrides.h"
+#include "z64recomp_api.h"
+
+static bool sShouldSkipFormInterpolation[PLAYER_FORM_MAX];
+static bool sShouldSkipMirrorShieldInterpolation;
 
 U32ValueHashmapHandle gLinkEquipmentGfxOverrides;
 U32ValueHashmapHandle gLinkEquipmentMtxOverrides;
@@ -239,6 +243,7 @@ void initFormProxies_on_go() {
 RECOMP_CALLBACK(".", _internal_onFormModelApplied)
 void refreshSharedModelsOnFormModelApply(Link_CustomModelCategory form) {
     requestRefreshFormProxy(&gLinkFormProxies[form]);
+    sShouldSkipFormInterpolation[form] = true;
 }
 
 RECOMP_CALLBACK(".", _internal_onEquipmentModelApplied)
@@ -255,6 +260,12 @@ void refreshEquipmentOnEquipmentModelApplied(Link_EquipmentReplacement eq){
         for (size_t j = 0; j < override->mtx.count; ++j) {
             requestRefreshFormProxyMtx(fp, override->mtx.overrides[j]);
         }
+
+        sShouldSkipFormInterpolation[i] = true;
+    }
+
+    if (eq == LINK_DL_REPLACE_SHIELD3) {
+        sShouldSkipMirrorShieldInterpolation = true;
     }
 }
 
@@ -263,4 +274,35 @@ RECOMP_DECLARE_EVENT(_internal_initHashObjects());
 RECOMP_CALLBACK("*", recomp_on_init)
 void handleInits() {
     _internal_initHashObjects();
+}
+
+RECOMP_CALLBACK("*", recomp_on_play_main)
+void skipInterpolationOnPlay(PlayState *play) {
+    Player *player = GET_PLAYER(play);
+
+    while (player) {
+        if (sShouldSkipFormInterpolation[player->transformation] && player->actor.scale.y >= 0.0f) {
+            actor_set_interpolation_skipped(&player->actor);
+        }
+
+        player = (Player *)player->actor.next;
+    }
+
+    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+        sShouldSkipFormInterpolation[i] = false;
+    }
+
+    if (sShouldSkipMirrorShieldInterpolation)  {
+        Actor *actor = play->actorCtx.actorLists[ACTORCAT_ITEMACTION].first;
+
+        while (actor) {
+            if (actor->id == ACTOR_MIR_RAY3) {
+                actor_set_interpolation_skipped(actor);
+            }
+
+            actor = actor->next;
+        }
+
+        sShouldSkipMirrorShieldInterpolation = false;
+    }
 }
