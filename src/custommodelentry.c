@@ -26,12 +26,12 @@ Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
     return (Gfx *)ret;
 }
 
-bool ModelEntry_setDisplayList(ModelEntry *this, Link_DisplayList id, Gfx *dl) {
+bool ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) {
     if (id >= LINK_DL_MAX || id < 0) {
         return false;
     }
 
-    recomputil_u32_value_hashmap_insert(this->displayListPtrs, id, (uintptr_t)dl);
+    recomputil_u32_value_hashmap_insert(entry->displayListPtrs, id, (uintptr_t)dl);
     return true;
 }
 
@@ -41,12 +41,12 @@ Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
     return (Mtx *)ret;
 }
 
-bool ModelEntry_setMatrix(ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx) {
+bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) {
     if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
         return false;
     }
 
-    recomputil_u32_value_hashmap_insert(this->mtxPtrs, id, (uintptr_t)mtx);
+    recomputil_u32_value_hashmap_insert(entry->mtxPtrs, id, (uintptr_t)mtx);
     return true;
 }
 
@@ -86,24 +86,24 @@ bool ModelEntryForm_applyToModelInfo(ModelEntry *thisx, Link_ModelInfoCustom *mo
     return true;
 }
 
-void ModelEntryForm_init(ModelEntryForm *this) {
-    ModelEntry_init(&this->modelEntry);
+void ModelEntryForm_init(ModelEntryForm *entry) {
+    ModelEntry_init(&entry->modelEntry);
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        if (ModelEntry_getMatrix(&this->modelEntry, i)) {
-            ModelEntry_setMatrix(&this->modelEntry, i, NULL);
+        if (ModelEntry_getMatrix(&entry->modelEntry, i)) {
+            ModelEntry_setMatrix(&entry->modelEntry, i, NULL);
         }
     }
 
-    this->modelEntry.applyToModelInfo = ModelEntryForm_applyToModelInfo;
+    entry->modelEntry.applyToModelInfo = ModelEntryForm_applyToModelInfo;
 
-    this->skel = NULL;
+    entry->skel = NULL;
 
-    this->shieldingSkel = NULL;
+    entry->shieldingSkel = NULL;
 
-    Lib_MemSet(this->mouthTex, 0, sizeof(this->mouthTex));
+    Lib_MemSet(entry->mouthTex, 0, sizeof(entry->mouthTex));
 
-    Lib_MemSet(this->eyesTex, 0, sizeof(this->eyesTex));
+    Lib_MemSet(entry->eyesTex, 0, sizeof(entry->eyesTex));
 }
 
 bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {

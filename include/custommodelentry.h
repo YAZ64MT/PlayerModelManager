@@ -43,13 +43,13 @@ void ModelEntry_init(ModelEntry *entry);
 
 Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id);
 
-bool ModelEntry_setDisplayList(ModelEntry *this, Link_DisplayList id, Gfx *dl);
+bool ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl);
 
 Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id);
 
-bool ModelEntry_setMatrix(ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx);
+bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx);
 
-void ModelEntryForm_init(ModelEntryForm *this);
+void ModelEntryForm_init(ModelEntryForm *entry);
 
 void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacement type);
 
