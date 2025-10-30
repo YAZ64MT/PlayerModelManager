@@ -14,14 +14,14 @@
 
 static bool isEntryLoaded(ModelEntry *entry) {
     if (entry) {
-        return CMEM_getCurrentEntry(getCategoryFromModelType(entry->type)) == entry;
+        return CMEM_getCurrentEntry(entry->category) == entry;
     }
 
     return false;
 }
 
 static void refreshProxyIfEntryLoaded(ModelEntry *entry) {
-    Link_CustomModelCategory cat = getCategoryFromModelType(entry->type);
+    Link_CustomModelCategory cat = entry->category;
 
     if (isEntryLoaded(entry)) {
         CMEM_reapplyEntry(cat);
@@ -94,7 +94,7 @@ static ModelEntryForm *getFormEntryOrPrintErr(PlayerModelManagerHandle h, const 
         return NULL;
     }
 
-    if (!isFormCategory(getCategoryFromModelType(entry->type))) {
+    if (!isFormCategory(entry->category)) {
         recomp_printf("PlayerModelManager: Handle with internal name %s does not support the function %s\n", entry->internalName, funcName);
         return NULL;
     }
@@ -266,6 +266,55 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
     }
 
     return false;
+}
+
+static bool isEntryWithinPack(const ModelEntryPack *pack, const ModelEntry *entry) {
+    if (YAZMTCore_IterableU32Set_contains(pack->modelEntries, (uintptr_t)entry)) {
+        return true;
+    }
+
+    size_t numPackEntries = ModelEntryPack_getModelEntriesCount(pack);
+    ModelEntry const *const *packEntries = ModelEntryPack_getModelEntries(pack);
+
+    for (size_t i = 0; i < numPackEntries; ++i) {
+        const ModelEntry *curr = packEntries[i];
+
+        if (isPackCategory(curr->category) && isEntryWithinPack((const ModelEntryPack *)curr, entry)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h, PlayerModelManagerHandle toAdd) {
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_addHandleToPack");
+
+    if (!entry) {
+        return false;
+    }
+
+    if (!isPackCategory(entry->category)) {
+        recomp_printf("PlayerModelManager_addHandleToPack: Non-model pack passed into first arg of PlayerModelManager_addHandleToPack (Category was %d)\n", entry->category);
+        return false;
+    }
+
+    ModelEntry *entryToAdd = getEntryOrPrintErrLocked(toAdd, "PlayerModelManager_addHandleToPack");
+
+    if (!entryToAdd) {
+        return false;
+    }
+
+    ModelEntryPack *packEntry = (ModelEntryPack *)entry;
+
+    if (isPackCategory(entryToAdd->category) && isEntryWithinPack((ModelEntryPack *)entryToAdd, entry)) {
+        recomp_printf("PlayerModelManager_addHandleToPack: Could not add handle! Handle with internal name '%s' is already a handle inside '%s' (Would cause circular reference)!\n", entry->internalName, entryToAdd->internalName);
+        return false;
+    }
+
+    YAZMTCore_IterableU32Set_insert(packEntry->modelEntries, (uintptr_t)entryToAdd);
+
+    return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerHandle h, PlayerModelManagerEventHandler *callback, void *userdata) {
@@ -490,7 +539,7 @@ RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
         return false;
     }
 
-    return CMEM_getCurrentEntry(getCategoryFromModelType(entry->type)) == entry;
+    return CMEM_getCurrentEntry(entry->category) == entry;
 }
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {

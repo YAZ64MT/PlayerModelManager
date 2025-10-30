@@ -426,6 +426,7 @@ typedef enum {
     PMM_MODEL_TYPE_MASK_GORON,
     PMM_MODEL_TYPE_MASK_ZORA,
     PMM_MODEL_TYPE_MASK_FIERCE_DEITY,
+    PMM_MODEL_TYPE_MODEL_PACK,
     PMM_MODEL_TYPE_MAX
 } PlayerModelManagerModelType;
 
@@ -505,6 +506,11 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayList(PlayerM
 //
 // Returns true if matrix was successfully set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, PlayerModelManagerMatrixId mtxId, Mtx *matrix));
+
+// Adds a handle to a model pack. Models will be applied in the order that their handles are added in.
+//
+// Returns true if handle was successfully added, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h, PlayerModelManagerHandle toAdd));
 
 // Set a callback function for this model. The types of events that can be responded to are in the PlayerModelManagerModelEvent enum.
 //

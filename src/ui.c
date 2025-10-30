@@ -14,7 +14,7 @@ typedef struct {
     const char *displayName;
     bool isVisible;
     bool isUsedByCurrentGame;
-    ModelEntry *realEntry;
+    const ModelEntry *realEntry;
     Link_CustomModelCategory category;
     bool isNeedsDiskSave;
 } CategoryInfo;
@@ -34,6 +34,7 @@ static bool sIsForceAllCategoriesVisible = false;
 
 static CategoryInfo sCategoryInfos[] = {
     // At least one category must be visible or the category selector goes into an infinite loop
+    DECLARE_CAT_INFO("Model Packs", CAT_USED_Z64, LINK_CMC_MODEL_PACK),
     DECLARE_DEFAULT_CAT_INFO("Young Link", CAT_USED_OOT, LINK_CMC_CHILD, CAT_USED_OOT),
     DECLARE_DEFAULT_CAT_INFO("Adult Link", CAT_USED_OOT, LINK_CMC_ADULT, CAT_USED_OOT),
     DECLARE_DEFAULT_CAT_INFO("Human", CAT_USED_MM, LINK_CMC_HUMAN, CAT_USED_MM),
@@ -234,13 +235,13 @@ RecompuiResource createAndPushButtonToList(RecompuiContext context, RecompuiReso
 
 U32ValueHashmapHandle sButtonsToData;
 
-static void *getListButtonData(RecompuiResource button) {
+static const void *getListButtonData(RecompuiResource button) {
     u32 out = (uintptr_t)NULL;
     recomputil_u32_value_hashmap_get(sButtonsToData, button, &out);
     return (void *)out;
 }
 
-static void setListButtonData(RecompuiResource button, void *data) {
+static void setListButtonData(RecompuiResource button, const void *data) {
     if (YAZMTCore_IterableU32Set_contains(sListButtons, button)) {
         recomputil_u32_value_hashmap_insert(sButtonsToData, button, (uintptr_t)data);
     }
@@ -270,7 +271,7 @@ static void refreshButtonEntryColors() {
             for (size_t i = 0; i < count; ++i) {
                 RecompuiResource button = buttons[i];
 
-                if (entry == getListButtonData(button)) {
+                if (entry && entry == getListButtonData(button)) {
                     recompui_set_background_color(button, &sModelSelectedButtonColor.bgColor);
                     recompui_set_border_color(button, &sModelSelectedButtonColor.borderColor);
                 } else {
@@ -353,7 +354,26 @@ static void fillRealEntries() {
 
 static void restoreCurrentCategoryModel() {
     if (isSelectingModel()) {
-        applyRealEntry(sCurrentCategoryInfo);
+        if (isPackCategory(getCurrentCategoryInfo()->category)) {
+            applyRealEntries();
+        } else {
+            applyRealEntry(sCurrentCategoryInfo);
+        }
+    }
+}
+
+static void removeAllModels() {
+    for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
+        CategoryInfo *catInf = &sCategoryInfos[i];
+        CMEM_tryApplyEntry(catInf->category, NULL);
+    }
+}
+
+static void saveAllModels() {
+    for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
+        CategoryInfo *catInf = &sCategoryInfos[i];
+        catInf->isNeedsDiskSave = true;
+        catInf->realEntry = CMEM_getCurrentEntry(catInf->category);
     }
 }
 
@@ -362,12 +382,8 @@ static void removeAllModelsButtonPressed(RecompuiResource resource, const Recomp
         if (data->type == UI_EVENT_CLICK) {
             if (isSelectingCategory()) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
-                for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
-                    CategoryInfo *catInf = &sCategoryInfos[i];
-                    CMEM_tryApplyEntry(catInf->category, NULL);
-                    catInf->isNeedsDiskSave = true;
-                    catInf->realEntry = NULL;
-                }
+                removeAllModels();
+                saveAllModels();
             }
         }
     }
@@ -397,6 +413,29 @@ static void removeSingleModelButtonPressed(RecompuiResource resource, const Reco
                 if (catInf) {
                     CMEM_tryApplyEntry(catInf->category, NULL);
                 }
+            }
+        }
+    }
+}
+
+static void removePackButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    if (sIsUIContextShown) {
+        if (data->type == UI_EVENT_CLICK) {
+            if (isSelectingModel()) {
+                CategoryInfo *catInf = getCurrentCategoryInfo();
+                if (catInf) {
+                    Audio_PlaySfx(NA_SE_SY_DECIDE);
+                    removeAllModels();
+                    saveAllModels();
+                } else {
+                    Audio_PlaySfx(NA_SE_SY_ERROR);
+                }
+            }
+        } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+            destroyAuthor();
+
+            if (shouldLivePreview()) {
+                removeAllModels();
             }
         }
     }
@@ -669,7 +708,7 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
         CategoryInfo *catInf = getCurrentCategoryInfo();
 
         if (catInf) {
-            Link_CustomModelCategory cat = getCategoryFromModelType(entry->type);
+            Link_CustomModelCategory cat = entry->category;
 
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
@@ -685,6 +724,31 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
                 setAuthor(entry->authorName);
 
                 if (shouldLivePreview()) {
+                    CMEM_tryApplyEntry(cat, entry);
+                }
+            }
+        }
+    }
+}
+
+static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    if (sIsUIContextShown) {
+        ModelEntry *entry = userdata;
+
+        CategoryInfo *catInf = getCurrentCategoryInfo();
+
+        if (catInf) {
+            Link_CustomModelCategory cat = entry->category;
+
+            if (data->type == UI_EVENT_CLICK) {
+                Audio_PlaySfx(NA_SE_SY_DECIDE);
+                CMEM_tryApplyEntry(cat, entry);
+                saveAllModels();
+            } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+                setAuthor(entry->authorName);
+
+                if (shouldLivePreview()) {
+                    applyRealEntries();
                     CMEM_tryApplyEntry(cat, entry);
                 }
             }
@@ -781,13 +845,22 @@ static void createCategoryListButtons() {
 }
 
 static void createModelListButtons() {
-    RecompuiResource removeModelButton = createAndPushButtonToList(sUIContext, sContainerListButtons, "[None]", BUTTONSTYLE_PRIMARY);
-    recompui_register_callback(removeModelButton, removeSingleModelButtonPressed, NULL);
-
     CategoryInfo *catInf = getCurrentCategoryInfo();
+    RecompuiEventHandler *pressedCallback = onModelButtonPressed;
+    RecompuiEventHandler *removedCallback = removeSingleModelButtonPressed;
+    const char *removeText = "[None]";
+
+    if (isPackCategory(catInf->category)) {
+        pressedCallback = onPackButtonPressed;
+        removedCallback = removePackButtonPressed;
+        removeText = "[Remove All Models]";
+    }
+
+    RecompuiResource removeModelButton = createAndPushButtonToList(sUIContext, sContainerListButtons, removeText, BUTTONSTYLE_PRIMARY);
+    recompui_register_callback(removeModelButton, removedCallback, NULL);
 
     size_t count = 0;
-    ModelEntry **modelEntries = CMEM_getCategoryEntryData(catInf->category, &count);
+    const ModelEntry **modelEntries = CMEM_getCategoryEntryData(catInf->category, &count);
 
     for (size_t i = 0; i < count; ++i) {
         const char *name = NULL;
@@ -802,7 +875,11 @@ static void createModelListButtons() {
         }
 
         RecompuiResource modelButton = createAndPushButtonToList(sUIContext, sContainerListButtons, name, BUTTONSTYLE_PRIMARY);
-        recompui_register_callback(modelButton, onModelButtonPressed, modelEntries[i]);
+
+        // Need to cast away constness due to API signature
+        // function in pressedCallback should not modify the ModelEntry, though
+        recompui_register_callback(modelButton, pressedCallback, (ModelEntry *)modelEntries[i]);
+
         setListButtonData(modelButton, modelEntries[i]);
     }
 

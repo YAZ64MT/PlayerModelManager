@@ -5,21 +5,25 @@
 #include "custommodelentrymanager.h"
 #include "equipmentoverrides.h"
 #include "model_common.h"
+#include "yazmtcorelib_api.h"
+#include "custommodelentrymanager.h"
 
 RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
 RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement eq));
 
-bool ModelEntry_applyToModelInfo(ModelEntry *this) {
+bool ModelEntry_applyToModelInfo(const ModelEntry *this) {
     recomp_printf("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_applyToModelInfo (should have been overriden!)\n", this->internalName ? this->internalName : "[UNKNOWN]");
     return false;
 }
 
-bool ModelEntry_removeFromModelInfo(ModelEntry *this) {
+bool ModelEntry_removeFromModelInfo(const ModelEntry *this) {
     recomp_printf("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_removeFromModelInfo (should have been overriden!)\n", this->internalName ? this->internalName : "[UNKNOWN]");
     return false;
 }
 
 void ModelEntry_init(ModelEntry *entry) {
+    entry->type = PMM_MODEL_TYPE_MAX;
+    entry->category = LINK_CMC_MAX;
     entry->displayName = NULL;
     entry->internalName = NULL;
     entry->authorName = NULL;
@@ -65,7 +69,7 @@ bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) 
     return true;
 }
 
-bool ModelEntryForm_applyToModelInfo(ModelEntry *thisx) {
+bool ModelEntryForm_applyToModelInfo(const ModelEntry *thisx) {
     PlayerTransformation form = getFormFromModelType(thisx->type);
 
     if (form >= PLAYER_FORM_MAX) {
@@ -109,7 +113,7 @@ bool ModelEntryForm_applyToModelInfo(ModelEntry *thisx) {
     return true;
 }
 
-bool ModelEntryForm_removeFromModelInfo(ModelEntry *thisx) {
+bool ModelEntryForm_removeFromModelInfo(const ModelEntry *thisx) {
     PlayerTransformation form = getFormFromModelType(thisx->type);
 
     Link_FormProxy *proxy = &gLinkFormProxies[form];
@@ -172,7 +176,7 @@ bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, M
     return false;
 }
 
-bool ModelEntryEquipment_applyToModelInfo(ModelEntry *thisx) {
+bool ModelEntryEquipment_applyToModelInfo(const ModelEntry *thisx) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
     if (this->equipType >= LINK_DL_REPLACE_MAX) {
@@ -205,7 +209,7 @@ bool ModelEntryEquipment_applyToModelInfo(ModelEntry *thisx) {
     return true;
 }
 
-bool ModelEntryEquipment_removeFromModelInfo(ModelEntry *thisx) {
+bool ModelEntryEquipment_removeFromModelInfo(const ModelEntry *thisx) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)thisx;
 
     const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
@@ -235,6 +239,30 @@ void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacem
     entry->modelEntry.setMatrix = ModelEntryEquipment_setMatrix;
     entry->modelEntry.applyToModelInfo = ModelEntryEquipment_applyToModelInfo;
     entry->modelEntry.removeFromModelInfo = ModelEntryEquipment_removeFromModelInfo;
+}
+
+bool ModelEntryPack_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
+    return false;
+}
+
+bool ModelEntryPack_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *mtx) {
+    return false;
+}
+
+bool ModelEntryPack_applyToModelInfo(const ModelEntry *thisx) {
+    const ModelEntryPack *this = (const ModelEntryPack *)thisx;
+
+    size_t numEntries = ModelEntryPack_getModelEntriesCount(this);
+    ModelEntry const *const *modelEntries = ModelEntryPack_getModelEntries(this);
+
+    for (size_t i = 0; i < numEntries; ++i) {
+        CMEM_tryApplyEntry(modelEntries[i]->category, modelEntries[i]);
+    }
+
+    return true;
+}
+
+bool ModelEntryPack_removeFromModelInfo(const ModelEntry *this) {
     return true;
 }
 
@@ -243,4 +271,15 @@ void ModelEntryPack_init(ModelEntryPack *entry) {
 
     entry->modelEntry.setDisplayList = ModelEntryPack_setDisplayList;
     entry->modelEntry.setMatrix = ModelEntryPack_setMatrix;
+    entry->modelEntry.applyToModelInfo = ModelEntryPack_applyToModelInfo;
+    entry->modelEntry.removeFromModelInfo = ModelEntryPack_removeFromModelInfo;
+    entry->modelEntries = YAZMTCore_IterableU32Set_new();
+}
+
+ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *entry) {
+    return (ModelEntry const *const *)YAZMTCore_IterableU32Set_values(entry->modelEntries);
+}
+
+size_t ModelEntryPack_getModelEntriesCount(const ModelEntryPack *entry) {
+    return YAZMTCore_IterableU32Set_size(entry->modelEntries);
 }

@@ -6,17 +6,19 @@
 #include "playermodelmanager_api.h"
 #include "equipmentoverrides.h"
 #include "recompdata.h"
+#include "yazmtcorelib_api.h"
 
 // This is the max file name length for most Linux distros and MacOS
 #define INTERNAL_NAME_MAX_LENGTH 255
 
 typedef struct ModelEntry {
     PlayerModelManagerModelType type;
+    Link_CustomModelCategory category;
     char *displayName;
     char *internalName;
     char *authorName;
-    bool (*applyToModelInfo)(struct ModelEntry *this);
-    bool (*removeFromModelInfo)(struct ModelEntry *this);
+    bool (*applyToModelInfo)(const struct ModelEntry *this);
+    bool (*removeFromModelInfo)(const struct ModelEntry *this);
     bool (*setDisplayList)(struct ModelEntry *this, Link_DisplayList id, Gfx *dl);
     bool (*setMatrix)(struct ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx);
     PlayerModelManagerEventHandler* callback;
@@ -40,6 +42,11 @@ typedef struct {
     Link_EquipmentReplacement equipType;
 } ModelEntryEquipment;
 
+typedef struct {
+    ModelEntry modelEntry;
+    YAZMTCore_IterableU32Set *modelEntries;
+} ModelEntryPack;
+
 void ModelEntry_init(ModelEntry *entry);
 
 Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id);
@@ -53,5 +60,11 @@ bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx);
 void ModelEntryForm_init(ModelEntryForm *entry);
 
 void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacement type);
+
+void ModelEntryPack_init(ModelEntryPack *entry);
+
+ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *entry);
+
+size_t ModelEntryPack_getModelEntriesCount(const ModelEntryPack *entry);
 
 #endif

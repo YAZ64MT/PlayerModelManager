@@ -561,6 +561,7 @@ typedef enum {
     LINK_CMC_MASK_GORON,
     LINK_CMC_MASK_ZORA,
     LINK_CMC_MASK_FIERCE_DEITY,
+    LINK_CMC_MODEL_PACK,
     LINK_CMC_MAX,
 } Link_CustomModelCategory;
 

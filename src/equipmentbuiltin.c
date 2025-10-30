@@ -11,6 +11,7 @@
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "maskdls.h"
 #include "apilocal.h"
+#include "recomputils.h"
 
 extern Gfx gLinkHumanFirstPersonHookshotDL[];
 extern Gfx gLinkHumanFirstPersonBowDL[];
@@ -438,19 +439,21 @@ static void initCustomDLs() {
     gSPBranchList(sCallMaskDekuScreamDL, getRepointedMMDL(OBJECT_MASK_NUTS, object_mask_nuts_DL_001D90));
 }
 
-static void registerMaskDL(const char *internalName, const char *displayName, PlayerModelManagerModelType modelType, Link_DisplayList dlId, Gfx *dl) {
+static void registerMaskDL(PlayerModelManagerHandle pack, const char *internalName, const char *displayName, PlayerModelManagerModelType modelType, Link_DisplayList dlId, Gfx *dl) {
     PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, internalName, modelType);
     PlayerModelManager_setDisplayName(h, displayName);
     PlayerModelManager_setAuthor(h, "Nintendo");
     PlayerModelManager_setDisplayList(h, dlId, dl);
+    PlayerModelManager_addHandleToPack(pack, h);
 }
 
-static void registerMaskDL2(const char *internalName, const char *displayName, PlayerModelManagerModelType modelType, Link_DisplayList dlId1, Gfx *dl1, Link_DisplayList dlId2, Gfx *dl2) {
+static void registerMaskDL2(PlayerModelManagerHandle pack, const char *internalName, const char *displayName, PlayerModelManagerModelType modelType, Link_DisplayList dlId1, Gfx *dl1, Link_DisplayList dlId2, Gfx *dl2) {
     PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, internalName, modelType);
     PlayerModelManager_setDisplayName(h, displayName);
     PlayerModelManager_setAuthor(h, "Nintendo");
     PlayerModelManager_setDisplayList(h, dlId1, dl1);
     PlayerModelManager_setDisplayList(h, dlId2, dl2);
+    PlayerModelManager_addHandleToPack(pack, h);
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
@@ -463,6 +466,14 @@ void registerMMEquipment() {
     void *zora = getMMObject(OBJECT_LINK_ZORA);
     void *deity = getMMObject(OBJECT_LINK_BOY);
 
+    PlayerModelManagerHandle vanillaPack = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_vanilla_equipment_c", PMM_MODEL_TYPE_MODEL_PACK);
+    PlayerModelManager_setAuthor(vanillaPack, "Nintendo");
+    PlayerModelManager_setDisplayName(vanillaPack, "MM Equipment");
+
+    PlayerModelManagerHandle adultPack = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_vanilla_equipment_a", PMM_MODEL_TYPE_MODEL_PACK);
+    PlayerModelManager_setAuthor(adultPack, "Nintendo");
+    PlayerModelManager_setDisplayName(adultPack, "MM Equipment (Adult-Sized)");
+
     // Hero's Shield
     {
         PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_hero_shield2_c", PMM_MODEL_TYPE_SHIELD_HERO);
@@ -470,6 +481,7 @@ void registerMMEquipment() {
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setMatrix(h, LINK_EQUIP_MATRIX_SHIELD_HERO_BACK, SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanHerosShieldMtx));
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_HERO, sCallHeroShieldDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     {
@@ -478,6 +490,7 @@ void registerMMEquipment() {
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setMatrix(h, LINK_EQUIP_MATRIX_SHIELD_HERO_BACK, &sAdultShieldMtx);
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_HERO, sHeroShieldAdultDL);
+        PlayerModelManager_addHandleToPack(adultPack, h);
     }
 
     // Mirror Shield (MM)
@@ -489,6 +502,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR, sCallMirrorShieldDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR_RAY, sCallMirrorShieldRayDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR_RAY_BEAM, sCallMirrorShieldRayBeamDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     {
@@ -499,6 +513,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR, sMirrorShieldAdultDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR_RAY, sMirrorShieldRayAdultDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SHIELD_MIRROR_RAY_BEAM, sMirrorShieldRayBeamAdultDL);
+        PlayerModelManager_addHandleToPack(adultPack, h);
     }
 
     // Kokiri Sword (MM)
@@ -510,6 +525,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_KOKIRI_HILT, sCallKokiriSwordHiltDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_KOKIRI_BLADE, sCallKokiriSwordBladeDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_KOKIRI_SHEATH, sCallKokiriSwordSheathDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Razor Sword (MM)
@@ -521,6 +537,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_RAZOR_HILT, sCallRazorSwordHiltDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_RAZOR_BLADE, sCallRazorSwordBladeDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_RAZOR_SHEATH, sCallRazorSwordSheathDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Gilded Sword (MM)
@@ -532,15 +549,18 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_HILT, sCallGildedSwordHiltDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_BLADE, sCallGildedSwordBladeDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_SHEATH, sCallGildedSwordSheathDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Fierce Deity Sword
     {
-        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_great_fairy_sword4_a", PMM_MODEL_TYPE_SWORD_FIERCE_DIETY);
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_fierce_deity_sword4_a", PMM_MODEL_TYPE_SWORD_FIERCE_DIETY);
         PlayerModelManager_setDisplayName(h, "Fierce Deity's Sword");
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_FIERCE_DEITY_BLADE, sCallFierceDeitySwordDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_FIERCE_DEITY_HILT, gEmptyDL);
+        PlayerModelManager_addHandleToPack(adultPack, h);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Great Fairy's Sword
@@ -550,6 +570,7 @@ void registerMMEquipment() {
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GREAT_FAIRY_BLADE, sCallGreatFairySwordDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GREAT_FAIRY_HILT, gEmptyDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Hookshot (MM)
@@ -563,6 +584,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_CHAIN, sCallHookshotChainDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_HOOK, sCallHookshotHookDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_RETICLE, sCallHookshotReticleDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     {
@@ -575,6 +597,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_CHAIN, sCallHookshotChainDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_HOOK, sHookshotHookAdultDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_RETICLE, sCallHookshotReticleDL);
+        PlayerModelManager_addHandleToPack(adultPack, h);
     }
 
     // Bow (MM)
@@ -586,6 +609,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_FPS_BOW, sCallBowFirstPersonDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_BOW_STRING, sCallBowStringDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_BOW_ARROW, sCallArrowDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Bottle (MM)
@@ -595,6 +619,7 @@ void registerMMEquipment() {
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_GLASS, sCallBottleGlassDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_CONTENTS, sCallBottleContentsDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Ocarina of Time
@@ -603,6 +628,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayName(h, "Ocarina of Time (Child)");
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_OCARINA_TIME, sCallOcarinaDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     {
@@ -610,6 +636,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayName(h, "Ocarina of Time (Adult)");
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_OCARINA_TIME, sOcarinaAdultDL);
+        PlayerModelManager_addHandleToPack(adultPack, h);
     }
 
     // Deku Stick (MM)
@@ -618,6 +645,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayName(h, "Deku Stick (MM)");
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_DEKU_STICK, sCallDekuStickDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Deku Pipes
@@ -631,6 +659,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_LEFT, sCallPipesLeftDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_RIGHT, sCallPipesRightDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_A, sCallPipesADL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Goron Drums
@@ -644,6 +673,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_LEFT, sCallDrumLeftDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_RIGHT, sCallDrumRightDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_DRUM_A, sCallDrumADL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Zora Guitar
@@ -652,31 +682,32 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayName(h, "Zora Guitar");
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_GUITAR, sCallGuitarDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Masks
-    registerMaskDL("mm_mask_truth_c", "Mask of Truth", PMM_MODEL_TYPE_MASK_TRUTH, LINK_DL_MASK_TRUTH, sCallMaskTruthDL);
-    registerMaskDL("mm_mask_kafei_c", "Kafei's Mask", PMM_MODEL_TYPE_MASK_KAFEIS_MASK, LINK_DL_MASK_KAFEIS_MASK, sCallMaskKafeiDL);
-    registerMaskDL("mm_mask_all_night_c", "All Night Mask", PMM_MODEL_TYPE_MASK_ALL_NIGHT, LINK_DL_MASK_ALL_NIGHT, sCallMaskAllNightDL);
-    registerMaskDL("mm_mask_bunny_hood_c", "Bunny Hood", PMM_MODEL_TYPE_MASK_BUNNY, LINK_DL_MASK_BUNNY, sCallMaskBunnyHoodDL);
-    registerMaskDL("mm_mask_keaton_c", "Keaton Mask", PMM_MODEL_TYPE_MASK_KEATON, LINK_DL_MASK_KEATON, sCallMaskKeatonDL);
-    registerMaskDL("mm_mask_garo_c", "Garo's Mask", PMM_MODEL_TYPE_MASK_GARO, LINK_DL_MASK_GARO, sCallMaskGaroDL);
-    registerMaskDL("mm_mask_romani_c", "Romani's Mask", PMM_MODEL_TYPE_MASK_ROMANI, LINK_DL_MASK_ROMANI, sCallMaskRomaniDL);
-    registerMaskDL("mm_mask_circus_leader_c", "Circus Leader's Mask", PMM_MODEL_TYPE_MASK_CIRCUS_LEADER, LINK_DL_MASK_CIRCUS_LEADER, sCallMaskCircusLeaderDL);
-    registerMaskDL("mm_mask_postman_c", "Postman's Hat", PMM_MODEL_TYPE_MASK_POSTMAN, LINK_DL_MASK_POSTMAN, sCallMaskPostmanDL);
-    registerMaskDL("mm_mask_couple_c", "Couple's Mask", PMM_MODEL_TYPE_MASK_COUPLE, LINK_DL_MASK_COUPLE, sCallMaskCoupleDL);
-    registerMaskDL("mm_mask_great_fairy_c", "Great Fairy Mask", PMM_MODEL_TYPE_MASK_GREAT_FAIRY, LINK_DL_MASK_GREAT_FAIRY, sCallMaskGreatFairyDL);
-    registerMaskDL("mm_mask_gibdo_c", "Gibdo Mask", PMM_MODEL_TYPE_MASK_GIBDO, LINK_DL_MASK_GIBDO, sCallMaskGibdoDL);
-    registerMaskDL("mm_mask_don_gero_c", "Don Gero's Mask", PMM_MODEL_TYPE_MASK_DON_GERO, LINK_DL_MASK_DON_GERO, sCallMaskDonGeroDL);
-    registerMaskDL("mm_mask_kamaro_c", "Kamaro's Mask", PMM_MODEL_TYPE_MASK_KAMARO, LINK_DL_MASK_KAMARO, sCallMaskKamaroDL);
-    registerMaskDL("mm_mask_captain_c", "Captain's Hat", PMM_MODEL_TYPE_MASK_CAPTAIN, LINK_DL_MASK_CAPTAIN, sCallMaskCaptainDL);
-    registerMaskDL("mm_mask_stone_c", "Stone Mask", PMM_MODEL_TYPE_MASK_STONE, LINK_DL_MASK_STONE, sCallMaskStoneDL);
-    registerMaskDL("mm_mask_bremen_c", "Bremen Mask", PMM_MODEL_TYPE_MASK_BREMEN, LINK_DL_MASK_BREMEN, sCallMaskBremenDL);
-    registerMaskDL("mm_mask_scents_c", "Mask of Scents", PMM_MODEL_TYPE_MASK_SCENTS, LINK_DL_MASK_SCENTS, sCallMaskScentsDL);
-    registerMaskDL2("mm_mask_blast", "Blast Mask", PMM_MODEL_TYPE_MASK_BLAST, LINK_DL_MASK_BLAST, sCallMaskBlastDL, LINK_DL_MASK_BLAST_COOLING_DOWN, sCallMaskBlastCooldownDL);
-    registerMaskDL("mm_mask_giant_c", "Giant's Mask", PMM_MODEL_TYPE_MASK_GIANT, LINK_DL_MASK_GIANT, sCallMaskGiantDL);
-    registerMaskDL2("mm_mask_fierce_deity_c", "Fierce Deity's Mask", PMM_MODEL_TYPE_MASK_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY, sCallMaskFierceDeityDL, LINK_DL_MASK_FIERCE_DEITY_SCREAM, sCallMaskFierceDeityScreamDL);
-    registerMaskDL2("mm_mask_goron_c", "Goron Mask", PMM_MODEL_TYPE_MASK_GORON, LINK_DL_MASK_GORON, sCallMaskGoronDL, LINK_DL_MASK_GORON_SCREAM, sCallMaskGoronScreamDL);
-    registerMaskDL2("mm_mask_zora_c", "Zora Mask", PMM_MODEL_TYPE_MASK_ZORA, LINK_DL_MASK_ZORA, sCallMaskZoraDL, LINK_DL_MASK_ZORA_SCREAM, sCallMaskZoraScreamDL);
-    registerMaskDL2("mm_mask_deku_c", "Deku Mask", PMM_MODEL_TYPE_MASK_DEKU, LINK_DL_MASK_DEKU, sCallMaskDekuDL, LINK_DL_MASK_DEKU_SCREAM, sCallMaskDekuScreamDL);
+    registerMaskDL(vanillaPack, "mm_mask_truth_c", "Mask of Truth", PMM_MODEL_TYPE_MASK_TRUTH, LINK_DL_MASK_TRUTH, sCallMaskTruthDL);
+    registerMaskDL(vanillaPack, "mm_mask_kafei_c", "Kafei's Mask", PMM_MODEL_TYPE_MASK_KAFEIS_MASK, LINK_DL_MASK_KAFEIS_MASK, sCallMaskKafeiDL);
+    registerMaskDL(vanillaPack, "mm_mask_all_night_c", "All Night Mask", PMM_MODEL_TYPE_MASK_ALL_NIGHT, LINK_DL_MASK_ALL_NIGHT, sCallMaskAllNightDL);
+    registerMaskDL(vanillaPack, "mm_mask_bunny_hood_c", "Bunny Hood", PMM_MODEL_TYPE_MASK_BUNNY, LINK_DL_MASK_BUNNY, sCallMaskBunnyHoodDL);
+    registerMaskDL(vanillaPack, "mm_mask_keaton_c", "Keaton Mask", PMM_MODEL_TYPE_MASK_KEATON, LINK_DL_MASK_KEATON, sCallMaskKeatonDL);
+    registerMaskDL(vanillaPack, "mm_mask_garo_c", "Garo's Mask", PMM_MODEL_TYPE_MASK_GARO, LINK_DL_MASK_GARO, sCallMaskGaroDL);
+    registerMaskDL(vanillaPack, "mm_mask_romani_c", "Romani's Mask", PMM_MODEL_TYPE_MASK_ROMANI, LINK_DL_MASK_ROMANI, sCallMaskRomaniDL);
+    registerMaskDL(vanillaPack, "mm_mask_circus_leader_c", "Circus Leader's Mask", PMM_MODEL_TYPE_MASK_CIRCUS_LEADER, LINK_DL_MASK_CIRCUS_LEADER, sCallMaskCircusLeaderDL);
+    registerMaskDL(vanillaPack, "mm_mask_postman_c", "Postman's Hat", PMM_MODEL_TYPE_MASK_POSTMAN, LINK_DL_MASK_POSTMAN, sCallMaskPostmanDL);
+    registerMaskDL(vanillaPack, "mm_mask_couple_c", "Couple's Mask", PMM_MODEL_TYPE_MASK_COUPLE, LINK_DL_MASK_COUPLE, sCallMaskCoupleDL);
+    registerMaskDL(vanillaPack, "mm_mask_great_fairy_c", "Great Fairy Mask", PMM_MODEL_TYPE_MASK_GREAT_FAIRY, LINK_DL_MASK_GREAT_FAIRY, sCallMaskGreatFairyDL);
+    registerMaskDL(vanillaPack, "mm_mask_gibdo_c", "Gibdo Mask", PMM_MODEL_TYPE_MASK_GIBDO, LINK_DL_MASK_GIBDO, sCallMaskGibdoDL);
+    registerMaskDL(vanillaPack, "mm_mask_don_gero_c", "Don Gero's Mask", PMM_MODEL_TYPE_MASK_DON_GERO, LINK_DL_MASK_DON_GERO, sCallMaskDonGeroDL);
+    registerMaskDL(vanillaPack, "mm_mask_kamaro_c", "Kamaro's Mask", PMM_MODEL_TYPE_MASK_KAMARO, LINK_DL_MASK_KAMARO, sCallMaskKamaroDL);
+    registerMaskDL(vanillaPack, "mm_mask_captain_c", "Captain's Hat", PMM_MODEL_TYPE_MASK_CAPTAIN, LINK_DL_MASK_CAPTAIN, sCallMaskCaptainDL);
+    registerMaskDL(vanillaPack, "mm_mask_stone_c", "Stone Mask", PMM_MODEL_TYPE_MASK_STONE, LINK_DL_MASK_STONE, sCallMaskStoneDL);
+    registerMaskDL(vanillaPack, "mm_mask_bremen_c", "Bremen Mask", PMM_MODEL_TYPE_MASK_BREMEN, LINK_DL_MASK_BREMEN, sCallMaskBremenDL);
+    registerMaskDL(vanillaPack, "mm_mask_scents_c", "Mask of Scents", PMM_MODEL_TYPE_MASK_SCENTS, LINK_DL_MASK_SCENTS, sCallMaskScentsDL);
+    registerMaskDL2(vanillaPack, "mm_mask_blast", "Blast Mask", PMM_MODEL_TYPE_MASK_BLAST, LINK_DL_MASK_BLAST, sCallMaskBlastDL, LINK_DL_MASK_BLAST_COOLING_DOWN, sCallMaskBlastCooldownDL);
+    registerMaskDL(vanillaPack, "mm_mask_giant_c", "Giant's Mask", PMM_MODEL_TYPE_MASK_GIANT, LINK_DL_MASK_GIANT, sCallMaskGiantDL);
+    registerMaskDL2(vanillaPack, "mm_mask_fierce_deity_c", "Fierce Deity's Mask", PMM_MODEL_TYPE_MASK_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY, sCallMaskFierceDeityDL, LINK_DL_MASK_FIERCE_DEITY_SCREAM, sCallMaskFierceDeityScreamDL);
+    registerMaskDL2(vanillaPack, "mm_mask_goron_c", "Goron Mask", PMM_MODEL_TYPE_MASK_GORON, LINK_DL_MASK_GORON, sCallMaskGoronDL, LINK_DL_MASK_GORON_SCREAM, sCallMaskGoronScreamDL);
+    registerMaskDL2(vanillaPack, "mm_mask_zora_c", "Zora Mask", PMM_MODEL_TYPE_MASK_ZORA, LINK_DL_MASK_ZORA, sCallMaskZoraDL, LINK_DL_MASK_ZORA_SCREAM, sCallMaskZoraScreamDL);
+    registerMaskDL2(vanillaPack, "mm_mask_deku_c", "Deku Mask", PMM_MODEL_TYPE_MASK_DEKU, LINK_DL_MASK_DEKU, sCallMaskDekuDL, LINK_DL_MASK_DEKU_SCREAM, sCallMaskDekuScreamDL);
 }
