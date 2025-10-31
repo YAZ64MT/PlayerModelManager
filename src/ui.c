@@ -887,7 +887,7 @@ static void createModelListButtons() {
     bool isPack = isPackCategory(catInf->category);
     if (isPack) {
         pressedCallback = onPackButtonPressed;
-        removedCallback = removeEquipmentModels;
+        removedCallback = removeEquipmentModelsButtonPressed;
         removeText = "[Remove Equipment Models]";
     }
 
