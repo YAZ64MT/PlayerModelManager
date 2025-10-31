@@ -369,6 +369,15 @@ static void removeAllModels() {
     }
 }
 
+static void removeEquipmentModels() {
+    for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
+        CategoryInfo *catInf = &sCategoryInfos[i];
+        if (isEquipmentCategory(catInf->category)) {
+            CMEM_tryApplyEntry(catInf->category, NULL);
+        }
+    }
+}
+
 static void saveAllModels() {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
@@ -384,6 +393,31 @@ static void removeAllModelsButtonPressed(RecompuiResource resource, const Recomp
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
                 removeAllModels();
                 saveAllModels();
+            }
+        }
+    }
+}
+
+static void removeEquipmentModelsButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    if (sIsUIContextShown) {
+        if (data->type == UI_EVENT_CLICK) {
+            if (isSelectingModel()) {
+                CategoryInfo *catInf = getCurrentCategoryInfo();
+                if (catInf) {
+                    Audio_PlaySfx(NA_SE_SY_DECIDE);
+                    applyRealEntries();
+                    removeEquipmentModels();
+                    saveAllModels();
+                } else {
+                    Audio_PlaySfx(NA_SE_SY_ERROR);
+                }
+            }
+        } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
+            destroyAuthor();
+
+            if (shouldLivePreview()) {
+                applyRealEntries();
+                removeEquipmentModels();
             }
         }
     }
@@ -850,10 +884,11 @@ static void createModelListButtons() {
     RecompuiEventHandler *removedCallback = removeSingleModelButtonPressed;
     const char *removeText = "[None]";
 
-    if (isPackCategory(catInf->category)) {
+    bool isPack = isPackCategory(catInf->category);
+    if (isPack) {
         pressedCallback = onPackButtonPressed;
-        removedCallback = removePackButtonPressed;
-        removeText = "[Remove All Models]";
+        removedCallback = removeEquipmentModels;
+        removeText = "[Remove Equipment Models]";
     }
 
     RecompuiResource removeModelButton = createAndPushButtonToList(sUIContext, sContainerListButtons, removeText, BUTTONSTYLE_PRIMARY);
