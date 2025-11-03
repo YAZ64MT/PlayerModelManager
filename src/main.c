@@ -17,6 +17,7 @@
 
 static bool sShouldSkipFormInterpolation[PLAYER_FORM_MAX];
 static bool sShouldSkipMirrorShieldInterpolation;
+static bool sShouldSkipHookshotInterpolation;
 
 U32ValueHashmapHandle gLinkEquipmentGfxOverrides;
 U32ValueHashmapHandle gLinkEquipmentMtxOverrides;
@@ -244,6 +245,8 @@ RECOMP_CALLBACK(".", _internal_onFormModelApplied)
 void refreshSharedModelsOnFormModelApply(Link_CustomModelCategory form) {
     requestRefreshFormProxy(&gLinkFormProxies[form]);
     sShouldSkipFormInterpolation[form] = true;
+    sShouldSkipMirrorShieldInterpolation = true;
+    sShouldSkipHookshotInterpolation = true;
 }
 
 RECOMP_CALLBACK(".", _internal_onEquipmentModelApplied)
@@ -266,6 +269,10 @@ void refreshEquipmentOnEquipmentModelApplied(Link_EquipmentReplacement eq){
 
     if (eq == LINK_DL_REPLACE_SHIELD3) {
         sShouldSkipMirrorShieldInterpolation = true;
+    }
+
+    if (eq == LINK_DL_REPLACE_HOOKSHOT) {
+        sShouldSkipHookshotInterpolation = true;
     }
 }
 
@@ -292,17 +299,18 @@ void skipInterpolationOnPlay(PlayState *play) {
         sShouldSkipFormInterpolation[i] = false;
     }
 
-    if (sShouldSkipMirrorShieldInterpolation)  {
+    if (sShouldSkipMirrorShieldInterpolation || sShouldSkipHookshotInterpolation)  {
         Actor *actor = play->actorCtx.actorLists[ACTORCAT_ITEMACTION].first;
 
         while (actor) {
-            if (actor->id == ACTOR_MIR_RAY3) {
+            if (actor->id == ACTOR_MIR_RAY3 || actor->id == ACTOR_ARMS_HOOK) {
                 actor_set_interpolation_skipped(actor);
             }
 
             actor = actor->next;
         }
-
-        sShouldSkipMirrorShieldInterpolation = false;
     }
+
+    sShouldSkipMirrorShieldInterpolation = false;
+    sShouldSkipHookshotInterpolation = false;
 }
