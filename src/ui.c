@@ -761,23 +761,27 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
 
 static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (sIsUIContextShown) {
-        ModelEntry *entry = userdata;
+        ModelEntry *entryOrNull = userdata;
 
         CategoryInfo *catInf = getCurrentCategoryInfo();
 
         if (catInf) {
-            Link_CustomModelCategory cat = entry->category;
+            Link_CustomModelCategory cat = catInf->category;
 
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
-                CMEM_tryApplyEntry(cat, entry);
+                CMEM_tryApplyEntry(cat, entryOrNull);
                 saveAllModels();
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
-                setAuthor(entry->authorName);
+                if (entryOrNull) {
+                    setAuthor(entryOrNull->authorName);
+                } else {
+                    destroyAuthor();
+                }
 
                 if (shouldLivePreview()) {
                     applyRealEntries();
-                    CMEM_tryApplyEntry(cat, entry);
+                    CMEM_tryApplyEntry(cat, entryOrNull);
                 }
             }
         }
