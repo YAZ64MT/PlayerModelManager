@@ -167,6 +167,21 @@ static const ButtonColor sModelSelectedButtonColor = {
     },
 };
 
+static const ButtonColor sModelRemovedButtonColor = {
+    .borderColor = {
+        .r = 224,
+        .g = 74,
+        .b = 89,
+        .a = 204,
+    },
+    .bgColor = {
+        .r = 224,
+        .g = 74,
+        .b = 89,
+        .a = 13,
+    },
+};
+
 static void setAllNavDirsToAuto(RecompuiResource id) {
     recompui_set_nav_auto(id, NAVDIRECTION_DOWN);
     recompui_set_nav_auto(id, NAVDIRECTION_UP);
@@ -257,6 +272,11 @@ static void setListButtonValue(RecompuiResource button, u32 val) {
     }
 }
 
+static void setButtonColor(RecompuiResource button, const ButtonColor *color) {
+    recompui_set_background_color(button, &color->bgColor);
+    recompui_set_border_color(button, &color->borderColor);
+}
+
 static void refreshButtonEntryColors() {
     if (isSelectingCategory()) {
         return;
@@ -270,13 +290,12 @@ static void refreshButtonEntryColors() {
 
             for (size_t i = 0; i < count; ++i) {
                 RecompuiResource button = buttons[i];
+                const void *buttonData = getListButtonData(button);
 
-                if (entry && entry == getListButtonData(button)) {
-                    recompui_set_background_color(button, &sModelSelectedButtonColor.bgColor);
-                    recompui_set_border_color(button, &sModelSelectedButtonColor.borderColor);
-                } else {
-                    recompui_set_background_color(button, &sPrimaryButtonColor.bgColor);
-                    recompui_set_border_color(button, &sPrimaryButtonColor.borderColor);
+                if (entry && entry == buttonData) {
+                    setButtonColor(button, &sModelSelectedButtonColor);
+                } else if (buttonData) {
+                    setButtonColor(button, &sPrimaryButtonColor);
                 }
             }
         }
@@ -865,6 +884,7 @@ static void destroyModelButtons() {
 static void createCategoryListButtons() {
     RecompuiResource removeModelsButton = createAndPushButtonToList(sUIContext, sContainerListButtons, "[Remove All Models]", BUTTONSTYLE_PRIMARY);
     recompui_register_callback(removeModelsButton, removeAllModelsButtonPressed, NULL);
+    setButtonColor(removeModelsButton, &sModelRemovedButtonColor);
 
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *curr = &sCategoryInfos[i];
@@ -892,6 +912,7 @@ static void createModelListButtons() {
     }
 
     RecompuiResource removeModelButton = createAndPushButtonToList(sUIContext, sContainerListButtons, removeText, BUTTONSTYLE_PRIMARY);
+    setButtonColor(removeModelButton, &sModelRemovedButtonColor);
     recompui_register_callback(removeModelButton, removedCallback, NULL);
 
     size_t count = 0;
