@@ -650,6 +650,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GREAT_FAIRY_BLADE, sCallGreatFairySwordDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GREAT_FAIRY_HILT, gEmptyDL);
         PlayerModelManager_addHandleToPack(vanillaPack, h);
+        PlayerModelManager_addHandleToPack(adultPack, h);
     }
 
     // Hookshot (MM)
@@ -710,6 +711,7 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_GLASS, sCallBottleGlassDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_CONTENTS, sCallBottleContentsDL);
         PlayerModelManager_addHandleToPack(vanillaPack, h);
+        PlayerModelManager_addHandleToPack(adultPack, h);
     }
 
     // Ocarina of Time
@@ -736,6 +738,7 @@ void registerMMEquipment() {
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_DEKU_STICK, sCallDekuStickDL);
         PlayerModelManager_addHandleToPack(vanillaPack, h);
+        PlayerModelManager_addHandleToPack(adultPack, h);
     }
 
     // Deku Pipes
