@@ -642,7 +642,7 @@ bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEnt
         CMEM_setCurrentEntry(cat, newEntry);
 
         if (newEntry->callback) {
-            newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, currEntry->callbackData);
+            newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, newEntry->callbackData);
         }
 
         return true;
