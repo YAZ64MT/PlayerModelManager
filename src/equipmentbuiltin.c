@@ -54,37 +54,55 @@ static Gfx sCallKokiriSwordHiltDL[] = {
     gsSPEndDisplayList(),
 };
 
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sKokiriSwordHiltAdultDL, sKokiriSwordHiltResizerMtx, sCallKokiriSwordHiltDL);
+
 static Gfx sCallKokiriSwordBladeDL[] = {
     gsSPEndDisplayList(),
 };
+
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sKokiriSwordBladeAdultDL, sKokiriSwordBladeResizerMtx, sCallKokiriSwordBladeDL);
 
 static Gfx sCallKokiriSwordSheathDL[] = {
     gsSPEndDisplayList(),
 };
 
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sKokiriSwordSheathAdultDL, sKokiriSwordSheathResizerMtx, sCallKokiriSwordSheathDL);
+
 static Gfx sCallRazorSwordHiltDL[] = {
     gsSPEndDisplayList(),
 };
+
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sRazorSwordHiltAdultDL, sRazorSwordHiltResizerMtx, sCallRazorSwordHiltDL);
 
 static Gfx sCallRazorSwordBladeDL[] = {
     gsSPEndDisplayList(),
 };
 
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sRazorSwordBladeAdultDL, sRazorSwordBladeResizerMtx, sCallRazorSwordBladeDL);
+
 static Gfx sCallRazorSwordSheathDL[] = {
     gsSPEndDisplayList(),
 };
+
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sRazorSwordSheathAdultDL, sRazorSwordSheathResizerMtx, sCallRazorSwordSheathDL);
 
 static Gfx sCallGildedSwordHiltDL[] = {
     gsSPEndDisplayList(),
 };
 
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sGildedSwordHiltAdultDL, sGildedSwordHiltResizerMtx, sCallGildedSwordHiltDL);
+
 static Gfx sCallGildedSwordBladeDL[] = {
     gsSPEndDisplayList(),
 };
 
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sGildedSwordBladeAdultDL, sGildedSwordBladeResizerMtx, sCallGildedSwordBladeDL);
+
 static Gfx sCallGildedSwordSheathDL[] = {
     gsSPEndDisplayList(),
 };
+
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sGildedSwordSheathAdultDL, sGildedSwordSheathResizerMtx, sCallGildedSwordSheathDL);
 
 static Gfx sCallGreatFairySwordDL[] = {
     gsSPEndDisplayList(),
@@ -124,13 +142,19 @@ static Gfx sCallBowDL[] = {
     gsSPEndDisplayList(),
 };
 
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sBowAdultDL, sBowResizerMtx, sCallBowDL);
+
 static Gfx sCallBowFirstPersonDL[] = {
     gsSPBranchList(gLinkHumanFirstPersonBowDL),
 };
 
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sBowFirstPersonAdultDL, sBowFirstPersonResizerMtx, sCallBowFirstPersonDL);
+
 static Gfx sCallBowStringDL[] = {
     gsSPEndDisplayList(),
 };
+
+DECLARE_STATIC_MATRIX_WRAPPED_DL(sBowStringAdultDL, sBowStringResizerMtx, sCallBowStringDL);
 
 static Gfx sCallArrowDL[] = {
     gsSPEndDisplayList(),
@@ -328,6 +352,10 @@ static Mtx sHookshotHookAndChainAdultMtx;
 
 static Mtx sAdultShieldMtx;
 
+static Mtx sAdultKokiriSwordBackMtx;
+static Mtx sAdultRazorSwordBackMtx;
+static Mtx sAdultGildedSwordBackMtx;
+
 static Gfx *getRepointedMMDL(ObjectId id, Gfx *g) {
     return GlobalObjects_getGlobalGfxPtr(id, g);
 }
@@ -337,6 +365,8 @@ static void *getMMObject(ObjectId id) {
 }
 
 static void initCustomDLs() {
+    const f32 SWORD_SCALE_FACTOR = 1.3f;
+
     void *human = getMMObject(OBJECT_LINK_CHILD);
 
     guPosition(&sAdultShieldMtx, 0.f, 0.f, 180.f, 1.f, 935.f, 94.f, 29.f);
@@ -356,14 +386,26 @@ static void initCustomDLs() {
     gSPBranchList(sCallKokiriSwordHiltDL, getRepointedMMDL(GAMEPLAY_KEEP, gKokiriSwordHandleDL));
     gSPBranchList(sCallKokiriSwordBladeDL, getRepointedMMDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL));
     gSPBranchList(sCallKokiriSwordSheathDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanKokiriSwordSheathDL));
+    guPosition(&sKokiriSwordHiltResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sKokiriSwordBladeResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sKokiriSwordSheathResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sAdultKokiriSwordBackMtx, 0.f, 0.f, 0.f, 1.f, -578.f * SWORD_SCALE_FACTOR, -221.f * SWORD_SCALE_FACTOR, -32.f * SWORD_SCALE_FACTOR);
 
     gSPBranchList(sCallRazorSwordHiltDL, getRepointedMMDL(GAMEPLAY_KEEP, gRazorSwordHandleDL));
     gSPBranchList(sCallRazorSwordBladeDL, getRepointedMMDL(GAMEPLAY_KEEP, gRazorSwordBladeDL));
     gSPBranchList(sCallRazorSwordSheathDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanRazorSwordSheathDL));
+    guPosition(&sRazorSwordHiltResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sRazorSwordBladeResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sRazorSwordSheathResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sAdultRazorSwordBackMtx, 0.f, 0.f, 0.f, 1.f, -480.f * SWORD_SCALE_FACTOR, -240.f * SWORD_SCALE_FACTOR, -14.f * SWORD_SCALE_FACTOR);
 
     gSPBranchList(sCallGildedSwordHiltDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordHandleDL));
     gSPBranchList(sCallGildedSwordBladeDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordBladeDL));
     gSPBranchList(sCallGildedSwordSheathDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL));
+    guPosition(&sGildedSwordHiltResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sGildedSwordBladeResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sGildedSwordSheathResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sAdultGildedSwordBackMtx, 0.f, 0.f, 0.f, 1.f, -578.f * SWORD_SCALE_FACTOR, -221.f * SWORD_SCALE_FACTOR, -32.f * SWORD_SCALE_FACTOR);
 
     gSPBranchList(sCallGreatFairySwordDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL));
 
@@ -382,9 +424,13 @@ static void initCustomDLs() {
 
     guPosition(&sHookshotHookAndChainAdultMtx, 0.f, 0.f, 0.f, 1.f, 50.f, 420.f, 0.f);
 
+    const f32 BOW_SCALE_FACTOR = 1.3f;
     gSPBranchList(sCallBowDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanBowDL));
     gSPBranchList(sCallBowStringDL, getRepointedMMDL(OBJECT_LINK_CHILD, object_link_child_DL_017818));
     gSPBranchList(sCallArrowDL, getRepointedMMDL(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0));
+    guPosition(&sBowResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sBowFirstPersonResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sBowStringResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, 0.f, 0.f);
 
     gSPBranchList(sCallBottleGlassDL, getRepointedMMDL(GAMEPLAY_KEEP, gBottleGlassDL));
     gSPBranchList(sCallBottleContentsDL, getRepointedMMDL(GAMEPLAY_KEEP, gBottleContentsDL));
@@ -528,6 +574,17 @@ void registerMMEquipment() {
         PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_kokiri_sword1_a", PMM_MODEL_TYPE_SWORD_KOKIRI);
+        PlayerModelManager_setDisplayName(h, "Kokiri Sword (MM) (Adult)");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setMatrix(h, LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK, &sAdultKokiriSwordBackMtx);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_KOKIRI_HILT, sKokiriSwordHiltAdultDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_KOKIRI_BLADE, sKokiriSwordBladeAdultDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_KOKIRI_SHEATH, sKokiriSwordSheathAdultDL);
+        PlayerModelManager_addHandleToPack(adultPack, h);
+    }
+
     // Razor Sword (MM)
     {
         PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_razor_sword2_c", PMM_MODEL_TYPE_SWORD_RAZOR);
@@ -540,6 +597,17 @@ void registerMMEquipment() {
         PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_razor_sword2_a", PMM_MODEL_TYPE_SWORD_RAZOR);
+        PlayerModelManager_setDisplayName(h, "Razor Sword (Adult)");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setMatrix(h, LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK, &sAdultRazorSwordBackMtx);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_RAZOR_HILT, sRazorSwordHiltAdultDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_RAZOR_BLADE, sRazorSwordBladeAdultDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_RAZOR_SHEATH, sRazorSwordSheathAdultDL);
+        PlayerModelManager_addHandleToPack(adultPack, h);
+    }
+
     // Gilded Sword (MM)
     {
         PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_gilded_sword3_c", PMM_MODEL_TYPE_SWORD_GILDED);
@@ -550,6 +618,17 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_BLADE, sCallGildedSwordBladeDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_SHEATH, sCallGildedSwordSheathDL);
         PlayerModelManager_addHandleToPack(vanillaPack, h);
+    }
+
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_gilded_sword3_a", PMM_MODEL_TYPE_SWORD_GILDED);
+        PlayerModelManager_setDisplayName(h, "Gilded Sword (Adult)");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setMatrix(h, LINK_EQUIP_MATRIX_SWORD_GILDED_BACK, &sAdultGildedSwordBackMtx);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_HILT, sGildedSwordHiltAdultDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_BLADE, sGildedSwordBladeAdultDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GILDED_SHEATH, sGildedSwordSheathAdultDL);
+        PlayerModelManager_addHandleToPack(adultPack, h);
     }
 
     // Fierce Deity Sword
@@ -610,6 +689,17 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_BOW_STRING, sCallBowStringDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_BOW_ARROW, sCallArrowDL);
         PlayerModelManager_addHandleToPack(vanillaPack, h);
+    }
+
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "mm_bow_a", PMM_MODEL_TYPE_BOW);
+        PlayerModelManager_setDisplayName(h, "Bow (MM) (Adult)");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOW, sBowAdultDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_FPS_BOW, sBowFirstPersonAdultDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOW_STRING, sBowStringAdultDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOW_ARROW, sCallArrowDL);
+        PlayerModelManager_addHandleToPack(adultPack, h);
     }
 
     // Bottle (MM)
