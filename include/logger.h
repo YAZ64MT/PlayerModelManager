@@ -14,5 +14,6 @@ void Logger_printLine(char *s, ...);
 void Logger_printInfo(char *s, ...);
 void Logger_printWarning(char *s, ...);
 void Logger_printError(char *s, ...);
+void Logger_setLoggerLevel(LoggerLevel level);
 
 #endif
