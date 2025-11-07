@@ -158,7 +158,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
         entry->flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
     }
 
-    Logger_printInfo("PlayerModelManager: Registered new model '%s' with model type %d", entry->internalName, modelType);
+    Logger_printVerbose("PlayerModelManager: Registered new model '%s' with model type %d", entry->internalName, modelType);
 
     return h;
 }
@@ -176,7 +176,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerHandle h,
 
     dupStrAndFreeOld(&entry->displayName, displayName);
 
-    Logger_printInfo("PlayerModelManager: Setting display name of handle with internal name '%s' to '%s'", entry->internalName, displayName);
+    Logger_printVerbose("PlayerModelManager: Setting display name of handle with internal name '%s' to '%s'", entry->internalName, displayName);
 
     return true;
 }
@@ -194,7 +194,7 @@ RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerHandle h, cons
 
     dupStrAndFreeOld(&entry->authorName, author);
 
-    Logger_printInfo("PlayerModelManager: Setting author of handle with internal name '%s' to '%s'", entry->internalName, author);
+    Logger_printVerbose("PlayerModelManager: Setting author of handle with internal name '%s' to '%s'", entry->internalName, author);
 
     return true;
 }
@@ -208,7 +208,7 @@ RECOMP_EXPORT bool PlayerModelManager_setFlags(PlayerModelManagerHandle h, u64 f
 
     entry->flags |= flags;
 
-    Logger_printInfo("PlayerModelManager: Setting flags 0x%llX of handle with internal name '%s'", flags, entry->internalName);
+    Logger_printVerbose("PlayerModelManager: Setting flags 0x%llX of handle with internal name '%s'", flags, entry->internalName);
 
     return true;
 }
@@ -222,7 +222,7 @@ RECOMP_EXPORT bool PlayerModelManager_clearFlags(PlayerModelManagerHandle h, u64
 
     entry->flags &= ~flags;
 
-    Logger_printInfo("PlayerModelManager: Clearing flags 0x%llX of handle with internal name '%s'", flags, entry->internalName);
+    Logger_printVerbose("PlayerModelManager: Clearing flags 0x%llX of handle with internal name '%s'", flags, entry->internalName);
 
     return true;
 }
@@ -236,7 +236,7 @@ RECOMP_EXPORT bool PlayerModelManager_clearAllFlags(PlayerModelManagerHandle h, 
 
     entry->flags = 0;
 
-    Logger_printInfo("PlayerModelManager: Clearing all flags of handle with internal name '%s'", entry->internalName);
+    Logger_printVerbose("PlayerModelManager: Clearing all flags of handle with internal name '%s'", entry->internalName);
 
     return true;
 }
@@ -255,10 +255,9 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
 
     if (entry->setDisplayList(entry, dlId, dl)) {
         refreshProxyDLIfEntryLoaded(entry, dlId);
+        Logger_printVerbose("PlayerModelManager: Setting DL id %d on handle with internal name '%s' to 0x%X", dlId, entry->internalName, dl);
         return true;
     }
-
-    Logger_printInfo("PlayerModelManager: Setting DL id %d on handle with internal name '%s' to 0x%X", dlId, entry->internalName, dl);
 
     return false;
 }
@@ -277,10 +276,9 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
 
     if (entry->setMatrix(entry, mtxId, matrix)) {
         refreshProxyMtxIfEntryLoaded(entry, mtxId);
+        Logger_printVerbose("PlayerModelManager: Copying matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix, entry->internalName);
         return true;
     }
-
-    Logger_printInfo("PlayerModelManager: Copying matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix,entry->internalName);
 
     return false;
 }
@@ -331,7 +329,7 @@ RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h
 
     YAZMTCore_IterableU32Set_insert(packEntry->modelEntries, (uintptr_t)entryToAdd);
 
-    Logger_printInfo("PlayerModelManager: Adding handle with internal name '%s' to model pack with internal name '%s'", entry->internalName, entryToAdd->internalName, entry->internalName);
+    Logger_printVerbose("PlayerModelManager: Adding handle with internal name '%s' to model pack with internal name '%s'", entry->internalName, entryToAdd->internalName, entry->internalName);
 
     return true;
 }
@@ -347,7 +345,7 @@ RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerHandle h, Pl
 
     entry->callbackData = userdata;
 
-    Logger_printInfo("PlayerModelManager: Setting handle with internal name '%s' to have callback function 0x%X with user data 0x%X", entry->internalName, callback, userdata);
+    Logger_printVerbose("PlayerModelManager: Setting handle with internal name '%s' to have callback function 0x%X with user data 0x%X", entry->internalName, callback, userdata);
 
     return true;
 }
@@ -396,7 +394,7 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, Fl
 
     refreshProxyIfEntryLoaded(&entry->modelEntry);
 
-    Logger_printInfo("PlayerModelManager: Setting skeleton of handle with internal name '%s' to 0x%X", entry->modelEntry.internalName, skel);
+    Logger_printVerbose("PlayerModelManager: Setting skeleton of handle with internal name '%s' to 0x%X", entry->modelEntry.internalName, skel);
 
     return true;
 }
@@ -435,7 +433,7 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 
     refreshProxyIfEntryLoaded(&entry->modelEntry);
 
-    Logger_printInfo("PlayerModelManager: Setting shielding skeleton of handle with internal name '%s' to 0x%X", entry->modelEntry.internalName, skel);
+    Logger_printVerbose("PlayerModelManager: Setting shielding skeleton of handle with internal name '%s' to 0x%X", entry->modelEntry.internalName, skel);
 
     return true;
 }
@@ -453,7 +451,7 @@ RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerHandle h
 
     refreshProxyEyesTexturesIfEntryLoaded(&entry->modelEntry);
 
-    Logger_printInfo("PlayerModelManager: Setting eyes flipbook textures of handle with internal name '%s'", entry->modelEntry.internalName);
+    Logger_printVerbose("PlayerModelManager: Setting eyes flipbook textures of handle with internal name '%s'", entry->modelEntry.internalName);
 
     return true;
 }
@@ -471,7 +469,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle 
 
     refreshProxyMouthTexturesIfEntryLoaded(&entry->modelEntry);
 
-    Logger_printInfo("PlayerModelManager: Setting mouth flipbook textures of handle with internal name '%s'", entry->modelEntry.internalName);
+    Logger_printVerbose("PlayerModelManager: Setting mouth flipbook textures of handle with internal name '%s'", entry->modelEntry.internalName);
 
     return true;
 }
@@ -527,7 +525,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long a
     gLinkFormProxies[form].vanilla.models[dlId] = dl;
     requestRefreshFormProxyDL(&gLinkFormProxies[form], dlId);
 
-    Logger_printInfo("PlayerModelManager_overrideVanillaDisplayList: Overriding vanilla DL with ID %d for form %d with new DL at 0x%X.", dlId, form, dl);
+    Logger_printVerbose("PlayerModelManager_overrideVanillaDisplayList: Overriding vanilla DL with ID %d for form %d with new DL at 0x%X.", dlId, form, dl);
 
     return true;
 }
@@ -559,7 +557,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVer
     gLinkFormProxies[form].vanilla.equipMtx[mtxId] = mtx;
     requestRefreshFormProxyMtx(&gLinkFormProxies[form], mtxId);
 
-    Logger_printInfo("PlayerModelManager_overrideVanillaMatrix: Copying matrix at 0x%X to with ID %d for form %d.");
+    Logger_printVerbose("PlayerModelManager_overrideVanillaMatrix: Copying matrix at 0x%X to with ID %d for form %d.");
 
     return true;
 }
@@ -652,20 +650,20 @@ void doRegisterModels() {
 RECOMP_CALLBACK(".", _internal_onReadyCMEM)
 void doRegisterModelsCMEMReady() {
     sIsCMEMReady = true;
-    Logger_printInfo("PlayerModelManager: CustomModelEntryManager is ready.");
+    Logger_printVerbose("PlayerModelManager: CustomModelEntryManager is ready.");
     doRegisterModels();
 }
 
 MODEL_REPLACER_CALLBACK_ON_REGISTER_REPLACERS
 void doRegisterModelsModelReplacerReady() {
     sIsModelReplacerReady = true;
-    Logger_printInfo("PlayerModelManager: ModelReplacer compatibility is ready.");
+    Logger_printVerbose("PlayerModelManager: ModelReplacer compatibility is ready.");
     doRegisterModels();
 }
 
 GLOBAL_OBJECTS_CALLBACK_ON_READY
 void doRegisterModelsGlobalObjectsReady() {
     sIsGlobalObjectsReady = true;
-    Logger_printInfo("PlayerModelManager: GlobalObjects is ready.");
+    Logger_printVerbose("PlayerModelManager: GlobalObjects is ready.");
     doRegisterModels();
 }

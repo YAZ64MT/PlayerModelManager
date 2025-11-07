@@ -5,6 +5,7 @@
 
 typedef enum {
     LOGGER_LEVEL_ALL,
+    LOGGER_LEVEL_VERBOSE,
     LOGGER_LEVEL_INFO,
     LOGGER_LEVEL_WARNING,
     LOGGER_LEVEL_ERROR,
@@ -17,6 +18,13 @@ extern LoggerLevel gLoggerLevel;
     {                               \
         recomp_printf(__VA_ARGS__); \
         recomp_printf("\n");        \
+    }
+
+#define Logger_printVerbose(...)                        \
+    {                                                   \
+        if (gLoggerLevel <= LOGGER_LEVEL_VERBOSE) {     \
+            Logger_printLine("[VERBOSE] " __VA_ARGS__); \
+        }                                               \
     }
 
 #define Logger_printInfo(...)                        \

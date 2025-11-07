@@ -138,6 +138,8 @@ Set the level of console logging.
 
 ALL: Display every logged message
 
+VERBOSE: Display every logged message with priority VERBOSE or above
+
 INFO: Display every logged message with priority INFO or above
 
 WARNING: Display every logged message with priority WARNING or above
@@ -148,5 +150,5 @@ NONE: Do not display logged messages from PMM
 
 """
 type = "Enum"
-options = [ "ALL", "INFO", "WARNING", "ERROR", "NONE" ]
+options = [ "ALL", "VERBOSE", "INFO", "WARNING", "ERROR", "NONE" ]
 default = "WARNING"
