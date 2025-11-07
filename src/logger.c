@@ -1,4 +1,7 @@
+#include "global.h"
 #include "logger.h"
+#include "modding.h"
+#include "recompconfig.h"
 
 LoggerLevel gLoggerLevel = LOGGER_LEVEL_WARNING;
 
@@ -9,4 +12,13 @@ void Logger_setLoggerLevel(LoggerLevel level) {
     }
 
     gLoggerLevel = level;
+}
+
+RECOMP_HOOK("Play_Main")
+void updateLoggerLevelOnPlayMain() {
+    LoggerLevel level = recomp_get_config_u32("logging_level");
+
+    if (level != gLoggerLevel) {
+        Logger_setLoggerLevel(level);
+    }
 }
