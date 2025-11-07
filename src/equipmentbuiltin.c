@@ -470,6 +470,7 @@ static void initCustomDLs() {
     gSPBranchList(sCallMaskDonGeroDL, getRepointedMMDL(OBJECT_MASK_GERO, gDonGeroMaskDL));
     gSPBranchList(sCallMaskKamaroDL, getRepointedMMDL(OBJECT_MASK_DANCER, object_mask_dancer_DL_000EF0));
     gSPBranchList(sCallMaskCaptainDL, getRepointedMMDL(OBJECT_MASK_SKJ, object_mask_skj_DL_0009F0));
+    gSPBranchList(sCallMaskStoneDL, getRepointedMMDL(OBJECT_MASK_STONE, object_mask_stone_DL_000820));
     gSPBranchList(sCallMaskBremenDL, getRepointedMMDL(OBJECT_MASK_BREE, object_mask_bree_DL_0003C0));
     gSPBranchList(sCallMaskBlastDL, getRepointedMMDL(OBJECT_MASK_BAKURETU, object_mask_bakuretu_DL_0005C0));
     gSPBranchList(sCallMaskBlastCooldownDL, getRepointedMMDL(OBJECT_MASK_BAKURETU, object_mask_bakuretu_DL_000440));
