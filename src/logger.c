@@ -1,6 +1,4 @@
 #include "logger.h"
-#include "recomputils.h"
-#include "libc/stdarg.h"
 
 LoggerLevel gLoggerLevel = LOGGER_LEVEL_WARNING;
 
