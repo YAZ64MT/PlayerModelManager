@@ -14,6 +14,11 @@ void Logger_setLoggerLevel(LoggerLevel level) {
     gLoggerLevel = level;
 }
 
+RECOMP_CALLBACK("*", recomp_on_init)
+void setupLoggerFirstTime() {
+    Logger_setLoggerLevel(recomp_get_config_u32("logging_level"));
+}
+
 RECOMP_HOOK("Play_Main")
 void updateLoggerLevelOnPlayMain() {
     LoggerLevel level = recomp_get_config_u32("logging_level");
