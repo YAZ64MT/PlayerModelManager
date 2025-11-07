@@ -4,11 +4,11 @@
 #include "recomputils.h"
 
 typedef enum {
-    LOGGER_LEVEL_NONE,
+    LOGGER_LEVEL_ALL,
     LOGGER_LEVEL_INFO,
     LOGGER_LEVEL_WARNING,
     LOGGER_LEVEL_ERROR,
-    LOGGER_LEVEL_ALL,
+    LOGGER_LEVEL_NONE,
 } LoggerLevel;
 
 extern LoggerLevel gLoggerLevel;
@@ -26,18 +26,18 @@ extern LoggerLevel gLoggerLevel;
         }                                            \
     }
 
-#define Logger_printWarning(...)                     \
-    {                                                \
-        if (gLoggerLevel <= LOGGER_LEVEL_WARNING) {  \
-            recomp_printf("[WARNING] " __VA_ARGS__); \
-        }                                            \
+#define Logger_printWarning(...)                        \
+    {                                                   \
+        if (gLoggerLevel <= LOGGER_LEVEL_WARNING) {     \
+            Logger_printLine("[WARNING] " __VA_ARGS__); \
+        }                                               \
     }
 
-#define Logger_printError(...)                     \
-    {                                              \
-        if (gLoggerLevel <= LOGGER_LEVEL_ERROR) {  \
-            recomp_printf("[ERROR] " __VA_ARGS__); \
-        }                                          \
+#define Logger_printError(...)                        \
+    {                                                 \
+        if (gLoggerLevel <= LOGGER_LEVEL_ERROR) {     \
+            Logger_printLine("[ERROR] " __VA_ARGS__); \
+        }                                             \
     }
 
 void Logger_setLoggerLevel(LoggerLevel level);
