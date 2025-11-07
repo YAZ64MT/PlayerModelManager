@@ -209,11 +209,6 @@ bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, M
 bool ModelEntryEquipment_applyToModelInfo(const ModelEntry *thisx) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-    if (this->equipType >= LINK_DL_REPLACE_MAX) {
-        recomp_printf("Passed in invalid equipment type %u\n", this->equipType);
-        return false;
-    }
-
     const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
 
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {

@@ -3,6 +3,7 @@
 #include "recompdata.h"
 #include "recomputils.h"
 #include "playermodelmanager.h"
+#include "logger.h"
 #include "model_common.h"
 #include "externs_z_player_lib.h"
 #include "maskdls.h"
@@ -128,7 +129,7 @@ void GfxHookLookup_init(GfxHookLookup *ghl) {
     for (size_t i = 0; i < ghl->numHookDLEntries; ++i) {
         GfxHookDisplayList *currHookDL = &ghl->rawHookDLEntries[i];
         if (!recomputil_u32_value_hashmap_insert(ghl->gfxPtrsToDLs, (uintptr_t)(currHookDL->target), currHookDL->replacementId)) {
-            recomp_printf("PlayerModelManager: WARNING! GfxHookLookup_init: Passed in GfxHookLookup contains duplicate keys!\n");
+            Logger_printWarning("PlayerModelManager: GfxHookLookup_init: Passed in GfxHookLookup contains duplicate keys!\n");
         }
     }
 }

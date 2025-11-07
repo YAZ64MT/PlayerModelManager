@@ -7,6 +7,7 @@
 #include "custommodelentrymanager.h"
 #include "model_common.h"
 #include "yazmtcorelib_api.h"
+#include "logger.h"
 
 static void refreshFileList();
 
@@ -111,7 +112,7 @@ static CategoryInfo *getCurrentCategoryInfo() {
     if (isSelectingModel()) {
         return &sCategoryInfos[sCurrentCategoryInfo];
     } else {
-        recomp_printf("PlayerModelManager: getCurrentCategoryInfo found invalid sCurrentCategoryInfo value %d\n", sCurrentCategoryInfo);
+        Logger_printWarning("PlayerModelManager: getCurrentCategoryInfo found invalid sCurrentCategoryInfo value %d\n", sCurrentCategoryInfo);
     }
 
     return NULL;
@@ -349,7 +350,7 @@ static void applyRealEntry(int entryIndex) {
     if (entryIndex >= 0 && entryIndex < ARRAY_COUNT(sCategoryInfos)) {
         CMEM_tryApplyEntry(sCategoryInfos[entryIndex].category, sCategoryInfos[entryIndex].realEntry);
     } else {
-        recomp_printf("PlayerModelManager: applyRealEntry received invalid entryIndex %d\n", entryIndex);
+        Logger_printWarning("PlayerModelManager: applyRealEntry received invalid entryIndex %d\n", entryIndex);
     }
 }
 

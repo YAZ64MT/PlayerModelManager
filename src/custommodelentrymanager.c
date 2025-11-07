@@ -622,12 +622,6 @@ void CMEM_reapplyEntry(Link_CustomModelCategory cat) {
 }
 
 bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry) {
-
-    if (!isValidCategory(cat)) {
-        recomp_printf("PlayerModelManager: Called CMEM_forceApplyEntry with invalid category %d\n", cat);
-        return false;
-    }
-
     const ModelEntry *currEntry = CMEM_getCurrentEntry(cat);
 
     if (newEntry == NULL) {
@@ -681,7 +675,8 @@ const ModelEntry **CMEM_getCategoryEntryData(Link_CustomModelCategory cat, size_
 void CMEM_removeModel(Link_CustomModelCategory cat) {
 
     if (!isValidCategory(cat)) {
-        recomp_printf("PlayerModelManager: Called CMEM_removeModel with invalid category %d\n", cat);
+        Logger_printError("PlayerModelManager: Called CMEM_removeModel with invalid category %d\n", cat);
+        tryCrashGame();
         return;
     }
 
