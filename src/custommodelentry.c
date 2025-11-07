@@ -7,36 +7,62 @@
 #include "model_common.h"
 #include "yazmtcorelib_api.h"
 #include "custommodelentrymanager.h"
+#include "logger.h"
 
 RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
 RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement eq));
 
 bool ModelEntry_applyToModelInfo(const ModelEntry *this) {
-    recomp_printf("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_applyToModelInfo (should have been overriden!)\n", this->internalName ? this->internalName : "[UNKNOWN]");
+    Logger_printError("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_applyToModelInfo (should have been overriden!)\n", this->internalName ? this->internalName : "[UNKNOWN]");
+    tryCrashGame();
     return false;
 }
 
 bool ModelEntry_removeFromModelInfo(const ModelEntry *this) {
-    recomp_printf("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_removeFromModelInfo (should have been overriden!)\n", this->internalName ? this->internalName : "[UNKNOWN]");
+    Logger_printError("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_removeFromModelInfo (should have been overriden!)\n", this->internalName ? this->internalName : "[UNKNOWN]");
+    tryCrashGame();
     return false;
 }
 
-void ModelEntry_init(ModelEntry *entry) {
-    entry->type = PMM_MODEL_TYPE_MAX;
-    entry->category = LINK_CMC_MAX;
+bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+
+    Link_CustomModelCategory cat = getCategoryFromModelType(type);
+
+    if (!isValidCategory(cat)) {
+        Logger_printError("PlayerModelmanager: Trying to initialize ModelEntry with invalid PlayerModelManagerModelType %d", type);
+        tryCrashGame();
+        return false;
+    }
+
+    if (!internalName) {
+        Logger_printError("PlayerModelmanager: Trying to initialize ModelEntry with type %d with NULL internal name!\n", type);
+        tryCrashGame();
+        return false;
+    }
+
+    if (!handle) {
+        Logger_printError("PlayerModelmanager: Trying to initialize ModelEntry with invalid PlayerModelManagerHandle %d", handle);
+        tryCrashGame();
+        return false;
+    }
+
+    entry->type = type;
+    entry->category = cat;
     entry->displayName = NULL;
-    entry->internalName = NULL;
+    entry->internalName = internalName;
     entry->authorName = NULL;
     entry->flags = 0;
     entry->callback = NULL;
     entry->callbackData = NULL;
-    entry->handle = 0;
+    entry->handle = handle;
     entry->applyToModelInfo = ModelEntry_applyToModelInfo;
     entry->removeFromModelInfo = ModelEntry_removeFromModelInfo;
     entry->displayListPtrs = recomputil_create_u32_value_hashmap();
     entry->mtxPtrs = recomputil_create_u32_value_hashmap();
     entry->setDisplayList = ModelEntry_setDisplayList;
     entry->setMatrix = ModelEntry_setMatrix;
+
+    return true;
 }
 
 Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
@@ -125,25 +151,29 @@ bool ModelEntryForm_removeFromModelInfo(const ModelEntry *thisx) {
     return true;
 }
 
-void ModelEntryForm_init(ModelEntryForm *entry) {
-    ModelEntry_init(&entry->modelEntry);
+bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+    if (!ModelEntry_init(&entry->modelEntry, handle, type, internalName)) {
+        return false;
+    }
+
+    if (!isFormCategory(entry->modelEntry.category)) {
+        Logger_printError("PlayerModelManager: ModelEntryForm with internal name %s had non-form type %d passed in!\n", internalName, type);
+        tryCrashGame();
+        return false;
+    }
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        if (ModelEntry_getMatrix(&entry->modelEntry, i)) {
-            ModelEntry_setMatrix(&entry->modelEntry, i, NULL);
-        }
+        ModelEntry_setMatrix(&entry->modelEntry, i, NULL);
     }
 
     entry->modelEntry.applyToModelInfo = ModelEntryForm_applyToModelInfo;
     entry->modelEntry.removeFromModelInfo = ModelEntryForm_removeFromModelInfo;
-
     entry->skel = NULL;
-
     entry->shieldingSkel = NULL;
-
     Lib_MemSet(entry->mouthTex, 0, sizeof(entry->mouthTex));
-
     Lib_MemSet(entry->eyesTex, 0, sizeof(entry->eyesTex));
+
+    return true;
 }
 
 bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
@@ -231,14 +261,24 @@ bool ModelEntryEquipment_removeFromModelInfo(const ModelEntry *thisx) {
     return true;
 }
 
-void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacement type) {
-    ModelEntry_init(&entry->modelEntry);
+bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+    if (!ModelEntry_init(&entry->modelEntry, handle, type, internalName)) {
+        return false;
+    }
 
-    entry->equipType = type;
+    if (!isEquipmentCategory(entry->modelEntry.category)) {
+        Logger_printError("PlayerModelManager: ModelEntryEquipment with internal name %s had non-equipment type %d passed in!\n", internalName, type);
+        tryCrashGame();
+        return false;
+    }
+
+    entry->equipType = getEquipmentReplacementFromCategory(entry->modelEntry.category);
     entry->modelEntry.setDisplayList = ModelEntryEquipment_setDisplayList;
     entry->modelEntry.setMatrix = ModelEntryEquipment_setMatrix;
     entry->modelEntry.applyToModelInfo = ModelEntryEquipment_applyToModelInfo;
     entry->modelEntry.removeFromModelInfo = ModelEntryEquipment_removeFromModelInfo;
+
+    return true;
 }
 
 bool ModelEntryPack_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
@@ -266,14 +306,18 @@ bool ModelEntryPack_removeFromModelInfo(const ModelEntry *this) {
     return true;
 }
 
-void ModelEntryPack_init(ModelEntryPack *entry) {
-    ModelEntry_init(&entry->modelEntry);
+bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle, char *internalName) {
+    if (!ModelEntry_init(&entry->modelEntry, handle, PMM_MODEL_TYPE_MODEL_PACK, internalName)) {
+        return false;
+    }
 
     entry->modelEntry.setDisplayList = ModelEntryPack_setDisplayList;
     entry->modelEntry.setMatrix = ModelEntryPack_setMatrix;
     entry->modelEntry.applyToModelInfo = ModelEntryPack_applyToModelInfo;
     entry->modelEntry.removeFromModelInfo = ModelEntryPack_removeFromModelInfo;
     entry->modelEntries = YAZMTCore_IterableU32Set_new();
+
+    return true;
 }
 
 ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *entry) {
