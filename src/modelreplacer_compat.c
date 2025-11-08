@@ -12,12 +12,31 @@
 
 static U32ValueHashmapHandle sObjectIdToVanillaDLToListenerMapMap;
 static U32ValueHashmapHandle sLinkDLEntryToListeners[PLAYER_FORM_MAX];
+static U32ValueHashmapHandle sListenerDLByForm[PLAYER_FORM_MAX + 1]; // add 1 to account for all forms option
+
 static U32HashsetHandle sExcludedDisplayLists;
 
 bool sIsModelReplacerCompatEnabled;
 
 bool MRC_isMRCEnabled() {
     return sIsModelReplacerCompatEnabled;
+}
+
+Gfx *MRC_getListenerDL(PlayerTransformation form, Link_DisplayList entryDLId) {
+    if (form < 0 || form >= PLAYER_FORM_MAX) {
+        return NULL;
+    }
+
+    uintptr_t dl = 0;
+
+    MRC_ListenerInfo *listener = MRC_getListenerFromFormAndDL(form, entryDLId);
+
+    if (listener) {
+        recomputil_u32_value_hashmap_get(sListenerDLByForm[listener->form], entryDLId, &dl);
+    }
+
+    return (Gfx *)dl;
+
 }
 
 MRC_ListenerInfo *getListenerInfo(ObjectId id, Gfx *vanillaDL) {
@@ -101,19 +120,25 @@ void updateListenerDLs_on_onModelChange(ObjectId id, Gfx *vanillaDL, Gfx *newDL)
         Link_DisplayList linkDLId = listener->linkDLId;
         PlayerTransformation form = listener->form;
 
+        // TODO: remove thiss functionality after Link_FormProxy is replaced by FormProxy
         if (listener->form == MRC_PLAYER_FORM_EVERY) {
             if (gSharedDisplayLists[linkDLId] != newDL) {
                 gSharedDisplayLists[linkDLId] = newDL;
-
-                for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-                    requestRefreshFormProxyDL(&gLinkFormProxies[i], linkDLId);
-                }
             }
         } else {
             if (gLinkFormProxies[form].vanilla.models[linkDLId] != newDL) {
                 gLinkFormProxies[form].vanilla.models[linkDLId] = newDL;
-                requestRefreshFormProxyDL(&gLinkFormProxies[form], linkDLId);
             }
+        }
+
+        if (newDL == listener->vanillaDL) {
+            recomputil_u32_value_hashmap_erase(sListenerDLByForm[listener->form], linkDLId);
+        } else {
+            recomputil_u32_value_hashmap_insert(sListenerDLByForm[listener->form], linkDLId, (uintptr_t)newDL);
+        }
+
+        for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
+            requestRefreshFormProxyDL(&gLinkFormProxies[i], linkDLId);
         }
     }
 }
@@ -140,6 +165,10 @@ void initModelReplacerHashObjects() {
         for (int j = 0; j < PLAYER_FORM_MAX; ++j) {
             recomputil_u32_hashset_insert(sExcludedDisplayLists, (uintptr_t)&gLinkFormProxies[j].displayLists[i]);
         }
+    }
+
+    for (int i = 0; i < ARRAY_COUNT(sListenerDLByForm); ++i) {
+        sListenerDLByForm[i] = recomputil_create_u32_value_hashmap();
     }
 }
 

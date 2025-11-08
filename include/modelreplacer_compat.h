@@ -16,5 +16,6 @@ typedef struct {
 void MRC_setupListenerDL(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId);
 MRC_ListenerInfo *MRC_getListenerFromFormAndDL(PlayerTransformation form, Link_DisplayList entryDLId);
 bool MRC_isMRCEnabled();
+Gfx *MRC_getListenerDL(PlayerTransformation form, Link_DisplayList entryDLId);
 
 #endif
