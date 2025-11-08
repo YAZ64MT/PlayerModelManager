@@ -1,14 +1,50 @@
 #include "global.h"
+#include "modding.h"
 #include "formproxy.h"
 #include "logger.h"
 #include "playermodelmanager_utils.h"
+#include "rt64_extended_gbi.h"
 
 static Gfx sPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
     gsSPEndDisplayList(),
 };
 
-static void initSkeleton(FormProxy *formProxy) {
+static Gfx sStartDLWrapper[] = {
+    gsSPNoOp(), // gEXPushEnvColor
+    gsSPEndDisplayList(),
+};
+
+static Gfx sEndDLWrapper[] = {
+    gsSPNoOp(), // gEXPopEnvColor
+    gsDPSetTextureFilter(G_TF_BILERP),
+    gsSPEndDisplayList(),
+};
+
+static Gfx sStartBowStringDL[] = {
+    // Two commands worth of space for the gEXMatrixGroup.
+    gsSPNoOp(),
+    gsSPNoOp(),
+
+    gsSPMatrix(&gIdentityMtx, G_MTX_MODELVIEW | G_MTX_NOPUSH | G_MTX_MUL),
+    gsSPEndDisplayList(),
+};
+
+static Gfx sEndBowstringDL[] = {
+    gsSPNoOp(),
+    gsSPBranchList(sEndDLWrapper),
+};
+
+RECOMP_CALLBACK("*", recomp_on_init)
+void initExDLs() {
+    gEXPushEnvColor(&sStartDLWrapper[0]);
+    gEXPopEnvColor(&sEndDLWrapper[0]);
+    gEXMatrixGroupSimple(&sStartBowStringDL[0], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
+                         G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_ORDER_LINEAR, G_EX_EDIT_NONE);
+    gEXPopMatrixGroup(&sEndBowstringDL[0], G_MTX_MODELVIEW);
+}
+
+static void initSkeleton(FormProxy *fp) {
     static const LodLimb skeletonBase[PLAYER_LIMB_COUNT] = {
         {{0, 0, 0}, PLAYER_LIMB_WAIST - 1, LIMB_DONE, {NULL, NULL}},
         {{0, 0, 0}, PLAYER_LIMB_LOWER_ROOT - 1, PLAYER_LIMB_UPPER_ROOT - 1, {gEmptyDL, gEmptyDL}},
@@ -33,9 +69,9 @@ static void initSkeleton(FormProxy *formProxy) {
         {{0, 0, 0}, LIMB_DONE, LIMB_DONE, {gEmptyDL, gEmptyDL}},
     };
 
-#define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = &formProxy->displayLists[proxyLimbName]
+#define SET_LIMB_DL(playerLimb, proxyLimbName) skel->limbs[playerLimb - 1].dLists[0] = skel->limbs[playerLimb - 1].dLists[1] = &fp->displayLists[proxyLimbName]
 
-    SkeletonProxy *skel = &formProxy->skeleton;
+    SkeletonProxy *skel = &fp->skeleton;
     FlexSkeletonHeader *flex = &skel->flexSkeleton;
     flex->dListCount = 18;
     flex->sh.limbCount = PLAYER_LIMB_COUNT;
@@ -70,7 +106,7 @@ static void initSkeleton(FormProxy *formProxy) {
 #undef SET_LIMB_DL
 }
 
-static void initShieldingSkeleton(FormProxy *formProxy) {
+static void initShieldingSkeleton(FormProxy *fp) {
     static const StandardLimb shieldingSkeletonBase[] = {
         {{0, 0, 0}, LINK_BODY_SHIELD_LIMB_BODY - 1, LIMB_DONE, NULL},
         {{0, 2000, -800}, LINK_BODY_SHIELD_LIMB_HEAD - 1, LINK_BODY_SHIELD_LIMB_ARMS_AND_LEGS - 1, gEmptyDL},
@@ -78,7 +114,7 @@ static void initShieldingSkeleton(FormProxy *formProxy) {
         {{0, 0, 0}, LIMB_DONE, LIMB_DONE, gEmptyDL},
     };
 
-    ShieldingSkeletonProxy *skel = &formProxy->shieldingSkeleton;
+    ShieldingSkeletonProxy *skel = &fp->shieldingSkeleton;
     FlexSkeletonHeader *flex = &skel->flexSkeleton;
 
     flex->sh.limbCount = PLAYER_BODY_SHIELD_LIMB_COUNT;
@@ -89,28 +125,28 @@ static void initShieldingSkeleton(FormProxy *formProxy) {
         skel->limbPtrs[i] = &skel->limbs[i];
     }
 
-    skel->limbs[LINK_BODY_SHIELD_LIMB_BODY - 1].dList = &formProxy->displayLists[LINK_DL_BODY_SHIELD_BODY];
-    skel->limbs[LINK_BODY_SHIELD_LIMB_HEAD - 1].dList = &formProxy->displayLists[LINK_DL_BODY_SHIELD_HEAD];
-    skel->limbs[LINK_BODY_SHIELD_LIMB_ARMS_AND_LEGS - 1].dList = &formProxy->displayLists[LINK_DL_BODY_SHIELD_ARMS_AND_LEGS];
+    skel->limbs[LINK_BODY_SHIELD_LIMB_BODY - 1].dList = &fp->displayLists[LINK_DL_BODY_SHIELD_BODY];
+    skel->limbs[LINK_BODY_SHIELD_LIMB_HEAD - 1].dList = &fp->displayLists[LINK_DL_BODY_SHIELD_HEAD];
+    skel->limbs[LINK_BODY_SHIELD_LIMB_ARMS_AND_LEGS - 1].dList = &fp->displayLists[LINK_DL_BODY_SHIELD_ARMS_AND_LEGS];
 
     flex->sh.segment = (void **)skel->limbPtrs;
 }
 
-static void initMatrixes(FormProxy *formProxy) {
+static void initMatrixes(FormProxy *fp) {
     Gfx *mtxDLs = recomp_alloc(sizeof(Gfx) * 2 * LINK_EQUIP_MATRIX_MAX);
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        formProxy->mtxDisplayLists[i] = &mtxDLs[i * 2];
+        fp->mtxDisplayLists[i] = &mtxDLs[i * 2];
 
-        gSPMatrix(&formProxy->mtxDisplayLists[i][0], &gIdentityMtx, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
-        gSPEndDisplayList(&formProxy->mtxDisplayLists[i][1]);
+        gSPMatrix(&fp->mtxDisplayLists[i][0], &gIdentityMtx, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+        gSPEndDisplayList(&fp->mtxDisplayLists[i][1]);
     }
 }
 
-static void initProxyShims(FormProxy *formProxy) {
-    Gfx *dls = formProxy->displayLists;
-    Gfx **mtxDls = formProxy->mtxDisplayLists;
-    Gfx **shims = formProxy->shimDisplayListPtrs;
+static void initProxyShims(FormProxy *fp) {
+    Gfx *dls = fp->displayLists;
+    Gfx **mtxDls = fp->mtxDisplayLists;
+    Gfx **shims = fp->shimDisplayListPtrs;
 
     // init by pointing all to DF command
     for (int i = 0; i < LINK_SHIMDL_MAX; ++i) {
@@ -234,6 +270,22 @@ static void initProxyShims(FormProxy *formProxy) {
 #undef SHIM_SHIELD_RFIST
 }
 
+static void initProxyWrappers(FormProxy *fp) {
+    for (int i = 0; i < LINK_DL_MAX; ++i) {
+        gSPDisplayList(&fp->wrappedDisplayLists[i].displayList[WRAPPED_DL_PREDRAW], sStartDLWrapper);
+        gSPDisplayList(&fp->wrappedDisplayLists[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
+        gSPBranchList(&fp->wrappedDisplayLists[i].displayList[WRAPPED_DL_POSTDRAW], sEndDLWrapper);
+    }
+
+    initBowWrapper(fp);
+}
+
+static void initProxyDLs(FormProxy *fp) {
+    for (int i = 0; i < LINK_DL_MAX; ++i) {
+        gSPBranchList(&fp->displayLists[i], fp->wrappedDisplayLists[i].displayList);
+    }
+}
+
 void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, PlayerTransformation form) {
     if (!current) {
         Logger_printError("PlayerModelManager: FormProxy_init received NULL current argument!");
@@ -256,4 +308,121 @@ void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, Play
     initSkeleton(fp);
     initShieldingSkeleton(fp);
     initMatrixes(fp);
+    initProxyShims(fp);
+    initProxyDLs(fp);
+}
+
+ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp) {
+    return fp->currentModelInfo;
+}
+
+ModelInfo *FormProxy_getFallbackModelInfo(FormProxy *fp) {
+    return fp->fallbackModelInfo;
+}
+
+void FormProxy_refreshSkeletons(FormProxy *fp) {
+#define NO_DISPLAY_LIST LINK_DL_MAX
+
+    static const Link_DisplayList limbToDLEntry[PLAYER_LIMB_COUNT] = {
+        NO_DISPLAY_LIST,
+        LINK_DL_WAIST,
+        NO_DISPLAY_LIST,
+        LINK_DL_RTHIGH,
+        LINK_DL_RSHIN,
+        LINK_DL_RFOOT,
+        LINK_DL_LTHIGH,
+        LINK_DL_LSHIN,
+        LINK_DL_LFOOT,
+        NO_DISPLAY_LIST,
+        LINK_DL_HEAD,
+        LINK_DL_HAT,
+        LINK_DL_COLLAR,
+        LINK_DL_LSHOULDER,
+        LINK_DL_LFOREARM,
+        LINK_DL_LHAND,
+        LINK_DL_RSHOULDER,
+        LINK_DL_RFOREARM,
+        LINK_DL_RHAND,
+        LINK_DL_SHEATH_NONE,
+        LINK_DL_TORSO,
+    };
+
+    FlexSkeletonHeader *skel = fp->currentModelInfo->skeleton;
+
+    if (!skel) {
+        skel = fp->fallbackModelInfo->skeleton;
+    }
+
+    if (skel) {
+        for (int i = 0; i < PLAYER_LIMB_COUNT; ++i) {
+            StandardLimb *limb = skel->sh.segment[i];
+            fp->skeleton.limbs[i].child = limb->child;
+            fp->skeleton.limbs[i].sibling = limb->sibling;
+            fp->skeleton.limbs[i].jointPos = limb->jointPos;
+
+            if (!limb->dList) {
+                fp->skeleton.limbs[i].dLists[0] = NULL;
+                fp->skeleton.limbs[i].dLists[1] = NULL;
+            } else {
+                Link_DisplayList id = limbToDLEntry[i];
+                if (id != NO_DISPLAY_LIST) {
+                    fp->skeleton.limbs[i].dLists[0] = &fp->displayLists[id];
+                    fp->skeleton.limbs[i].dLists[1] = &fp->displayLists[id];
+                }
+            }
+        }
+
+        fp->skeleton.flexSkeleton.dListCount = skel->dListCount;
+    }
+
+    FlexSkeletonHeader *shieldSkel = fp->currentModelInfo->shieldingSkeleton;
+
+    if (!shieldSkel) {
+        shieldSkel = fp->fallbackModelInfo->shieldingSkeleton;
+    }
+
+    if (shieldSkel) {
+        for (int i = 0; i < PLAYER_BODY_SHIELD_LIMB_COUNT; ++i) {
+            StandardLimb *limb = shieldSkel->sh.segment[i];
+            fp->shieldingSkeleton.limbs[i].child = limb->child;
+            fp->shieldingSkeleton.limbs[i].sibling = limb->sibling;
+            fp->shieldingSkeleton.limbs[i].jointPos = limb->jointPos;
+        }
+
+        fp->shieldingSkeleton.flexSkeleton.dListCount = shieldSkel->dListCount;
+    }
+
+#undef NO_DISPLAY_LIST
+}
+
+void FormProxy_refreshDL(FormProxy *fp, Link_DisplayList id) {
+
+}
+
+void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
+    extern TexturePtr sPlayerEyesTextures[];
+    extern TexturePtr sPlayerMouthTextures[];
+
+    ModelInfo *current = fp->currentModelInfo;
+    ModelInfo *fallback = fp->fallbackModelInfo;
+
+    for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
+        TexturePtr eyesTex = ModelInfo_getEyesTexture(current, i);
+
+        if (!eyesTex) {
+            eyesTex = ModelInfo_getEyesTexture(fallback, i);
+        }
+
+        sPlayerEyesTextures[i] = eyesTex;
+    }
+
+    for (PlayerMouthIndex i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        TexturePtr mouthTex = ModelInfo_getMouthTexture(current, i);
+
+        if (!mouthTex) {
+            mouthTex = ModelInfo_getMouthTexture(fallback, i);
+        }
+
+        sPlayerMouthTextures[i] = mouthTex;
+    }
 }

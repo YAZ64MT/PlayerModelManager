@@ -46,7 +46,7 @@ typedef struct {
     WrappedDisplayList wrappedDisplayLists[LINK_DL_MAX];
 } FormProxy;
 
-void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback);
+void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, PlayerTransformation form);
 ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp);
 ModelInfo *FormProxy_getFallbackModelInfo(FormProxy *fp);
 void FormProxy_refreshSkeletons(FormProxy *fp);
@@ -56,5 +56,8 @@ void FormProxy_refreshMtx(FormProxy *fp, Link_EquipmentMatrix id);
 void FormProxy_refreshAllMtxs(FormProxy *fp);
 void FormProxy_requestTunicColor(FormProxy *fp, Color_RGBA8 color);
 void FormProxy_refreshTunicColor(FormProxy *fp);
+void FormProxy_swapCurrentDLMap(FormProxy *fp);
+void FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id);
+void FormProxy_refreshPlayerFaceTextures(FormProxy *fp);
 
 #endif
