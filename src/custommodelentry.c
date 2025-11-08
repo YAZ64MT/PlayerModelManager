@@ -8,6 +8,7 @@
 #include "yazmtcorelib_api.h"
 #include "custommodelentrymanager.h"
 #include "logger.h"
+#include "assets/objects/object_link_child/object_link_child.h"
 
 RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
 RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement eq));
@@ -182,6 +183,50 @@ TexturePtr ModelEntryForm_getEyesTexture(ModelEntryForm *entry, PlayerEyeIndex i
 
 TexturePtr ModelEntryForm_getMouthTexture(ModelEntryForm *entry, PlayerMouthIndex i) {
     return entry->mouthTex[i];
+}
+
+static TexturePtr sDefaultEyesTextures[PLAYER_EYES_MAX] = {
+    gLinkHumanEyesOpenTex,        // PLAYER_EYES_OPEN
+    gLinkHumanEyesHalfTex,        // PLAYER_EYES_HALF
+    gLinkHumanEyesClosedTex,      // PLAYER_EYES_CLOSED
+    gLinkHumanEyesRollRightTex,   // PLAYER_EYES_ROLL_RIGHT
+    gLinkHumanEyesRollLeftTex,    // PLAYER_EYES_ROLL_LEFT
+    gLinkHumanEyesRollUpTex,      // PLAYER_EYES_ROLL_UP
+    gLinkHumanEyesRollDownTex,    // PLAYER_EYES_ROLL_DOWN
+    object_link_child_Tex_003800, // PLAYER_EYES_7
+};
+
+static TexturePtr sDefaultMouthTextures[PLAYER_MOUTH_MAX] = {
+    gLinkHumanMouthClosedTex, // PLAYER_MOUTH_CLOSED
+    gLinkHumanMouthTeethTex,  // PLAYER_MOUTH_TEETH
+    gLinkHumanMouthAngryTex,  // PLAYER_MOUTH_ANGRY
+    gLinkHumanMouthHappyTex,  // PLAYER_MOUTH_HAPPY
+};
+
+void ModelEntryForm_setEyesTexture(ModelEntryForm *entry, TexturePtr tex, PlayerEyeIndex i) {
+    if (i < 0 || i >= PLAYER_EYES_MAX) {
+        return;
+    }
+
+    entry->eyesTex[i] = tex;
+}
+
+void ModelEntryForm_setMouthTexture(ModelEntryForm *entry, TexturePtr tex, PlayerMouthIndex i) {
+    if (i < 0 || i >= PLAYER_MOUTH_MAX) {
+        return;
+    }
+
+    entry->mouthTex[i] = tex;
+}
+
+void ModelEntryForm_fillDefaultFaceTextures(ModelEntryForm *entry) {
+    for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
+        ModelEntryForm_setEyesTexture(entry, sDefaultEyesTextures[i], i);
+    }
+
+    for (PlayerMouthIndex i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        ModelEntryForm_setMouthTexture(entry, sDefaultMouthTextures[i], i);
+    }
 }
 
 bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {

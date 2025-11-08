@@ -61,6 +61,12 @@ TexturePtr ModelEntryForm_getEyesTexture(ModelEntryForm *entry, PlayerEyeIndex i
 
 TexturePtr ModelEntryForm_getMouthTexture(ModelEntryForm *entry, PlayerMouthIndex i);
 
+void ModelEntryForm_setEyesTexture(ModelEntryForm *entry, TexturePtr tex, PlayerEyeIndex i);
+
+void ModelEntryForm_setMouthTexture(ModelEntryForm *entry, TexturePtr tex, PlayerMouthIndex i);
+
+void ModelEntryForm_fillDefaultFaceTextures(ModelEntryForm *entry);
+
 bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
 
 bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle, char *internalName);
