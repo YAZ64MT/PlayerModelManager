@@ -176,6 +176,14 @@ bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle,
     return true;
 }
 
+TexturePtr ModelEntryForm_getEyesTexture(ModelEntryForm *entry, PlayerEyeIndex i) {
+    return entry->eyesTex[i];
+}
+
+TexturePtr ModelEntryForm_getMouthTexture(ModelEntryForm *entry, PlayerMouthIndex i) {
+    return entry->mouthTex[i];
+}
+
 bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
