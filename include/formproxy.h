@@ -37,6 +37,7 @@ typedef struct {
     PlayerTransformation form;
     ModelInfo* currentModelInfo;
     ModelInfo* fallbackModelInfo;
+    U32ValueHashmapHandle sharedDisplayLists;
     SkeletonProxy skeleton;
     ShieldingSkeletonProxy shieldingSkeleton;
     TunicColor tunicColor;
@@ -46,7 +47,7 @@ typedef struct {
     WrappedDisplayList wrappedDisplayLists[LINK_DL_MAX];
 } FormProxy;
 
-void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, PlayerTransformation form);
+void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, PlayerTransformation form, U32ValueHashmapHandle sharedDisplayLists);
 ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp);
 ModelInfo *FormProxy_getFallbackModelInfo(FormProxy *fp);
 void FormProxy_refreshSkeletons(FormProxy *fp);
@@ -59,5 +60,6 @@ void FormProxy_refreshTunicColor(FormProxy *fp);
 void FormProxy_swapCurrentDLMap(FormProxy *fp);
 void FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id);
 void FormProxy_refreshPlayerFaceTextures(FormProxy *fp);
+Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id);
 
 #endif

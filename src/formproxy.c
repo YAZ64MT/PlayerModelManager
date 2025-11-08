@@ -4,6 +4,7 @@
 #include "logger.h"
 #include "playermodelmanager_utils.h"
 #include "rt64_extended_gbi.h"
+#include "modelreplacer_compat.h"
 
 static Gfx sPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
@@ -286,7 +287,7 @@ static void initProxyDLs(FormProxy *fp) {
     }
 }
 
-void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, PlayerTransformation form) {
+void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, PlayerTransformation form, U32HashsetHandle sharedDisplayLists) {
     if (!current) {
         Logger_printError("PlayerModelManager: FormProxy_init received NULL current argument!");
         tryCrashGame();
@@ -302,9 +303,15 @@ void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, Play
         tryCrashGame();
     }
 
+    if (!sharedDisplayLists) {
+        Logger_printError("PlayerModelManager: FormProxy_init received invalid sharedDisplayLists argument!");
+        tryCrashGame();
+    }
+
     fp->form = form;
     fp->currentModelInfo = current;
     fp->fallbackModelInfo = fallback;
+    fp->sharedDisplayLists = sharedDisplayLists;
     initSkeleton(fp);
     initShieldingSkeleton(fp);
     initMatrixes(fp);
@@ -425,4 +432,46 @@ void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
 
         sPlayerMouthTextures[i] = mouthTex;
     }
+}
+
+Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
+    Gfx *dl = MRC_getListenerDL(fp, id);
+
+    if (!dl) {
+        dl = ModelInfo_getGfx(fp->currentModelInfo, id);
+    }
+
+    // Use third person models in first person if third person model exists but not first person
+    if (!dl) {
+        Link_DisplayList thirdPersonTarget = id;
+
+        switch (id) {
+            case LINK_DL_FPS_HOOKSHOT:
+                thirdPersonTarget = LINK_DL_HOOKSHOT;
+                break;
+
+            case LINK_DL_FPS_BOW:
+                thirdPersonTarget = LINK_DL_BOW;
+                break;
+
+            case LINK_DL_FPS_SLINGSHOT:
+                thirdPersonTarget = LINK_DL_SLINGSHOT;
+                break;
+
+            default:
+                break;
+        }
+
+        dl = ModelInfo_getGfx(fp->currentModelInfo, thirdPersonTarget);
+    }
+
+    if (!dl) {
+        dl = ModelInfo_getGfx(fp->fallbackModelInfo, id);
+    }
+
+    if (!dl) {
+        recomputil_u32_value_hashmap_get(fp->sharedDisplayLists, id, (uintptr_t *)&dl);
+    }
+
+    return dl;
 }
