@@ -19,6 +19,8 @@ static YAZMTCore_DynamicU32Array *sModelEntries[LINK_CMC_MAX];
 
 static const ModelEntry *sCurrentModelEntries[LINK_CMC_MAX];
 
+static U32HashsetHandle sHiddenModelEntries;
+
 #define SAVED_INTERNAL_NAME_BUFFER_SIZE (INTERNAL_NAME_MAX_LENGTH + 1)
 
 typedef struct {
@@ -646,6 +648,18 @@ bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEnt
     return false;
 }
 
+bool CMEM_isEntryHidden(const ModelEntry *ModelEntry) {
+    return recomputil_u32_hashset_contains(sHiddenModelEntries, (uintptr_t)ModelEntry);
+}
+
+void CMEM_setEntryHidden(const ModelEntry *modelEntry, bool isHidden) {
+    if (isHidden) {
+        recomputil_u32_hashset_insert(sHiddenModelEntries, (uintptr_t)modelEntry);
+    } else {
+        recomputil_u32_hashset_erase(sHiddenModelEntries, (uintptr_t)modelEntry);
+    }
+}
+
 bool CMEM_tryApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry) {
     const ModelEntry *currEntry = CMEM_getCurrentEntry(cat);
     if (newEntry != currEntry) {
@@ -821,4 +835,5 @@ RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initCMEMHash() {
     sEntryHandles = recomputil_create_u32_slotmap();
     sInternalNamesToEntries = YAZMTCore_StringU32Dictionary_new();
+    sHiddenModelEntries = recomputil_create_u32_hashset();
 }

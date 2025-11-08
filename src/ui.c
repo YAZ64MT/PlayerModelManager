@@ -899,24 +899,26 @@ static void createModelListButtons() {
     const ModelEntry **modelEntries = CMEM_getCategoryEntryData(catInf->category, &count);
 
     for (size_t i = 0; i < count; ++i) {
-        const char *name = NULL;
+        if (!CMEM_isEntryHidden(modelEntries[i])) {
+            const char *name = NULL;
 
-        name = modelEntries[i]->displayName;
-        if (!name) {
-            name = modelEntries[i]->internalName;
-
+            name = modelEntries[i]->displayName;
             if (!name) {
-                name = "ERROR READING MODEL ENTRY NAME";
+                name = modelEntries[i]->internalName;
+
+                if (!name) {
+                    name = "ERROR READING MODEL ENTRY NAME";
+                }
             }
+
+            RecompuiResource modelButton = createAndPushButtonToList(sUIContext, sContainerListButtons, name, BUTTONSTYLE_PRIMARY);
+
+            // Need to cast away constness due to API signature
+            // function in pressedCallback should not modify the ModelEntry, though
+            recompui_register_callback(modelButton, pressedCallback, (ModelEntry *)modelEntries[i]);
+
+            setListButtonData(modelButton, modelEntries[i]);
         }
-
-        RecompuiResource modelButton = createAndPushButtonToList(sUIContext, sContainerListButtons, name, BUTTONSTYLE_PRIMARY);
-
-        // Need to cast away constness due to API signature
-        // function in pressedCallback should not modify the ModelEntry, though
-        recompui_register_callback(modelButton, pressedCallback, (ModelEntry *)modelEntries[i]);
-
-        setListButtonData(modelButton, modelEntries[i]);
     }
 
     connectListBoxButtons(getCurrentButtonArray(), getCurrentButtonArraySize());
