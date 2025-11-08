@@ -131,7 +131,7 @@ void updateListenerDLs_on_onModelChange(ObjectId id, Gfx *vanillaDL, Gfx *newDL)
             }
         }
 
-        if (newDL == listener->vanillaDL) {
+        if (newDL == GlobalObjects_getGlobalGfxPtr(listener->objId, listener->vanillaDL)) {
             recomputil_u32_value_hashmap_erase(sListenerDLByForm[listener->form], linkDLId);
         } else {
             recomputil_u32_value_hashmap_insert(sListenerDLByForm[listener->form], linkDLId, (uintptr_t)newDL);
