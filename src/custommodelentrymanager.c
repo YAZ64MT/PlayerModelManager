@@ -9,6 +9,7 @@
 #include "proxymm_kv_api.h"
 #include "playermodelmanager_api.h"
 #include "yazmtcorelib_api.h"
+#include "logger.h"
 
 static U32SlotmapHandle sEntryHandles;
 
@@ -621,12 +622,6 @@ void CMEM_reapplyEntry(Link_CustomModelCategory cat) {
 }
 
 bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry) {
-
-    if (!isValidCategory(cat)) {
-        recomp_printf("PlayerModelManager: Called CMEM_forceApplyEntry with invalid category %d\n", cat);
-        return false;
-    }
-
     const ModelEntry *currEntry = CMEM_getCurrentEntry(cat);
 
     if (newEntry == NULL) {
@@ -642,7 +637,7 @@ bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEnt
         CMEM_setCurrentEntry(cat, newEntry);
 
         if (newEntry->callback) {
-            newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, currEntry->callbackData);
+            newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, newEntry->callbackData);
         }
 
         return true;
@@ -680,7 +675,8 @@ const ModelEntry **CMEM_getCategoryEntryData(Link_CustomModelCategory cat, size_
 void CMEM_removeModel(Link_CustomModelCategory cat) {
 
     if (!isValidCategory(cat)) {
-        recomp_printf("PlayerModelManager: Called CMEM_removeModel with invalid category %d\n", cat);
+        Logger_printError("PlayerModelManager: Called CMEM_removeModel with invalid category %d\n", cat);
+        tryCrashGame();
         return;
     }
 
@@ -726,29 +722,29 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType typ
     ModelEntry *entry = recomp_alloc(handleSize);
 
     if (!entry) {
-        return 0;
-    }
 
-    memset(entry, 0, handleSize);
-
-    if (isFormEntry) {
-        ModelEntryForm_init((ModelEntryForm *)entry);
-    } else if (isEquipmentEntry) {
-        ModelEntryEquipment_init((ModelEntryEquipment *)entry, getEquipmentReplacementFromCategory(cat));
-    } else if (isPackEntry) {
-        ModelEntryPack_init((ModelEntryPack *)entry);
-    } else {
-        recomp_free(entry);
         return 0;
     }
 
     PlayerModelManagerHandle handle = recomputil_u32_slotmap_create(sEntryHandles);
-    recomputil_u32_slotmap_set(sEntryHandles, handle, (uintptr_t)entry);
-    
-    entry->internalName = internalName;
-    entry->handle = handle;
-    entry->type = type;
-    entry->category = cat;
+    bool isEntryInitialized = false;
+
+    if (isFormEntry) {
+        isEntryInitialized = ModelEntryForm_init((ModelEntryForm *)entry, handle, type, internalName);
+    } else if (isEquipmentEntry) {
+        isEntryInitialized = ModelEntryEquipment_init((ModelEntryEquipment *)entry, handle, type, internalName);
+    } else if (isPackEntry) {
+        isEntryInitialized = ModelEntryPack_init((ModelEntryPack *)entry, handle, internalName);
+    }
+
+    if (isEntryInitialized) {
+        recomputil_u32_slotmap_set(sEntryHandles, handle, (uintptr_t)entry);
+    } else {
+        Logger_printWarning("PlayerModelManager: CMEM_createMemoryHandle failed to initialize an entry!");
+        recomp_free(entry);
+        recomputil_u32_slotmap_erase(sEntryHandles, handle);
+        return 0;
+    }
 
     pushEntry(sModelEntries[cat], entry);
 

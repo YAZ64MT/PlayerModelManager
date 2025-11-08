@@ -7,6 +7,7 @@
 #include "custommodelentrymanager.h"
 #include "model_common.h"
 #include "yazmtcorelib_api.h"
+#include "logger.h"
 
 static void refreshFileList();
 
@@ -111,7 +112,7 @@ static CategoryInfo *getCurrentCategoryInfo() {
     if (isSelectingModel()) {
         return &sCategoryInfos[sCurrentCategoryInfo];
     } else {
-        recomp_printf("PlayerModelManager: getCurrentCategoryInfo found invalid sCurrentCategoryInfo value %d\n", sCurrentCategoryInfo);
+        Logger_printWarning("PlayerModelManager: getCurrentCategoryInfo found invalid sCurrentCategoryInfo value %d\n", sCurrentCategoryInfo);
     }
 
     return NULL;
@@ -163,6 +164,21 @@ static const ButtonColor sModelSelectedButtonColor = {
         .r = 227,
         .g = 151,
         .b = 75,
+        .a = 13,
+    },
+};
+
+static const ButtonColor sModelRemovedButtonColor = {
+    .borderColor = {
+        .r = 224,
+        .g = 74,
+        .b = 89,
+        .a = 204,
+    },
+    .bgColor = {
+        .r = 224,
+        .g = 74,
+        .b = 89,
         .a = 13,
     },
 };
@@ -257,6 +273,11 @@ static void setListButtonValue(RecompuiResource button, u32 val) {
     }
 }
 
+static void setButtonColor(RecompuiResource button, const ButtonColor *color) {
+    recompui_set_background_color(button, &color->bgColor);
+    recompui_set_border_color(button, &color->borderColor);
+}
+
 static void refreshButtonEntryColors() {
     if (isSelectingCategory()) {
         return;
@@ -270,13 +291,12 @@ static void refreshButtonEntryColors() {
 
             for (size_t i = 0; i < count; ++i) {
                 RecompuiResource button = buttons[i];
+                const void *buttonData = getListButtonData(button);
 
-                if (entry && entry == getListButtonData(button)) {
-                    recompui_set_background_color(button, &sModelSelectedButtonColor.bgColor);
-                    recompui_set_border_color(button, &sModelSelectedButtonColor.borderColor);
-                } else {
-                    recompui_set_background_color(button, &sPrimaryButtonColor.bgColor);
-                    recompui_set_border_color(button, &sPrimaryButtonColor.borderColor);
+                if (entry && entry == buttonData) {
+                    setButtonColor(button, &sModelSelectedButtonColor);
+                } else if (buttonData) {
+                    setButtonColor(button, &sPrimaryButtonColor);
                 }
             }
         }
@@ -330,7 +350,7 @@ static void applyRealEntry(int entryIndex) {
     if (entryIndex >= 0 && entryIndex < ARRAY_COUNT(sCategoryInfos)) {
         CMEM_tryApplyEntry(sCategoryInfos[entryIndex].category, sCategoryInfos[entryIndex].realEntry);
     } else {
-        recomp_printf("PlayerModelManager: applyRealEntry received invalid entryIndex %d\n", entryIndex);
+        Logger_printWarning("PlayerModelManager: applyRealEntry received invalid entryIndex %d\n", entryIndex);
     }
 }
 
@@ -418,35 +438,6 @@ static void removeEquipmentModelsButtonPressed(RecompuiResource resource, const 
             if (shouldLivePreview()) {
                 applyRealEntries();
                 removeEquipmentModels();
-            }
-        }
-    }
-}
-
-static void removeSingleModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
-    if (sIsUIContextShown) {
-        if (data->type == UI_EVENT_CLICK) {
-            if (isSelectingModel()) {
-                CategoryInfo *catInf = getCurrentCategoryInfo();
-                if (catInf) {
-                    Audio_PlaySfx(NA_SE_SY_DECIDE);
-                    catInf->realEntry = NULL;
-                    CMEM_tryApplyEntry(catInf->category, NULL);
-                    refreshButtonEntryColors();
-                    catInf->isNeedsDiskSave = true;
-                } else {
-                    Audio_PlaySfx(NA_SE_SY_ERROR);
-                }
-            }
-        } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
-            destroyAuthor();
-
-            if (shouldLivePreview()) {
-                CategoryInfo *catInf = getCurrentCategoryInfo();
-
-                if (catInf) {
-                    CMEM_tryApplyEntry(catInf->category, NULL);
-                }
             }
         }
     }
@@ -737,28 +728,32 @@ void on_init() {
 
 static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (sIsUIContextShown) {
-        ModelEntry *entry = userdata;
+        ModelEntry *entryOrNull = userdata;
 
         CategoryInfo *catInf = getCurrentCategoryInfo();
 
         if (catInf) {
-            Link_CustomModelCategory cat = entry->category;
+            Link_CustomModelCategory cat = catInf->category;
 
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
 
-                CMEM_tryApplyEntry(cat, entry);
+                CMEM_tryApplyEntry(cat, entryOrNull);
 
-                catInf->realEntry = entry;
+                catInf->realEntry = entryOrNull;
 
                 refreshButtonEntryColors();
 
                 catInf->isNeedsDiskSave = true;
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
-                setAuthor(entry->authorName);
+                if (entryOrNull) {
+                    setAuthor(entryOrNull->authorName);
+                } else {
+                    destroyAuthor();
+                }
 
                 if (shouldLivePreview()) {
-                    CMEM_tryApplyEntry(cat, entry);
+                    CMEM_tryApplyEntry(cat, entryOrNull);
                 }
             }
         }
@@ -767,23 +762,27 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
 
 static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (sIsUIContextShown) {
-        ModelEntry *entry = userdata;
+        ModelEntry *entryOrNull = userdata;
 
         CategoryInfo *catInf = getCurrentCategoryInfo();
 
         if (catInf) {
-            Link_CustomModelCategory cat = entry->category;
+            Link_CustomModelCategory cat = catInf->category;
 
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
-                CMEM_tryApplyEntry(cat, entry);
+                CMEM_tryApplyEntry(cat, entryOrNull);
                 saveAllModels();
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
-                setAuthor(entry->authorName);
+                if (entryOrNull) {
+                    setAuthor(entryOrNull->authorName);
+                } else {
+                    destroyAuthor();
+                }
 
                 if (shouldLivePreview()) {
                     applyRealEntries();
-                    CMEM_tryApplyEntry(cat, entry);
+                    CMEM_tryApplyEntry(cat, entryOrNull);
                 }
             }
         }
@@ -865,6 +864,7 @@ static void destroyModelButtons() {
 static void createCategoryListButtons() {
     RecompuiResource removeModelsButton = createAndPushButtonToList(sUIContext, sContainerListButtons, "[Remove All Models]", BUTTONSTYLE_PRIMARY);
     recompui_register_callback(removeModelsButton, removeAllModelsButtonPressed, NULL);
+    setButtonColor(removeModelsButton, &sModelRemovedButtonColor);
 
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *curr = &sCategoryInfos[i];
@@ -881,7 +881,7 @@ static void createCategoryListButtons() {
 static void createModelListButtons() {
     CategoryInfo *catInf = getCurrentCategoryInfo();
     RecompuiEventHandler *pressedCallback = onModelButtonPressed;
-    RecompuiEventHandler *removedCallback = removeSingleModelButtonPressed;
+    RecompuiEventHandler *removedCallback = onModelButtonPressed;
     const char *removeText = "[None]";
 
     bool isPack = isPackCategory(catInf->category);
@@ -892,6 +892,7 @@ static void createModelListButtons() {
     }
 
     RecompuiResource removeModelButton = createAndPushButtonToList(sUIContext, sContainerListButtons, removeText, BUTTONSTYLE_PRIMARY);
+    setButtonColor(removeModelButton, &sModelRemovedButtonColor);
     recompui_register_callback(removeModelButton, removedCallback, NULL);
 
     size_t count = 0;

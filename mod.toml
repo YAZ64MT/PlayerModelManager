@@ -129,3 +129,26 @@ name = "Tunic Color"
 description = "Hex string color value of tunic.\n\nDoes nothing if 'Set Tunic Color' is disabled.\n\nDefault: 1E691B"
 type = "String"
 default = "1E691B"
+
+[[manifest.config_options]]
+id = "logging_level"
+name = "Console Log Level"
+description = """
+Set the level of console logging.
+
+ALL: Display every logged message
+
+VERBOSE: Display every logged message with priority VERBOSE or above
+
+INFO: Display every logged message with priority INFO or above
+
+WARNING: Display every logged message with priority WARNING or above
+
+ERROR: Display every logged message with priority ERROR or above
+
+NONE: Do not display logged messages from PMM
+
+"""
+type = "Enum"
+options = [ "ALL", "VERBOSE", "INFO", "WARNING", "ERROR", "NONE" ]
+default = "WARNING"

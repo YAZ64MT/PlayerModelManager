@@ -3,6 +3,7 @@
 #include "recompdata.h"
 #include "recomputils.h"
 #include "playermodelmanager.h"
+#include "logger.h"
 #include "model_common.h"
 #include "externs_z_player_lib.h"
 #include "maskdls.h"
@@ -37,6 +38,9 @@ typedef struct {
 typedef struct {
     PlayState *play;
     Link_FormProxy *formProxy;
+    const GfxHookLookup *segment04;
+    const GfxHookLookup *segment06;
+    const GfxHookLookup *segment0A;
     Gfx *startOpa;
     Gfx *startXlu;
 } GfxHookData;
@@ -51,11 +55,13 @@ U32ValueHashmapHandle initReplacementList(GfxHookDisplayList replacements[], int
     return h;
 }
 
-// By coincidence, none of these DLs have overlapping segmented addresses
-// Any new entries should be checked to ensure that their segmented addresses do not overlap
-static GfxHookDisplayList sLinkFormsDLReplacements[] = {
+static GfxHookDisplayList sLinkHumanDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_link_child_DL_017818, LINK_DL_BOW_STRING),
     DECLARE_GFX_HOOK_DL(object_link_child_DL_01D960, LINK_DL_HOOKSHOT_HOOK),
+};
+static GfxHookLookup sLinkHumanDLMap = DECLARE_GFX_HOOK_LUT(sLinkHumanDLReplacements);
+
+static GfxHookDisplayList sLinkDekuDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_link_nuts_DL_007390, LINK_DL_PIPE_MOUTH),
     DECLARE_GFX_HOOK_DL(object_link_nuts_DL_007548, LINK_DL_PIPE_RIGHT),
     DECLARE_GFX_HOOK_DL(object_link_nuts_DL_0076A0, LINK_DL_PIPE_UP),
@@ -69,6 +75,10 @@ static GfxHookDisplayList sLinkFormsDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_link_nuts_DL_00A348, LINK_DL_DEKU_GUARD),
     DECLARE_GFX_HOOK_DL(gLinkDekuOpenFlowerDL, LINK_DL_CENTER_FLOWER_PROPELLER_OPEN),
     DECLARE_GFX_HOOK_DL(gLinkDekuClosedFlowerDL, LINK_DL_CENTER_FLOWER_PROPELLER_CLOSED),
+};
+static GfxHookLookup sLinkDekuDLMap = DECLARE_GFX_HOOK_LUT(sLinkDekuDLReplacements);
+
+static GfxHookDisplayList sLinkGoronDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_link_goron_DL_00FC18, LINK_DL_DRUM_STRAP),
     DECLARE_GFX_HOOK_DL(object_link_goron_DL_00FCF0, LINK_DL_DRUM_UP),
     DECLARE_GFX_HOOK_DL(object_link_goron_DL_00FF18, LINK_DL_DRUM_LEFT),
@@ -80,15 +90,23 @@ static GfxHookDisplayList sLinkFormsDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_link_goron_DL_0127B0, LINK_DL_FIRE_INIT),
     DECLARE_GFX_HOOK_DL(object_link_goron_DL_0134D0, LINK_DL_FIRE_ROLL),
     DECLARE_GFX_HOOK_DL(gLinkGoronGoronPunchEffectDL, LINK_DL_FIRE_PUNCH),
+};
+static GfxHookLookup sLinkGoronDLMap = DECLARE_GFX_HOOK_LUT(sLinkGoronDLReplacements);
+
+static GfxHookDisplayList sLinkZoraDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(gLinkZoraLeftHandOpenDL, LINK_DL_LHAND),
     DECLARE_GFX_HOOK_DL(gLinkZoraRightHandOpenDL, LINK_DL_RHAND),
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_00E088, LINK_DL_LHAND_GUITAR),
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_00E2A0, LINK_DL_GUITAR),
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_0110A8, LINK_DL_FIN_SHIELD),
+};
+static GfxHookLookup sLinkZoraDLMap = DECLARE_GFX_HOOK_LUT(sLinkZoraDLReplacements);
+
+static GfxHookDisplayList sShieldMirrorDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_mir_ray_DL_0004B0, LINK_DL_SHIELD3_RAY),
     DECLARE_GFX_HOOK_DL(object_mir_ray_DL_000168, LINK_DL_SHIELD3_RAY_BEAM),
 };
-static GfxHookLookup sLinkFormsDLMap = DECLARE_GFX_HOOK_LUT(sLinkFormsDLReplacements);
+static GfxHookLookup sShieldMirrorDLMap = DECLARE_GFX_HOOK_LUT(sShieldMirrorDLReplacements);
 
 static GfxHookDisplayList sGameplayKeepDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(gDekuStickDL, LINK_DL_DEKU_STICK),
@@ -101,17 +119,17 @@ static GfxHookDisplayList sGameplayKeepDLReplacements[] = {
 };
 static GfxHookLookup sGameplayKeepDLMap = DECLARE_GFX_HOOK_LUT(sGameplayKeepDLReplacements);
 
-static GfxHookDisplayList sMaskDLReplacements[] = {
+static GfxHookDisplayList sBlastMaskDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_mask_bakuretu_DL_000440, LINK_DL_MASK_BLAST_COOLING_DOWN),
 };
-static GfxHookLookup sMaskDLMap = DECLARE_GFX_HOOK_LUT(sMaskDLReplacements);
+static GfxHookLookup sBlastMaskDLMap = DECLARE_GFX_HOOK_LUT(sBlastMaskDLReplacements);
 
 void GfxHookLookup_init(GfxHookLookup *ghl) {
     ghl->gfxPtrsToDLs = recomputil_create_u32_value_hashmap();
     for (size_t i = 0; i < ghl->numHookDLEntries; ++i) {
         GfxHookDisplayList *currHookDL = &ghl->rawHookDLEntries[i];
         if (!recomputil_u32_value_hashmap_insert(ghl->gfxPtrsToDLs, (uintptr_t)(currHookDL->target), currHookDL->replacementId)) {
-            recomp_printf("PlayerModelManager: WARNING! GfxHookLookup_init: Passed in GfxHookLookup contains duplicate keys!\n");
+            Logger_printWarning("PlayerModelManager: GfxHookLookup_init: Passed in GfxHookLookup contains duplicate keys!\n");
         }
     }
 }
@@ -119,12 +137,16 @@ void GfxHookLookup_init(GfxHookLookup *ghl) {
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initGfxHookReplacmentMaps() {
     GfxHookLookup_init(&sGameplayKeepDLMap);
-    GfxHookLookup_init(&sLinkFormsDLMap);
-    GfxHookLookup_init(&sMaskDLMap);
+    GfxHookLookup_init(&sLinkHumanDLMap);
+    GfxHookLookup_init(&sLinkDekuDLMap);
+    GfxHookLookup_init(&sLinkZoraDLMap);
+    GfxHookLookup_init(&sLinkGoronDLMap);
+    GfxHookLookup_init(&sShieldMirrorDLMap);
+    GfxHookLookup_init(&sBlastMaskDLMap);
 }
 
 // assumed hookdat has valid playstate ptr
-void fillGfxHookData(GfxHookData *hookDat, PlayState *play, Link_FormProxy *formProxy) {
+void fillGfxHookData(GfxHookData *hookDat, PlayState *play, Link_FormProxy *formProxy, const GfxHookLookup *seg04, const GfxHookLookup *seg06, const GfxHookLookup *seg0A) {
     hookDat->play = play;
     hookDat->formProxy = formProxy;
 
@@ -132,29 +154,59 @@ void fillGfxHookData(GfxHookData *hookDat, PlayState *play, Link_FormProxy *form
 
     hookDat->startOpa = POLY_OPA_DISP;
     hookDat->startXlu = POLY_XLU_DISP;
+    hookDat->segment04 = seg04;
+    hookDat->segment06 = seg06;
+    hookDat->segment0A = seg0A;
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
-void replaceHookedGfxCommands(GfxHookData *hookDat, Gfx *startDL, Gfx *endDL) {
+static void replaceHookedGfxCommands(GfxHookData *hookDat, Gfx *startDL, Gfx *endDL) {
     Gfx *curr = startDL;
 
+    U32HashsetHandle seg04Handle = hookDat->segment04 ? hookDat->segment04->gfxPtrsToDLs : 0;
+    U32HashsetHandle savedSeg04Handle = seg04Handle;
+
+    U32HashsetHandle seg06Handle = hookDat->segment06 ? hookDat->segment06->gfxPtrsToDLs : 0;
+    U32HashsetHandle savedSeg06Handle = seg06Handle;
+
+    U32HashsetHandle seg0AHandle = hookDat->segment0A ? hookDat->segment0A->gfxPtrsToDLs : 0;
+    U32HashsetHandle savedSeg0AHandle = seg0AHandle;
+
+    uintptr_t origSeg04 = gSegments[0x04];
+    uintptr_t origSeg06 = gSegments[0x06];
+    uintptr_t origSeg0A = gSegments[0x0A];
+
     while (curr <= endDL) {
+        // encountered a gSPSegment command
+        // Disable replacing commands unless the object being pointed to is restored
+        if ((curr->words.w0 >> 16) == ((G_MOVEWORD << 8) | G_MW_SEGMENT)) {
+            int segment = (curr->words.w0 & 0xFFFF) / 4;
+
+            if (segment == 0x04) {
+                seg04Handle = curr->words.w1 == origSeg04 ? savedSeg04Handle : 0;
+            } else if (segment == 0x06) {
+                seg06Handle = curr->words.w1 == origSeg06 ? savedSeg06Handle : 0;
+            } else if (segment == 0x0A) {
+                seg0AHandle = curr->words.w1 == origSeg0A ? savedSeg0AHandle : 0;
+            }
+        }
+
         // Check if this command is segmented gSPDisplayList command
         if ((curr->words.w0 >> 16) == (G_DL << 8 | G_DL_PUSH) && curr->words.w1 < K0BASE) {
             U32ValueHashmapHandle hashmap = 0;
 
             switch (SEGMENT_NUMBER(curr->words.w1)) {
                 case 0x04:
-                    hashmap = sGameplayKeepDLMap.gfxPtrsToDLs;
+                    hashmap = seg04Handle;
                     break;
 
                 case 0x06:
-                    hashmap = sLinkFormsDLMap.gfxPtrsToDLs;
+                    hashmap = seg06Handle;
                     break;
 
                 case 0x0A:
-                    hashmap = sMaskDLMap.gfxPtrsToDLs;
+                    hashmap = seg0AHandle;
                     break;
 
                 default:
@@ -162,7 +214,7 @@ void replaceHookedGfxCommands(GfxHookData *hookDat, Gfx *startDL, Gfx *endDL) {
             }
 
             if (hashmap) {
-                unsigned long tmp = curr->words.w1;
+                unsigned long tmp;
                 if (recomputil_u32_value_hashmap_get(hashmap, curr->words.w1, &tmp)) {
                     gSPDisplayList(curr, &hookDat->formProxy->displayLists[tmp]);
                 }
@@ -185,11 +237,40 @@ void replaceHookedXluGfxCommands(GfxHookData *hookDat) {
     CLOSE_DISPS(hookDat->play.state.gfxCtx);
 }
 
+static GfxHookLookup *getFormGfxLookup(PlayerTransformation form) {
+    GfxHookLookup *seg06;
+
+    switch (form) {
+        case PLAYER_FORM_GORON:
+            seg06 = &sLinkGoronDLMap;
+            break;
+
+        case PLAYER_FORM_ZORA:
+            seg06 = &sLinkZoraDLMap;
+            break;
+
+        case PLAYER_FORM_DEKU:
+            seg06 = &sLinkDekuDLMap;
+            break;
+
+        case PLAYER_FORM_HUMAN:
+            seg06 = &sLinkHumanDLMap;
+            break;
+
+        default:
+            seg06 = NULL;
+            break;
+    }
+
+    return seg06;
+}
+
 static GfxHookData sPlayerDrawGfxHook;
 
 RECOMP_HOOK("Player_Draw")
 void hookGfx_on_Player_Draw(Actor *thisx, PlayState *play) {
-    fillGfxHookData(&sPlayerDrawGfxHook, play, &gLinkFormProxies[((Player *)thisx)->transformation]);
+    Player *player = (Player *)thisx;
+    fillGfxHookData(&sPlayerDrawGfxHook, play, &gLinkFormProxies[player->transformation], &sGameplayKeepDLMap, getFormGfxLookup(player->transformation), NULL);
 }
 
 RECOMP_HOOK_RETURN("Player_Draw")
@@ -198,11 +279,24 @@ void hookGfx_on_return_Player_Draw() {
     replaceHookedXluGfxCommands(&sPlayerDrawGfxHook);
 }
 
+static GfxHookData sPlayerDrawBlastMaskGfxHook;
+
+RECOMP_HOOK("Player_DrawBlastMask")
+void hookGfx_on_Player_DrawBlastMask(PlayState *play, Player *player) {
+    fillGfxHookData(&sPlayerDrawBlastMaskGfxHook, play, &gLinkFormProxies[player->transformation], &sGameplayKeepDLMap, NULL, &sBlastMaskDLMap);
+}
+
+RECOMP_HOOK_RETURN("Player_DrawBlastMask")
+void hookGfx_on_return_Player_DrawBlastMask() {
+    replaceHookedOpaGfxCommands(&sPlayerDrawBlastMaskGfxHook);
+    replaceHookedXluGfxCommands(&sPlayerDrawBlastMaskGfxHook);
+}
+
 static GfxHookData sHookshotGfxHook;
 
 RECOMP_HOOK("ArmsHook_Draw")
 void hookGfx_on_ArmsHook_Draw(Actor *thisx, PlayState *play) {
-    fillGfxHookData(&sHookshotGfxHook, play, &gLinkFormProxies[GET_PLAYER(play)->transformation]);
+    fillGfxHookData(&sHookshotGfxHook, play, &gLinkFormProxies[GET_PLAYER(play)->transformation], &sGameplayKeepDLMap, &sLinkHumanDLMap, NULL);
 }
 
 RECOMP_HOOK_RETURN("ArmsHook_Draw")
@@ -217,17 +311,17 @@ RECOMP_HOOK("EnArrow_Draw")
 void hookGfx_on_EnArrow_Draw(Actor *thisx, PlayState *play) {
     Player *player = GET_PLAYER(play);
 
-    PlayerTransformation tf;
+    PlayerTransformation form;
 
     // Account for possibility form has a custom arrow model
     // otherwise default to human
     if (gLinkFormProxies[player->transformation].current.modelInfo.models[LINK_DL_BOW_ARROW]) {
-        tf = player->transformation;
+        form = player->transformation;
     } else {
-        tf = PLAYER_FORM_HUMAN;
+        form = PLAYER_FORM_HUMAN;
     }
 
-    fillGfxHookData(&sArrowGfxHook, play, &gLinkFormProxies[tf]);
+    fillGfxHookData(&sArrowGfxHook, play, &gLinkFormProxies[form], &sGameplayKeepDLMap, getFormGfxLookup(form), NULL);
 }
 
 RECOMP_HOOK_RETURN("EnArrow_Draw")
@@ -241,8 +335,7 @@ static GfxHookData sMirrorRayGfxHook;
 RECOMP_HOOK("MirRay3_Draw")
 void hookGfx_on_MirRay_Draw(Actor *thisx, PlayState *play) {
     Player *player = GET_PLAYER(play);
-
-    fillGfxHookData(&sMirrorRayGfxHook, play, &gLinkFormProxies[player->transformation]);
+    fillGfxHookData(&sMirrorRayGfxHook, play, &gLinkFormProxies[player->transformation], &sGameplayKeepDLMap, &sShieldMirrorDLMap, NULL);
 }
 
 RECOMP_HOOK_RETURN("MirRay3_Draw")

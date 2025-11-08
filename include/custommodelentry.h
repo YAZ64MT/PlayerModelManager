@@ -47,8 +47,6 @@ typedef struct {
     YAZMTCore_IterableU32Set *modelEntries;
 } ModelEntryPack;
 
-void ModelEntry_init(ModelEntry *entry);
-
 Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id);
 
 bool ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl);
@@ -57,11 +55,11 @@ Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id);
 
 bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx);
 
-void ModelEntryForm_init(ModelEntryForm *entry);
+bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
 
-void ModelEntryEquipment_init(ModelEntryEquipment *entry, Link_EquipmentReplacement type);
+bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
 
-void ModelEntryPack_init(ModelEntryPack *entry);
+bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle, char *internalName);
 
 ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *entry);
 

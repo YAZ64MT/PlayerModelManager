@@ -6,6 +6,7 @@
 #include "playermodelmanager.h"
 #include "playermodelmanager_utils.h"
 #include "libc/string.h"
+#include "logger.h"
 
 void clearLinkModelInfo(Link_ModelInfo* modelInfo) {
     memset(modelInfo, 0, sizeof(Link_ModelInfo));
@@ -106,4 +107,18 @@ void writeU32(u8 array[], u32 offset, u32 value) {
 
 bool isSegmentedPtr(void *p) {
     return (uintptr_t)p >> 24 <= 0xF;
+}
+
+bool sIsCrashDisabled;
+
+void setCrashEnabled(bool isEnabled) {
+    sIsCrashDisabled = isEnabled;
+}
+
+void tryCrashGame() {
+    if (!sIsCrashDisabled) {
+        Logger_printError("PlayerModelManager: Forcing game crash...");
+        int *ptr = NULL;
+        *ptr = 0xDEADBEEF;
+    }
 }
