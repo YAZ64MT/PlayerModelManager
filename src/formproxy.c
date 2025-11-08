@@ -5,6 +5,8 @@
 #include "playermodelmanager_utils.h"
 #include "rt64_extended_gbi.h"
 #include "modelreplacer_compat.h"
+#include "modelmatrixids.h"
+#include "playermodelmanager_mm.h"
 
 static Gfx sPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
@@ -35,6 +37,18 @@ static Gfx sEndBowstringDL[] = {
     gsSPNoOp(),
     gsSPBranchList(sEndDLWrapper),
 };
+
+static Gfx *getSharedDL(FormProxy *fp, Link_DisplayList id) {
+    uintptr_t dl = 0;
+    recomputil_u32_value_hashmap_get(fp->sharedDisplayLists, id, &dl);
+    return (Gfx *)dl;
+}
+
+static Mtx *getSharedMtx(FormProxy *fp, Link_EquipmentMatrix id) {
+    uintptr_t mtx = 0;
+    recomputil_u32_value_hashmap_get(fp->sharedMatrixes, id, &mtx);
+    return (Mtx *)mtx;
+}
 
 RECOMP_CALLBACK("*", recomp_on_init)
 void initExDLs() {
@@ -287,9 +301,9 @@ static void initProxyDLs(FormProxy *fp) {
     }
 }
 
-void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, PlayerTransformation form, U32HashsetHandle sharedDisplayLists) {
-    if (!current) {
-        Logger_printError("PlayerModelManager: FormProxy_init received NULL current argument!");
+void FormProxy_init(FormProxy *fp, PlayerTransformation form, ModelInfo *fallback, ModelInfo *fallbackOverride, U32ValueHashmapHandle sharedDisplayLists, U32ValueHashmapHandle sharedMatrixes) {
+    if (form < 0 || form >= PLAYER_FORM_MAX) {
+        Logger_printError("PlayerModelManager: FormProxy_init received invalid form argument with value %d!", form);
         tryCrashGame();
     }
 
@@ -298,8 +312,8 @@ void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, Play
         tryCrashGame();
     }
 
-    if (form < 0 || form >= PLAYER_FORM_MAX) {
-        Logger_printError("PlayerModelManager: FormProxy_init received invalid form argument with value %d!", form);
+    if (!fallbackOverride) {
+        Logger_printError("PlayerModelManager: FormProxy_init received NULL fallbackOverride argument!");
         tryCrashGame();
     }
 
@@ -308,11 +322,18 @@ void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, Play
         tryCrashGame();
     }
 
+    if (!sharedMatrixes) {
+        Logger_printError("PlayerModelManager: FormProxy_init received invalid sharedMatrixes argument!");
+        tryCrashGame();
+    }
+
     fp->form = form;
-    fp->currentModelInfo = current;
+    ModelInfo_init(&fp->currentModelInfo);
+    fp->fallbackOverrideModelInfo = fallbackOverride;
     fp->fallbackModelInfo = fallback;
     fp->sharedDisplayLists = sharedDisplayLists;
     fp->displayListAlternates = recomputil_create_u32_value_hashmap();
+    fp->tunicColor.isOverrideRequested = false;
     initSkeleton(fp);
     initShieldingSkeleton(fp);
     initMatrixes(fp);
@@ -321,7 +342,11 @@ void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, Play
 }
 
 ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp) {
-    return fp->currentModelInfo;
+    return &fp->currentModelInfo;
+}
+
+ModelInfo *FormProxy_getFallbackOverrideModelInfo(FormProxy *fp) {
+    return fp->fallbackOverrideModelInfo;
 }
 
 ModelInfo *FormProxy_getFallbackModelInfo(FormProxy *fp) {
@@ -355,10 +380,14 @@ void FormProxy_refreshSkeletons(FormProxy *fp) {
         LINK_DL_TORSO,
     };
 
-    FlexSkeletonHeader *skel = fp->currentModelInfo->skeleton;
+    FlexSkeletonHeader *skel = ModelInfo_getSkeleton(&fp->currentModelInfo);
 
     if (!skel) {
-        skel = fp->fallbackModelInfo->skeleton;
+        skel = ModelInfo_getSkeleton(fp->fallbackOverrideModelInfo);
+    }
+
+    if (!skel) {
+        skel = ModelInfo_getSkeleton(fp->fallbackModelInfo);
     }
 
     if (skel) {
@@ -383,10 +412,14 @@ void FormProxy_refreshSkeletons(FormProxy *fp) {
         fp->skeleton.flexSkeleton.dListCount = skel->dListCount;
     }
 
-    FlexSkeletonHeader *shieldSkel = fp->currentModelInfo->shieldingSkeleton;
+    FlexSkeletonHeader *shieldSkel = ModelInfo_getShieldingSkeleton(&fp->currentModelInfo);
 
     if (!shieldSkel) {
-        shieldSkel = fp->fallbackModelInfo->shieldingSkeleton;
+        ModelInfo_getShieldingSkeleton(fp->fallbackOverrideModelInfo);
+    }
+
+    if (!shieldSkel) {
+        shieldSkel = ModelInfo_getShieldingSkeleton(fp->fallbackModelInfo);
     }
 
     if (shieldSkel) {
@@ -411,15 +444,197 @@ void FormProxy_refreshDL(FormProxy *fp, Link_DisplayList id) {
     }
 }
 
+static void setDLsToShims(FormProxy *fp) {
+
+#define PROXY_TO_SHIM(dlName) gSPDisplayList(&fp->wrappedDisplayLists[LINK_DL_##dlName].displayList[WRAPPED_DL_DRAW], fp->shimDisplayListPtrs[LINK_SHIMDL_##dlName])
+
+    PROXY_TO_SHIM(SWORD1);
+    PROXY_TO_SHIM(SWORD2);
+    PROXY_TO_SHIM(SWORD3);
+    PROXY_TO_SHIM(SWORD4);
+    PROXY_TO_SHIM(SWORD4_BROKEN);
+    PROXY_TO_SHIM(SWORD5);
+
+    PROXY_TO_SHIM(SWORD1_HILT_BACK);
+    PROXY_TO_SHIM(SWORD2_HILT_BACK);
+    PROXY_TO_SHIM(SWORD3_HILT_BACK);
+    PROXY_TO_SHIM(SWORD4_HILT_BACK);
+    PROXY_TO_SHIM(SWORD5_HILT_BACK);
+
+    PROXY_TO_SHIM(SWORD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHEATHED);
+    PROXY_TO_SHIM(SWORD5_SHEATHED);
+
+    PROXY_TO_SHIM(SHIELD1_BACK);
+    PROXY_TO_SHIM(SHIELD2_BACK);
+    PROXY_TO_SHIM(SHIELD3_BACK);
+
+    PROXY_TO_SHIM(SWORD1_SHIELD1_SHEATH);
+    PROXY_TO_SHIM(SWORD1_SHIELD2_SHEATH);
+    PROXY_TO_SHIM(SWORD1_SHIELD3_SHEATH);
+    PROXY_TO_SHIM(SWORD2_SHIELD1_SHEATH);
+    PROXY_TO_SHIM(SWORD2_SHIELD2_SHEATH);
+    PROXY_TO_SHIM(SWORD2_SHIELD3_SHEATH);
+    PROXY_TO_SHIM(SWORD3_SHIELD1_SHEATH);
+    PROXY_TO_SHIM(SWORD3_SHIELD2_SHEATH);
+    PROXY_TO_SHIM(SWORD3_SHIELD3_SHEATH);
+    PROXY_TO_SHIM(SWORD4_SHIELD1_SHEATH);
+    PROXY_TO_SHIM(SWORD4_SHIELD2_SHEATH);
+    PROXY_TO_SHIM(SWORD4_SHIELD3_SHEATH);
+    PROXY_TO_SHIM(SWORD5_SHIELD1_SHEATH);
+    PROXY_TO_SHIM(SWORD5_SHIELD2_SHEATH);
+    PROXY_TO_SHIM(SWORD5_SHIELD3_SHEATH);
+
+    PROXY_TO_SHIM(SWORD1_SHIELD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD1_SHIELD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD1_SHIELD3_SHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHIELD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHIELD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD2_SHIELD3_SHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHIELD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHIELD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD3_SHIELD3_SHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHIELD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHIELD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD4_SHIELD3_SHEATHED);
+    PROXY_TO_SHIM(SWORD5_SHIELD1_SHEATHED);
+    PROXY_TO_SHIM(SWORD5_SHIELD2_SHEATHED);
+    PROXY_TO_SHIM(SWORD5_SHIELD3_SHEATHED);
+
+    PROXY_TO_SHIM(LFIST_SWORD1);
+    PROXY_TO_SHIM(LFIST_SWORD2);
+    PROXY_TO_SHIM(LFIST_SWORD3);
+    PROXY_TO_SHIM(LFIST_SWORD3_PEDESTAL_GRABBED);
+    PROXY_TO_SHIM(LFIST_SWORD4);
+    PROXY_TO_SHIM(LFIST_SWORD4_BROKEN);
+    PROXY_TO_SHIM(LFIST_SWORD5);
+
+    PROXY_TO_SHIM(RFIST_SHIELD1);
+    PROXY_TO_SHIM(RFIST_SHIELD2);
+    PROXY_TO_SHIM(RFIST_SHIELD3);
+
+    PROXY_TO_SHIM(LFIST_HAMMER);
+    PROXY_TO_SHIM(LFIST_BOOMERANG);
+    PROXY_TO_SHIM(RFIST_BOW);
+    PROXY_TO_SHIM(RFIST_SLINGSHOT);
+    PROXY_TO_SHIM(RFIST_HOOKSHOT);
+    PROXY_TO_SHIM(RHAND_OCARINA_FAIRY);
+    PROXY_TO_SHIM(RHAND_OCARINA_TIME);
+
+    PROXY_TO_SHIM(FPS_RHAND_BOW);
+    PROXY_TO_SHIM(FPS_RHAND_SLINGSHOT);
+    PROXY_TO_SHIM(FPS_RHAND_HOOKSHOT);
+
+    PROXY_TO_SHIM(SHIELD1_ITEM);
+    PROXY_TO_SHIM(SWORD3_PEDESTAL);
+    PROXY_TO_SHIM(SWORD3_PEDESTAL_GRABBED);
+
+    PROXY_TO_SHIM(CENTER_FLOWER_PROPELLER_CLOSED);
+    PROXY_TO_SHIM(CENTER_FLOWER_PROPELLER_OPEN);
+
+#undef PROXY_TO_SHIM
+}
+
+void FormProxy_refreshAllDLs(FormProxy *fp) {
+    WrappedDisplayList *wDLs = fp->wrappedDisplayLists;
+    ModelInfo *current = &fp->currentModelInfo;
+    ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
+    ModelInfo *fallback = fp->fallbackModelInfo;
+
+    for (int i = 0; i < LINK_DL_MAX; ++i) {
+        gSPDisplayList(&wDLs[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
+    }
+
+    setDLsToShims(fp);
+
+    for (int i = 0; i < LINK_DL_MAX; ++i) {
+        Gfx *dl = FormProxy_getDL(fp, i);
+
+        if (dl) {
+            gSPDisplayList(&wDLs[i].displayList[WRAPPED_DL_DRAW], dl);
+        }
+    }
+
+    // first person hookshot workaround
+    Gfx *listenerHookDL = MRC_getListenerDL(fp->form, LINK_DL_HOOKSHOT);
+    if (listenerHookDL) {
+        gSPDisplayList(&wDLs[LINK_DL_FPS_HOOKSHOT].displayList[WRAPPED_DL_DRAW], listenerHookDL);
+    }
+
+    // first person bow workaround
+    Gfx *listenerBowDL = MRC_getListenerDL(fp->form, LINK_DL_BOW);
+    if (listenerBowDL) {
+        gSPDisplayList(&wDLs[LINK_DL_BOW].displayList[WRAPPED_DL_DRAW], listenerBowDL);
+    }
+
+    // disable hilt for Great Fairy Sword if replaced
+    Gfx *listenerGFSwordDL = MRC_getListenerDL(fp->form, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
+    if (listenerGFSwordDL) {
+        gSPDisplayList(&wDLs[LINK_DL_SWORD_GREAT_FAIRY_HILT].displayList[WRAPPED_DL_DRAW], gEmptyDL);
+    }
+
+    // disable hilt for Fierce Deity's Sword if replaced
+    Gfx *listenerFDSwordDL = MRC_getListenerDL(fp->form, LINK_DL_SWORD_FIERCE_DEITY_BLADE);
+    if (listenerFDSwordDL) {
+        gSPDisplayList(&wDLs[LINK_DL_SWORD_GREAT_FAIRY_HILT].displayList[WRAPPED_DL_DRAW], gEmptyDL);
+    }
+}
+
+void FormProxy_refreshMtx(FormProxy *fp, Link_EquipmentMatrix id) {
+    Mtx *matrix = ModelInfo_getMtx(&fp->currentModelInfo, id);
+
+    if (!matrix) {
+        matrix = ModelInfo_getMtx(fp->fallbackOverrideModelInfo, id);
+    }
+
+    if (!matrix) {
+        matrix = ModelInfo_getMtx(fp->fallbackModelInfo, id);
+    }
+
+    if (!matrix) {
+        matrix = getSharedMtx(fp, id);
+    }
+
+    if (matrix) {
+        gSPMatrix(&fp->mtxDisplayLists[id][0], matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+    }
+}
+
+void FormProxy_refreshAllMtxs(FormProxy *fp) {
+    for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
+        FormProxy_refreshMtx(fp, i);
+    }
+}
+
+void FormProxy_requestTunicColor(FormProxy *fp, Color_RGBA8 color) {
+    fp->tunicColor.isOverrideRequested = true;
+    fp->tunicColor.requested = color;
+}
+
+void FormProxy_refreshTunicColor(FormProxy *fp) {
+    // TODO: IMPLEMENT FormProxy_refreshTunicColor
+}
+
+void FormProxy_setCurrentModelFormEntry(FormProxy *fp, ModelEntryForm *modelEntry) {
+    ModelInfo_setModelEntryForm(&fp->currentModelInfo, modelEntry);
+}
+
 void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
     extern TexturePtr sPlayerEyesTextures[];
     extern TexturePtr sPlayerMouthTextures[];
 
-    ModelInfo *current = fp->currentModelInfo;
+    ModelInfo *current = &fp->currentModelInfo;
+    ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
     ModelInfo *fallback = fp->fallbackModelInfo;
 
     for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
         TexturePtr eyesTex = ModelInfo_getEyesTexture(current, i);
+
+        if (!eyesTex) {
+            eyesTex = ModelInfo_getEyesTexture(fallbackOverride, i);
+        }
 
         if (!eyesTex) {
             eyesTex = ModelInfo_getEyesTexture(fallback, i);
@@ -432,6 +647,10 @@ void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
         TexturePtr mouthTex = ModelInfo_getMouthTexture(current, i);
 
         if (!mouthTex) {
+            mouthTex = ModelInfo_getMouthTexture(fallbackOverride, i);
+        }
+
+        if (!mouthTex) {
             mouthTex = ModelInfo_getMouthTexture(fallback, i);
         }
 
@@ -439,8 +658,12 @@ void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
     }
 }
 
+Mtx *FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id) {
+    return (Mtx *)fp->mtxDisplayLists[id][0].words.w1;
+}
+
 Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
-    Gfx *dl = MRC_getListenerDL(fp, id);
+    Gfx *dl = MRC_getListenerDL(fp->form, id);
 
     if (!dl) {
         FormProxy *fpAlt;
@@ -451,13 +674,18 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
         }
     }
 
+    ModelInfo *current = &fp->currentModelInfo;
+    ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
+    ModelInfo *fallback = fp->fallbackModelInfo;
+
     if (!dl) {
-        dl = ModelInfo_getGfx(fp->currentModelInfo, id);
+        dl = ModelInfo_getGfx(current, id);
     }
 
     // Use third person models in first person if third person model exists but not first person
     if (!dl) {
         Link_DisplayList thirdPersonTarget = id;
+        bool hasThirdPersonTarget = true;
 
         switch (id) {
             case LINK_DL_FPS_HOOKSHOT:
@@ -473,18 +701,29 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
                 break;
 
             default:
+                hasThirdPersonTarget = false;
                 break;
         }
 
-        dl = ModelInfo_getGfx(fp->currentModelInfo, thirdPersonTarget);
+        if (hasThirdPersonTarget) {
+            dl = ModelInfo_getGfx(current, thirdPersonTarget);
+        }
+
+        if (!dl) {
+            dl = ModelInfo_getGfx(fallbackOverride, id);
+        }
+
+        if (!dl && hasThirdPersonTarget) {
+            dl = ModelInfo_getGfx(fallbackOverride, thirdPersonTarget);
+        }
     }
 
     if (!dl) {
-        dl = ModelInfo_getGfx(fp->fallbackModelInfo, id);
+        dl = ModelInfo_getGfx(fallback, id);
     }
 
     if (!dl) {
-        recomputil_u32_value_hashmap_get(fp->sharedDisplayLists, id, (uintptr_t *)&dl);
+        dl = getSharedDL(fp, id);
     }
 
     return dl;

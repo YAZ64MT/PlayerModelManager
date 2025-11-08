@@ -35,9 +35,11 @@ typedef struct TunicColor {
 
 typedef struct FormProxy {
     PlayerTransformation form;
-    ModelInfo* currentModelInfo;
-    ModelInfo* fallbackModelInfo;
+    ModelInfo currentModelInfo;
+    ModelInfo *fallbackOverrideModelInfo;
+    ModelInfo *fallbackModelInfo;
     U32ValueHashmapHandle sharedDisplayLists;
+    U32ValueHashmapHandle sharedMatrixes;
     U32ValueHashmapHandle displayListAlternates;
     SkeletonProxy skeleton;
     ShieldingSkeletonProxy shieldingSkeleton;
@@ -48,8 +50,9 @@ typedef struct FormProxy {
     WrappedDisplayList wrappedDisplayLists[LINK_DL_MAX];
 } FormProxy;
 
-void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, PlayerTransformation form, U32ValueHashmapHandle sharedDisplayLists);
+void FormProxy_init(FormProxy *fp, PlayerTransformation form, ModelInfo *fallback, ModelInfo *fallbackOverride, U32ValueHashmapHandle sharedDisplayLists, U32ValueHashmapHandle sharedMatrixes);
 ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp);
+ModelInfo *FormProxy_getFallbackOverrideModelInfo(FormProxy *fp);
 ModelInfo *FormProxy_getFallbackModelInfo(FormProxy *fp);
 void FormProxy_refreshSkeletons(FormProxy *fp);
 void FormProxy_refreshDL(FormProxy *fp, Link_DisplayList id);
@@ -58,9 +61,9 @@ void FormProxy_refreshMtx(FormProxy *fp, Link_EquipmentMatrix id);
 void FormProxy_refreshAllMtxs(FormProxy *fp);
 void FormProxy_requestTunicColor(FormProxy *fp, Color_RGBA8 color);
 void FormProxy_refreshTunicColor(FormProxy *fp);
-void FormProxy_swapCurrentDLMap(FormProxy *fp);
-void FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id);
+void FormProxy_setCurrentModelFormEntry(FormProxy *fp, ModelEntryForm *modelEntry);
 void FormProxy_refreshPlayerFaceTextures(FormProxy *fp);
+Mtx *FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id);
 Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id);
 
 #endif
