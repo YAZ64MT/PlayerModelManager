@@ -7,19 +7,19 @@
 #define PLAYER_BODY_SHIELD_LIMB_COUNT 4
 #define PLAYER_LIMB_COUNT (PLAYER_LIMB_MAX - 1)
 
-typedef struct {
+typedef struct ShieldingSkeletonProxy {
     FlexSkeletonHeader flexSkeleton;
     StandardLimb *limbPtrs[PLAYER_BODY_SHIELD_LIMB_COUNT];
     StandardLimb limbs[PLAYER_BODY_SHIELD_LIMB_COUNT];
 } ShieldingSkeletonProxy;
 
-typedef struct {
+typedef struct SkeletonProxy {
     FlexSkeletonHeader flexSkeleton;
     LodLimb *limbPtrs[PLAYER_LIMB_COUNT];
     LodLimb limbs[PLAYER_LIMB_COUNT];
 } SkeletonProxy;
 
-typedef struct {
+typedef struct WrappedDisplayList {
     Gfx displayList[3];
 } WrappedDisplayList;
 
@@ -27,17 +27,18 @@ typedef struct {
 #define WRAPPED_DL_DRAW 1
 #define WRAPPED_DL_POSTDRAW 2
 
-typedef struct {
+typedef struct TunicColor {
     Color_RGBA8 current;
     Color_RGBA8 requested;
     bool isOverrideRequested;
 } TunicColor;
 
-typedef struct {
+typedef struct FormProxy {
     PlayerTransformation form;
     ModelInfo* currentModelInfo;
     ModelInfo* fallbackModelInfo;
     U32ValueHashmapHandle sharedDisplayLists;
+    U32ValueHashmapHandle displayListAlternates;
     SkeletonProxy skeleton;
     ShieldingSkeletonProxy shieldingSkeleton;
     TunicColor tunicColor;

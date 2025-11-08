@@ -312,6 +312,7 @@ void FormProxy_init(FormProxy *fp, ModelInfo *current, ModelInfo *fallback, Play
     fp->currentModelInfo = current;
     fp->fallbackModelInfo = fallback;
     fp->sharedDisplayLists = sharedDisplayLists;
+    fp->displayListAlternates = recomputil_create_u32_value_hashmap();
     initSkeleton(fp);
     initShieldingSkeleton(fp);
     initMatrixes(fp);
@@ -403,7 +404,11 @@ void FormProxy_refreshSkeletons(FormProxy *fp) {
 }
 
 void FormProxy_refreshDL(FormProxy *fp, Link_DisplayList id) {
+    Gfx *dl = FormProxy_getDL(fp, id);
 
+    if (dl) {
+        gSPDisplayList(&fp->wrappedDisplayLists[id].displayList[WRAPPED_DL_DRAW], dl);
+    }
 }
 
 void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
@@ -436,6 +441,15 @@ void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
 
 Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
     Gfx *dl = MRC_getListenerDL(fp, id);
+
+    if (!dl) {
+        FormProxy *fpAlt;
+        if (recomputil_u32_value_hashmap_get(fp->displayListAlternates, id, (uintptr_t *)&fpAlt)) {
+            if (fpAlt != fp) {
+                dl = FormProxy_getDL(fpAlt, id);
+            }
+        }
+    }
 
     if (!dl) {
         dl = ModelInfo_getGfx(fp->currentModelInfo, id);
