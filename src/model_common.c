@@ -15,8 +15,7 @@
 #include "yazmtcorelib_api.h"
 #include "rt64_extended_gbi.h"
 #include "colorfixes.h"
-
-RECOMP_IMPORT("*", u32 z64recomp_get_bowstring_transform_id());
+#include "z64recomp_api.h"
 
 Gfx gPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
@@ -424,7 +423,7 @@ void refreshProxyDL(Link_FormProxy *formProxy, Link_DisplayList linkDLId) {
 }
 
 void refreshProxyDLs(Link_FormProxy *formProxy) {
-    WrappedDisplayList *wDLs = formProxy->wrappedDisplayLists;
+    Link_WrappedDisplayList *wDLs = formProxy->wrappedDisplayLists;
     Link_ModelInfo *current = &formProxy->current.modelInfo;
     Link_ModelInfo *vanilla = &formProxy->vanilla;
 

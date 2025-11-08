@@ -7,6 +7,7 @@
 #include "modelreplacer_compat.h"
 #include "modelmatrixids.h"
 #include "playermodelmanager_mm.h"
+#include "z64recomp_api.h"
 
 static Gfx sPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
@@ -51,7 +52,7 @@ static Mtx *getSharedMtx(FormProxy *fp, Link_EquipmentMatrix id) {
 }
 
 RECOMP_CALLBACK("*", recomp_on_init)
-void initExDLs() {
+void initFormProxyExDLs() {
     gEXPushEnvColor(&sStartDLWrapper[0]);
     gEXPopEnvColor(&sEndDLWrapper[0]);
     gEXMatrixGroupSimple(&sStartBowStringDL[0], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
@@ -285,6 +286,11 @@ static void initProxyShims(FormProxy *fp) {
 #undef SHIM_SHIELD_RFIST
 }
 
+static void initBowWrapper(FormProxy *fp) {
+    gSPDisplayList(&fp->wrappedDisplayLists[LINK_DL_BOW_STRING].displayList[WRAPPED_DL_PREDRAW], sStartBowStringDL);
+    gSPBranchList(&fp->wrappedDisplayLists[LINK_DL_BOW_STRING].displayList[WRAPPED_DL_POSTDRAW], sEndBowstringDL);
+}
+
 static void initProxyWrappers(FormProxy *fp) {
     for (int i = 0; i < LINK_DL_MAX; ++i) {
         gSPDisplayList(&fp->wrappedDisplayLists[i].displayList[WRAPPED_DL_PREDRAW], sStartDLWrapper);
@@ -338,6 +344,7 @@ void FormProxy_init(FormProxy *fp, PlayerTransformation form, ModelInfo *fallbac
     initShieldingSkeleton(fp);
     initMatrixes(fp);
     initProxyShims(fp);
+    initProxyWrappers(fp);
     initProxyDLs(fp);
 }
 

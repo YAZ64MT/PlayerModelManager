@@ -8,11 +8,6 @@ void ModelInfo_init(ModelInfo *modelInfo) {
     modelInfo->modelEntryForm = NULL;
     modelInfo->gfxOverrides = recomputil_create_u32_value_hashmap();
     modelInfo->mtxOverrides = recomputil_create_u32_value_hashmap();
-    ModelInfo_clearFlags(modelInfo);
-    ModelInfo_unsetSkeleton(modelInfo);
-    ModelInfo_unsetShieldingSkeleton(modelInfo);
-    ModelInfo_clearEyesTextures(modelInfo);
-    ModelInfo_clearMouthTextures(modelInfo);
 }
 
 bool ModelInfo_hasModelEntry(ModelInfo *modelInfo) {
@@ -20,7 +15,7 @@ bool ModelInfo_hasModelEntry(ModelInfo *modelInfo) {
 }
 
 Gfx *ModelInfo_getGfx(ModelInfo *modelInfo, Link_DisplayList id) {
-    if (!isValidDisplayListID(id)) {
+    if (id >= LINK_DL_MAX || id < 0) {
         Logger_printWarning("PlayerModelManager: ModelInfo_getGfx called with invalid display list ID %d.", id);
     }
 
@@ -36,7 +31,7 @@ Gfx *ModelInfo_getGfx(ModelInfo *modelInfo, Link_DisplayList id) {
 }
 
 Mtx *ModelInfo_getMtx(ModelInfo *modelInfo, Link_EquipmentMatrix id) {
-    if (!isValidMatrixID(id)) {
+    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
         Logger_printWarning("PlayerModelManager: ModelInfo_getMtx called with invalid matrix ID %d.", id);
         return NULL;
     }
