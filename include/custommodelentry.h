@@ -69,6 +69,14 @@ void ModelEntryForm_fillDefaultFaceTextures(ModelEntryForm *entry);
 
 void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry);
 
+void ModelEntryForm_setSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel);
+
+FlexSkeletonHeader *ModelEntryForm_getSkeleton(ModelEntryForm *entry);
+
+void ModelEntryForm_setShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel);
+
+FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel);
+
 bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
 
 bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle, char *internalName);

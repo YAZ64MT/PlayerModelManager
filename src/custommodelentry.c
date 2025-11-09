@@ -280,6 +280,22 @@ void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
 #undef SET_SHIELDING_LIMB_DL
 }
 
+void ModelEntryForm_setSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel) {
+    entry->skel = skel;
+}
+
+FlexSkeletonHeader *ModelEntryForm_getSkeleton(ModelEntryForm *entry) {
+    return entry->skel;
+}
+
+void ModelEntryForm_setShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel) {
+    entry->shieldingSkel = skel;
+}
+
+FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel) {
+    return entry->shieldingSkel;
+}
+
 bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
