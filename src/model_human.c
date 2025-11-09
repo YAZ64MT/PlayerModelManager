@@ -4,6 +4,14 @@
 #include "playermodelmanager_utils.h"
 #include "model_common.h"
 #include "globalobjects_api.h"
+#include "modelinfo.h"
+#include "custommodelentry.h"
+#include "custommodelentrymanager.h"
+#include "modelmatrixids.h"
+#include "playermodelmanager_api.h"
+
+ModelEntryForm *gHumanModelEntry;
+ModelInfo gHumanModelInfo;
 
 // handless ocarina
 Gfx gLinkHumanOcarinaDL[] = {
@@ -143,6 +151,26 @@ Gfx gLinkHumanFirstPersonArmDL[] = {
 
 Gfx *getHumanDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, dl);
+}
+
+static void setupHumanFallbackModel() {
+    void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
+
+    FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);
+
+    ModelInfo_init(&gHumanModelInfo);
+
+    ModelEntryForm *entry = gHumanModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_child__"));
+    ModelEntryForm_fillDefaultFaceTextures(entry);
+    ModelEntryForm_setSkeleton(entry, skel);
+    ModelEntryForm_setDLsFromSkeletons(entry);
+
+    CMEM_setEntryHidden(&entry->modelEntry, true);
+    ModelInfo_setModelEntryForm(&gHumanModelInfo, entry);
+
+    GlobalObjects_globalizeLodLimbSkeleton(human, &gLinkHumanSkel);
+
+
 }
 
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)
