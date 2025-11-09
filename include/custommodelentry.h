@@ -67,6 +67,8 @@ void ModelEntryForm_setMouthTexture(ModelEntryForm *entry, TexturePtr tex, Playe
 
 void ModelEntryForm_fillDefaultFaceTextures(ModelEntryForm *entry);
 
+void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry);
+
 bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
 
 bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle, char *internalName);

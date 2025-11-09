@@ -229,6 +229,57 @@ void ModelEntryForm_fillDefaultFaceTextures(ModelEntryForm *entry) {
     }
 }
 
+void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
+#define SET_LIMB_DL(pLimb, id)                                                                                                           \
+    {                                                                                                                                    \
+        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                        \
+            ModelEntry_setDisplayList(&entry->modelEntry, id, (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL); \
+        }                                                                                                                                \
+    }                                                                                                                                    \
+    (void)0
+
+    if (entry->skel) {
+        LodLimb **limbs = (LodLimb **)entry->skel->sh.segment;
+        SET_LIMB_DL(PLAYER_LIMB_WAIST, LINK_DL_WAIST);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_THIGH, LINK_DL_RTHIGH);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHIN, LINK_DL_RSHIN);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOOT, LINK_DL_RFOOT);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_THIGH, LINK_DL_LTHIGH);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_SHIN, LINK_DL_LSHIN);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_FOOT, LINK_DL_LFOOT);
+        SET_LIMB_DL(PLAYER_LIMB_HEAD, LINK_DL_HEAD);
+        SET_LIMB_DL(PLAYER_LIMB_HAT, LINK_DL_HAT);
+        SET_LIMB_DL(PLAYER_LIMB_COLLAR, LINK_DL_COLLAR);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_SHOULDER, LINK_DL_LSHOULDER);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_FOREARM, LINK_DL_LFOREARM);
+        SET_LIMB_DL(PLAYER_LIMB_LEFT_HAND, LINK_DL_LHAND);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_SHOULDER, LINK_DL_RSHOULDER);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_FOREARM, LINK_DL_RFOREARM);
+        SET_LIMB_DL(PLAYER_LIMB_RIGHT_HAND, LINK_DL_RHAND);
+        SET_LIMB_DL(PLAYER_LIMB_SHEATH, LINK_DL_SHEATH_NONE);
+        SET_LIMB_DL(PLAYER_LIMB_TORSO, LINK_DL_TORSO);
+    }
+
+#undef SET_LIMB_DL
+
+#define SET_SHIELDING_LIMB_DL(pLimb, id)                                                                                                           \
+    {                                                                                                                                    \
+        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                        \
+            ModelEntry_setDisplayList(&entry->modelEntry, id, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
+        }                                                                                                                                \
+    }                                                                                                                                    \
+    (void)0
+
+    if (entry->shieldingSkel) {
+        StandardLimb **limbs = (StandardLimb **)entry->shieldingSkel->sh.segment;
+        SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_BODY, LINK_DL_BODY_SHIELD_BODY);
+        SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_HEAD, LINK_DL_BODY_SHIELD_HEAD);
+        SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_ARMS_AND_LEGS, LINK_DL_BODY_SHIELD_ARMS_AND_LEGS);
+    }
+
+#undef SET_SHIELDING_LIMB_DL
+}
+
 bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
