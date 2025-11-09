@@ -157,6 +157,7 @@ static void setupHumanFallbackModel() {
     void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);
+    GlobalObjects_globalizeLodLimbSkeleton(human, &gLinkHumanSkel);
 
     ModelInfo_init(&gHumanModelInfo);
 
@@ -168,9 +169,32 @@ static void setupHumanFallbackModel() {
     CMEM_setEntryHidden(&entry->modelEntry, true);
     ModelInfo_setModelEntryForm(&gHumanModelInfo, entry);
 
-    GlobalObjects_globalizeLodLimbSkeleton(human, &gLinkHumanSkel);
+#define SET_ENTRY_DL(id, dl) entry->modelEntry.setDisplayList(&entry->modelEntry, id, dl)
 
+    SET_ENTRY_DL(LINK_DL_LHAND, getHumanDL(gLinkHumanLeftHandOpenDL));
+    SET_ENTRY_DL(LINK_DL_LFIST, getHumanDL(gLinkHumanLeftHandClosedDL));
+    SET_ENTRY_DL(LINK_DL_LHAND_BOTTLE, getHumanDL(gLinkHumanLeftHandHoldBottleDL));
+    SET_ENTRY_DL(LINK_DL_LHAND_GUITAR, getHumanDL(gLinkHumanLeftHandOpenDL));
+    SET_ENTRY_DL(LINK_DL_RHAND, getHumanDL(gLinkHumanRightHandOpenDL));
+    SET_ENTRY_DL(LINK_DL_RFIST, getHumanDL(gLinkHumanRightHandClosedDL));
 
+    // First Person
+    SET_ENTRY_DL(LINK_DL_FPS_LFOREARM, getHumanDL(gLinkHumanLeftForearmDL));
+    SET_ENTRY_DL(LINK_DL_FPS_LHAND, getHumanDL(gLinkHumanLeftHandClosedDL));
+    SET_ENTRY_DL(LINK_DL_FPS_RFOREARM, gEmptyDL);
+
+    GlobalObjectsSegmentMap humanSegMap = {0};
+    humanSegMap[0x04] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
+    humanSegMap[0x06] = human;
+
+    SET_ENTRY_DL(LINK_DL_FPS_RHAND, gLinkHumanFirstPersonArmDL);
+    GlobalObjects_rebaseDL(gLinkHumanFirstPersonArmDL, humanSegMap); // repoint vertices, textures, etc. to static link obj
+
+    // items
+    SET_ENTRY_DL(LINK_DL_OCARINA_TIME, gLinkHumanOcarinaDL);
+    GlobalObjects_rebaseDL(gLinkHumanOcarinaDL, humanSegMap); // repoint vertices, textures, etc. to static link obj
+
+    #undef SET_ENTRY_DL
 }
 
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)
