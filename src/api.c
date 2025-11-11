@@ -1,5 +1,5 @@
 #include "global.h"
-#include "custommodelentrymanager.h"
+#include "modelentrymanager.h"
 #include "recomputils.h"
 #include "playermodelmanager.h"
 #include "model_common.h"

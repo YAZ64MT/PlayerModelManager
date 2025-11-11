@@ -4,7 +4,7 @@
 #include "recomputils.h"
 #include "recompconfig.h"
 #include "recompui.h"
-#include "custommodelentrymanager.h"
+#include "modelentrymanager.h"
 #include "model_common.h"
 #include "yazmtcorelib_api.h"
 #include "logger.h"

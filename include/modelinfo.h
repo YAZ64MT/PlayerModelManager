@@ -4,7 +4,7 @@
 #include "global.h"
 #include "modelmatrixids.h"
 #include "recompdata.h"
-#include "custommodelentry.h"
+#include "modelentry.h"
 
 typedef struct {
     ModelEntryForm *modelEntryForm;

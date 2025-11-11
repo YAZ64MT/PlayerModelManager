@@ -5,8 +5,8 @@
 #include "model_common.h"
 #include "globalobjects_api.h"
 #include "modelinfo.h"
-#include "custommodelentry.h"
-#include "custommodelentrymanager.h"
+#include "modelentry.h"
+#include "modelentrymanager.h"
 #include "modelmatrixids.h"
 #include "playermodelmanager_api.h"
 

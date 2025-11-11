@@ -1,6 +1,6 @@
 #ifndef __CUSTOMMODELENTRYMANAGER_H
 #define __CUSTOMMODELENTRYMANAGER_H
-#include "custommodelentry.h"
+#include "modelentry.h"
 
 typedef unsigned long PlayerModelManagerHandle;
 
