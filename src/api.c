@@ -15,14 +15,14 @@
 
 static bool isEntryLoaded(ModelEntry *entry) {
     if (entry) {
-        return CMEM_getCurrentEntry(entry->category) == entry;
+        return CMEM_getCurrentEntry(ModelEntry_getCategory(entry)) == entry;
     }
 
     return false;
 }
 
 static void refreshProxyIfEntryLoaded(ModelEntry *entry) {
-    Link_CustomModelCategory cat = entry->category;
+    Link_CustomModelCategory cat = ModelEntry_getCategory(entry);
 
     if (isEntryLoaded(entry)) {
         CMEM_reapplyEntry(cat);
@@ -95,8 +95,8 @@ static ModelEntryForm *getFormEntryOrPrintErr(PlayerModelManagerHandle h, const 
         return NULL;
     }
 
-    if (!isFormCategory(entry->category)) {
-        Logger_printWarning("PlayerModelManager: Handle with internal name '%s' does not support the function '%s'", entry->internalName, funcName);
+    if (!isFormCategory(ModelEntry_getCategory(entry))) {
+        Logger_printWarning("PlayerModelManager: Handle with internal name '%s' does not support the function '%s'", ModelEntry_getInternalName(entry), funcName);
         return NULL;
     }
 
@@ -155,10 +155,10 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
     }
 
     if (modelType == PMM_MODEL_TYPE_ADULT) {
-        entry->flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
+        ModelEntry_setFlags(entry, MODELENTRY_FLAG_IS_ADULT);
     }
 
-    Logger_printVerbose("PlayerModelManager: Registered new model '%s' with model type %d", entry->internalName, modelType);
+    Logger_printVerbose("PlayerModelManager: Registered new model '%s' with model type %d", ModelEntry_getInternalName(entry), modelType);
 
     return h;
 }
@@ -174,9 +174,9 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerHandle h,
         return false;
     }
 
-    dupStrAndFreeOld(&entry->displayName, displayName);
+    ModelEntry_setDisplayName(entry, displayName);
 
-    Logger_printVerbose("PlayerModelManager: Setting display name of handle with internal name '%s' to '%s'", entry->internalName, displayName);
+    Logger_printVerbose("PlayerModelManager: Setting display name of handle with internal name '%s' to '%s'", ModelEntry_getInternalName(entry), displayName);
 
     return true;
 }
@@ -192,9 +192,9 @@ RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerHandle h, cons
         return false;
     }
 
-    dupStrAndFreeOld(&entry->authorName, author);
+    ModelEntry_setAuthorName(entry, author);
 
-    Logger_printVerbose("PlayerModelManager: Setting author of handle with internal name '%s' to '%s'", entry->internalName, author);
+    Logger_printVerbose("PlayerModelManager: Setting author of handle with internal name '%s' to '%s'", ModelEntry_getInternalName(entry), author);
 
     return true;
 }
@@ -206,9 +206,9 @@ RECOMP_EXPORT bool PlayerModelManager_setFlags(PlayerModelManagerHandle h, u64 f
         return false;
     }
 
-    entry->flags |= flags;
+    ModelEntry_setFlags(entry, flags);
 
-    Logger_printVerbose("PlayerModelManager: Setting flags 0x%llX of handle with internal name '%s'", flags, entry->internalName);
+    Logger_printVerbose("PlayerModelManager: Setting flags 0x%llX of handle with internal name '%s'", flags, ModelEntry_getInternalName(entry));
 
     return true;
 }
@@ -220,9 +220,9 @@ RECOMP_EXPORT bool PlayerModelManager_clearFlags(PlayerModelManagerHandle h, u64
         return false;
     }
 
-    entry->flags &= ~flags;
+    ModelEntry_unsetFlags(entry, flags);
 
-    Logger_printVerbose("PlayerModelManager: Clearing flags 0x%llX of handle with internal name '%s'", flags, entry->internalName);
+    Logger_printVerbose("PlayerModelManager: Clearing flags 0x%llX of handle with internal name '%s'", flags, ModelEntry_getInternalName(entry));
 
     return true;
 }
@@ -234,9 +234,9 @@ RECOMP_EXPORT bool PlayerModelManager_clearAllFlags(PlayerModelManagerHandle h, 
         return false;
     }
 
-    entry->flags = 0;
+    ModelEntry_unsetAllFlags(entry);
 
-    Logger_printVerbose("PlayerModelManager: Clearing all flags of handle with internal name '%s'", entry->internalName);
+    Logger_printVerbose("PlayerModelManager: Clearing all flags of handle with internal name '%s'", ModelEntry_getInternalName(entry));
 
     return true;
 }
@@ -253,9 +253,9 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
         return false;
     }
 
-    if (entry->setDisplayList(entry, dlId, dl)) {
+    if (ModelEntry_setDisplayList(entry, dlId, dl)) {
         refreshProxyDLIfEntryLoaded(entry, dlId);
-        Logger_printVerbose("PlayerModelManager: Setting DL id %d on handle with internal name '%s' to 0x%X", dlId, entry->internalName, dl);
+        Logger_printVerbose("PlayerModelManager: Setting DL id %d on handle with internal name '%s' to 0x%X", dlId, ModelEntry_getInternalName(entry), dl);
         return true;
     }
 
@@ -274,29 +274,10 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
         return false;
     }
 
-    if (entry->setMatrix(entry, mtxId, matrix)) {
+    if (ModelEntry_setMatrix(entry, mtxId, matrix)) {
         refreshProxyMtxIfEntryLoaded(entry, mtxId);
-        Logger_printVerbose("PlayerModelManager: Copying matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix, entry->internalName);
+        Logger_printVerbose("PlayerModelManager: Copying matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix, ModelEntry_getInternalName(entry));
         return true;
-    }
-
-    return false;
-}
-
-static bool isEntryWithinPack(const ModelEntryPack *pack, const ModelEntry *entry) {
-    if (YAZMTCore_IterableU32Set_contains(pack->modelEntries, (uintptr_t)entry)) {
-        return true;
-    }
-
-    size_t numPackEntries = ModelEntryPack_getModelEntriesCount(pack);
-    ModelEntry const *const *packEntries = ModelEntryPack_getModelEntries(pack);
-
-    for (size_t i = 0; i < numPackEntries; ++i) {
-        const ModelEntry *curr = packEntries[i];
-
-        if (isPackCategory(curr->category) && isEntryWithinPack((const ModelEntryPack *)curr, entry)) {
-            return true;
-        }
     }
 
     return false;
@@ -309,8 +290,8 @@ RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h
         return false;
     }
 
-    if (!isPackCategory(entry->category)) {
-        Logger_printError("PlayerModelManager_addHandleToPack: Non-model pack passed into first arg of PlayerModelManager_addHandleToPack (Category was %d)", entry->category);
+    if (!isPackCategory(ModelEntry_getCategory(entry))) {
+        Logger_printError("PlayerModelManager_addHandleToPack: Non-model pack passed into first arg of PlayerModelManager_addHandleToPack (Category was %d)", ModelEntry_getCategory(entry));
         return false;
     }
 
@@ -320,16 +301,15 @@ RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h
         return false;
     }
 
+    // cast relies on first member of ModelEntryPack being a ModelEntry
     ModelEntryPack *packEntry = (ModelEntryPack *)entry;
 
-    if (isPackCategory(entryToAdd->category) && isEntryWithinPack((ModelEntryPack *)entryToAdd, entry)) {
-        Logger_printError("PlayerModelManager_addHandleToPack: Could not add handle! Handle with internal name '%s' is already a handle inside '%s' (Would cause circular reference)!", entry->internalName, entryToAdd->internalName);
+    if (!ModelEntryPack_addEntryToPack(packEntry, entryToAdd)) {
+        Logger_printError("PlayerModelManager_addHandleToPack: Could not add handle! Handle with internal name '%s' is already a handle inside '%s' (Would cause circular reference)!", ModelEntry_getInternalName(entry), ModelEntry_getInternalName(entryToAdd));
         return false;
     }
 
-    YAZMTCore_IterableU32Set_insert(packEntry->modelEntries, (uintptr_t)entryToAdd);
-
-    Logger_printVerbose("PlayerModelManager: Adding handle with internal name '%s' to model pack with internal name '%s'", entry->internalName, entryToAdd->internalName, entry->internalName);
+    Logger_printVerbose("PlayerModelManager: Adding handle with internal name '%s' to model pack with internal name '%s'", ModelEntry_getInternalName(entry), ModelEntry_getInternalName(entryToAdd), ModelEntry_getInternalName(entry));
 
     return true;
 }
@@ -341,32 +321,32 @@ RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerHandle h, Pl
         return false;
     }
 
-    entry->callback = callback;
+    ModelEntry_setCallback(entry, callback, userdata);
 
-    entry->callbackData = userdata;
-
-    Logger_printVerbose("PlayerModelManager: Setting handle with internal name '%s' to have callback function 0x%X with user data 0x%X", entry->internalName, callback, userdata);
+    Logger_printVerbose("PlayerModelManager: Setting handle with internal name '%s' to have callback function 0x%X with user data 0x%X", ModelEntry_getInternalName(entry), callback, userdata);
 
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel) {
-    ModelEntryForm *entry = getFormEntryOrPrintErr(h, "PlayerModelManager_setSkeleton");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setSkeleton");
 
-    if (!entry) {
+    if (!entryForm) {
         return false;
     }
 
-    entry->skel = skel;
+    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
+
+    ModelEntryForm_setSkeleton(entryForm, skel);
 
     if (skel) {
         StandardLimb **limbs = (StandardLimb **)skel->sh.segment;
 
 #define SET_LIMB_DL(pLimb, entryDL)                                                                                                          \
     {                                                                                                                                        \
-        if (!ModelEntry_getDisplayList(&entry->modelEntry, entryDL))                                                                         \
-            entry->modelEntry.setDisplayList(&entry->modelEntry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        refreshProxyDLIfEntryLoaded(&entry->modelEntry, entryDL);                                                                            \
+        if (!ModelEntry_getDisplayList(entry, entryDL))                                                                         \
+            ModelEntry_setDisplayList(entry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
+        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                            \
     }                                                                                                                                        \
     (void)0
 
@@ -392,21 +372,22 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, Fl
 
 #undef SET_LIMB_DL
 
-    refreshProxyIfEntryLoaded(&entry->modelEntry);
+    refreshProxyIfEntryLoaded(entry);
 
-    Logger_printVerbose("PlayerModelManager: Setting skeleton of handle with internal name '%s' to 0x%X", entry->modelEntry.internalName, skel);
+    Logger_printVerbose("PlayerModelManager: Setting skeleton of handle with internal name '%s' to 0x%X", ModelEntry_getInternalName(entry), skel);
 
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel) {
-    ModelEntryForm *entry = getFormEntryOrPrintErr(h, "PlayerModelManager_setShieldingSkeleton");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setShieldingSkeleton");
+    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
 
     if (!entry) {
         return false;
     }
 
-    entry->shieldingSkel = skel;
+    ModelEntryForm_setShieldingSkeleton(entryForm, skel);
 
     if (skel) {
         if (skel->sh.limbCount != PLAYER_BODY_SHIELD_LIMB_COUNT) {
@@ -418,9 +399,9 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 
 #define SET_SHIELDING_LIMB_DL(pLimb, entryDL)                                                                                                \
     {                                                                                                                                        \
-        if (!ModelEntry_getDisplayList(&entry->modelEntry, entryDL))                                                                         \
-            entry->modelEntry.setDisplayList(&entry->modelEntry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        refreshProxyDLIfEntryLoaded(&entry->modelEntry, entryDL);                                                                            \
+        if (!ModelEntry_getDisplayList(entry, entryDL))                                                                         \
+            ModelEntry_setDisplayList(entry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
+        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                            \
     }                                                                                                                                        \
     (void)0
 
@@ -431,45 +412,49 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 
 #undef SET_SHIELDING_LIMB_DL
 
-    refreshProxyIfEntryLoaded(&entry->modelEntry);
+    refreshProxyIfEntryLoaded(entry);
 
-    Logger_printVerbose("PlayerModelManager: Setting shielding skeleton of handle with internal name '%s' to 0x%X", entry->modelEntry.internalName, skel);
+    Logger_printVerbose("PlayerModelManager: Setting shielding skeleton of handle with internal name '%s' to 0x%X", ModelEntry_getInternalName(entry), skel);
 
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerHandle h, TexturePtr eyesTextures[]) {
-    ModelEntryForm *entry = getFormEntryOrPrintErr(h, "PlayerModelManager_setEyesTextures");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setEyesTextures");
 
-    if (!entry) {
+    if (!entryForm) {
         return false;
     }
 
+    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
+
     for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
-        entry->eyesTex[i] = eyesTextures[i];
+        ModelEntryForm_setEyesTexture(entryForm, eyesTextures[i], i);
     }
 
-    refreshProxyEyesTexturesIfEntryLoaded(&entry->modelEntry);
+    refreshProxyEyesTexturesIfEntryLoaded(entry);
 
-    Logger_printVerbose("PlayerModelManager: Setting eyes flipbook textures of handle with internal name '%s'", entry->modelEntry.internalName);
+    Logger_printVerbose("PlayerModelManager: Setting eyes flipbook textures of handle with internal name '%s'", ModelEntry_getInternalName(entry));
 
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle h, TexturePtr mouthTextures[]) {
-    ModelEntryForm *entry = getFormEntryOrPrintErr(h, "PlayerModelManager_setMouthTextures");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setMouthTextures");
 
-    if (!entry) {
+    if (!entryForm) {
         return false;
     }
 
+    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
+
     for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        entry->mouthTex[i] = mouthTextures[i];
+        ModelEntryForm_setMouthTexture(entryForm, mouthTextures[i], i);
     }
 
-    refreshProxyMouthTexturesIfEntryLoaded(&entry->modelEntry);
+    refreshProxyMouthTexturesIfEntryLoaded(entry);
 
-    Logger_printVerbose("PlayerModelManager: Setting mouth flipbook textures of handle with internal name '%s'", entry->modelEntry.internalName);
+    Logger_printVerbose("PlayerModelManager: Setting mouth flipbook textures of handle with internal name '%s'", ModelEntry_getInternalName(entry));
 
     return true;
 }
@@ -569,11 +554,11 @@ RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
         return false;
     }
 
-    if (entry->type == PMM_MODEL_TYPE_NONE) {
+    if (ModelEntry_getType(entry) == PMM_MODEL_TYPE_NONE) {
         return false;
     }
 
-    return CMEM_getCurrentEntry(entry->category) == entry;
+    return CMEM_getCurrentEntry(ModelEntry_getCategory(entry)) == entry;
 }
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {

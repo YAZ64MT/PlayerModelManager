@@ -10,19 +10,79 @@
 #include "logger.h"
 #include "assets/objects/object_link_child/object_link_child.h"
 
+typedef struct ModelEntryFunctions {
+    bool (*applyToModelInfo)(const struct ModelEntry *entry);
+    bool (*removeFromModelInfo)(const struct ModelEntry *entry);
+    bool (*setDisplayList)(struct ModelEntry *entry, Link_DisplayList id, Gfx *dl);
+    bool (*setMatrix)(struct ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx);
+} ModelEntryVirtualFunctions;
+
+typedef struct ModelEntry {
+    const ModelEntryVirtualFunctions *virtualFuncs;
+    PlayerModelManagerModelType type;
+    Link_CustomModelCategory category;
+    char *displayName;
+    char *internalName;
+    char *authorName;
+    PlayerModelManagerEventHandler *callback;
+    void *callbackData;
+    PlayerModelManagerHandle handle;
+    u64 flags;
+    U32ValueHashmapHandle displayListPtrs;
+    U32ValueHashmapHandle mtxPtrs;
+} ModelEntry;
+
+typedef struct ModelEntryForm {
+    ModelEntry modelEntry;
+    FlexSkeletonHeader *skel;
+    FlexSkeletonHeader *shieldingSkel;
+    TexturePtr eyesTex[PLAYER_EYES_MAX];
+    TexturePtr mouthTex[PLAYER_MOUTH_MAX];
+} ModelEntryForm;
+
+typedef struct ModelEntryEquipment {
+    ModelEntry modelEntry;
+    Link_EquipmentReplacement equipType;
+} ModelEntryEquipment;
+
+typedef struct ModelEntryPack {
+    ModelEntry modelEntry;
+    YAZMTCore_IterableU32Set *modelEntries;
+} ModelEntryPack;
+
 RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
 RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement eq));
 
-bool ModelEntry_applyToModelInfo(const ModelEntry *this) {
-    Logger_printError("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_applyToModelInfo (should have been overriden!)\n", this->internalName ? this->internalName : "[UNKNOWN]");
+static bool ModelEntry_applyToModelInfo_default(const ModelEntry *entry) {
+    Logger_printError("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_applyToModelInfo (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
     tryCrashGame();
     return false;
 }
 
-bool ModelEntry_removeFromModelInfo(const ModelEntry *this) {
-    Logger_printError("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_removeFromModelInfo (should have been overriden!)\n", this->internalName ? this->internalName : "[UNKNOWN]");
+static bool ModelEntry_removeFromModelInfo_default(const ModelEntry *entry) {
+    Logger_printError("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_removeFromModelInfo (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
     tryCrashGame();
     return false;
+}
+
+static bool ModelEntry_setDisplayList_default(ModelEntry *entry, Link_DisplayList id, Gfx *dl) {
+    if (id >= LINK_DL_MAX || id < 0) {
+        return false;
+    }
+
+    recomputil_u32_value_hashmap_insert(entry->displayListPtrs, id, (uintptr_t)dl);
+
+    return true;
+}
+
+static bool ModelEntry_setMatrix_default(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) {
+    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
+        return false;
+    }
+
+    recomputil_u32_value_hashmap_insert(entry->mtxPtrs, id, (uintptr_t)mtx);
+
+    return true;
 }
 
 bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
@@ -47,23 +107,35 @@ bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerM
         return false;
     }
 
+    static ModelEntryVirtualFunctions funcs = {
+        .applyToModelInfo = ModelEntry_applyToModelInfo_default,
+        .removeFromModelInfo = ModelEntry_removeFromModelInfo_default,
+        .setDisplayList = ModelEntry_setDisplayList_default,
+        .setMatrix = ModelEntry_setMatrix_default,
+    };
+
+    entry->virtualFuncs = &funcs;
     entry->type = type;
     entry->category = cat;
     entry->displayName = NULL;
-    entry->internalName = internalName;
+    entry->internalName = YAZMTCore_Utils_StrDup(internalName);
     entry->authorName = NULL;
     entry->flags = 0;
     entry->callback = NULL;
     entry->callbackData = NULL;
     entry->handle = handle;
-    entry->applyToModelInfo = ModelEntry_applyToModelInfo;
-    entry->removeFromModelInfo = ModelEntry_removeFromModelInfo;
     entry->displayListPtrs = recomputil_create_u32_value_hashmap();
     entry->mtxPtrs = recomputil_create_u32_value_hashmap();
-    entry->setDisplayList = ModelEntry_setDisplayList;
-    entry->setMatrix = ModelEntry_setMatrix;
 
     return true;
+}
+
+bool ModelEntry_applyToModelInfo(const ModelEntry *entry) {
+    return entry->virtualFuncs->applyToModelInfo(entry);
+}
+
+bool ModelEntry_removeFromModelInfo(const ModelEntry *entry) {
+    return entry->virtualFuncs->removeFromModelInfo(entry);
 }
 
 Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
@@ -73,12 +145,7 @@ Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
 }
 
 bool ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) {
-    if (id >= LINK_DL_MAX || id < 0) {
-        return false;
-    }
-
-    recomputil_u32_value_hashmap_insert(entry->displayListPtrs, id, (uintptr_t)dl);
-    return true;
+    return entry->virtualFuncs->setDisplayList(entry, id, dl);
 }
 
 Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
@@ -87,13 +154,8 @@ Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
     return (Mtx *)ret;
 }
 
-bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) {
-    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
-        return false;
-    }
-
-    recomputil_u32_value_hashmap_insert(entry->mtxPtrs, id, (uintptr_t)mtx);
-    return true;
+bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *matrix) {
+    return entry->virtualFuncs->setMatrix(entry, id, matrix);
 }
 
 bool ModelEntryForm_applyToModelInfo(const ModelEntry *thisx) {
@@ -152,7 +214,7 @@ bool ModelEntryForm_removeFromModelInfo(const ModelEntry *thisx) {
     return true;
 }
 
-bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
     if (!ModelEntry_init(&entry->modelEntry, handle, type, internalName)) {
         return false;
     }
@@ -167,14 +229,110 @@ bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle,
         ModelEntry_setMatrix(&entry->modelEntry, i, NULL);
     }
 
-    entry->modelEntry.applyToModelInfo = ModelEntryForm_applyToModelInfo;
-    entry->modelEntry.removeFromModelInfo = ModelEntryForm_removeFromModelInfo;
+    static ModelEntryVirtualFunctions funcs = {
+        .applyToModelInfo = ModelEntryForm_applyToModelInfo,
+        .removeFromModelInfo = ModelEntryForm_removeFromModelInfo,
+        .setDisplayList = ModelEntry_setDisplayList_default,
+        .setMatrix = ModelEntry_setMatrix_default,
+    };
+
+    entry->modelEntry.virtualFuncs = &funcs;
     entry->skel = NULL;
     entry->shieldingSkel = NULL;
     Lib_MemSet(entry->mouthTex, 0, sizeof(entry->mouthTex));
     Lib_MemSet(entry->eyesTex, 0, sizeof(entry->eyesTex));
 
     return true;
+}
+
+const char *ModelEntry_getInternalName(const ModelEntry *entry) {
+    return entry->internalName;
+}
+
+const char *ModelEntry_getDisplayName(const ModelEntry *entry) {
+    return entry->displayName;
+}
+
+void ModelEntry_setDisplayName(ModelEntry *entry, const char *name) {
+    recomp_free(entry->displayName);
+    
+    entry->displayName = name ? YAZMTCore_Utils_StrDup(name) : NULL;
+}
+
+const char *ModelEntry_getAuthorName(const ModelEntry *entry) {
+    return entry->authorName;
+}
+
+void ModelEntry_setAuthorName(ModelEntry *entry, const char *name) {
+    recomp_free(entry->authorName);
+
+    entry->authorName = name ? YAZMTCore_Utils_StrDup(name) : NULL;
+}
+
+Link_CustomModelCategory ModelEntry_getCategory(const ModelEntry *entry) {
+    return entry->category;
+}
+
+PlayerModelManagerModelType ModelEntry_getType(const ModelEntry *entry) {
+    return entry->type;
+}
+
+void ModelEntry_doCallback(const ModelEntry *entry, PlayerModelManagerModelEvent eventId) {
+    if (entry->callback) {
+        entry->callback(entry->handle, eventId, entry->callbackData);
+    }
+}
+
+void ModelEntry_setFlags(ModelEntry *entry, u64 flags) {
+    entry->flags |= flags;
+}
+
+void ModelEntry_unsetFlags(ModelEntry *entry, u64 flags) {
+    entry->flags &= (~flags);
+}
+
+void ModelEntry_unsetAllFlags(ModelEntry *entry) {
+    entry->flags = 0;
+}
+
+bool ModelEntry_isAnyFlagEnabled(ModelEntry *entry, u64 flags) {
+    return entry->flags & flags;
+}
+
+void ModelEntry_setCallback(ModelEntry *entry, PlayerModelManagerEventHandler *callback, void *data) {
+    entry->callback = callback;
+    entry->callbackData = data;
+}
+
+PlayerModelManagerEventHandler *ModelEntry_getCallbackFunction(const ModelEntry *entry) {
+    return entry->callback;
+}
+
+void *ModelEntry_getCallbackData(const ModelEntry *entry) {
+    return entry->callbackData;
+}
+
+ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+    ModelEntryForm *entry = recomp_alloc(sizeof(ModelEntryForm));
+
+    if (!entry) {
+        Logger_printError("PlayerModelManager: Failed to allocate memory for ModelEntryForm!");
+        tryCrashGame();
+        return NULL;
+    }
+
+    if (!ModelEntryForm_init(entry, handle, type, internalName)) {
+        Logger_printError("PlayerModelManager: Failed to initialize ModelEntryForm!");
+        tryCrashGame();
+        recomp_free(entry);
+        return NULL;
+    }
+
+    return entry;
+}
+
+ModelEntry *ModelEntryForm_getModelEntry(ModelEntryForm *entry) {
+    return &entry->modelEntry;
 }
 
 TexturePtr ModelEntryForm_getEyesTexture(ModelEntryForm *entry, PlayerEyeIndex i) {
@@ -262,12 +420,12 @@ void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
 
 #undef SET_LIMB_DL
 
-#define SET_SHIELDING_LIMB_DL(pLimb, id)                                                                                                           \
-    {                                                                                                                                    \
-        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                        \
+#define SET_SHIELDING_LIMB_DL(pLimb, id)                                                                                         \
+    {                                                                                                                            \
+        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                \
             ModelEntry_setDisplayList(&entry->modelEntry, id, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        }                                                                                                                                \
-    }                                                                                                                                    \
+        }                                                                                                                        \
+    }                                                                                                                            \
     (void)0
 
     if (entry->shieldingSkel) {
@@ -292,7 +450,7 @@ void ModelEntryForm_setShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHead
     entry->shieldingSkel = skel;
 }
 
-FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel) {
+FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry) {
     return entry->shieldingSkel;
 }
 
@@ -376,7 +534,7 @@ bool ModelEntryEquipment_removeFromModelInfo(const ModelEntry *thisx) {
     return true;
 }
 
-bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
     if (!ModelEntry_init(&entry->modelEntry, handle, type, internalName)) {
         return false;
     }
@@ -387,13 +545,40 @@ bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHand
         return false;
     }
 
+    static ModelEntryVirtualFunctions funcs = {
+        .applyToModelInfo = ModelEntryEquipment_applyToModelInfo,
+        .removeFromModelInfo = ModelEntryEquipment_removeFromModelInfo,
+        .setDisplayList = ModelEntryEquipment_setDisplayList,
+        .setMatrix = ModelEntryEquipment_setMatrix,
+    };
+
+    entry->modelEntry.virtualFuncs = &funcs;
     entry->equipType = getEquipmentReplacementFromCategory(entry->modelEntry.category);
-    entry->modelEntry.setDisplayList = ModelEntryEquipment_setDisplayList;
-    entry->modelEntry.setMatrix = ModelEntryEquipment_setMatrix;
-    entry->modelEntry.applyToModelInfo = ModelEntryEquipment_applyToModelInfo;
-    entry->modelEntry.removeFromModelInfo = ModelEntryEquipment_removeFromModelInfo;
 
     return true;
+}
+
+ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+    ModelEntryEquipment *entry = recomp_alloc(sizeof(ModelEntryEquipment));
+
+    if (!entry) {
+        Logger_printError("PlayerModelManager: Failed to allocate memory for ModelEntryEquipment!");
+        tryCrashGame();
+        return NULL;
+    }
+
+    if (!ModelEntryEquipment_init(entry, handle, type, internalName)) {
+        Logger_printError("PlayerModelManager: Failed to initialize ModelEntryEquipment!");
+        tryCrashGame();
+        recomp_free(entry);
+        return NULL;
+    }
+
+    return entry;
+}
+
+ModelEntry *ModelEntryEquipment_getModelEntry(ModelEntryEquipment *entry) {
+    return &entry->modelEntry;
 }
 
 bool ModelEntryPack_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
@@ -426,13 +611,39 @@ bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle,
         return false;
     }
 
-    entry->modelEntry.setDisplayList = ModelEntryPack_setDisplayList;
-    entry->modelEntry.setMatrix = ModelEntryPack_setMatrix;
-    entry->modelEntry.applyToModelInfo = ModelEntryPack_applyToModelInfo;
-    entry->modelEntry.removeFromModelInfo = ModelEntryPack_removeFromModelInfo;
+    static ModelEntryVirtualFunctions funcs = {
+        .applyToModelInfo = ModelEntryPack_applyToModelInfo,
+        .removeFromModelInfo = ModelEntryPack_removeFromModelInfo,
+        .setDisplayList = ModelEntryPack_setDisplayList,
+        .setMatrix = ModelEntryPack_setMatrix,
+    };
+    entry->modelEntry.virtualFuncs = &funcs;
     entry->modelEntries = YAZMTCore_IterableU32Set_new();
 
     return true;
+}
+
+ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, char *internalName) {
+    ModelEntryPack *entry = recomp_alloc(sizeof(ModelEntryPack));
+
+    if (!entry) {
+        Logger_printError("PlayerModelManager: Failed to allocate memory for ModelEntryPack!");
+        tryCrashGame();
+        return NULL;
+    }
+
+    if (!ModelEntryPack_init(entry, handle, internalName)) {
+        Logger_printError("PlayerModelManager: Failed to initialize ModelEntryPack!");
+        tryCrashGame();
+        recomp_free(entry);
+        return NULL;
+    }
+
+    return entry;
+}
+
+ModelEntry *ModelEntryPack_getModelEntry(ModelEntryPack *entry) {
+    return &entry->modelEntry;
 }
 
 ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *entry) {
@@ -441,4 +652,52 @@ ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *en
 
 size_t ModelEntryPack_getModelEntriesCount(const ModelEntryPack *entry) {
     return YAZMTCore_IterableU32Set_size(entry->modelEntries);
+}
+
+static YAZMTCore_DynamicU32Array *sQueuedPacks;
+
+static bool isEntryInPack(const ModelEntryPack *pack, const ModelEntry *entry) {
+    YAZMTCore_DynamicU32Array_clear(sQueuedPacks);
+
+    YAZMTCore_DynamicU32Array_push(sQueuedPacks, (uintptr_t)pack);
+
+    do {
+        size_t packsCount = YAZMTCore_DynamicU32Array_size(sQueuedPacks);
+
+        ModelEntryPack *currPack = (ModelEntryPack *)YAZMTCore_DynamicU32Array_data(sQueuedPacks)[packsCount - 1];
+
+        if (YAZMTCore_IterableU32Set_contains(pack->modelEntries, (uintptr_t)entry)) {
+            return true;
+        }
+
+        YAZMTCore_DynamicU32Array_pop(sQueuedPacks);
+
+        const ModelEntry *const *packEntries = ModelEntryPack_getModelEntries(currPack);
+        size_t entryCount = ModelEntryPack_getModelEntriesCount(currPack);
+
+        for (size_t i = 0; i < entryCount; ++i) {
+            const ModelEntry *currEntry = packEntries[i];
+
+            if (isPackCategory(ModelEntry_getCategory(currEntry))) {
+                YAZMTCore_DynamicU32Array_push(sQueuedPacks, (uintptr_t)currEntry);
+            }
+        }
+
+    } while (YAZMTCore_DynamicU32Array_size(sQueuedPacks) > 0);
+    
+    return false;
+}
+
+bool ModelEntryPack_addEntryToPack(ModelEntryPack *entry, ModelEntry *entryToAdd) {
+    if (!isPackCategory(ModelEntry_getCategory(entryToAdd)) || !isEntryInPack((ModelEntryPack *)entryToAdd, &entry->modelEntry)) {
+        YAZMTCore_IterableU32Set_insert(entry->modelEntries, (uintptr_t)entryToAdd);
+        return true;
+    }
+
+    return false;
+}
+
+RECOMP_CALLBACK(".", _internal_initHashObjects)
+void initModelEntryObjects() {
+    sQueuedPacks = YAZMTCore_DynamicU32Array_new();
 }

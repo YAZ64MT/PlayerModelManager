@@ -747,7 +747,7 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
                 catInf->isNeedsDiskSave = true;
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
                 if (entryOrNull) {
-                    setAuthor(entryOrNull->authorName);
+                    setAuthor(ModelEntry_getAuthorName(entryOrNull));
                 } else {
                     destroyAuthor();
                 }
@@ -775,7 +775,7 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
                 saveAllModels();
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
                 if (entryOrNull) {
-                    setAuthor(entryOrNull->authorName);
+                    setAuthor(ModelEntry_getAuthorName(entryOrNull));
                 } else {
                     destroyAuthor();
                 }
@@ -902,9 +902,9 @@ static void createModelListButtons() {
         if (!CMEM_isEntryHidden(modelEntries[i])) {
             const char *name = NULL;
 
-            name = modelEntries[i]->displayName;
+            name = ModelEntry_getDisplayName(modelEntries[i]);
             if (!name) {
-                name = modelEntries[i]->internalName;
+                name = ModelEntry_getInternalName(modelEntries[i]);
 
                 if (!name) {
                     name = "ERROR READING MODEL ENTRY NAME";

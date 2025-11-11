@@ -23,7 +23,7 @@ Gfx *ModelInfo_getGfx(ModelInfo *modelInfo, Link_DisplayList id) {
 
     if (!recomputil_u32_value_hashmap_get(modelInfo->gfxOverrides, id, &gfx)) {
         if (modelInfo->modelEntryForm) {
-            gfx = (uintptr_t)ModelEntry_getDisplayList(&modelInfo->modelEntryForm->modelEntry, id);
+            gfx = (uintptr_t)ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(modelInfo->modelEntryForm), id);
         }
     }
 
@@ -40,7 +40,7 @@ Mtx *ModelInfo_getMtx(ModelInfo *modelInfo, Link_EquipmentMatrix id) {
 
     if (!recomputil_u32_value_hashmap_get(modelInfo->mtxOverrides, id, &mtx)) {
         if (modelInfo->modelEntryForm) {
-            mtx = (uintptr_t)ModelEntry_getMatrix(&modelInfo->modelEntryForm->modelEntry, id);
+            mtx = (uintptr_t)ModelEntry_getMatrix(ModelEntryForm_getModelEntry(modelInfo->modelEntryForm), id);
         }
     }
 
@@ -82,11 +82,11 @@ TexturePtr ModelInfo_getMouthTexture(ModelInfo *modelInfo, PlayerMouthIndex i) {
 }
 
 FlexSkeletonHeader *ModelInfo_getSkeleton(ModelInfo *modelInfo) {
-    return modelInfo->modelEntryForm ? modelInfo->modelEntryForm->skel : NULL;
+    return modelInfo->modelEntryForm ? ModelEntryForm_getSkeleton(modelInfo->modelEntryForm) : NULL;
 }
 
 FlexSkeletonHeader *ModelInfo_getShieldingSkeleton(ModelInfo *modelInfo) {
-    return modelInfo->modelEntryForm ? modelInfo->modelEntryForm->shieldingSkel : NULL;
+    return modelInfo->modelEntryForm ? ModelEntryForm_getShieldingSkeleton(modelInfo->modelEntryForm) : NULL;
 }
 
 bool ModelInfo_setGfxOverride(ModelInfo *modelInfo, Link_DisplayList id, Gfx *dl) {
@@ -118,5 +118,5 @@ void ModelInfo_clearAllMtxOverrides(ModelInfo *modelInfo) {
 }
 
 bool ModelInfo_isAnyFlagEnabled(ModelInfo *modelInfo, u64 flags) {
-    return modelInfo->modelEntryForm ? (modelInfo->modelEntryForm->modelEntry.flags & flags) : false;
+    return modelInfo->modelEntryForm ? (ModelEntry_isAnyFlagEnabled(ModelEntryForm_getModelEntry(modelInfo->modelEntryForm), flags)) : false;
 }

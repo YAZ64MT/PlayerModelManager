@@ -161,15 +161,16 @@ static void setupHumanFallbackModel() {
 
     ModelInfo_init(&gHumanModelInfo);
 
-    ModelEntryForm *entry = gHumanModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_child__"));
-    ModelEntryForm_fillDefaultFaceTextures(entry);
-    ModelEntryForm_setSkeleton(entry, skel);
-    ModelEntryForm_setDLsFromSkeletons(entry);
+    ModelEntryForm *entryForm = gHumanModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_child__"));
+    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
+    ModelEntryForm_fillDefaultFaceTextures(entryForm);
+    ModelEntryForm_setSkeleton(entryForm, skel);
+    ModelEntryForm_setDLsFromSkeletons(entryForm);
 
-    CMEM_setEntryHidden(&entry->modelEntry, true);
-    ModelInfo_setModelEntryForm(&gHumanModelInfo, entry);
+    CMEM_setEntryHidden(entry, true);
+    ModelInfo_setModelEntryForm(&gHumanModelInfo, entryForm);
 
-#define SET_ENTRY_DL(id, dl) entry->modelEntry.setDisplayList(&entry->modelEntry, id, dl)
+#define SET_ENTRY_DL(id, dl) ModelEntry_setDisplayList(entry, id, dl)
 
     SET_ENTRY_DL(LINK_DL_LHAND, getHumanDL(gLinkHumanLeftHandOpenDL));
     SET_ENTRY_DL(LINK_DL_LFIST, getHumanDL(gLinkHumanLeftHandClosedDL));

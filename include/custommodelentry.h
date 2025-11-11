@@ -8,44 +8,15 @@
 #include "recompdata.h"
 #include "yazmtcorelib_api.h"
 
+#define MODELENTRY_FLAG_IS_ADULT 0x1
+
 // This is the max file name length for most Linux distros and MacOS
 #define INTERNAL_NAME_MAX_LENGTH 255
 
-typedef struct ModelEntry {
-    PlayerModelManagerModelType type;
-    Link_CustomModelCategory category;
-    char *displayName;
-    char *internalName;
-    char *authorName;
-    bool (*applyToModelInfo)(const struct ModelEntry *this);
-    bool (*removeFromModelInfo)(const struct ModelEntry *this);
-    bool (*setDisplayList)(struct ModelEntry *this, Link_DisplayList id, Gfx *dl);
-    bool (*setMatrix)(struct ModelEntry *this, Link_EquipmentMatrix id, Mtx *mtx);
-    PlayerModelManagerEventHandler* callback;
-    void *callbackData;
-    PlayerModelManagerHandle handle;
-    u64 flags;
-    U32ValueHashmapHandle displayListPtrs;
-    U32ValueHashmapHandle mtxPtrs;
-} ModelEntry;
-
-typedef struct {
-    ModelEntry modelEntry;
-    FlexSkeletonHeader *skel;
-    FlexSkeletonHeader *shieldingSkel;
-    TexturePtr eyesTex[PLAYER_EYES_MAX];
-    TexturePtr mouthTex[PLAYER_MOUTH_MAX];
-} ModelEntryForm;
-
-typedef struct {
-    ModelEntry modelEntry;
-    Link_EquipmentReplacement equipType;
-} ModelEntryEquipment;
-
-typedef struct {
-    ModelEntry modelEntry;
-    YAZMTCore_IterableU32Set *modelEntries;
-} ModelEntryPack;
+typedef struct ModelEntry ModelEntry;
+typedef struct ModelEntryForm ModelEntryForm;
+typedef struct ModelEntryEquipment ModelEntryEquipment;
+typedef struct ModelEntryPack ModelEntryPack;
 
 Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id);
 
@@ -55,7 +26,39 @@ Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id);
 
 bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx);
 
-bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
+bool ModelEntry_applyToModelInfo(const ModelEntry *entry);
+
+bool ModelEntry_removeFromModelInfo(const ModelEntry *entry);
+
+const char *ModelEntry_getInternalName(const ModelEntry *entry);
+
+const char *ModelEntry_getDisplayName(const ModelEntry *entry);
+
+void ModelEntry_setDisplayName(ModelEntry *entry, const char *name);
+
+const char *ModelEntry_getAuthorName(const ModelEntry *entry);
+
+void ModelEntry_setAuthorName(ModelEntry *entry, const char *name);
+
+Link_CustomModelCategory ModelEntry_getCategory(const ModelEntry *entry);
+
+PlayerModelManagerModelType ModelEntry_getType(const ModelEntry *entry);
+
+void ModelEntry_doCallback(const ModelEntry *entry, PlayerModelManagerModelEvent eventId);
+
+void ModelEntry_setFlags(ModelEntry *entry, u64 flags);
+
+void ModelEntry_unsetFlags(ModelEntry *entry, u64 flags);
+
+void ModelEntry_unsetAllFlags(ModelEntry *entry);
+
+bool ModelEntry_isAnyFlagEnabled(ModelEntry *entry, u64 flags);
+
+void ModelEntry_setCallback(ModelEntry *entry, PlayerModelManagerEventHandler *callback, void *data);
+
+ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
+
+ModelEntry *ModelEntryForm_getModelEntry(ModelEntryForm *entry);
 
 TexturePtr ModelEntryForm_getEyesTexture(ModelEntryForm *entry, PlayerEyeIndex i);
 
@@ -75,14 +78,20 @@ FlexSkeletonHeader *ModelEntryForm_getSkeleton(ModelEntryForm *entry);
 
 void ModelEntryForm_setShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel);
 
-FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel);
+FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry);
 
-bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
+ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
 
-bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle, char *internalName);
+ModelEntry *ModelEntryEquipment_getModelEntry(ModelEntryEquipment *entry);
+
+ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, char *internalName);
+
+ModelEntry *ModelEntryPack_getModelEntry(ModelEntryPack *entry);
 
 ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *entry);
 
 size_t ModelEntryPack_getModelEntriesCount(const ModelEntryPack *entry);
+
+bool ModelEntryPack_addEntryToPack(ModelEntryPack *entry, ModelEntry *entryToAdd);
 
 #endif

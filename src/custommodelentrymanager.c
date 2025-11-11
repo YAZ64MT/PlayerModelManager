@@ -599,13 +599,13 @@ void CMEM_setCurrentEntry(Link_CustomModelCategory cat, const ModelEntry *e) {
     }
 }
 
-static void pushEntry(YAZMTCore_DynamicU32Array *entryArr, void *entry) {
-    ModelEntry *fme = entry;
+static void pushEntry(YAZMTCore_DynamicU32Array *entryArr, ModelEntry *entry) {
+    ModelEntry *modelEntry = entry;
+    const char *internalName = ModelEntry_getInternalName(entry);
 
-    if (!YAZMTCore_StringU32Dictionary_contains(sInternalNamesToEntries, fme->internalName)) {
+    if (!YAZMTCore_StringU32Dictionary_contains(sInternalNamesToEntries, internalName)) {
         YAZMTCore_DynamicU32Array_push(entryArr, (uintptr_t)entry);
-
-        YAZMTCore_StringU32Dictionary_set(sInternalNamesToEntries, fme->internalName, (uintptr_t)entry);
+        YAZMTCore_StringU32Dictionary_set(sInternalNamesToEntries, internalName, (uintptr_t)entry);
     }
 }
 
@@ -619,7 +619,7 @@ void CMEM_reapplyEntry(Link_CustomModelCategory cat) {
     const ModelEntry *currEntry = CMEM_getCurrentEntry(cat);
 
     if (currEntry) {
-        currEntry->applyToModelInfo(currEntry);
+        ModelEntry_applyToModelInfo(currEntry);
     }
 }
 
@@ -631,15 +631,15 @@ bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEnt
         return true;
     }
 
-    if (newEntry->applyToModelInfo(newEntry)) {
-        if (currEntry && currEntry->callback) {
-            currEntry->callback(currEntry->handle, PMM_EVENT_MODEL_REMOVED, currEntry->callbackData);
+    if (ModelEntry_applyToModelInfo(newEntry)) {
+        if (currEntry) {
+            ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_REMOVED);
         }
 
         CMEM_setCurrentEntry(cat, newEntry);
 
-        if (newEntry->callback) {
-            newEntry->callback(newEntry->handle, PMM_EVENT_MODEL_APPLIED, newEntry->callbackData);
+        if (newEntry) {
+            ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_APPLIED);
         }
 
         return true;
@@ -697,13 +697,12 @@ void CMEM_removeModel(Link_CustomModelCategory cat) {
     const ModelEntry *entry = sCurrentModelEntries[cat];
 
     if (entry) {
-        if (entry->callback) {
-            entry->callback(entry->handle, PMM_EVENT_MODEL_REMOVED, entry->callbackData);
-        }
+
+        ModelEntry_doCallback(entry, PMM_EVENT_MODEL_REMOVED);
 
         CMEM_setCurrentEntry(cat, NULL);
 
-        entry->removeFromModelInfo(entry);
+        ModelEntry_removeFromModelInfo(entry);
     }
 }
 
@@ -714,51 +713,32 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType typ
         return 0;
     }
 
-    size_t handleSize;
     bool isFormEntry = isFormCategory(cat);
     bool isEquipmentEntry = isEquipmentCategory(cat);
     bool isPackEntry = isPackCategory(cat);
+    ModelEntry *entry = NULL;
+    PlayerModelManagerHandle handle = recomputil_u32_slotmap_create(sEntryHandles);
 
     if (isFormEntry) {
-        handleSize = sizeof(ModelEntryForm);
+        ModelEntryForm *formEntry = ModelEntryForm_new(handle, type, internalName);
+        entry = ModelEntryForm_getModelEntry(formEntry);
     } else if (isEquipmentEntry) {
-        handleSize = sizeof(ModelEntryEquipment);
-
-        if (getEquipmentReplacementFromCategory(cat) >= LINK_DL_REPLACE_MAX) {
-            return 0;
+        if (getEquipmentReplacementFromCategory(cat) < LINK_DL_REPLACE_MAX) {
+            ModelEntryEquipment *entryEquipment = ModelEntryEquipment_new(handle, type, internalName);
+            entry = ModelEntryEquipment_getModelEntry(entryEquipment);
         }
     } else if (isPackEntry) {
-        handleSize = sizeof(ModelEntryPack);
-    } else {
-        return 0;
+        ModelEntryPack *entryPack = ModelEntryPack_new(handle, internalName);
+        entry = ModelEntryPack_getModelEntry(entryPack);
     }
-
-    ModelEntry *entry = recomp_alloc(handleSize);
 
     if (!entry) {
-
-        return 0;
-    }
-
-    PlayerModelManagerHandle handle = recomputil_u32_slotmap_create(sEntryHandles);
-    bool isEntryInitialized = false;
-
-    if (isFormEntry) {
-        isEntryInitialized = ModelEntryForm_init((ModelEntryForm *)entry, handle, type, internalName);
-    } else if (isEquipmentEntry) {
-        isEntryInitialized = ModelEntryEquipment_init((ModelEntryEquipment *)entry, handle, type, internalName);
-    } else if (isPackEntry) {
-        isEntryInitialized = ModelEntryPack_init((ModelEntryPack *)entry, handle, internalName);
-    }
-
-    if (isEntryInitialized) {
-        recomputil_u32_slotmap_set(sEntryHandles, handle, (uintptr_t)entry);
-    } else {
         Logger_printWarning("PlayerModelManager: CMEM_createMemoryHandle failed to initialize an entry!");
-        recomp_free(entry);
         recomputil_u32_slotmap_erase(sEntryHandles, handle);
         return 0;
     }
+
+    recomputil_u32_slotmap_set(sEntryHandles, handle, (uintptr_t)entry);
 
     pushEntry(sModelEntries[cat], entry);
 
@@ -797,7 +777,7 @@ void CMEM_saveCurrentEntry(Link_CustomModelCategory cat) {
         // No need to initialize this since there will be a null terminator
         char tmpNameBuf[SAVED_INTERNAL_NAME_BUFFER_SIZE];
 
-        strcpy(tmpNameBuf, sCurrentModelEntries[cat]->internalName);
+        strcpy(tmpNameBuf, ModelEntry_getInternalName(sCurrentModelEntries[cat]));
         KV_Global_Set(key, tmpNameBuf, INTERNAL_NAME_MAX_LENGTH);
     }
 }
