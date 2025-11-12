@@ -226,7 +226,7 @@ static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle 
     }
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        ModelEntry_setMatrix(&entry->modelEntry, i, NULL);
+        ModelEntry_setMatrix_default(&entry->modelEntry, i, NULL);
     }
 
     static ModelEntryVirtualFunctions funcs = {
@@ -391,7 +391,7 @@ void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
 #define SET_LIMB_DL(pLimb, id)                                                                                                           \
     {                                                                                                                                    \
         if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                        \
-            ModelEntry_setDisplayList(&entry->modelEntry, id, (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL); \
+            ModelEntry_setDisplayList_default(&entry->modelEntry, id, (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL); \
         }                                                                                                                                \
     }                                                                                                                                    \
     (void)0
@@ -423,7 +423,7 @@ void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
 #define SET_SHIELDING_LIMB_DL(pLimb, id)                                                                                         \
     {                                                                                                                            \
         if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                \
-            ModelEntry_setDisplayList(&entry->modelEntry, id, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
+            ModelEntry_setDisplayList_default(&entry->modelEntry, id, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
         }                                                                                                                        \
     }                                                                                                                            \
     (void)0
@@ -462,7 +462,7 @@ bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, 
     // Count generally is very small (count < 10), so a simple linear search will do
     for (size_t i = 0; i < override->dl.count; ++i) {
         if (id == override->dl.overrides[i]) {
-            return ModelEntry_setDisplayList(thisx, id, dl);
+            return ModelEntry_setDisplayList_default(thisx, id, dl);
         }
     }
 
@@ -477,7 +477,7 @@ bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, M
     // Count generally is very small (count < 10), so a simple linear search will do
     for (size_t i = 0; i < override->mtx.count; ++i) {
         if (id == override->mtx.overrides[i]) {
-            return ModelEntry_setMatrix(thisx, id, mtx);
+            return ModelEntry_setMatrix_default(thisx, id, mtx);
         }
     }
 
