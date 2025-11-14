@@ -112,7 +112,7 @@ static CategoryInfo *getCurrentCategoryInfo() {
     if (isSelectingModel()) {
         return &sCategoryInfos[sCurrentCategoryInfo];
     } else {
-        Logger_printWarning("PlayerModelManager: getCurrentCategoryInfo found invalid sCurrentCategoryInfo value %d\n", sCurrentCategoryInfo);
+        Logger_printWarning("getCurrentCategoryInfo found invalid sCurrentCategoryInfo value %d\n", sCurrentCategoryInfo);
     }
 
     return NULL;
@@ -350,7 +350,7 @@ static void applyRealEntry(int entryIndex) {
     if (entryIndex >= 0 && entryIndex < ARRAY_COUNT(sCategoryInfos)) {
         CMEM_tryApplyEntry(sCategoryInfos[entryIndex].category, sCategoryInfos[entryIndex].realEntry);
     } else {
-        Logger_printWarning("PlayerModelManager: applyRealEntry received invalid entryIndex %d\n", entryIndex);
+        Logger_printWarning("applyRealEntry received invalid entryIndex %d\n", entryIndex);
     }
 }
 

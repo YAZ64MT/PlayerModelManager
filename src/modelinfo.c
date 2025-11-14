@@ -16,7 +16,7 @@ bool ModelInfo_hasModelEntry(ModelInfo *modelInfo) {
 
 Gfx *ModelInfo_getGfx(ModelInfo *modelInfo, Link_DisplayList id) {
     if (id >= LINK_DL_MAX || id < 0) {
-        Logger_printWarning("PlayerModelManager: ModelInfo_getGfx called with invalid display list ID %d.", id);
+        Logger_printWarning("ModelInfo_getGfx called with invalid display list ID %d.", id);
     }
 
     uintptr_t gfx = 0;
@@ -32,7 +32,7 @@ Gfx *ModelInfo_getGfx(ModelInfo *modelInfo, Link_DisplayList id) {
 
 Mtx *ModelInfo_getMtx(ModelInfo *modelInfo, Link_EquipmentMatrix id) {
     if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
-        Logger_printWarning("PlayerModelManager: ModelInfo_getMtx called with invalid matrix ID %d.", id);
+        Logger_printWarning("ModelInfo_getMtx called with invalid matrix ID %d.", id);
         return NULL;
     }
 
@@ -57,7 +57,7 @@ ModelEntryForm *ModelInfo_getModelEntryForm(ModelInfo *modelInfo) {
 
 TexturePtr ModelInfo_getEyesTexture(ModelInfo *modelInfo, PlayerEyeIndex i) {
     if (i >= PLAYER_EYES_MAX || i < 0) {
-        Logger_printWarning("PlayerModelManager: ModelInfo_getEyesTexture called with invalid PlayerEyeIndex %d.", i);
+        Logger_printWarning("ModelInfo_getEyesTexture called with invalid PlayerEyeIndex %d.", i);
         return (TexturePtr)NULL;
     }
 
@@ -70,7 +70,7 @@ TexturePtr ModelInfo_getEyesTexture(ModelInfo *modelInfo, PlayerEyeIndex i) {
 
 TexturePtr ModelInfo_getMouthTexture(ModelInfo *modelInfo, PlayerMouthIndex i) {
     if (i >= PLAYER_MOUTH_MAX || i < 0) {
-        Logger_printWarning("PlayerModelManager: ModelInfo_getMouthTexture called with invalid PlayerMouthIndex %d.", i);
+        Logger_printWarning("ModelInfo_getMouthTexture called with invalid PlayerMouthIndex %d.", i);
         return (TexturePtr)NULL;
     }
 

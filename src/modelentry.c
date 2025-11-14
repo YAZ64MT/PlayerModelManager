@@ -17,7 +17,7 @@ static bool isValidModelEntry(const ModelEntry *entry) {
 }
 
 static void printInvalidPtrWarning(const char *s) {
-    Logger_printWarning("PlayerModelManager: %s reveived an invalid pointer", s);
+    Logger_printWarning("%s reveived an invalid pointer", s);
 }
 
 typedef struct ModelEntryFunctions {
@@ -64,13 +64,13 @@ RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
 RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement eq));
 
 static bool ModelEntry_applyToModelInfo_default(const ModelEntry *entry) {
-    Logger_printError("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_applyToModelInfo (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
+    Logger_printError("Model Entry with internal name %s is using ModelEntry_applyToModelInfo (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
     tryCrashGame();
     return false;
 }
 
 static bool ModelEntry_removeFromModelInfo_default(const ModelEntry *entry) {
-    Logger_printError("PlayerModelManager: Model Entry with internal name %s is using ModelEntry_removeFromModelInfo (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
+    Logger_printError("Model Entry with internal name %s is using ModelEntry_removeFromModelInfo (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
     tryCrashGame();
     return false;
 }
@@ -100,19 +100,19 @@ bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerM
     Link_CustomModelCategory cat = getCategoryFromModelType(type);
 
     if (!isValidCategory(cat)) {
-        Logger_printError("PlayerModelmanager: Trying to initialize ModelEntry with invalid PlayerModelManagerModelType %d", type);
+        Logger_printError("Trying to initialize ModelEntry with invalid PlayerModelManagerModelType %d", type);
         tryCrashGame();
         return false;
     }
 
     if (!internalName) {
-        Logger_printError("PlayerModelmanager: Trying to initialize ModelEntry with type %d with NULL internal name!\n", type);
+        Logger_printError("Trying to initialize ModelEntry with type %d with NULL internal name!\n", type);
         tryCrashGame();
         return false;
     }
 
     if (!handle) {
-        Logger_printError("PlayerModelmanager: Trying to initialize ModelEntry with invalid PlayerModelManagerHandle %d", handle);
+        Logger_printError("Trying to initialize ModelEntry with invalid PlayerModelManagerHandle %d", handle);
         tryCrashGame();
         return false;
     }
@@ -261,7 +261,7 @@ static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle 
     }
 
     if (!isFormCategory(entry->modelEntry.category)) {
-        Logger_printError("PlayerModelManager: ModelEntryForm with internal name %s had non-form type %d passed in!\n", internalName, type);
+        Logger_printError("ModelEntryForm with internal name %s had non-form type %d passed in!\n", internalName, type);
         tryCrashGame();
         return false;
     }
@@ -414,13 +414,13 @@ ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelM
     ModelEntryForm *entry = recomp_alloc(sizeof(ModelEntryForm));
 
     if (!entry) {
-        Logger_printError("PlayerModelManager: Failed to allocate memory for ModelEntryForm!");
+        Logger_printError("Failed to allocate memory for ModelEntryForm!");
         tryCrashGame();
         return NULL;
     }
 
     if (!ModelEntryForm_init(entry, handle, type, internalName)) {
-        Logger_printError("PlayerModelManager: Failed to initialize ModelEntryForm!");
+        Logger_printError("Failed to initialize ModelEntryForm!");
         tryCrashGame();
         recomp_free(entry);
         return NULL;
@@ -481,7 +481,7 @@ void ModelEntryForm_setEyesTexture(ModelEntryForm *entry, TexturePtr tex, Player
     }
 
     if (i < 0 || i >= PLAYER_EYES_MAX) {
-        Logger_printWarning("PlayerModelManager: %s received invalid index %d", __PRETTY_FUNCTION__, i);
+        Logger_printWarning("%s received invalid index %d", __PRETTY_FUNCTION__, i);
         return;
     }
 
@@ -495,7 +495,7 @@ void ModelEntryForm_setMouthTexture(ModelEntryForm *entry, TexturePtr tex, Playe
     }
 
     if (i < 0 || i >= PLAYER_MOUTH_MAX) {
-        Logger_printWarning("PlayerModelManager: %s received invalid index %d", __PRETTY_FUNCTION__, i);
+        Logger_printWarning("%s received invalid index %d", __PRETTY_FUNCTION__, i);
         return;
     }
 
@@ -690,7 +690,7 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
     }
 
     if (!isEquipmentCategory(entry->modelEntry.category)) {
-        Logger_printError("PlayerModelManager: ModelEntryEquipment with internal name %s had non-equipment type %d passed in!\n", internalName, type);
+        Logger_printError("ModelEntryEquipment with internal name %s had non-equipment type %d passed in!\n", internalName, type);
         tryCrashGame();
         return false;
     }
@@ -712,13 +712,13 @@ ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, Pl
     ModelEntryEquipment *entry = recomp_alloc(sizeof(ModelEntryEquipment));
 
     if (!entry) {
-        Logger_printError("PlayerModelManager: Failed to allocate memory for ModelEntryEquipment!");
+        Logger_printError("Failed to allocate memory for ModelEntryEquipment!");
         tryCrashGame();
         return NULL;
     }
 
     if (!ModelEntryEquipment_init(entry, handle, type, internalName)) {
-        Logger_printError("PlayerModelManager: Failed to initialize ModelEntryEquipment!");
+        Logger_printError("Failed to initialize ModelEntryEquipment!");
         tryCrashGame();
         recomp_free(entry);
         return NULL;
@@ -782,13 +782,13 @@ ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, char *intern
     ModelEntryPack *entry = recomp_alloc(sizeof(ModelEntryPack));
 
     if (!entry) {
-        Logger_printError("PlayerModelManager: Failed to allocate memory for ModelEntryPack!");
+        Logger_printError("Failed to allocate memory for ModelEntryPack!");
         tryCrashGame();
         return NULL;
     }
 
     if (!ModelEntryPack_init(entry, handle, internalName)) {
-        Logger_printError("PlayerModelManager: Failed to initialize ModelEntryPack!");
+        Logger_printError("Failed to initialize ModelEntryPack!");
         tryCrashGame();
         recomp_free(entry);
         return NULL;

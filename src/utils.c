@@ -117,7 +117,7 @@ void setCrashEnabled(bool isEnabled) {
 
 void tryCrashGame() {
     if (!sIsCrashDisabled) {
-        Logger_printError("PlayerModelManager: Forcing game crash...");
+        Logger_printError("Forcing game crash...");
         int *ptr = NULL;
         *ptr = 0xDEADBEEF;
     }

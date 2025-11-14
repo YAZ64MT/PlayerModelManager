@@ -309,27 +309,27 @@ static void initProxyDLs(FormProxy *fp) {
 
 void FormProxy_init(FormProxy *fp, PlayerTransformation form, ModelInfo *fallback, ModelInfo *fallbackOverride, U32ValueHashmapHandle sharedDisplayLists, U32ValueHashmapHandle sharedMatrixes) {
     if (form < 0 || form >= PLAYER_FORM_MAX) {
-        Logger_printError("PlayerModelManager: FormProxy_init received invalid form argument with value %d!", form);
+        Logger_printError("FormProxy_init received invalid form argument with value %d!", form);
         tryCrashGame();
     }
 
     if (!fallback) {
-        Logger_printError("PlayerModelManager: FormProxy_init received NULL fallback argument!");
+        Logger_printError("FormProxy_init received NULL fallback argument!");
         tryCrashGame();
     }
 
     if (!fallbackOverride) {
-        Logger_printError("PlayerModelManager: FormProxy_init received NULL fallbackOverride argument!");
+        Logger_printError("FormProxy_init received NULL fallbackOverride argument!");
         tryCrashGame();
     }
 
     if (!sharedDisplayLists) {
-        Logger_printError("PlayerModelManager: FormProxy_init received invalid sharedDisplayLists argument!");
+        Logger_printError("FormProxy_init received invalid sharedDisplayLists argument!");
         tryCrashGame();
     }
 
     if (!sharedMatrixes) {
-        Logger_printError("PlayerModelManager: FormProxy_init received invalid sharedMatrixes argument!");
+        Logger_printError("FormProxy_init received invalid sharedMatrixes argument!");
         tryCrashGame();
     }
 

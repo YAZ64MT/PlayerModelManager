@@ -689,7 +689,7 @@ const ModelEntry **CMEM_getCategoryEntryData(Link_CustomModelCategory cat, size_
 void CMEM_removeModel(Link_CustomModelCategory cat) {
 
     if (!isValidCategory(cat)) {
-        Logger_printError("PlayerModelManager: Called CMEM_removeModel with invalid category %d\n", cat);
+        Logger_printError("Called CMEM_removeModel with invalid category %d\n", cat);
         tryCrashGame();
         return;
     }
@@ -733,7 +733,7 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType typ
     }
 
     if (!entry) {
-        Logger_printWarning("PlayerModelManager: CMEM_createMemoryHandle failed to initialize an entry!");
+        Logger_printWarning("CMEM_createMemoryHandle failed to initialize an entry!");
         recomputil_u32_slotmap_erase(sEntryHandles, handle);
         return 0;
     }
