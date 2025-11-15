@@ -28,7 +28,8 @@ extern LoggerLevel gLoggerLevel;
     {                               \
         recomp_printf(__VA_ARGS__); \
         recomp_printf("\n");        \
-    }
+    }                               \
+    (void)0
 
 #define Logger_printVerbose(...)                         \
     {                                                    \
@@ -36,7 +37,8 @@ extern LoggerLevel gLoggerLevel;
             Logger_printCurrentFuncAndLine("[VERBOSE]"); \
             Logger_printLine(__VA_ARGS__);               \
         }                                                \
-    }
+    }                                                    \
+    (void)0
 
 #define Logger_printInfo(...)                         \
     {                                                 \
@@ -44,7 +46,8 @@ extern LoggerLevel gLoggerLevel;
             Logger_printCurrentFuncAndLine("[INFO]"); \
             Logger_printLine(__VA_ARGS__);            \
         }                                             \
-    }
+    }                                                 \
+    (void)0
 
 #define Logger_printWarning(...)                         \
     {                                                    \
@@ -52,7 +55,8 @@ extern LoggerLevel gLoggerLevel;
             Logger_printCurrentFuncAndLine("[WARNING]"); \
             Logger_printLine(__VA_ARGS__);               \
         }                                                \
-    }
+    }                                                    \
+    (void)0
 
 #define Logger_printError(...)                         \
     {                                                  \
@@ -60,7 +64,8 @@ extern LoggerLevel gLoggerLevel;
             Logger_printCurrentFuncAndLine("[ERROR]"); \
             Logger_printLine(__VA_ARGS__);             \
         }                                              \
-    }
+    }                                                  \
+    (void)0
 
 void Logger_setLoggerLevel(LoggerLevel level);
 
