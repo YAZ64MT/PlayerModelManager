@@ -9,6 +9,7 @@
 #include "model_shared.h"
 #include "model_common.h"
 #include "recomputils.h"
+#include "modelentry.h"
 
 static U32ValueHashmapHandle sObjectIdToVanillaDLToListenerMapMap;
 static U32ValueHashmapHandle sLinkDLEntryToListeners[PLAYER_FORM_MAX];
@@ -92,6 +93,8 @@ void createListenerInfo(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, 
     }
 }
 
+extern ModelEntryForm *gSharedModelEntry;
+
 void MRC_setupListenerDL(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId) {
     if (sIsModelReplacerCompatEnabled) {
         createListenerInfo(id, vanillaDL, form, linkDLId);
@@ -106,6 +109,10 @@ void MRC_setupListenerDL(ObjectId id, Gfx *vanillaDL, PlayerTransformation form,
     }
 
     models[linkDLId] = GlobalObjects_getGlobalGfxPtr(id, vanillaDL);
+
+    if (gSharedModelEntry) {
+        //ModelEntry_setDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), linkDLId, GlobalObjects_getGlobalGfxPtr(id, vanillaDL));
+    }
 }
 
 RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, onModelChange)

@@ -16,6 +16,10 @@
 #include "maskdls.h"
 #include "modelreplacer_compat.h"
 #include "model_common.h"
+#include "modelentrymanager.h"
+#include "modelentry.h"
+
+ModelEntryForm *gSharedModelEntry;
 
 // handless first person hookshot
 Gfx gLinkHumanFirstPersonHookshotDL[] = {
@@ -187,7 +191,32 @@ Gfx *getGameplayKeepDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, dl);
 }
 
+static void setupSharedFallbackModel() {
+
+    ModelEntry *modelEntry = CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_shared__"));
+
+    CMEM_setEntryHidden(modelEntry, true);
+
+    gSharedModelEntry = (ModelEntryForm *)modelEntry;
+
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK, getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK, getHumanMtx(&gLinkHumanSheathedRazorSwordMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SWORD_GILDED_BACK, getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SHIELD_HERO_BACK, getHumanMtx(&gLinkHumanHerosShieldMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, getHumanMtx(&gLinkHumanMirrorShieldMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, getHumanMtx(&gLinkHumanMirrorShieldMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SWORD3_PEDESTAL, &gIdentityMtx);
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SWORD3_PEDESTAL_GRABBED, &gIdentityMtx);
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_ARROW_DRAWN, &gIdentityMtx);
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK, &gIdentityMtx);
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_MASKS, &gIdentityMtx);
+
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gElegyShellHumanDL));
+}
+
 void initSharedDLs() {
+    setupSharedFallbackModel();
+    
     Mtx **equipMatrixes = gSharedMatrixes;
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx);
     equipMatrixes[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = getHumanMtx(&gLinkHumanSheathedRazorSwordMtx);

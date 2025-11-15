@@ -200,6 +200,8 @@ static void setupHumanFallbackModel() {
 
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)
 void setupVanillaHuman() {
+    setupHumanFallbackModel();
+
     Link_FormProxy *formProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
 
     clearModelInfoKeepEyes(&formProxy->vanilla);

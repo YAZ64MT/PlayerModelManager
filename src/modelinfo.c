@@ -3,6 +3,7 @@
 #include "recompdata.h"
 #include "logger.h"
 #include "playermodelmanager_utils.h"
+#include "modelinfo.h"
 
 void ModelInfo_init(ModelInfo *modelInfo) {
     modelInfo->modelEntryForm = NULL;

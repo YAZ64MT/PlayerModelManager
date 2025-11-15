@@ -4,13 +4,60 @@
 #include "playermodelmanager_utils.h"
 #include "model_common.h"
 #include "globalobjects_api.h"
+#include "modelentrymanager.h"
+#include "modelinfo.h"
+#include "modelentry.h"
+#include "playermodelmanager_api.h"
+
+ModelEntryForm *gFierceDeityModelEntry;
+ModelInfo gFierceDeityModelInfo;
 
 Gfx *getFierceDeityDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_BOY, dl);
 }
 
+static void setupFierceDeityFallbackModel() {
+    void *fd = GlobalObjects_getGlobalObject(OBJECT_LINK_BOY);
+
+    FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(fd, &gLinkFierceDeitySkel);
+    GlobalObjects_globalizeLodLimbSkeleton(fd, &gLinkFierceDeitySkel);
+
+    ModelInfo_init(&gFierceDeityModelInfo);
+
+    ModelEntryForm *entryForm = gFierceDeityModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_FIERCE_DEITY, "__mm_object_link_boy__"));
+    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
+
+    ModelEntryForm_fillDefaultFaceTextures(entryForm);
+    ModelEntryForm_setSkeleton(entryForm, skel);
+    ModelEntryForm_setDLsFromSkeletons(entryForm);
+
+    CMEM_setEntryHidden(entry, true);
+    ModelInfo_setModelEntryForm(&gFierceDeityModelInfo, entryForm);
+
+#define SET_ENTRY_DL(id, dl) ModelEntry_setDisplayList(entry, id, dl)
+
+    // hands
+    SET_ENTRY_DL(LINK_DL_LHAND, getFierceDeityDL(gLinkFierceDeityLeftHandDL));
+    SET_ENTRY_DL(LINK_DL_LFIST, getFierceDeityDL(gLinkFierceDeityLeftHandDL));
+    SET_ENTRY_DL(LINK_DL_LHAND_BOTTLE, getFierceDeityDL(gLinkFierceDeityLeftHandDL));
+    SET_ENTRY_DL(LINK_DL_LHAND_GUITAR, getFierceDeityDL(gLinkFierceDeityLeftHandDL));
+
+    SET_ENTRY_DL(LINK_DL_RHAND, getFierceDeityDL(gLinkFierceDeityRightHandDL));
+    SET_ENTRY_DL(LINK_DL_RFIST, getFierceDeityDL(gLinkFierceDeityRightHandDL));
+
+    // First Person
+    SET_ENTRY_DL(LINK_DL_FPS_LFOREARM, getFierceDeityDL(gLinkFierceDeityLeftForearmDL));
+    SET_ENTRY_DL(LINK_DL_FPS_LHAND, getFierceDeityDL(gLinkFierceDeityLeftHandDL));
+    SET_ENTRY_DL(LINK_DL_FPS_RFOREARM, getFierceDeityDL(gLinkFierceDeityRightForearmDL));
+    SET_ENTRY_DL(LINK_DL_FPS_RHAND, getFierceDeityDL(gLinkFierceDeityRightHandDL));
+
+#undef SET_ENTRY_DL
+}
+
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)
 void setupVanillaFierceDeity() {
+    setupFierceDeityFallbackModel();
+
     Link_FormProxy *formProxy = &gLinkFormProxies[PLAYER_FORM_FIERCE_DEITY];
 
     clearModelInfoKeepEyes(&formProxy->vanilla);
