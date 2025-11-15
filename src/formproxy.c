@@ -8,6 +8,7 @@
 #include "modelmatrixids.h"
 #include "playermodelmanager_mm.h"
 #include "z64recomp_api.h"
+#include "model_shared.h"
 
 static Gfx sPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
@@ -556,12 +557,8 @@ void FormProxy_refreshAllDLs(FormProxy *fp) {
 
     setDLsToShims(fp);
 
-    for (int i = 0; i < LINK_DL_MAX; ++i) {
-        Gfx *dl = FormProxy_getDL(fp, i);
-
-        if (dl) {
-            gSPDisplayList(&wDLs[i].displayList[WRAPPED_DL_DRAW], dl);
-        }
+    for (Link_DisplayList i = 0; i < LINK_DL_MAX; ++i) {
+        FormProxy_refreshDL(fp, i);
     }
 
     // first person hookshot workaround
@@ -723,14 +720,18 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
         if (!dl && hasThirdPersonTarget) {
             dl = ModelInfo_getGfx(fallbackOverride, thirdPersonTarget);
         }
+
+        if (!dl) {
+            dl = ModelInfo_getGfx(fallback, id);
+        }
+
+        if (!dl && hasThirdPersonTarget) {
+            dl = ModelInfo_getGfx(fallback, thirdPersonTarget);
+        }
     }
 
     if (!dl) {
-        dl = ModelInfo_getGfx(fallback, id);
-    }
-
-    if (!dl) {
-        dl = getSharedDL(fp, id);
+        dl = ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), id);
     }
 
     return dl;

@@ -93,8 +93,6 @@ void createListenerInfo(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, 
     }
 }
 
-extern ModelEntryForm *gSharedModelEntry;
-
 void MRC_setupListenerDL(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId) {
     if (sIsModelReplacerCompatEnabled) {
         createListenerInfo(id, vanillaDL, form, linkDLId);

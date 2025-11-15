@@ -2,6 +2,7 @@
 #define __MODEL_COMMON_H__
 
 #include "playermodelmanager.h"
+#include "formproxy.h"
 
 #define GET_PLAYER_FORM_PROXY (&gLinkFormProxies[GET_PLAYER_FORM])
 
