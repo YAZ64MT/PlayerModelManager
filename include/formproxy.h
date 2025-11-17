@@ -35,11 +35,10 @@ typedef struct TunicColor {
 
 typedef struct FormProxy {
     PlayerTransformation form;
+    FormProxyId fpId;
     ModelInfo currentModelInfo;
     ModelInfo *fallbackOverrideModelInfo;
     ModelInfo *fallbackModelInfo;
-    U32ValueHashmapHandle sharedDisplayLists;
-    U32ValueHashmapHandle sharedMatrixes;
     U32ValueHashmapHandle displayListAlternates;
     SkeletonProxy skeleton;
     ShieldingSkeletonProxy shieldingSkeleton;
@@ -50,10 +49,13 @@ typedef struct FormProxy {
     WrappedDisplayList wrappedDisplayLists[LINK_DL_MAX];
 } FormProxy;
 
-void FormProxy_init(FormProxy *fp, PlayerTransformation form, ModelInfo *fallback, ModelInfo *fallbackOverride, U32ValueHashmapHandle sharedDisplayLists, U32ValueHashmapHandle sharedMatrixes);
+void FormProxy_init(FormProxy *fp, PlayerTransformation form, FormProxyId fpId, ModelInfo *fallback, ModelInfo *fallbackOverride);
+FormProxyId FormProxy_getFormProxyId(const FormProxy *fp);
 ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp);
 ModelInfo *FormProxy_getFallbackOverrideModelInfo(FormProxy *fp);
 ModelInfo *FormProxy_getFallbackModelInfo(FormProxy *fp);
+bool FormProxy_setAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id, FormProxy *alt);
+bool FormProxy_unsetAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id);
 void FormProxy_refreshSkeletons(FormProxy *fp);
 void FormProxy_refreshDL(FormProxy *fp, Link_DisplayList id);
 void FormProxy_refreshAllDLs(FormProxy *fp);

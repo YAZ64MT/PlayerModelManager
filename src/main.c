@@ -270,10 +270,12 @@ void refreshEquipmentOnEquipmentModelApplied(Link_EquipmentReplacement eq){
 }
 
 RECOMP_DECLARE_EVENT(_internal_initHashObjects());
+RECOMP_DECLARE_EVENT(_internal_postInitHashObjects());
 
 RECOMP_CALLBACK("*", recomp_on_init)
 void handleInits() {
     _internal_initHashObjects();
+    _internal_postInitHashObjects();
 }
 
 RECOMP_CALLBACK("*", recomp_on_play_main)

@@ -40,18 +40,6 @@ static Gfx sEndBowstringDL[] = {
     gsSPBranchList(sEndDLWrapper),
 };
 
-static Gfx *getSharedDL(FormProxy *fp, Link_DisplayList id) {
-    uintptr_t dl = 0;
-    recomputil_u32_value_hashmap_get(fp->sharedDisplayLists, id, &dl);
-    return (Gfx *)dl;
-}
-
-static Mtx *getSharedMtx(FormProxy *fp, Link_EquipmentMatrix id) {
-    uintptr_t mtx = 0;
-    recomputil_u32_value_hashmap_get(fp->sharedMatrixes, id, &mtx);
-    return (Mtx *)mtx;
-}
-
 RECOMP_CALLBACK("*", recomp_on_init)
 void initFormProxyExDLs() {
     gEXPushEnvColor(&sStartDLWrapper[0]);
@@ -308,7 +296,7 @@ static void initProxyDLs(FormProxy *fp) {
     }
 }
 
-void FormProxy_init(FormProxy *fp, PlayerTransformation form, ModelInfo *fallback, ModelInfo *fallbackOverride, U32ValueHashmapHandle sharedDisplayLists, U32ValueHashmapHandle sharedMatrixes) {
+void FormProxy_init(FormProxy *fp, PlayerTransformation form, FormProxyId fpId, ModelInfo *fallback, ModelInfo *fallbackOverride) {
     if (form < 0 || form >= PLAYER_FORM_MAX) {
         Logger_printError("FormProxy_init received invalid form argument with value %d!", form);
         tryCrashGame();
@@ -324,21 +312,11 @@ void FormProxy_init(FormProxy *fp, PlayerTransformation form, ModelInfo *fallbac
         tryCrashGame();
     }
 
-    if (!sharedDisplayLists) {
-        Logger_printError("FormProxy_init received invalid sharedDisplayLists argument!");
-        tryCrashGame();
-    }
-
-    if (!sharedMatrixes) {
-        Logger_printError("FormProxy_init received invalid sharedMatrixes argument!");
-        tryCrashGame();
-    }
-
     fp->form = form;
+    fp->fpId = fpId;
     ModelInfo_init(&fp->currentModelInfo);
     fp->fallbackOverrideModelInfo = fallbackOverride;
     fp->fallbackModelInfo = fallback;
-    fp->sharedDisplayLists = sharedDisplayLists;
     fp->displayListAlternates = recomputil_create_u32_value_hashmap();
     fp->tunicColor.isOverrideRequested = false;
     initSkeleton(fp);
@@ -347,6 +325,27 @@ void FormProxy_init(FormProxy *fp, PlayerTransformation form, ModelInfo *fallbac
     initProxyShims(fp);
     initProxyWrappers(fp);
     initProxyDLs(fp);
+}
+
+FormProxyId FormProxy_getFormProxyId(const FormProxy *fp) {
+    return fp->fpId;
+}
+
+bool FormProxy_setAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id, FormProxy *alt) {
+    if (alt == fp) {
+        Logger_printWarning("fp == alt! Trying to assign would create circular reference! Ignoring...");
+        return false;
+    }
+
+    if (alt) {
+        return recomputil_u32_value_hashmap_insert(fp->displayListAlternates, id, (uintptr_t)alt);
+    }
+
+    return FormProxy_unsetAlternateFormProxyDL(fp, id);
+}
+
+bool FormProxy_unsetAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id) {
+    return recomputil_u32_value_hashmap_erase(fp->displayListAlternates, id);
 }
 
 ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp) {
@@ -598,7 +597,7 @@ void FormProxy_refreshMtx(FormProxy *fp, Link_EquipmentMatrix id) {
     }
 
     if (!matrix) {
-        matrix = getSharedMtx(fp, id);
+        matrix = ModelEntry_getMatrix(ModelEntryForm_getModelEntry(gSharedModelEntry), id);
     }
 
     if (matrix) {
@@ -672,7 +671,7 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
     if (!dl) {
         FormProxy *fpAlt;
         if (recomputil_u32_value_hashmap_get(fp->displayListAlternates, id, (uintptr_t *)&fpAlt)) {
-            if (fpAlt != fp) {
+            if (fpAlt && fpAlt != fp) {
                 dl = FormProxy_getDL(fpAlt, id);
             }
         }

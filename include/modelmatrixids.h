@@ -565,4 +565,12 @@ typedef enum {
     LINK_CMC_MAX,
 } Link_CustomModelCategory;
 
+typedef unsigned long FormProxyId;
+
+#define FORM_PROXY_ID_FIERCE_DEITY ((FormProxyId)0)
+#define FORM_PROXY_ID_GORON ((FormProxyId)1)
+#define FORM_PROXY_ID_ZORA ((FormProxyId)2)
+#define FORM_PROXY_ID_DEKU ((FormProxyId)3)
+#define FORM_PROXY_ID_HUMAN ((FormProxyId)4)
+
 #endif

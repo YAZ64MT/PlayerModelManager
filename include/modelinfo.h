@@ -6,7 +6,7 @@
 #include "recompdata.h"
 #include "modelentry.h"
 
-typedef struct {
+typedef struct ModelInfo {
     ModelEntryForm *modelEntryForm;
     U32ValueHashmapHandle gfxOverrides;
     U32ValueHashmapHandle mtxOverrides;

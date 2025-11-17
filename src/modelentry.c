@@ -18,10 +18,6 @@ static bool isValidModelEntry(const ModelEntry *entry) {
     return recomputil_u32_hashset_contains(sValidModelEntryPtrs, (uintptr_t)entry);
 }
 
-static void printInvalidPtrWarning(const char *s) {
-    Logger_printWarning("%s reveived an invalid pointer", s);
-}
-
 typedef struct ModelEntryFunctions {
     bool (*applyToModelInfo)(const struct ModelEntry *entry);
     bool (*removeFromModelInfo)(const struct ModelEntry *entry);

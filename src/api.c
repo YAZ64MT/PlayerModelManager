@@ -116,14 +116,6 @@ static ModelEntry *getEntryOrPrintErrLocked(PlayerModelManagerHandle h, const ch
     return getEntryOrPrintErr(h, funcName);
 }
 
-static void dupStrAndFreeOld(char **dest, const char *src) {
-    if (*dest) {
-        recomp_free(*dest);
-    }
-
-    *dest = YAZMTCore_Utils_StrDup(src);
-}
-
 RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType) {
     if (apiVersion > PMM_API_VERSION) {
         Logger_printWarning("PlayerModelManager_registerModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
