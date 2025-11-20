@@ -2,13 +2,14 @@
 #include "modelentry.h"
 #include "playermodelmanager_utils.h"
 #include "recomputils.h"
-#include "model_common.h"
 #include "libc/string.h"
 #include "modelentrymanager.h"
 #include "recompdata.h"
 #include "proxymm_kv_api.h"
 #include "playermodelmanager_api.h"
 #include "yazmtcorelib_api.h"
+#include "formproxy.h"
+#include "playerproxy.h"
 #include "logger.h"
 
 static U32SlotmapHandle sEntryHandles;
@@ -589,6 +590,10 @@ bool isValidCategory(Link_CustomModelCategory cat) {
 }
 
 const ModelEntry *CMEM_getCurrentEntry(Link_CustomModelCategory cat) {
+    if (!isValidCategory(cat)) {
+        return NULL;
+    }
+
     return sCurrentModelEntries[cat];
 }
 
@@ -609,17 +614,39 @@ static void pushEntry(YAZMTCore_DynamicU32Array *entryArr, ModelEntry *entry) {
     }
 }
 
-void initEntryManager() {
-    for (int i = 0; i < ARRAY_COUNT(sModelEntries); ++i) {
-        sModelEntries[i] = YAZMTCore_DynamicU32Array_new();
+static FormProxy *getLocalFormProxyFromCategory(Link_CustomModelCategory cat) {
+    FormProxyId fpId;
+
+    switch (cat) {
+        case LINK_CMC_DEKU:
+            fpId = FORM_PROXY_ID_DEKU;
+            break;
+
+        case LINK_CMC_GORON:
+            fpId = FORM_PROXY_ID_GORON;
+            break;
+
+        case LINK_CMC_ZORA:
+            fpId = FORM_PROXY_ID_ZORA;
+            break;
+
+        case LINK_CMC_FIERCE_DEITY:
+            fpId = FORM_PROXY_ID_FIERCE_DEITY;
+            break;
+
+        default:
+            fpId = FORM_PROXY_ID_HUMAN;
+            break;
     }
+
+    return PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
 }
 
 void CMEM_reapplyEntry(Link_CustomModelCategory cat) {
     const ModelEntry *currEntry = CMEM_getCurrentEntry(cat);
 
     if (currEntry) {
-        ModelEntry_applyToModelInfo(currEntry);
+        ModelEntry_applyToFormProxy(currEntry, getLocalFormProxyFromCategory(cat));
     }
 }
 
@@ -631,7 +658,7 @@ bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEnt
         return true;
     }
 
-    if (ModelEntry_applyToModelInfo(newEntry)) {
+    if (ModelEntry_applyToFormProxy(newEntry, getLocalFormProxyFromCategory(cat))) {
         if (currEntry) {
             ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_REMOVED);
         }
@@ -687,7 +714,6 @@ const ModelEntry **CMEM_getCategoryEntryData(Link_CustomModelCategory cat, size_
 }
 
 void CMEM_removeModel(Link_CustomModelCategory cat) {
-
     if (!isValidCategory(cat)) {
         Logger_printError("Called CMEM_removeModel with invalid category %d\n", cat);
         tryCrashGame();
@@ -702,7 +728,7 @@ void CMEM_removeModel(Link_CustomModelCategory cat) {
 
         CMEM_setCurrentEntry(cat, NULL);
 
-        ModelEntry_removeFromModelInfo(entry);
+        ModelEntry_removeFromFormProxy(entry, getLocalFormProxyFromCategory(cat));
     }
 }
 
@@ -798,16 +824,8 @@ void loadSavedModels() {
     _internal_onSavedModelsApplied();
 }
 
-RECOMP_DECLARE_EVENT(_internal_onReadyCMEM());
-
-RECOMP_CALLBACK(".", _internal_onReadyUI)
-void initEntryManagerCallback() {
-    initEntryManager();
-    _internal_onReadyCMEM();
-}
-
-RECOMP_HOOK_RETURN("TitleSetup_SetupTitleScreen")
-void applySavedModelOnTitleScreen() {
+RECOMP_HOOK_RETURN("ConsoleLogo_Destroy")
+void applySavedModelsAtStart() {
     loadSavedModels();
 }
 
@@ -816,4 +834,7 @@ void initCMEMHash() {
     sEntryHandles = recomputil_create_u32_slotmap();
     sInternalNamesToEntries = YAZMTCore_StringU32Dictionary_new();
     sHiddenModelEntries = recomputil_create_u32_hashset();
+    for (int i = 0; i < ARRAY_COUNT(sModelEntries); ++i) {
+        sModelEntries[i] = YAZMTCore_DynamicU32Array_new();
+    }
 }

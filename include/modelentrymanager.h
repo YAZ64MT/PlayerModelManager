@@ -1,6 +1,10 @@
-#ifndef __CUSTOMMODELENTRYMANAGER_H
-#define __CUSTOMMODELENTRYMANAGER_H
-#include "modelentry.h"
+#ifndef CUSTOMMODELENTRYMANAGER_H
+#define CUSTOMMODELENTRYMANAGER_H
+
+typedef struct ModelEntry ModelEntry;
+
+#include "playermodelmanager_api.h"
+#include "modelmatrixids.h"
 
 typedef unsigned long PlayerModelManagerHandle;
 

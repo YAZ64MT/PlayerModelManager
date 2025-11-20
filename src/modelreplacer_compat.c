@@ -3,11 +3,10 @@
 #include "global.h"
 #include "recompdata.h"
 #include "modelreplacer_compat.h"
-#include "playermodelmanager.h"
+#include "modelmatrixids.h"
 #include "globalobjects_api.h"
 #include "modelreplacer_api.h"
 #include "model_shared.h"
-#include "model_common.h"
 #include "recomputils.h"
 #include "modelentry.h"
 
@@ -24,6 +23,10 @@ bool MRC_isMRCEnabled() {
 }
 
 Gfx *MRC_getListenerDL(PlayerTransformation form, Link_DisplayList entryDLId) {
+    if (!MRC_isMRCEnabled()) {
+        return NULL;
+    }
+
     if (form < 0 || form >= PLAYER_FORM_MAX) {
         return NULL;
     }
@@ -52,7 +55,7 @@ MRC_ListenerInfo *getListenerInfo(ObjectId id, Gfx *vanillaDL) {
 }
 
 MRC_ListenerInfo *MRC_getListenerFromFormAndDL(PlayerTransformation form, Link_DisplayList entryDLId) {
-    if (!sIsModelReplacerCompatEnabled) {
+    if (!MRC_isMRCEnabled()) {
         return NULL;
     }
 
@@ -94,22 +97,8 @@ void createListenerInfo(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, 
 }
 
 void MRC_setupListenerDL(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId) {
-    if (sIsModelReplacerCompatEnabled) {
+    if (MRC_isMRCEnabled()) {
         createListenerInfo(id, vanillaDL, form, linkDLId);
-    }
-
-    Gfx **models = NULL;
-
-    if (form == MRC_PLAYER_FORM_EVERY) {
-        models = gSharedDisplayLists;
-    } else {
-        models = gLinkFormProxies[form].vanilla.models;
-    }
-
-    models[linkDLId] = GlobalObjects_getGlobalGfxPtr(id, vanillaDL);
-
-    if (gSharedModelEntry) {
-        //ModelEntry_setDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), linkDLId, GlobalObjects_getGlobalGfxPtr(id, vanillaDL));
     }
 }
 
@@ -125,26 +114,17 @@ void updateListenerDLs_on_onModelChange(ObjectId id, Gfx *vanillaDL, Gfx *newDL)
         Link_DisplayList linkDLId = listener->linkDLId;
         PlayerTransformation form = listener->form;
 
-        // TODO: remove thiss functionality after Link_FormProxy is replaced by FormProxy
-        if (listener->form == MRC_PLAYER_FORM_EVERY) {
-            if (gSharedDisplayLists[linkDLId] != newDL) {
-                gSharedDisplayLists[linkDLId] = newDL;
-            }
-        } else {
-            if (gLinkFormProxies[form].vanilla.models[linkDLId] != newDL) {
-                gLinkFormProxies[form].vanilla.models[linkDLId] = newDL;
-            }
-        }
-
         if (newDL == GlobalObjects_getGlobalGfxPtr(listener->objId, listener->vanillaDL)) {
             recomputil_u32_value_hashmap_erase(sListenerDLByForm[listener->form], linkDLId);
         } else {
             recomputil_u32_value_hashmap_insert(sListenerDLByForm[listener->form], linkDLId, (uintptr_t)newDL);
         }
+    }
+}
 
-        for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-            requestRefreshFormProxyDL(&gLinkFormProxies[i], linkDLId);
-        }
+void MRC_addExcludedDL(Gfx *dl) {
+    if (MRC_isMRCEnabled()) {
+        recomputil_u32_hashset_insert(sExcludedDisplayLists, (uintptr_t)dl);
     }
 }
 
@@ -165,12 +145,6 @@ void initModelReplacerHashObjects() {
     }
 
     sExcludedDisplayLists = recomputil_create_u32_hashset();
-
-    for (int i = 0; i < LINK_DL_MAX; ++i) {
-        for (int j = 0; j < PLAYER_FORM_MAX; ++j) {
-            recomputil_u32_hashset_insert(sExcludedDisplayLists, (uintptr_t)&gLinkFormProxies[j].displayLists[i]);
-        }
-    }
 
     for (int i = 0; i < ARRAY_COUNT(sListenerDLByForm); ++i) {
         sListenerDLByForm[i] = recomputil_create_u32_value_hashmap();

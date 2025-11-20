@@ -1,10 +1,7 @@
 #include "global.h"
 #include "modelentrymanager.h"
 #include "recomputils.h"
-#include "playermodelmanager.h"
-#include "model_common.h"
-#include "defines_modelinfo.h"
-#include "colorfixes.h"
+#include "modelmatrixids.h"
 #include "playermodelmanager_api.h"
 #include "yazmtcorelib_api.h"
 #include "modelreplacer_api.h"
@@ -12,6 +9,10 @@
 #include "modelreplacer_compat.h"
 #include "apilocal.h"
 #include "logger.h"
+#include "playerproxy.h"
+#include "playerproxymanager.h"
+#include "modelentry.h"
+#include "formproxy.h"
 
 static bool isEntryLoaded(ModelEntry *entry) {
     if (entry) {
@@ -118,12 +119,12 @@ static ModelEntry *getEntryOrPrintErrLocked(PlayerModelManagerHandle h, const ch
 
 RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType) {
     if (apiVersion > PMM_API_VERSION) {
-        Logger_printWarning("PlayerModelManager_registerModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
+        Logger_printWarning("Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
         return 0;
     }
 
     if (sIsAPILocked) {
-        Logger_printWarning("PlayerModelManager_registerModel: Models can only be registered during a onRegisterModels callback.");
+        Logger_printWarning("Models can only be registered during a onRegisterModels callback.");
         return 0;
     }
 
@@ -134,7 +135,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
     Link_CustomModelCategory cat = getCategoryFromModelType(modelType);
 
     if (!isValidCategory(cat)) {
-        Logger_printError("PlayerModelManager_registerFormModel: Passed in unsupported PlayerModelManagerModelType %d to PlayerModelManager_registerModel.", modelType);
+        Logger_printError("Passed in unsupported PlayerModelManagerModelType %d.", modelType);
         return 0;
     }
 
@@ -283,7 +284,7 @@ RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h
     }
 
     if (!isPackCategory(ModelEntry_getCategory(entry))) {
-        Logger_printError("PlayerModelManager_addHandleToPack: Non-model pack passed into first arg of PlayerModelManager_addHandleToPack (Category was %d)", ModelEntry_getCategory(entry));
+        Logger_printError("Non-model pack passed into first arg of PlayerModelManager_addHandleToPack (Category was %d)", ModelEntry_getCategory(entry));
         return false;
     }
 
@@ -297,7 +298,7 @@ RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h
     ModelEntryPack *packEntry = (ModelEntryPack *)entry;
 
     if (!ModelEntryPack_addEntryToPack(packEntry, entryToAdd)) {
-        Logger_printError("PlayerModelManager_addHandleToPack: Could not add handle! Handle with internal name '%s' is already a handle inside '%s' (Would cause circular reference)!", ModelEntry_getInternalName(entry), ModelEntry_getInternalName(entryToAdd));
+        Logger_printError("Could not add handle! Handle with internal name '%s' is already a handle inside '%s' (Would cause circular reference)!", ModelEntry_getInternalName(entry), ModelEntry_getInternalName(entryToAdd));
         return false;
     }
 
@@ -383,7 +384,7 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 
     if (skel) {
         if (skel->sh.limbCount != PLAYER_BODY_SHIELD_LIMB_COUNT) {
-            Logger_printError("PlayerModelManager_setShieldingSkeleton: Skeleton with incorrect limb count passed in to PlayerModelManager_setShieldingSkeleton");
+            Logger_printError("Skeleton with incorrect limb count passed in to PlayerModelManager_setShieldingSkeleton");
             return false;
         }
 
@@ -453,56 +454,76 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle 
 
 RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dlId) {
     if (apiVersion > PMM_API_VERSION) {
-        Logger_printError("PlayerModelManager_getFormDisplayList: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
+        Logger_printError("Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
         return NULL;
     }
 
     if (form >= PLAYER_FORM_MAX) {
-        Logger_printError("PlayerModelManager_getFormDisplayList: Mod requesting invalid player form %d!", form);
+        Logger_printError("Mod requesting invalid player form %d!", form);
         return NULL;
     }
 
     if (dlId >= LINK_DL_MAX) {
-        Logger_printError("PlayerModelManager_getFormDisplayList: Mod requesting display list ID %d!", dlId);
+        Logger_printError("Mod requesting display list ID %d!", dlId);
         return NULL;
     }
 
-    return &gLinkFormProxies[form].displayLists[dlId];
+    FormProxyId fpId;
+    if (PlayerProxy_getProxyIdFromForm(form, &fpId)) {
+        FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
+        
+        if (fp) {
+            return FormProxy_getCurrentDL(fp, dlId);
+        }
+    }
+
+    return NULL;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dlId, Gfx *dl) {
     if (sIsAPILocked) {
         Logger_printError("%s called while API locked. "
                           "Please only call these functions during a onRegisterModels callback.",
-                          "PlayerModelManager_overrideVanillaDisplayList");
+                          __FUNCTION__);
 
         return false;
     }
 
     if (apiVersion > PMM_API_VERSION) {
-        Logger_printError("PlayerModelManager_overrideVanillaDisplayList: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
+        Logger_printError("Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
         return false;
     }
 
     if (form >= PLAYER_FORM_MAX) {
-        Logger_printError("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid player form %d!", form);
+        Logger_printError("Mod requesting invalid player form %d!", form);
         return false;
     }
 
     if (dlId >= LINK_DL_MAX) {
-        Logger_printError("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid display list ID %d! (ID too high!)", form);
+        Logger_printError("Mod requesting invalid display list ID %d! (ID too high!)", form);
         return false;
     }
 
     if (dlId >= LINK_DL_SWORD1 && dlId <= LINK_DL_CENTER_FLOWER_PROPELLER_CLOSED) {
-        Logger_printError("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid display list ID %d! (ID was a shim!)", form);
+        Logger_printError("Mod requesting invalid display list ID %d! (ID was a shim!)", form);
         return false;
     }
 
-    gLinkFormProxies[form].vanilla.models[dlId] = dl;
-    requestRefreshFormProxyDL(&gLinkFormProxies[form], dlId);
+    FormProxyId fpId;
+    if (PlayerProxy_getProxyIdFromForm(form, &fpId)) {
+        FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
+        
+        if (fp) {
+            ModelInfo *fallbackModelInfo = FormProxy_getFallbackModelInfo(fp);
 
-    Logger_printVerbose("PlayerModelManager_overrideVanillaDisplayList: Overriding vanilla DL with ID %d for form %d with new DL at 0x%X.", dlId, form, dl);
+            if (fallbackModelInfo) {
+                ModelInfo_setGfxOverride(fallbackModelInfo, dlId, dl);
+                PlayerProxyManager_refreshDLAll(dlId);
+            }
+        }
+    }
+
+    Logger_printVerbose("Overriding vanilla DL with ID %d for form %d with new DL at 0x%X.", dlId, form, dl);
 
     return true;
 }
@@ -511,30 +532,41 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVer
     if (sIsAPILocked) {
         Logger_printError("%s called while API locked. "
                           "Please only call these functions during a onRegisterModels callback.",
-                          "PlayerModelManager_overrideVanillaMatrix");
+                          __FUNCTION__);
 
         return false;
     }
 
     if (apiVersion > PMM_API_VERSION) {
-        Logger_printError("PlayerModelManager_overrideVanillaMatrix: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
+        Logger_printError("Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
         return false;
     }
 
     if (form >= PLAYER_FORM_MAX) {
-        Logger_printError("PlayerModelManager_overrideVanillaMatrix: Mod requesting invalid player form %d!", form);
+        Logger_printError("Mod requesting invalid player form %d!", form);
         return false;
     }
 
     if (mtxId >= LINK_EQUIP_MATRIX_MAX) {
-        Logger_printError("PlayerModelManager_overrideVanillaMatrix: Mod requesting invalid matrix ID %d! (ID too high!)", form);
+        Logger_printError("Mod requesting invalid matrix ID %d! (ID too high!)", form);
         return false;
     }
 
-    gLinkFormProxies[form].vanilla.equipMtx[mtxId] = mtx;
-    requestRefreshFormProxyMtx(&gLinkFormProxies[form], mtxId);
+    FormProxyId fpId;
+    if (PlayerProxy_getProxyIdFromForm(form, &fpId)) {
+        FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
 
-    Logger_printVerbose("PlayerModelManager_overrideVanillaMatrix: Copying matrix at 0x%X to with ID %d for form %d.");
+        if (fp) {
+            ModelInfo *fallbackModelInfo = FormProxy_getFallbackModelInfo(fp);
+
+            if (fallbackModelInfo) {
+                ModelInfo_setMtxOverride(fallbackModelInfo, mtxId, mtx);
+                PlayerProxyManager_refreshMtxAll(mtxId);
+            }
+        }
+    }
+
+    Logger_printVerbose("Copying matrix at 0x%X to with ID %d for form %d.");
 
     return true;
 }
@@ -554,11 +586,18 @@ RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
 }
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {
-    setTunicColor(r, g, b, a);
+    PlayerProxy_requestTunicColorOverride(gPlayer1Proxy, (Color_RGBA8){r, g, b, a});
 }
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a) {
-    setFormTunicColor(form, r, g, b, a);
+    FormProxyId fpId;
+    if (PlayerProxy_getProxyIdFromForm(form, &fpId)) {
+        FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
+
+        if (fp) {
+            FormProxy_requestTunicColorOverride(fp, (Color_RGBA8){r, g, b, a});
+        }
+    }
 }
 
 RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form) {
@@ -624,10 +663,10 @@ void doRegisterModels() {
     Logger_printInfo("Ready");
 }
 
-RECOMP_CALLBACK(".", _internal_onReadyCMEM)
+RECOMP_CALLBACK(".", _internal_postInitHashObjects)
 void doRegisterModelsCMEMReady() {
     sIsCMEMReady = true;
-    Logger_printVerbose("CustomModelEntryManager is ready.");
+    Logger_printVerbose("ModelEntryManager is ready.");
     doRegisterModels();
 }
 

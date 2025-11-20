@@ -14,7 +14,7 @@ void Logger_setLoggerLevel(LoggerLevel level) {
     gLoggerLevel = level;
 }
 
-RECOMP_CALLBACK("*", recomp_on_init)
+RECOMP_CALLBACK(".", _internal_preInitHashObjects)
 void setupLoggerFirstTime() {
     Logger_setLoggerLevel(recomp_get_config_u32("logging_level"));
 }

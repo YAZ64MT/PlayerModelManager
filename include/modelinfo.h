@@ -1,10 +1,10 @@
-#ifndef __MODELINFO_H__
-#define __MODELINFO_H__
+#ifndef MODELINFO_H
+#define MODELINFO_H
 
-#include "global.h"
 #include "modelmatrixids.h"
 #include "recompdata.h"
-#include "modelentry.h"
+
+typedef struct ModelEntryForm ModelEntryForm;
 
 typedef struct ModelInfo {
     ModelEntryForm *modelEntryForm;
@@ -29,5 +29,11 @@ bool ModelInfo_unsetMtxOverride(ModelInfo *modelInfo, Link_EquipmentMatrix id);
 void ModelInfo_clearAllGfxOverrides(ModelInfo *modelInfo);
 void ModelInfo_clearAllMtxOverrides(ModelInfo *modelInfo);
 bool ModelInfo_isAnyFlagEnabled(ModelInfo *modelInfo, u64 flags);
+
+extern ModelInfo gHumanModelInfo;
+extern ModelInfo gDekuModelInfo;
+extern ModelInfo gGoronModelInfo;
+extern ModelInfo gZoraModelInfo;
+extern ModelInfo gFierceDeityModelInfo;
 
 #endif

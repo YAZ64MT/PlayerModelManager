@@ -1,8 +1,9 @@
-#ifndef __PlAYERMODELCONFIG_H__
-#define __PlAYERMODELCONFIG_H__
+#ifndef PlAYERMODELCONFIG_H
+#define PlAYERMODELCONFIG_H
 
-#include "PR/gbi.h"
+#include "modelmatrixids.h"
 #include "PR/ultratypes.h"
+#include "PR/gbi.h"
 #include "stdbool.h"
 
 typedef unsigned long PlayerModelConfigDLHandle;
@@ -17,5 +18,7 @@ PlayerModelConfigDLHandle PlayerModelConfig_addShimDL(PlayerModelConfigDLHandle 
 PlayerModelConfigDLHandle PLayerModelConfig_addDLWithMtx(PlayerModelConfigMtxHandle mtx, PlayerModelConfigDLHandle dl[], size_t n);
 
 bool PlayerModelConfig_getEntries(PlayerModelConfigDLHandle **handlesOut, size_t *numOut);
+
+FormProxyId PlayerModelConfig_getNumFormIds();
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef __LOGGING_H__
-#define __LOGGING_H__
+#ifndef __LOGGER_H__
+#define __LOGGER_H__
 
 #include "recomputils.h"
 

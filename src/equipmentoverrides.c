@@ -1,6 +1,7 @@
 #include "global.h"
 #include "equipmentoverrides.h"
 #include "modelmatrixids.h"
+#include "logger.h"
 
 static Link_DisplayList sSword1DLs[] = {LINK_DL_SWORD1_HILT, LINK_DL_SWORD1_BLADE, LINK_DL_SWORD1_SHEATH};
 static Link_DisplayList sSword2DLs[] = {LINK_DL_SWORD2_HILT, LINK_DL_SWORD2_BLADE, LINK_DL_SWORD2_SHEATH};
@@ -104,7 +105,7 @@ static Link_DisplayList sMaskFierceDeityDLs[] = {LINK_DL_MASK_FIERCE_DEITY, LINK
 #define DECLARE_OVERRIDE_TABLE_ENTRY_NO_MTX(disps) {.dl = {.overrides = disps, .count = ARRAY_COUNT(disps)}, .mtx = {.overrides = NULL, .count = 0}}
 // clang-format on
 
-const EquipmentOverride gEquipmentOverrideTable[LINK_DL_REPLACE_MAX] = {
+static const EquipmentOverride sEquipmentOverrideTable[LINK_DL_REPLACE_MAX] = {
     DECLARE_OVERRIDE_TABLE_ENTRY(sSword1DLs, sSword1Mtxs),     // LINK_DL_REPLACE_SWORD1
     DECLARE_OVERRIDE_TABLE_ENTRY(sSword2DLs, sSword2Mtxs),     // LINK_DL_REPLACE_SWORD2
     DECLARE_OVERRIDE_TABLE_ENTRY(sSword3DLs, sSword3Mtxs),     // LINK_DL_REPLACE_SWORD3
@@ -155,3 +156,12 @@ const EquipmentOverride gEquipmentOverrideTable[LINK_DL_REPLACE_MAX] = {
 };
 
 #undef DECLARE_OVERRIDE_TABLE_ENTRY
+
+const EquipmentOverride *EquipmentOverrides_getEquipmentOverride(Link_EquipmentReplacement id) {
+    if (id >= LINK_DL_REPLACE_MAX) {
+        Logger_printError("Passed in invalid id %d", id);
+        return NULL;
+    }
+
+    return &sEquipmentOverrideTable[id];
+}

@@ -2,9 +2,9 @@
 #include "modelentry.h"
 #include "recomputils.h"
 #include "playermodelmanager_utils.h"
-#include "modelentrymanager.h"
 #include "equipmentoverrides.h"
-#include "model_common.h"
+#include "playerproxy.h"
+#include "formproxy.h"
 #include "yazmtcorelib_api.h"
 #include "modelentrymanager.h"
 #include "logger.h"
@@ -19,8 +19,8 @@ static bool isValidModelEntry(const ModelEntry *entry) {
 }
 
 typedef struct ModelEntryFunctions {
-    bool (*applyToModelInfo)(const struct ModelEntry *entry);
-    bool (*removeFromModelInfo)(const struct ModelEntry *entry);
+    bool (*applyToFormProxy)(const struct ModelEntry *entry, FormProxy *fp);
+    bool (*removeFromFormProxy)(const struct ModelEntry *entry, FormProxy *fp);
     bool (*setDisplayList)(struct ModelEntry *entry, Link_DisplayList id, Gfx *dl);
     bool (*setMatrix)(struct ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx);
 } ModelEntryVirtualFunctions;
@@ -61,14 +61,14 @@ typedef struct ModelEntryPack {
 RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
 RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement eq));
 
-static bool ModelEntry_applyToModelInfo_default(const ModelEntry *entry) {
-    Logger_printError("Model Entry with internal name %s is using ModelEntry_applyToModelInfo (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
+static bool ModelEntry_applyToFormProxy_default(const ModelEntry *entry, FormProxy *fp) {
+    Logger_printError("Model Entry with internal name %s is using ModelEntry_applyToFormProxy (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
     tryCrashGame();
     return false;
 }
 
-static bool ModelEntry_removeFromModelInfo_default(const ModelEntry *entry) {
-    Logger_printError("Model Entry with internal name %s is using ModelEntry_removeFromModelInfo (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
+static bool ModelEntry_removeFromFormProxy_default(const ModelEntry *entry, FormProxy *fp) {
+    Logger_printError("Model Entry with internal name %s is using ModelEntry_removeFromFormProxy (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
     tryCrashGame();
     return false;
 }
@@ -116,8 +116,8 @@ bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerM
     }
 
     static ModelEntryVirtualFunctions funcs = {
-        .applyToModelInfo = ModelEntry_applyToModelInfo_default,
-        .removeFromModelInfo = ModelEntry_removeFromModelInfo_default,
+        .applyToFormProxy = ModelEntry_applyToFormProxy_default,
+        .removeFromFormProxy = ModelEntry_removeFromFormProxy_default,
         .setDisplayList = ModelEntry_setDisplayList_default,
         .setMatrix = ModelEntry_setMatrix_default,
     };
@@ -139,22 +139,22 @@ bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerM
     return true;
 }
 
-bool ModelEntry_applyToModelInfo(const ModelEntry *entry) {
+bool ModelEntry_applyToFormProxy(const ModelEntry *entry, FormProxy *fp) {
     if (!isValidModelEntry(entry)) {
         PRINT_INVALID_PTR_ERR();
         return false;
     }
 
-    return entry->virtualFuncs->applyToModelInfo(entry);
+    return entry->virtualFuncs->applyToFormProxy(entry, fp);
 }
 
-bool ModelEntry_removeFromModelInfo(const ModelEntry *entry) {
+bool ModelEntry_removeFromFormProxy(const ModelEntry *entry, FormProxy *fp) {
     if (!isValidModelEntry(entry)) {
         PRINT_INVALID_PTR_ERR();
         return false;
     }
 
-    return entry->virtualFuncs->removeFromModelInfo(entry);
+    return entry->virtualFuncs->removeFromFormProxy(entry, fp);
 }
 
 Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
@@ -197,60 +197,38 @@ bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *matri
     return entry->virtualFuncs->setMatrix(entry, id, matrix);
 }
 
-bool ModelEntryForm_applyToModelInfo(const ModelEntry *thisx) {
-    PlayerTransformation form = getFormFromModelType(thisx->type);
+bool ModelEntryForm_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
+    PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
 
-    if (form >= PLAYER_FORM_MAX) {
-        return false;
+    if (pp) {
+        FormProxy_setCurrentModelFormEntry(fp, (ModelEntryForm *)thisx);
+
+        FormProxy_refresh(fp);
+        PlayerProxy_refreshAlternateDLs(pp);
+
+        _internal_onFormModelApplied(FormProxy_getTargetForm(fp));
+
+        return true;
     }
 
-    Link_ModelInfo *modelInfo = &gLinkFormProxies[form].current.modelInfo;
-
-    clearLinkModelInfo(modelInfo);
-
-    ModelEntryForm *this = (ModelEntryForm *)(thisx);
-
-    for (int i = 0; i < LINK_DL_MAX; ++i) {
-        modelInfo->models[i] = ModelEntry_getDisplayList(&this->modelEntry, i);
-    }
-
-    for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        modelInfo->equipMtx[i] = ModelEntry_getMatrix(&this->modelEntry, i);
-    }
-
-    modelInfo->flags = this->modelEntry.flags;
-
-    modelInfo->skeleton = this->skel;
-
-    modelInfo->shieldingSkeleton = this->shieldingSkel;
-
-    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        if (this->eyesTex[i]) {
-            modelInfo->mouthTextures[i] = this->mouthTex[i];
-        }
-    }
-
-    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
-        if (this->eyesTex[i]) {
-            modelInfo->eyesTextures[i] = this->eyesTex[i];
-        }
-    }
-
-    _internal_onFormModelApplied(form);
-
-    return true;
+    return false;
 }
 
-bool ModelEntryForm_removeFromModelInfo(const ModelEntry *thisx) {
-    PlayerTransformation form = getFormFromModelType(thisx->type);
+bool ModelEntryForm_removeFromFormProxy(const ModelEntry *thisx, FormProxy *fp) {
+    PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
 
-    Link_FormProxy *proxy = &gLinkFormProxies[form];
+    if (pp) {
+        FormProxy_setCurrentModelFormEntry(fp, NULL);
 
-    clearLinkModelInfo(&proxy->current.modelInfo);
+        FormProxy_refresh(fp);
+        PlayerProxy_refreshAlternateDLs(pp);
 
-    _internal_onFormModelApplied(form);
+        _internal_onFormModelApplied(FormProxy_getTargetForm(fp));
 
-    return true;
+        return true;
+    }
+
+    return false;
 }
 
 static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
@@ -269,8 +247,8 @@ static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle 
     }
 
     static ModelEntryVirtualFunctions funcs = {
-        .applyToModelInfo = ModelEntryForm_applyToModelInfo,
-        .removeFromModelInfo = ModelEntryForm_removeFromModelInfo,
+        .applyToFormProxy = ModelEntryForm_applyToFormProxy,
+        .removeFromFormProxy = ModelEntryForm_removeFromFormProxy,
         .setDisplayList = ModelEntry_setDisplayList_default,
         .setMatrix = ModelEntry_setMatrix_default,
     };
@@ -389,7 +367,7 @@ void ModelEntry_unsetAllFlags(ModelEntry *entry) {
     entry->flags = 0;
 }
 
-bool ModelEntry_isAnyFlagEnabled(ModelEntry *entry, u64 flags) {
+bool ModelEntry_isAnyFlagEnabled(ModelEntry *entry, ModelEntryFlag flags) {
     if (!isValidModelEntry(entry)) {
         PRINT_INVALID_PTR_ERR();
         return false;
@@ -605,12 +583,14 @@ FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry) {
 bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+    const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
 
-    // Count generally is very small (count < 10), so a simple linear search will do
-    for (size_t i = 0; i < override->dl.count; ++i) {
-        if (id == override->dl.overrides[i]) {
-            return ModelEntry_setDisplayList_default(thisx, id, dl);
+    if (override) {
+        // Count generally is very small (count < 10), so a simple linear search will do
+        for (size_t i = 0; i < override->dl.count; ++i) {
+            if (id == override->dl.overrides[i]) {
+                return ModelEntry_setDisplayList_default(thisx, id, dl);
+            }
         }
     }
 
@@ -620,66 +600,86 @@ bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, 
 bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *mtx) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+    const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
 
-    // Count generally is very small (count < 10), so a simple linear search will do
-    for (size_t i = 0; i < override->mtx.count; ++i) {
-        if (id == override->mtx.overrides[i]) {
-            return ModelEntry_setMatrix_default(thisx, id, mtx);
+    if (override) {
+        // Count generally is very small (count < 10), so a simple linear search will do
+        for (size_t i = 0; i < override->mtx.count; ++i) {
+            if (id == override->mtx.overrides[i]) {
+                return ModelEntry_setMatrix_default(thisx, id, mtx);
+            }
         }
     }
 
     return false;
 }
 
-bool ModelEntryEquipment_applyToModelInfo(const ModelEntry *thisx) {
-    ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
+bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
+    PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
 
-    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+    if (pp) {
+        ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        Link_ModelInfoCustom *modelInfoCustom = &gLinkFormProxies[i].current;
+        const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
 
-        for (size_t i = 0; i < override->dl.count; ++i) {
-            Link_DisplayList id = override->dl.overrides[i];
-            uintptr_t dl = 0;
-            recomputil_u32_value_hashmap_get(this->modelEntry.displayListPtrs, id, &dl);
-            recomputil_u32_value_hashmap_insert(modelInfoCustom->gfxOverrides, id, dl);
-        }
+        if (override) {
+            for (size_t i = 0; i < override->dl.count; ++i) {
+                Link_DisplayList id = override->dl.overrides[i];
+                uintptr_t dl = 0;
+                recomputil_u32_value_hashmap_get(this->modelEntry.displayListPtrs, id, &dl);
+                PlayerProxy_setOverrideDL(pp, id, (Gfx *)dl);
+                PlayerProxy_refreshDL(pp, id);
+            }
 
-        for (size_t i = 0; i < override->mtx.count; ++i) {
-            Link_EquipmentMatrix id = override->mtx.overrides[i];
-            uintptr_t mtx = 0;
-            recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &mtx);
-            recomputil_u32_value_hashmap_insert(modelInfoCustom->mtxOverrides, id, mtx);
+            for (size_t i = 0; i < override->mtx.count; ++i) {
+                Link_EquipmentMatrix id = override->mtx.overrides[i];
+                uintptr_t mtx = 0;
+                recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &mtx);
+                PlayerProxy_setOverrideMtx(pp, id, (Mtx *)mtx);
+                PlayerProxy_refreshMtx(pp, id);
+            }
+
+            _internal_onEquipmentModelApplied(this->equipType);
+
+            return true;
         }
     }
 
-    _internal_onEquipmentModelApplied(this->equipType);
-
-    return true;
+    return false;
 }
 
-bool ModelEntryEquipment_removeFromModelInfo(const ModelEntry *thisx) {
-    ModelEntryEquipment *this = (ModelEntryEquipment *)thisx;
+bool ModelEntryEquipment_removeFromFormProxy(const ModelEntry *thisx, FormProxy *fp) {
+    PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
 
-    const EquipmentOverride *override = &gEquipmentOverrideTable[this->equipType];
+    if (pp) {
+        ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        Link_FormProxy *fp = &gLinkFormProxies[i];
+        const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
 
-        for (size_t j = 0; j < override->dl.count; ++j) {
-            recomputil_u32_value_hashmap_erase(fp->current.gfxOverrides, override->dl.overrides[j]);
-        }
+        if (override) {
+            for (size_t i = 0; i < override->dl.count; ++i) {
+                Link_DisplayList id = override->dl.overrides[i];
+                uintptr_t dl = 0;
+                recomputil_u32_value_hashmap_get(this->modelEntry.displayListPtrs, id, &dl);
+                PlayerProxy_setOverrideDL(pp, id, NULL);
+                PlayerProxy_refreshDL(pp, id);
+            }
 
-        for (size_t j = 0; j < override->mtx.count; ++j) {
-            recomputil_u32_value_hashmap_erase(fp->current.mtxOverrides, override->mtx.overrides[j]);
+            for (size_t i = 0; i < override->mtx.count; ++i) {
+                Link_EquipmentMatrix id = override->mtx.overrides[i];
+                uintptr_t mtx = 0;
+                recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &mtx);
+                PlayerProxy_setOverrideMtx(pp, id, NULL);
+                PlayerProxy_refreshMtx(pp, id);
+            }
+
+            _internal_onEquipmentModelApplied(this->equipType);
+
+            return true;
         }
     }
 
-    _internal_onEquipmentModelApplied(this->equipType);
-
-    return true;
+    return false;
 }
 
 static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
@@ -694,8 +694,8 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
     }
 
     static ModelEntryVirtualFunctions funcs = {
-        .applyToModelInfo = ModelEntryEquipment_applyToModelInfo,
-        .removeFromModelInfo = ModelEntryEquipment_removeFromModelInfo,
+        .applyToFormProxy = ModelEntryEquipment_applyToFormProxy,
+        .removeFromFormProxy = ModelEntryEquipment_removeFromFormProxy,
         .setDisplayList = ModelEntryEquipment_setDisplayList,
         .setMatrix = ModelEntryEquipment_setMatrix,
     };
@@ -742,7 +742,7 @@ bool ModelEntryPack_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *m
     return false;
 }
 
-bool ModelEntryPack_applyToModelInfo(const ModelEntry *thisx) {
+bool ModelEntryPack_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
     const ModelEntryPack *this = (const ModelEntryPack *)thisx;
 
     size_t numEntries = ModelEntryPack_getModelEntriesCount(this);
@@ -755,7 +755,7 @@ bool ModelEntryPack_applyToModelInfo(const ModelEntry *thisx) {
     return true;
 }
 
-bool ModelEntryPack_removeFromModelInfo(const ModelEntry *this) {
+bool ModelEntryPack_removeFromFormProxy(const ModelEntry *this, FormProxy *fp) {
     return true;
 }
 
@@ -765,8 +765,8 @@ bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle,
     }
 
     static ModelEntryVirtualFunctions funcs = {
-        .applyToModelInfo = ModelEntryPack_applyToModelInfo,
-        .removeFromModelInfo = ModelEntryPack_removeFromModelInfo,
+        .applyToFormProxy = ModelEntryPack_applyToFormProxy,
+        .removeFromFormProxy = ModelEntryPack_removeFromFormProxy,
         .setDisplayList = ModelEntryPack_setDisplayList,
         .setMatrix = ModelEntryPack_setMatrix,
     };

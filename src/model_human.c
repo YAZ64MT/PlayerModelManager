@@ -2,7 +2,6 @@
 #include "global.h"
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "playermodelmanager_utils.h"
-#include "model_common.h"
 #include "globalobjects_api.h"
 #include "modelinfo.h"
 #include "modelentry.h"
@@ -201,46 +200,4 @@ static void setupHumanFallbackModel() {
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)
 void setupVanillaHuman() {
     setupHumanFallbackModel();
-
-    Link_FormProxy *formProxy = &gLinkFormProxies[PLAYER_FORM_HUMAN];
-
-    clearModelInfoKeepEyes(&formProxy->vanilla);
-
-    void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
-
-    GlobalObjects_globalizeLodLimbSkeleton(human, &gLinkHumanSkel);
-
-    FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);
-
-    formProxy->vanilla.skeleton = skel;
-
-    Gfx **models = formProxy->vanilla.models;
-
-    // limbs
-    setSkeletonDLsOnModelInfo(&formProxy->vanilla, skel);
-
-    // hands
-    models[LINK_DL_LHAND] = getHumanDL(gLinkHumanLeftHandOpenDL);
-    models[LINK_DL_LFIST] = getHumanDL(gLinkHumanLeftHandClosedDL);
-    models[LINK_DL_LHAND_BOTTLE] = getHumanDL(gLinkHumanLeftHandHoldBottleDL);
-    models[LINK_DL_LHAND_GUITAR] = getHumanDL(gLinkHumanLeftHandOpenDL);
-    models[LINK_DL_RHAND] = getHumanDL(gLinkHumanRightHandOpenDL);
-    models[LINK_DL_RFIST] = getHumanDL(gLinkHumanRightHandClosedDL);
-
-    // First Person
-    models[LINK_DL_FPS_LFOREARM] = getHumanDL(gLinkHumanLeftForearmDL);
-    models[LINK_DL_FPS_LHAND] = getHumanDL(gLinkHumanLeftHandClosedDL);
-    models[LINK_DL_FPS_RFOREARM] = gEmptyDL;
-
-    GlobalObjectsSegmentMap humanSegMap = {0};
-    humanSegMap[0x04] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
-    humanSegMap[0x06] = human;
-
-    models[LINK_DL_FPS_RHAND] = gLinkHumanFirstPersonArmDL; // not in Link obj
-
-    GlobalObjects_rebaseDL(gLinkHumanFirstPersonArmDL, humanSegMap); // repoint vertices, textures, etc. to static link obj
-
-    // items
-    models[LINK_DL_OCARINA_TIME] = gLinkHumanOcarinaDL;       // not in Link obj
-    GlobalObjects_rebaseDL(gLinkHumanOcarinaDL, humanSegMap); // repoint vertices, textures, etc. to static link obj
 }

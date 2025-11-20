@@ -2,29 +2,10 @@
 #include "modding.h"
 #include "recompconfig.h"
 #include "rt64_extended_gbi.h"
-#include "colorfixes.h"
-#include "model_common.h"
-
-void setFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a) {
-    if (form >= PLAYER_FORM_MAX) {
-        return;
-    }
-
-    Link_TunicColor *tunicColor = &gLinkFormProxies[form].tunicColor;
-
-    tunicColor->isOverrideRequested = true;
-
-    tunicColor->requested.r = r;
-    tunicColor->requested.g = g;
-    tunicColor->requested.b = b;
-    tunicColor->requested.a = a;
-}
-
-void setTunicColor(u8 r, u8 g, u8 b, u8 a) {
-    for (PlayerTransformation i = 0; i < PLAYER_FORM_MAX; ++i) {
-        setFormTunicColor(i, r, g, b, a);
-    }
-}
+#include "formproxy.h"
+#include "playerproxy.h"
+#include "playermodelconfig.h"
+#include "proxyactorext.h"
 
 // Convert char to its numeric value
 // Returns 0xFF if invalid character
@@ -70,53 +51,40 @@ typedef enum {
     TUNIC_COLOR_FORCE,
 } TunicColorConfigOption;
 
-static Link_TunicColor *sCurrentTunicColor; 
-
 RECOMP_HOOK("Player_Draw")
 void readTunicColor_on_Player_Draw(Actor *thisx, PlayState *play) {
     Player *player = (Player *)thisx;
 
-    Link_TunicColor *playerTunic = &gLinkFormProxies[player->transformation].tunicColor;
-    sCurrentTunicColor = playerTunic;
+    FormProxy *fp = ProxyActorExt_getFormProxy(thisx);
 
-    TunicColorConfigOption tunicColorOpt = recomp_get_config_u32("is_modify_tunic_color");
+    if (fp) {
+        switch (recomp_get_config_u32("is_modify_tunic_color")) {
+            case TUNIC_COLOR_OFF:
+                return;
+                break;
 
-    bool shouldPullFromConfig = false;
+            case TUNIC_COLOR_AUTO:
+                if (FormProxy_isTunicColorOverrideRequested(fp)) {
+                    FormProxy_pullCurrentTunicColorFromRequested(fp);
+                } else {
+                    FormProxy_pullCurrentTunicColorFromConfig(fp);
+                }
+                break;
 
-    switch (tunicColorOpt) {
-        case TUNIC_COLOR_AUTO:
-            shouldPullFromConfig = !playerTunic->isOverrideRequested;
+            case TUNIC_COLOR_FORCE:
+                FormProxy_pullCurrentTunicColorFromConfig(fp);
+                break;
 
-            if (!shouldPullFromConfig) {
-                playerTunic->current = playerTunic->requested;
-            }
-            break;
-
-        case TUNIC_COLOR_FORCE:
-            shouldPullFromConfig = true;
-            break;
-
-        default:
-            break;
-    }
-
-    if (shouldPullFromConfig) {
-        char *color = recomp_get_config_string("tunic_color");
-
-        if (color) {
-            if (isValidHexString(color)) {
-                playerTunic->current.r = sToU8(color);
-                playerTunic->current.g = sToU8(color + 2);
-                playerTunic->current.b = sToU8(color + 4);
-            }
-
-            recomp_free_config_string(color);
+            default:
+                break;
         }
-    }
 
-    OPEN_DISPS(play->state.gfxCtx);
-    gDPSetEnvColor(POLY_OPA_DISP++, playerTunic->current.r, playerTunic->current.g, playerTunic->current.b, playerTunic->current.a);
-    CLOSE_DISPS(play->state.gfxCtx);
+        Color_RGBA8 tunicColor = FormProxy_getCurrentTunicColor(fp);
+
+        OPEN_DISPS(play->state.gfxCtx);
+        gDPSetEnvColor(POLY_OPA_DISP++, tunicColor.r, tunicColor.g, tunicColor.b, tunicColor.a);
+        CLOSE_DISPS(play->state.gfxCtx);
+    }
 }
 
 // Handle Masks and other DLs that might potentially set the env color

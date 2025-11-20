@@ -6,9 +6,11 @@
 #include "rt64_extended_gbi.h"
 #include "modelreplacer_compat.h"
 #include "modelmatrixids.h"
-#include "playermodelmanager_mm.h"
 #include "z64recomp_api.h"
 #include "model_shared.h"
+#include "modelentry.h"
+#include "modelreplacer_compat.h"
+#include "recompconfig.h"
 
 static Gfx sPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
@@ -40,7 +42,7 @@ static Gfx sEndBowstringDL[] = {
     gsSPBranchList(sEndDLWrapper),
 };
 
-RECOMP_CALLBACK("*", recomp_on_init)
+RECOMP_CALLBACK(".", _internal_preInitHashObjects)
 void initFormProxyExDLs() {
     gEXPushEnvColor(&sStartDLWrapper[0]);
     gEXPopEnvColor(&sEndDLWrapper[0]);
@@ -292,26 +294,34 @@ static void initProxyWrappers(FormProxy *fp) {
 
 static void initProxyDLs(FormProxy *fp) {
     for (int i = 0; i < LINK_DL_MAX; ++i) {
+        MRC_addExcludedDL(&fp->displayLists[i]);
+        MRC_addExcludedDL(fp->wrappedDisplayLists[i].displayList);
         gSPBranchList(&fp->displayLists[i], fp->wrappedDisplayLists[i].displayList);
     }
 }
 
-void FormProxy_init(FormProxy *fp, PlayerTransformation form, FormProxyId fpId, ModelInfo *fallback, ModelInfo *fallbackOverride) {
+void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, FormProxyId fpId, ModelInfo *fallback, ModelInfo *fallbackOverride) {
+    if (!pp) {
+        Logger_printError("Received NULL PlayerProxy argument!");
+        tryCrashGame();
+    }
+
     if (form < 0 || form >= PLAYER_FORM_MAX) {
-        Logger_printError("FormProxy_init received invalid form argument with value %d!", form);
+        Logger_printError("Received invalid form argument with value %d!", form);
         tryCrashGame();
     }
 
     if (!fallback) {
-        Logger_printError("FormProxy_init received NULL fallback argument!");
+        Logger_printError("Received NULL fallback argument!");
         tryCrashGame();
     }
 
     if (!fallbackOverride) {
-        Logger_printError("FormProxy_init received NULL fallbackOverride argument!");
+        Logger_printError("Received NULL fallbackOverride argument!");
         tryCrashGame();
     }
 
+    fp->playerProxy = pp;
     fp->form = form;
     fp->fpId = fpId;
     ModelInfo_init(&fp->currentModelInfo);
@@ -325,6 +335,8 @@ void FormProxy_init(FormProxy *fp, PlayerTransformation form, FormProxyId fpId, 
     initProxyShims(fp);
     initProxyWrappers(fp);
     initProxyDLs(fp);
+
+    FormProxy_resetTunicColor(fp);
 }
 
 FormProxyId FormProxy_getFormProxyId(const FormProxy *fp) {
@@ -358,6 +370,22 @@ ModelInfo *FormProxy_getFallbackOverrideModelInfo(FormProxy *fp) {
 
 ModelInfo *FormProxy_getFallbackModelInfo(FormProxy *fp) {
     return fp->fallbackModelInfo;
+}
+
+bool FormProxy_setCurrentOverrideDL(FormProxy *fp, Link_DisplayList dlId, Gfx *dl) {
+    return ModelInfo_setGfxOverride(&fp->currentModelInfo, dlId, dl);
+}
+
+bool FormProxy_unsetCurrentOverrideDL(FormProxy *fp, Link_DisplayList dlId) {
+    return ModelInfo_unsetGfxOverride(&fp->currentModelInfo, dlId);
+}
+
+bool FormProxy_setCurrentOverrideMtx(FormProxy *fp, Link_EquipmentMatrix mtxId, Mtx *mtx) {
+    return ModelInfo_setMtxOverride(&fp->currentModelInfo, mtxId, mtx);
+}
+
+bool FormProxy_unsetCurrentOverrideMtx(FormProxy *fp, Link_EquipmentMatrix mtxId) {
+    return ModelInfo_unsetMtxOverride(&fp->currentModelInfo, mtxId);
 }
 
 void FormProxy_refreshSkeletons(FormProxy *fp) {
@@ -611,13 +639,87 @@ void FormProxy_refreshAllMtxs(FormProxy *fp) {
     }
 }
 
-void FormProxy_requestTunicColor(FormProxy *fp, Color_RGBA8 color) {
+void FormProxy_requestTunicColorOverride(FormProxy *fp, Color_RGBA8 color) {
     fp->tunicColor.isOverrideRequested = true;
     fp->tunicColor.requested = color;
 }
 
-void FormProxy_refreshTunicColor(FormProxy *fp) {
-    // TODO: IMPLEMENT FormProxy_refreshTunicColor
+bool FormProxy_isTunicColorOverrideRequested(FormProxy *fp) {
+    return fp->tunicColor.isOverrideRequested;
+}
+
+Color_RGBA8 FormProxy_getRequestedTunicColor(FormProxy *fp) {
+    return fp->tunicColor.requested;
+}
+
+Color_RGBA8 FormProxy_getCurrentTunicColor(FormProxy *fp) {
+    return fp->tunicColor.current;
+}
+
+void FormProxy_resetTunicColor(FormProxy *fp) {
+    fp->tunicColor.current = (Color_RGBA8){30, 105, 27, 0};
+}
+
+// Convert char to its numeric value
+// Returns 0xFF if invalid character
+static u8 cToNum(char c) {
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    } else if (c >= 'a' && c <= 'f') {
+        return c - 'a' + 10;
+    } else if (c >= 'A' && c <= 'F') {
+        return c - 'A' + 10;
+    }
+
+    return 0xFF;
+}
+
+static u8 sToU8(const char *s) {
+    return (cToNum(s[0]) << 4) | cToNum(s[1]);
+}
+
+static bool isValidHexString(const char *s) {
+    bool isValid = true;
+
+    size_t len = 0;
+
+    while (*s != '\0' && isValid) {
+        if (len > 6 || cToNum(*s) == 0xFF) {
+            isValid = false;
+        }
+        s++;
+        len++;
+    }
+
+    if (len < 6) {
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+typedef enum TunicColorConfigOption {
+    TUNIC_COLOR_OFF,
+    TUNIC_COLOR_AUTO,
+    TUNIC_COLOR_FORCE,
+} TunicColorConfigOption;
+
+void FormProxy_pullCurrentTunicColorFromConfig(FormProxy *fp) {
+    char *color = recomp_get_config_string("tunic_color");
+
+    if (color) {
+        if (isValidHexString(color)) {
+            fp->tunicColor.current.r = sToU8(color);
+            fp->tunicColor.current.g = sToU8(color + 2);
+            fp->tunicColor.current.b = sToU8(color + 4);
+        }
+
+        recomp_free_config_string(color);
+    }
+}
+
+void FormProxy_pullCurrentTunicColorFromRequested(FormProxy *fp) {
+    fp->tunicColor.current = fp->tunicColor.requested;
 }
 
 void FormProxy_setCurrentModelFormEntry(FormProxy *fp, ModelEntryForm *modelEntry) {
@@ -659,6 +761,12 @@ void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
 
         sPlayerMouthTextures[i] = mouthTex;
     }
+}
+
+void FormProxy_refresh(FormProxy *fp) {
+    FormProxy_refreshSkeletons(fp);
+    FormProxy_refreshAllDLs(fp);
+    FormProxy_refreshAllMtxs(fp);
 }
 
 Mtx *FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id) {
@@ -734,4 +842,38 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
     }
 
     return dl;
+}
+
+Gfx *FormProxy_getCurrentDL(FormProxy *fp, Link_DisplayList id) {
+    return &fp->displayLists[id];
+}
+
+FlexSkeletonHeader *FormProxy_getSkeleton(FormProxy *fp) {
+    return &fp->skeleton.flexSkeleton;
+}
+
+FlexSkeletonHeader *FormProxy_getShieldingSkeleton(FormProxy *fp) {
+    return &fp->shieldingSkeleton.flexSkeleton;
+}
+
+bool FormProxy_isAdultModelType(FormProxy *fp) {
+    ModelEntryForm *curr = ModelInfo_getModelEntryForm(&fp->currentModelInfo);
+
+    if (curr) {
+        ModelEntry *currModelEntry = ModelEntryForm_getModelEntry(curr);
+
+        if (currModelEntry) {
+            return ModelEntry_isAnyFlagEnabled(currModelEntry, MODELENTRY_FLAG_IS_ADULT);
+        }
+    }
+
+    return false;
+}
+
+PlayerProxy *FormProxy_getPlayerProxy(FormProxy *fp) {
+    return fp->playerProxy;
+}
+
+PlayerTransformation FormProxy_getTargetForm(FormProxy *fp) {
+    return fp->form;
 }

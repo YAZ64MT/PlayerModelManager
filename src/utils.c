@@ -3,38 +3,10 @@
 #include "recomputils.h"
 #include "recompconfig.h"
 #include "libc/stdarg.h"
-#include "playermodelmanager.h"
+#include "modelmatrixids.h"
 #include "playermodelmanager_utils.h"
 #include "libc/string.h"
 #include "logger.h"
-
-void clearLinkModelInfo(Link_ModelInfo* modelInfo) {
-    memset(modelInfo, 0, sizeof(Link_ModelInfo));
-}
-
-void clearModelInfoKeepEyes(Link_ModelInfo *info) {
-
-    TexturePtr eyesTex[PLAYER_EYES_MAX];
-    TexturePtr mouthTex[PLAYER_MOUTH_MAX];
-
-    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
-        eyesTex[i] = info->eyesTextures[i];
-    }
-
-    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        mouthTex[i] = info->mouthTextures[i];
-    }
-
-    clearLinkModelInfo(info);
-
-    for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
-        info->eyesTextures[i] = eyesTex[i];
-    }
-
-    for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        info->mouthTextures[i] = mouthTex[i];
-    }
-}
 
 Gfx *createShimDisplayList(int displayListCount, ...) {
     if (displayListCount < 1) {

@@ -1,5 +1,5 @@
-#ifndef __MASKDLS_H__
-#define __MASKDLS_H__
+#ifndef MASKDLS_H
+#define MASKDLS_H
 
 #include "global.h"
 

@@ -1,13 +1,13 @@
-#include "modding.h"
-#include "sys_cmpdma.h"
 #include "global.h"
+#include "modding.h"
 #include "recomputils.h"
 #include "recompconfig.h"
 #include "recompui.h"
 #include "modelentrymanager.h"
-#include "model_common.h"
 #include "yazmtcorelib_api.h"
 #include "logger.h"
+#include "recompdata.h"
+#include "modelentry.h"
 
 static void refreshFileList();
 
@@ -562,7 +562,6 @@ static void changeCategoryButtonPressed(RecompuiResource resource, const Recompu
 
             refreshFileList();
             refreshButtonEntryColors();
-            refreshCategoryName();
         } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
             destroyAuthor();
 
@@ -595,10 +594,8 @@ static void createNextPrevCategoryButtons() {
     recompui_register_callback(sButtonCategoryNext, changeCategoryButtonPressed, (void *)1);
 }
 
-RECOMP_DECLARE_EVENT(_internal_onReadyUI());
-
-RECOMP_CALLBACK("*", recomp_on_init)
-void on_init() {
+RECOMP_CALLBACK(".", _internal_preInitHashObjects)
+void initUIOnRecompInit() {
     RecompuiColor bg_color;
     bg_color.r = 255;
     bg_color.g = 255;
@@ -717,13 +714,9 @@ void on_init() {
     recompui_set_align_items(sRowAuthor, ALIGN_ITEMS_FLEX_END);
     recompui_set_gap(sRowAuthor, 0.0f, UNIT_DP);
 
-    refreshCategoryName();
-
     recompui_close_context(sUIContext);
 
     sIsUIContextShown = false;
-
-    _internal_onReadyUI();
 }
 
 static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {

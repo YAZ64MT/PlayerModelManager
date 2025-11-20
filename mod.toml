@@ -38,7 +38,7 @@ dependencies = [
 #    "modname:1.0.0"
     "yazmt_mm_global_objects",
     "ProxyMM_KV:0.0.5",
-    "yazmt_mm_corelib:0.1.1",
+    "yazmt_mm_corelib",
 ]
 
 # Optional dependency mods. This has the same format as `dependencies`, but the game will still start if dependencies in this
@@ -146,7 +146,7 @@ WARNING: Display every logged message with priority WARNING or above
 
 ERROR: Display every logged message with priority ERROR or above
 
-NONE: Do not display logged messages from PMM
+NONE: Do not display logged messages from this mod
 
 """
 type = "Enum"

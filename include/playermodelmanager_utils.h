@@ -1,12 +1,10 @@
-#ifndef __PLAYERMODELMANAGER_UTILS_H__
-#define __PLAYERMODELMANAGER_UTILS_H__
+#ifndef PLAYERMODELMANAGER_UTILS_H
+#define PLAYERMODELMANAGER_UTILS_H
 
-#include "global.h"
+#include "PR/ultratypes.h"
+#include "PR/gbi.h"
 #include "modding.h"
-#include "playermodelmanager.h"
-
-void clearLinkModelInfo(Link_ModelInfo *modelInfo);
-void clearModelInfoKeepEyes(Link_ModelInfo *info);
+#include "stdbool.h"
 
 Gfx *createShimWithMatrix(Mtx *matrix, int displayListCount, ...);
 Gfx *createShimDisplayList(int displayListCount, ...);
