@@ -287,7 +287,7 @@ void ModelEntry_setDisplayName(ModelEntry *entry, const char *name) {
     }
 
     recomp_free(entry->displayName);
-    
+
     entry->displayName = name ? YAZMTCore_Utils_StrDup(name) : NULL;
 }
 
@@ -494,12 +494,12 @@ void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
         return;
     }
 
-#define SET_LIMB_DL(pLimb, id)                                                                                                           \
-    {                                                                                                                                    \
-        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                        \
+#define SET_LIMB_DL(pLimb, id)                                                                                                                   \
+    {                                                                                                                                            \
+        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                                \
             ModelEntry_setDisplayList_default(&entry->modelEntry, id, (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL); \
-        }                                                                                                                                \
-    }                                                                                                                                    \
+        }                                                                                                                                        \
+    }                                                                                                                                            \
     (void)0
 
     if (entry->skel) {
@@ -526,12 +526,12 @@ void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
 
 #undef SET_LIMB_DL
 
-#define SET_SHIELDING_LIMB_DL(pLimb, id)                                                                                         \
-    {                                                                                                                            \
-        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                \
+#define SET_SHIELDING_LIMB_DL(pLimb, id)                                                                                                 \
+    {                                                                                                                                    \
+        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                        \
             ModelEntry_setDisplayList_default(&entry->modelEntry, id, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        }                                                                                                                        \
-    }                                                                                                                            \
+        }                                                                                                                                \
+    }                                                                                                                                    \
     (void)0
 
     if (entry->shieldingSkel) {
@@ -852,7 +852,7 @@ static bool isEntryInPack(const ModelEntryPack *pack, const ModelEntry *entry) {
         }
 
     } while (YAZMTCore_DynamicU32Array_size(sQueuedPacks) > 0);
-    
+
     return false;
 }
 
