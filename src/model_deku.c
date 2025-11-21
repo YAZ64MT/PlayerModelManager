@@ -22,17 +22,11 @@ static void setupDekuFallbackModel() {
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(deku, &gLinkDekuSkel);
     GlobalObjects_globalizeLodLimbSkeleton(deku, &gLinkDekuSkel);
 
-    GlobalObjectsSegmentMap segments = {0};
-    segments[4] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
-    segments[6] = deku;
-    Utils_repointLodLimbSkelDLs(skel, segments);
-
     ModelInfo_init(&gDekuModelInfo);
 
     ModelEntryForm *entryForm = gDekuModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_DEKU, "__mm_object_link_nuts__"));
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
-    ModelEntryForm_setDLsFromSkeletons(entryForm);
 
     for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
         ModelEntryForm_setEyesTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(deku, gDefaultEyesTextures[i]), i);
@@ -47,13 +41,32 @@ static void setupDekuFallbackModel() {
 
 #define SET_ENTRY_DL(id, dl) ModelEntry_setDisplayList(entry, id, dl)
 
-    // hands
+    // Body
+    SET_ENTRY_DL(LINK_DL_WAIST, getDekuDL(gLinkDekuWaistDL));
+    SET_ENTRY_DL(LINK_DL_RTHIGH, getDekuDL(gLinkDekuRightThighDL));
+    SET_ENTRY_DL(LINK_DL_RSHIN, getDekuDL(gLinkDekuRightShinDL));
+    SET_ENTRY_DL(LINK_DL_RFOOT, getDekuDL(gLinkDekuRightFootDL));
+    SET_ENTRY_DL(LINK_DL_LTHIGH, getDekuDL(gLinkDekuLeftThighDL));
+    SET_ENTRY_DL(LINK_DL_LSHIN, getDekuDL(gLinkDekuLeftShinDL));
+    SET_ENTRY_DL(LINK_DL_LFOOT, getDekuDL(gLinkDekuLeftFootDL));
+    SET_ENTRY_DL(LINK_DL_HEAD, getDekuDL(gLinkDekuHeadDL));
+    SET_ENTRY_DL(LINK_DL_HAT, getDekuDL(gLinkDekuHatDL));
+    SET_ENTRY_DL(LINK_DL_COLLAR, getDekuDL(gLinkDekuCollarDL));
+    SET_ENTRY_DL(LINK_DL_LSHOULDER, getDekuDL(gLinkDekuLeftShoulderDL));
+    SET_ENTRY_DL(LINK_DL_LFOREARM, getDekuDL(gLinkDekuLeftForearmDL));
     SET_ENTRY_DL(LINK_DL_LHAND, getDekuDL(gLinkDekuLeftHandDL));
+    SET_ENTRY_DL(LINK_DL_RSHOULDER, getDekuDL(gLinkDekuRightShoulderDL));
+    SET_ENTRY_DL(LINK_DL_RFOREARM, getDekuDL(gLinkDekuRightForearmDL));
+    SET_ENTRY_DL(LINK_DL_RHAND, getDekuDL(gLinkDekuRightHandDL));
+    SET_ENTRY_DL(LINK_DL_SHEATH_NONE, gEmptyDL);
+    SET_ENTRY_DL(LINK_DL_TORSO, getDekuDL(gLinkDekuTorsoDL));
+
+
+    // hands
     SET_ENTRY_DL(LINK_DL_LFIST, getDekuDL(gLinkDekuLeftHandDL));
     SET_ENTRY_DL(LINK_DL_LHAND_BOTTLE, getDekuDL(gLinkDekuLeftHandDL));
     SET_ENTRY_DL(LINK_DL_LHAND_GUITAR, getDekuDL(gLinkDekuLeftHandDL));
 
-    SET_ENTRY_DL(LINK_DL_RHAND, getDekuDL(gLinkDekuRightHandDL));
     SET_ENTRY_DL(LINK_DL_RFIST, getDekuDL(gLinkDekuRightHandDL));
 
     // First Person

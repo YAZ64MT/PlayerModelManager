@@ -21,17 +21,11 @@ static void setupZoraFallbackModel() {
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(zora, &gLinkZoraSkel);
     GlobalObjects_globalizeLodLimbSkeleton(zora, &gLinkZoraSkel);
 
-    GlobalObjectsSegmentMap segments = {0};
-    segments[4] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
-    segments[6] = zora;
-    Utils_repointLodLimbSkelDLs(skel, segments);
-
     ModelInfo_init(&gZoraModelInfo);
 
     ModelEntryForm *entryForm = gZoraModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_ZORA, "__mm_object_link_zora__"));
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
-    ModelEntryForm_setDLsFromSkeletons(entryForm);
 
     for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
         ModelEntryForm_setEyesTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(zora, gDefaultEyesTextures[i]), i);
@@ -45,6 +39,26 @@ static void setupZoraFallbackModel() {
     ModelInfo_setModelEntryForm(&gZoraModelInfo, entryForm);
 
 #define SET_ENTRY_DL(id, dl) ModelEntry_setDisplayList(entry, id, dl)
+
+    // Body
+    SET_ENTRY_DL(LINK_DL_WAIST, getZoraDL(gLinkZoraWaistDL));
+    SET_ENTRY_DL(LINK_DL_RTHIGH, getZoraDL(gLinkZoraRightThighDL));
+    SET_ENTRY_DL(LINK_DL_RSHIN, getZoraDL(gLinkZoraRightShinDL));
+    SET_ENTRY_DL(LINK_DL_RFOOT, getZoraDL(gLinkZoraRightFootDL));
+    SET_ENTRY_DL(LINK_DL_LTHIGH, getZoraDL(gLinkZoraLeftThighDL));
+    SET_ENTRY_DL(LINK_DL_LSHIN, getZoraDL(gLinkZoraLeftShinDL));
+    SET_ENTRY_DL(LINK_DL_LFOOT, getZoraDL(gLinkZoraLeftFootDL));
+    SET_ENTRY_DL(LINK_DL_HEAD, getZoraDL(gLinkZoraHeadDL));
+    SET_ENTRY_DL(LINK_DL_HAT, getZoraDL(gLinkZoraHatDL));
+    SET_ENTRY_DL(LINK_DL_COLLAR, getZoraDL(gLinkZoraCollarDL));
+    SET_ENTRY_DL(LINK_DL_LSHOULDER, getZoraDL(gLinkZoraLeftShoulderDL));
+    SET_ENTRY_DL(LINK_DL_LFOREARM, getZoraDL(gLinkZoraLeftForearmDL));
+    SET_ENTRY_DL(LINK_DL_LHAND, getZoraDL(gLinkZoraLeftHandOpenDL));
+    SET_ENTRY_DL(LINK_DL_RSHOULDER, getZoraDL(gLinkZoraRightShoulderDL));
+    SET_ENTRY_DL(LINK_DL_RFOREARM, getZoraDL(gLinkZoraRightForearmDL));
+    SET_ENTRY_DL(LINK_DL_RHAND, getZoraDL(gLinkZoraRightHandOpenDL));
+    SET_ENTRY_DL(LINK_DL_SHEATH_NONE, gEmptyDL);
+    SET_ENTRY_DL(LINK_DL_TORSO, getZoraDL(gLinkZoraTorsoDL));
 
     // hands
     SET_ENTRY_DL(LINK_DL_LHAND, getZoraDL(gLinkZoraLeftHandOpenDL));
