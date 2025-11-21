@@ -63,9 +63,6 @@ void initAdultLinkAgeProperties() {
     gAdultLinkAgeProps.surfaceSfxIdOffset = 0x80;
 }
 
-extern LinkAnimationHeader gPlayerAnim_clink_demo_doorA_link;
-extern LinkAnimationHeader gPlayerAnim_clink_demo_doorB_link;
-
 extern u8 sPlayerMass[PLAYER_FORM_MAX];
 static u8 sHumanMass;
 
@@ -118,10 +115,12 @@ extern PlayerAnimationHeader *D_8085BE84[PLAYER_ANIMGROUP_MAX][PLAYER_ANIMTYPE_M
 
 static PlayerAnimationHeader *sDoorAAnimsTmp[PLAYER_ANIMTYPE_MAX];
 static PlayerAnimationHeader *sDoorBAnimsTmp[PLAYER_ANIMTYPE_MAX];
+bool sWasDoorAnimChanged;
 
 RECOMP_HOOK("Player_Door_Knob")
 void replaceDoorAnim_on_Player_Door_Knob(PlayState *play, Player *this, Actor *door) {
     if (shouldUseAdultFixes(this)) {
+        sWasDoorAnimChanged = true;
         for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
             sDoorAAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i];
             sDoorBAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i];
@@ -133,9 +132,12 @@ void replaceDoorAnim_on_Player_Door_Knob(PlayState *play, Player *this, Actor *d
 
 RECOMP_HOOK_RETURN("Player_Door_Knob")
 void replaceDoorAnim_on_return_Player_Door_Knob() {
-    for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
-        PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i] = sDoorAAnimsTmp[i];
-        PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i] = sDoorBAnimsTmp[i];
+    if (sWasDoorAnimChanged) {
+        sWasDoorAnimChanged = false;
+        for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
+            PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i] = sDoorAAnimsTmp[i];
+            PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i] = sDoorBAnimsTmp[i];
+        }
     }
 }
 
@@ -144,12 +146,6 @@ void initVanillaProps_on_Player_Init(Actor *thisx, PlayState *play) {
     static bool isFirstTimeInitDone;
     if (!isFirstTimeInitDone) {
         isFirstTimeInitDone = true;
-        
-        for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
-            sDoorAAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i];
-            sDoorBAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i];
-        }
-        
         initAdultLinkAgeProperties();
     }
 }
