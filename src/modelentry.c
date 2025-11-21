@@ -63,13 +63,13 @@ RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement
 
 static bool ModelEntry_applyToFormProxy_default(const ModelEntry *entry, FormProxy *fp) {
     Logger_printError("Model Entry with internal name %s is using ModelEntry_applyToFormProxy (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
-    tryCrashGame();
+    Utils_tryCrashGame();
     return false;
 }
 
 static bool ModelEntry_removeFromFormProxy_default(const ModelEntry *entry, FormProxy *fp) {
     Logger_printError("Model Entry with internal name %s is using ModelEntry_removeFromFormProxy (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
-    tryCrashGame();
+    Utils_tryCrashGame();
     return false;
 }
 
@@ -99,19 +99,19 @@ bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerM
 
     if (!isValidCategory(cat)) {
         Logger_printError("Trying to initialize ModelEntry with invalid PlayerModelManagerModelType %d", type);
-        tryCrashGame();
+        Utils_tryCrashGame();
         return false;
     }
 
     if (!internalName) {
         Logger_printError("Trying to initialize ModelEntry with type %d with NULL internal name!\n", type);
-        tryCrashGame();
+        Utils_tryCrashGame();
         return false;
     }
 
     if (!handle) {
         Logger_printError("Trying to initialize ModelEntry with invalid PlayerModelManagerHandle %d", handle);
-        tryCrashGame();
+        Utils_tryCrashGame();
         return false;
     }
 
@@ -238,7 +238,7 @@ static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle 
 
     if (!isFormCategory(entry->modelEntry.category)) {
         Logger_printError("ModelEntryForm with internal name %s had non-form type %d passed in!\n", internalName, type);
-        tryCrashGame();
+        Utils_tryCrashGame();
         return false;
     }
 
@@ -391,13 +391,13 @@ ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelM
 
     if (!entry) {
         Logger_printError("Failed to allocate memory for ModelEntryForm!");
-        tryCrashGame();
+        Utils_tryCrashGame();
         return NULL;
     }
 
     if (!ModelEntryForm_init(entry, handle, type, internalName)) {
         Logger_printError("Failed to initialize ModelEntryForm!");
-        tryCrashGame();
+        Utils_tryCrashGame();
         recomp_free(entry);
         return NULL;
     }
@@ -671,7 +671,7 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
 
     if (!isEquipmentCategory(entry->modelEntry.category)) {
         Logger_printError("ModelEntryEquipment with internal name %s had non-equipment type %d passed in!\n", internalName, type);
-        tryCrashGame();
+        Utils_tryCrashGame();
         return false;
     }
 
@@ -693,13 +693,13 @@ ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, Pl
 
     if (!entry) {
         Logger_printError("Failed to allocate memory for ModelEntryEquipment!");
-        tryCrashGame();
+        Utils_tryCrashGame();
         return NULL;
     }
 
     if (!ModelEntryEquipment_init(entry, handle, type, internalName)) {
         Logger_printError("Failed to initialize ModelEntryEquipment!");
-        tryCrashGame();
+        Utils_tryCrashGame();
         recomp_free(entry);
         return NULL;
     }
@@ -763,13 +763,13 @@ ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, char *intern
 
     if (!entry) {
         Logger_printError("Failed to allocate memory for ModelEntryPack!");
-        tryCrashGame();
+        Utils_tryCrashGame();
         return NULL;
     }
 
     if (!ModelEntryPack_init(entry, handle, internalName)) {
         Logger_printError("Failed to initialize ModelEntryPack!");
-        tryCrashGame();
+        Utils_tryCrashGame();
         recomp_free(entry);
         return NULL;
     }

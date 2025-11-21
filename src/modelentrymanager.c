@@ -716,7 +716,7 @@ const ModelEntry **CMEM_getCategoryEntryData(Link_CustomModelCategory cat, size_
 void CMEM_removeModel(Link_CustomModelCategory cat) {
     if (!isValidCategory(cat)) {
         Logger_printError("Called CMEM_removeModel with invalid category %d\n", cat);
-        tryCrashGame();
+        Utils_tryCrashGame();
         return;
     }
 

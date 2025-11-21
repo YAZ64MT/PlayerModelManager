@@ -28,8 +28,8 @@ static void setupGoronFallbackModel() {
     GlobalObjectsSegmentMap segments = {0};
     segments[4] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
     segments[6] = goron;
-    repointLodLimbSkelDLs(skel, segments);
-    repointStandardLimbSkelDLs(shieldingSkel, segments);
+    Utils_repointLodLimbSkelDLs(skel, segments);
+    Utils_repointStandardLimbSkelDLs(shieldingSkel, segments);
 
     ModelInfo_init(&gGoronModelInfo);
 

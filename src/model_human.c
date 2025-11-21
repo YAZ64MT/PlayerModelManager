@@ -162,7 +162,7 @@ static void setupHumanFallbackModel() {
     GlobalObjectsSegmentMap segments = {0};
     segments[4] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
     segments[6] = human;
-    repointLodLimbSkelDLs(skel, segments);
+    Utils_repointLodLimbSkelDLs(skel, segments);
 
     ModelInfo_init(&gHumanModelInfo);
 

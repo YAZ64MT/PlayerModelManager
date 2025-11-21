@@ -25,7 +25,7 @@ static void setupDekuFallbackModel() {
     GlobalObjectsSegmentMap segments = {0};
     segments[4] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
     segments[6] = deku;
-    repointLodLimbSkelDLs(skel, segments);
+    Utils_repointLodLimbSkelDLs(skel, segments);
 
     ModelInfo_init(&gDekuModelInfo);
 

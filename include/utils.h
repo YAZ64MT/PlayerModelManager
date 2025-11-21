@@ -7,17 +7,17 @@
 #include "stdbool.h"
 #include "globalobjects_api.h"
 
-Gfx *createShimWithMatrix(Mtx *matrix, int displayListCount, ...);
-Gfx *createShimDisplayList(int displayListCount, ...);
+Gfx *Utils_createShimWithMatrix(Mtx *matrix, int displayListCount, ...);
+Gfx *Utils_createShimDisplayList(int displayListCount, ...);
 
-u32 readU32(const u8 array[], u32 offset);
-void writeU32(u8 array[], u32 offset, u32 value);
-bool isSegmentedPtr(void *p);
+u32 Utils_readU32(const u8 array[], u32 offset);
+void Utils_writeU32(u8 array[], u32 offset, u32 value);
+bool Utils_isSegmentedPtr(void *p);
 
-void setCrashEnabled(bool isEnabled);
-void tryCrashGame();
+void Utils_setCrashEnabled(bool isEnabled);
+void Utils_tryCrashGame();
 
-void repointLodLimbSkelDLs(FlexSkeletonHeader *skel, GlobalObjectsSegmentMap segments);
-void repointStandardLimbSkelDLs(FlexSkeletonHeader *skel, GlobalObjectsSegmentMap segments);
+void Utils_repointLodLimbSkelDLs(FlexSkeletonHeader *skel, GlobalObjectsSegmentMap segments);
+void Utils_repointStandardLimbSkelDLs(FlexSkeletonHeader *skel, GlobalObjectsSegmentMap segments);
 
 #endif
