@@ -134,6 +134,9 @@ RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initModelReplacerHashObjects() {
     sIsModelReplacerCompatEnabled = recomp_is_dependency_met("yazmt_mm_modelreplacer") == DEPENDENCY_STATUS_FOUND;
 
+    // This compatibility layer is currently prone to crashes (Goron shielding skel is most evident example) so disable for now
+    sIsModelReplacerCompatEnabled = false;
+
     if (!sIsModelReplacerCompatEnabled) {
         return;
     }
