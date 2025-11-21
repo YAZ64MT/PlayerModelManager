@@ -144,6 +144,12 @@ void initVanillaProps_on_Player_Init(Actor *thisx, PlayState *play) {
     static bool isFirstTimeInitDone;
     if (!isFirstTimeInitDone) {
         isFirstTimeInitDone = true;
+        
+        for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
+            sDoorAAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i];
+            sDoorBAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i];
+        }
+        
         initAdultLinkAgeProperties();
     }
 }
