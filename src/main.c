@@ -2,7 +2,7 @@
 #include "global.h"
 #include "recomputils.h"
 #include "recompconfig.h"
-#include "playermodelmanager_utils.h"
+#include "utils.h"
 #include "modelreplacer_api.h"
 #include "modelreplacer_compat.h"
 #include "globalobjects_api.h"

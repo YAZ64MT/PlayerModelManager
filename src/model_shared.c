@@ -3,7 +3,7 @@
 #include "recompdata.h"
 #include "globalobjects_api.h"
 #include "modelreplacer_api.h"
-#include "playermodelmanager_utils.h"
+#include "utils.h"
 #include "assets/objects/object_link_boy/object_link_boy.h"
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "assets/objects/object_link_zora/object_link_zora.h"

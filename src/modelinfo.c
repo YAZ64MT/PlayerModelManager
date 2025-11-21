@@ -3,7 +3,7 @@
 #include "modelentry.h"
 #include "recompdata.h"
 #include "logger.h"
-#include "playermodelmanager_utils.h"
+#include "utils.h"
 
 #define PRINT_INVALID_PTR_ERR() Logger_printError("Received invalid pointer.")
 

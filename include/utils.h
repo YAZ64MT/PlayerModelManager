@@ -1,10 +1,11 @@
-#ifndef PLAYERMODELMANAGER_UTILS_H
-#define PLAYERMODELMANAGER_UTILS_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include "PR/ultratypes.h"
 #include "PR/gbi.h"
-#include "modding.h"
+#include "z64animation.h"
 #include "stdbool.h"
+#include "globalobjects_api.h"
 
 Gfx *createShimWithMatrix(Mtx *matrix, int displayListCount, ...);
 Gfx *createShimDisplayList(int displayListCount, ...);
@@ -15,5 +16,8 @@ bool isSegmentedPtr(void *p);
 
 void setCrashEnabled(bool isEnabled);
 void tryCrashGame();
+
+void repointLodLimbSkelDLs(FlexSkeletonHeader *skel, GlobalObjectsSegmentMap segments);
+void repointStandardLimbSkelDLs(FlexSkeletonHeader *skel, GlobalObjectsSegmentMap segments);
 
 #endif

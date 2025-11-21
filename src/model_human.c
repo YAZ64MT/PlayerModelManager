@@ -1,13 +1,14 @@
 #include "modding.h"
 #include "global.h"
 #include "assets/objects/object_link_child/object_link_child.h"
-#include "playermodelmanager_utils.h"
+#include "utils.h"
 #include "globalobjects_api.h"
 #include "modelinfo.h"
 #include "modelentry.h"
 #include "modelentrymanager.h"
 #include "modelmatrixids.h"
 #include "playermodelmanager_api.h"
+#include "defaultfacetex.h"
 
 ModelEntryForm *gHumanModelEntry;
 ModelInfo gHumanModelInfo;
@@ -158,13 +159,25 @@ static void setupHumanFallbackModel() {
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);
     GlobalObjects_globalizeLodLimbSkeleton(human, &gLinkHumanSkel);
 
+    GlobalObjectsSegmentMap segments = {0};
+    segments[4] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
+    segments[6] = human;
+    repointLodLimbSkelDLs(skel, segments);
+
     ModelInfo_init(&gHumanModelInfo);
 
     ModelEntryForm *entryForm = gHumanModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_child__"));
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
-    ModelEntryForm_fillDefaultFaceTextures(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
     ModelEntryForm_setDLsFromSkeletons(entryForm);
+
+    for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
+        ModelEntryForm_setEyesTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(human, gDefaultEyesTextures[i]), i);
+    }
+
+    for (PlayerMouthIndex i = 0; i < PLAYER_MOUTH_MAX; ++i) {
+        ModelEntryForm_setMouthTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(human, gDefaultMouthTextures[i]), i);
+    }
 
     CMEM_setEntryHidden(entry, true);
     ModelInfo_setModelEntryForm(&gHumanModelInfo, entryForm);
@@ -183,18 +196,14 @@ static void setupHumanFallbackModel() {
     SET_ENTRY_DL(LINK_DL_FPS_LHAND, getHumanDL(gLinkHumanLeftHandClosedDL));
     SET_ENTRY_DL(LINK_DL_FPS_RFOREARM, gEmptyDL);
 
-    GlobalObjectsSegmentMap humanSegMap = {0};
-    humanSegMap[0x04] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
-    humanSegMap[0x06] = human;
-
     SET_ENTRY_DL(LINK_DL_FPS_RHAND, gLinkHumanFirstPersonArmDL);
-    GlobalObjects_rebaseDL(gLinkHumanFirstPersonArmDL, humanSegMap); // repoint vertices, textures, etc. to static link obj
+    GlobalObjects_rebaseDL(gLinkHumanFirstPersonArmDL, segments); // repoint vertices, textures, etc. to static link obj
 
     // items
     SET_ENTRY_DL(LINK_DL_OCARINA_TIME, gLinkHumanOcarinaDL);
-    GlobalObjects_rebaseDL(gLinkHumanOcarinaDL, humanSegMap); // repoint vertices, textures, etc. to static link obj
+    GlobalObjects_rebaseDL(gLinkHumanOcarinaDL, segments); // repoint vertices, textures, etc. to static link obj
 
-    #undef SET_ENTRY_DL
+#undef SET_ENTRY_DL
 }
 
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)

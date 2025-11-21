@@ -1,14 +1,14 @@
 #include "global.h"
 #include "modelentry.h"
 #include "recomputils.h"
-#include "playermodelmanager_utils.h"
+#include "utils.h"
 #include "equipmentoverrides.h"
 #include "playerproxy.h"
 #include "formproxy.h"
 #include "yazmtcorelib_api.h"
 #include "modelentrymanager.h"
 #include "logger.h"
-#include "assets/objects/object_link_child/object_link_child.h"
+#include "defaultfacetex.h"
 
 #define PRINT_INVALID_PTR_ERR() Logger_printError("Received invalid pointer.")
 
@@ -432,24 +432,6 @@ TexturePtr ModelEntryForm_getMouthTexture(ModelEntryForm *entry, PlayerMouthInde
     return entry->mouthTex[i];
 }
 
-static TexturePtr sDefaultEyesTextures[PLAYER_EYES_MAX] = {
-    gLinkHumanEyesOpenTex,        // PLAYER_EYES_OPEN
-    gLinkHumanEyesHalfTex,        // PLAYER_EYES_HALF
-    gLinkHumanEyesClosedTex,      // PLAYER_EYES_CLOSED
-    gLinkHumanEyesRollRightTex,   // PLAYER_EYES_ROLL_RIGHT
-    gLinkHumanEyesRollLeftTex,    // PLAYER_EYES_ROLL_LEFT
-    gLinkHumanEyesRollUpTex,      // PLAYER_EYES_ROLL_UP
-    gLinkHumanEyesRollDownTex,    // PLAYER_EYES_ROLL_DOWN
-    object_link_child_Tex_003800, // PLAYER_EYES_7
-};
-
-static TexturePtr sDefaultMouthTextures[PLAYER_MOUTH_MAX] = {
-    gLinkHumanMouthClosedTex, // PLAYER_MOUTH_CLOSED
-    gLinkHumanMouthTeethTex,  // PLAYER_MOUTH_TEETH
-    gLinkHumanMouthAngryTex,  // PLAYER_MOUTH_ANGRY
-    gLinkHumanMouthHappyTex,  // PLAYER_MOUTH_HAPPY
-};
-
 void ModelEntryForm_setEyesTexture(ModelEntryForm *entry, TexturePtr tex, PlayerEyeIndex i) {
     if (!isValidModelEntry((ModelEntry *)entry)) {
         PRINT_INVALID_PTR_ERR();
@@ -480,11 +462,11 @@ void ModelEntryForm_setMouthTexture(ModelEntryForm *entry, TexturePtr tex, Playe
 
 void ModelEntryForm_fillDefaultFaceTextures(ModelEntryForm *entry) {
     for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
-        ModelEntryForm_setEyesTexture(entry, sDefaultEyesTextures[i], i);
+        ModelEntryForm_setEyesTexture(entry, gDefaultEyesTextures[i], i);
     }
 
     for (PlayerMouthIndex i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        ModelEntryForm_setMouthTexture(entry, sDefaultMouthTextures[i], i);
+        ModelEntryForm_setMouthTexture(entry, gDefaultMouthTextures[i], i);
     }
 }
 

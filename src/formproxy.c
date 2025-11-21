@@ -2,7 +2,7 @@
 #include "modding.h"
 #include "formproxy.h"
 #include "logger.h"
-#include "playermodelmanager_utils.h"
+#include "utils.h"
 #include "rt64_extended_gbi.h"
 #include "modelreplacer_compat.h"
 #include "modelmatrixids.h"

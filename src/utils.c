@@ -4,9 +4,9 @@
 #include "recompconfig.h"
 #include "libc/stdarg.h"
 #include "modelmatrixids.h"
-#include "playermodelmanager_utils.h"
-#include "libc/string.h"
+#include "utils.h"
 #include "logger.h"
+#include "globalobjects_api.h"
 
 Gfx *createShimDisplayList(int displayListCount, ...) {
     if (displayListCount < 1) {
@@ -33,7 +33,7 @@ Gfx *createShimDisplayList(int displayListCount, ...) {
     return shimDl;
 }
 
-Gfx *createShimWithMatrix(Mtx* matrix, int displayListCount, ...) {
+Gfx *createShimWithMatrix(Mtx *matrix, int displayListCount, ...) {
     if (displayListCount < 1) {
         return NULL;
     }
@@ -78,7 +78,7 @@ void writeU32(u8 array[], u32 offset, u32 value) {
 }
 
 bool isSegmentedPtr(void *p) {
-    return (uintptr_t)p >> 24 <= 0xF;
+    return p < (void *)K0BASE;
 }
 
 bool sIsCrashDisabled;
@@ -92,5 +92,77 @@ void tryCrashGame() {
         Logger_printError("Forcing game crash...");
         int *ptr = NULL;
         *ptr = 0xDEADBEEF;
+    }
+}
+
+void repointLodLimbSkelDLs(FlexSkeletonHeader *skel, GlobalObjectsSegmentMap segments) {
+    if (isSegmentedPtr(skel)) {
+        Logger_printWarning("Passed in segmented skel");
+        return;
+    }
+
+    if (isSegmentedPtr(skel->sh.segment)) {
+        Logger_printWarning("Passed in segmented skel->sh.segment");
+        return;
+    }
+
+    for (int i = 0; i < skel->sh.limbCount; ++i) {
+        LodLimb *limb = skel->sh.segment[i];
+
+        if (!limb) {
+            Logger_printWarning("Passed in skeleton with NULL limb pointers!");
+        }
+
+        if (isSegmentedPtr(limb)) {
+            Logger_printWarning("Passed in skeleton with segmented limb pointers!");
+            return;
+        }
+
+        for (int j = 0; j < ARRAY_COUNT(limb->dLists); ++j) {
+            Gfx *dl = limb->dLists[j];
+            if (dl) {
+                if (isSegmentedPtr(dl)) {
+                    Logger_printWarning("Passed in skeleton with segmented limb DLs!");
+                    return;
+                }
+
+                GlobalObjects_rebaseDL(dl, segments);
+            }
+        }
+    }
+}
+
+void repointStandardLimbSkelDLs(FlexSkeletonHeader *skel, GlobalObjectsSegmentMap segments) {
+    if (isSegmentedPtr(skel)) {
+        Logger_printWarning("Passed in segmented skel");
+        return;
+    }
+
+    if (isSegmentedPtr(skel->sh.segment)) {
+        Logger_printWarning("Passed in segmented skel->sh.segment");
+        return;
+    }
+
+    for (int i = 0; i < skel->sh.limbCount; ++i) {
+        StandardLimb *limb = skel->sh.segment[i];
+
+        if (!limb) {
+            Logger_printWarning("Passed in skeleton with NULL limb pointers!");
+        }
+
+        if (isSegmentedPtr(limb)) {
+            Logger_printWarning("Passed in skeleton with segmented limb pointers!");
+            return;
+        }
+
+        Gfx *dl = limb->dList;
+        if (dl) {
+            if (isSegmentedPtr(dl)) {
+                Logger_printWarning("Passed in skeleton with segmented limb pointers!");
+                return;
+            }
+
+            GlobalObjects_rebaseDL(dl, segments);
+        }
     }
 }
