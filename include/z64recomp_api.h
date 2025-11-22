@@ -26,7 +26,11 @@ RECOMP_IMPORT("*", void* z64recomp_get_extended_actor_data(Actor* actor, ActorEx
 RECOMP_IMPORT("*", u32 z64recomp_get_actor_spawn_index(Actor* actor));
 
 RECOMP_IMPORT("*", u32 actor_get_interpolation_skipped(Actor *actor));
+
 RECOMP_IMPORT("*", void actor_set_interpolation_skipped(Actor *actor));
+
 RECOMP_IMPORT("*", void actor_clear_interpolation_skipped(Actor *actor));
+
+RECOMP_IMPORT("*", u32 z64recomp_get_bowstring_transform_id());
 
 #endif

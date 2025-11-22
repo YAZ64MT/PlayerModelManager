@@ -1,10 +1,7 @@
 #include "global.h"
-#include "custommodelentrymanager.h"
+#include "modelentrymanager.h"
 #include "recomputils.h"
-#include "playermodelmanager.h"
-#include "model_common.h"
-#include "defines_modelinfo.h"
-#include "colorfixes.h"
+#include "modelmatrixids.h"
 #include "playermodelmanager_api.h"
 #include "yazmtcorelib_api.h"
 #include "modelreplacer_api.h"
@@ -12,17 +9,21 @@
 #include "modelreplacer_compat.h"
 #include "apilocal.h"
 #include "logger.h"
+#include "playerproxy.h"
+#include "playerproxymanager.h"
+#include "modelentry.h"
+#include "formproxy.h"
 
 static bool isEntryLoaded(ModelEntry *entry) {
     if (entry) {
-        return CMEM_getCurrentEntry(entry->category) == entry;
+        return CMEM_getCurrentEntry(ModelEntry_getCategory(entry)) == entry;
     }
 
     return false;
 }
 
 static void refreshProxyIfEntryLoaded(ModelEntry *entry) {
-    Link_CustomModelCategory cat = entry->category;
+    Link_CustomModelCategory cat = ModelEntry_getCategory(entry);
 
     if (isEntryLoaded(entry)) {
         CMEM_reapplyEntry(cat);
@@ -82,7 +83,7 @@ static ModelEntry *getEntryOrPrintErr(PlayerModelManagerHandle h, const char *fu
     ModelEntry *entry = CMEM_getEntry(h);
 
     if (!entry) {
-        Logger_printError("PlayerModelManager: Invalid handle passed in to %s.", funcName);
+        Logger_printError("Invalid handle passed in to %s.", funcName);
     }
 
     return entry;
@@ -95,8 +96,8 @@ static ModelEntryForm *getFormEntryOrPrintErr(PlayerModelManagerHandle h, const 
         return NULL;
     }
 
-    if (!isFormCategory(entry->category)) {
-        Logger_printWarning("PlayerModelManager: Handle with internal name '%s' does not support the function '%s'", entry->internalName, funcName);
+    if (!isFormCategory(ModelEntry_getCategory(entry))) {
+        Logger_printWarning("Handle with internal name '%s' does not support the function '%s'", ModelEntry_getInternalName(entry), funcName);
         return NULL;
     }
 
@@ -106,7 +107,7 @@ static ModelEntryForm *getFormEntryOrPrintErr(PlayerModelManagerHandle h, const 
 static ModelEntry *getEntryOrPrintErrLocked(PlayerModelManagerHandle h, const char *funcName) {
     if (sIsAPILocked) {
         Logger_printWarning(
-            "PlayerModelManager: %s called while API locked. "
+            "%s called while API locked. "
             "Please only call these functions during a onRegisterModels callback.",
             funcName);
 
@@ -116,22 +117,14 @@ static ModelEntry *getEntryOrPrintErrLocked(PlayerModelManagerHandle h, const ch
     return getEntryOrPrintErr(h, funcName);
 }
 
-static void dupStrAndFreeOld(char **dest, const char *src) {
-    if (*dest) {
-        recomp_free(*dest);
-    }
-
-    *dest = YAZMTCore_Utils_StrDup(src);
-}
-
 RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType) {
     if (apiVersion > PMM_API_VERSION) {
-        Logger_printWarning("PlayerModelManager_registerModel: Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
+        Logger_printWarning("Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
         return 0;
     }
 
     if (sIsAPILocked) {
-        Logger_printWarning("PlayerModelManager_registerModel: Models can only be registered during a onRegisterModels callback.");
+        Logger_printWarning("Models can only be registered during a onRegisterModels callback.");
         return 0;
     }
 
@@ -142,7 +135,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
     Link_CustomModelCategory cat = getCategoryFromModelType(modelType);
 
     if (!isValidCategory(cat)) {
-        Logger_printError("PlayerModelManager_registerFormModel: Passed in unsupported PlayerModelManagerModelType %d to PlayerModelManager_registerModel.", modelType);
+        Logger_printError("Passed in unsupported PlayerModelManagerModelType %d.", modelType);
         return 0;
     }
 
@@ -155,10 +148,10 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
     }
 
     if (modelType == PMM_MODEL_TYPE_ADULT) {
-        entry->flags |= LINK_MODELINFO_FLAG_MM_ADULT_FIX;
+        ModelEntry_setFlags(entry, MODELENTRY_FLAG_IS_ADULT);
     }
 
-    Logger_printVerbose("PlayerModelManager: Registered new model '%s' with model type %d", entry->internalName, modelType);
+    Logger_printVerbose("Registered new model '%s' with model type %d", ModelEntry_getInternalName(entry), modelType);
 
     return h;
 }
@@ -174,9 +167,9 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerHandle h,
         return false;
     }
 
-    dupStrAndFreeOld(&entry->displayName, displayName);
+    ModelEntry_setDisplayName(entry, displayName);
 
-    Logger_printVerbose("PlayerModelManager: Setting display name of handle with internal name '%s' to '%s'", entry->internalName, displayName);
+    Logger_printVerbose("Setting display name of handle with internal name '%s' to '%s'", ModelEntry_getInternalName(entry), displayName);
 
     return true;
 }
@@ -192,9 +185,9 @@ RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerHandle h, cons
         return false;
     }
 
-    dupStrAndFreeOld(&entry->authorName, author);
+    ModelEntry_setAuthorName(entry, author);
 
-    Logger_printVerbose("PlayerModelManager: Setting author of handle with internal name '%s' to '%s'", entry->internalName, author);
+    Logger_printVerbose("Setting author of handle with internal name '%s' to '%s'", ModelEntry_getInternalName(entry), author);
 
     return true;
 }
@@ -206,9 +199,9 @@ RECOMP_EXPORT bool PlayerModelManager_setFlags(PlayerModelManagerHandle h, u64 f
         return false;
     }
 
-    entry->flags |= flags;
+    ModelEntry_setFlags(entry, flags);
 
-    Logger_printVerbose("PlayerModelManager: Setting flags 0x%llX of handle with internal name '%s'", flags, entry->internalName);
+    Logger_printVerbose("Setting flags 0x%llX of handle with internal name '%s'", flags, ModelEntry_getInternalName(entry));
 
     return true;
 }
@@ -220,9 +213,9 @@ RECOMP_EXPORT bool PlayerModelManager_clearFlags(PlayerModelManagerHandle h, u64
         return false;
     }
 
-    entry->flags &= ~flags;
+    ModelEntry_unsetFlags(entry, flags);
 
-    Logger_printVerbose("PlayerModelManager: Clearing flags 0x%llX of handle with internal name '%s'", flags, entry->internalName);
+    Logger_printVerbose("Clearing flags 0x%llX of handle with internal name '%s'", flags, ModelEntry_getInternalName(entry));
 
     return true;
 }
@@ -234,16 +227,16 @@ RECOMP_EXPORT bool PlayerModelManager_clearAllFlags(PlayerModelManagerHandle h, 
         return false;
     }
 
-    entry->flags = 0;
+    ModelEntry_unsetAllFlags(entry);
 
-    Logger_printVerbose("PlayerModelManager: Clearing all flags of handle with internal name '%s'", entry->internalName);
+    Logger_printVerbose("Clearing all flags of handle with internal name '%s'", ModelEntry_getInternalName(entry));
 
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, Link_DisplayList dlId, Gfx *dl) {
     if (dlId >= LINK_DL_MAX || dlId < 0) {
-        Logger_printError("PlayerModelManager: Invalid display list ID passed in to PlayerModelManager_setDisplayList.");
+        Logger_printError("Invalid display list ID passed in to PlayerModelManager_setDisplayList.");
         return false;
     }
 
@@ -253,9 +246,9 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
         return false;
     }
 
-    if (entry->setDisplayList(entry, dlId, dl)) {
+    if (ModelEntry_setDisplayList(entry, dlId, dl)) {
         refreshProxyDLIfEntryLoaded(entry, dlId);
-        Logger_printVerbose("PlayerModelManager: Setting DL id %d on handle with internal name '%s' to 0x%X", dlId, entry->internalName, dl);
+        Logger_printVerbose("Setting DL id %d on handle with internal name '%s' to 0x%X", dlId, ModelEntry_getInternalName(entry), dl);
         return true;
     }
 
@@ -264,7 +257,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
 
 RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix) {
     if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
-        Logger_printError("PlayerModelManager: Invalid matrix ID passed in to PlayerModelManager_setMtx.");
+        Logger_printError("Invalid matrix ID passed in to PlayerModelManager_setMtx.");
         return false;
     }
 
@@ -274,29 +267,10 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
         return false;
     }
 
-    if (entry->setMatrix(entry, mtxId, matrix)) {
+    if (ModelEntry_setMatrix(entry, mtxId, matrix)) {
         refreshProxyMtxIfEntryLoaded(entry, mtxId);
-        Logger_printVerbose("PlayerModelManager: Copying matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix, entry->internalName);
+        Logger_printVerbose("Copying matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix, ModelEntry_getInternalName(entry));
         return true;
-    }
-
-    return false;
-}
-
-static bool isEntryWithinPack(const ModelEntryPack *pack, const ModelEntry *entry) {
-    if (YAZMTCore_IterableU32Set_contains(pack->modelEntries, (uintptr_t)entry)) {
-        return true;
-    }
-
-    size_t numPackEntries = ModelEntryPack_getModelEntriesCount(pack);
-    ModelEntry const *const *packEntries = ModelEntryPack_getModelEntries(pack);
-
-    for (size_t i = 0; i < numPackEntries; ++i) {
-        const ModelEntry *curr = packEntries[i];
-
-        if (isPackCategory(curr->category) && isEntryWithinPack((const ModelEntryPack *)curr, entry)) {
-            return true;
-        }
     }
 
     return false;
@@ -309,8 +283,8 @@ RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h
         return false;
     }
 
-    if (!isPackCategory(entry->category)) {
-        Logger_printError("PlayerModelManager_addHandleToPack: Non-model pack passed into first arg of PlayerModelManager_addHandleToPack (Category was %d)", entry->category);
+    if (!isPackCategory(ModelEntry_getCategory(entry))) {
+        Logger_printError("Non-model pack passed into first arg of PlayerModelManager_addHandleToPack (Category was %d)", ModelEntry_getCategory(entry));
         return false;
     }
 
@@ -320,16 +294,15 @@ RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h
         return false;
     }
 
+    // cast relies on first member of ModelEntryPack being a ModelEntry
     ModelEntryPack *packEntry = (ModelEntryPack *)entry;
 
-    if (isPackCategory(entryToAdd->category) && isEntryWithinPack((ModelEntryPack *)entryToAdd, entry)) {
-        Logger_printError("PlayerModelManager_addHandleToPack: Could not add handle! Handle with internal name '%s' is already a handle inside '%s' (Would cause circular reference)!", entry->internalName, entryToAdd->internalName);
+    if (!ModelEntryPack_addEntryToPack(packEntry, entryToAdd)) {
+        Logger_printError("Could not add handle! Handle with internal name '%s' is already a handle inside '%s' (Would cause circular reference)!", ModelEntry_getInternalName(entry), ModelEntry_getInternalName(entryToAdd));
         return false;
     }
 
-    YAZMTCore_IterableU32Set_insert(packEntry->modelEntries, (uintptr_t)entryToAdd);
-
-    Logger_printVerbose("PlayerModelManager: Adding handle with internal name '%s' to model pack with internal name '%s'", entry->internalName, entryToAdd->internalName, entry->internalName);
+    Logger_printVerbose("Adding handle with internal name '%s' to model pack with internal name '%s'", ModelEntry_getInternalName(entry), ModelEntry_getInternalName(entryToAdd), ModelEntry_getInternalName(entry));
 
     return true;
 }
@@ -341,32 +314,32 @@ RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerHandle h, Pl
         return false;
     }
 
-    entry->callback = callback;
+    ModelEntry_setCallback(entry, callback, userdata);
 
-    entry->callbackData = userdata;
-
-    Logger_printVerbose("PlayerModelManager: Setting handle with internal name '%s' to have callback function 0x%X with user data 0x%X", entry->internalName, callback, userdata);
+    Logger_printVerbose("Setting handle with internal name '%s' to have callback function 0x%X with user data 0x%X", ModelEntry_getInternalName(entry), callback, userdata);
 
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel) {
-    ModelEntryForm *entry = getFormEntryOrPrintErr(h, "PlayerModelManager_setSkeleton");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setSkeleton");
 
-    if (!entry) {
+    if (!entryForm) {
         return false;
     }
 
-    entry->skel = skel;
+    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
+
+    ModelEntryForm_setSkeleton(entryForm, skel);
 
     if (skel) {
         StandardLimb **limbs = (StandardLimb **)skel->sh.segment;
 
 #define SET_LIMB_DL(pLimb, entryDL)                                                                                                          \
     {                                                                                                                                        \
-        if (!ModelEntry_getDisplayList(&entry->modelEntry, entryDL))                                                                         \
-            entry->modelEntry.setDisplayList(&entry->modelEntry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        refreshProxyDLIfEntryLoaded(&entry->modelEntry, entryDL);                                                                            \
+        if (!ModelEntry_getDisplayList(entry, entryDL))                                                                         \
+            ModelEntry_setDisplayList(entry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
+        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                            \
     }                                                                                                                                        \
     (void)0
 
@@ -392,25 +365,26 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, Fl
 
 #undef SET_LIMB_DL
 
-    refreshProxyIfEntryLoaded(&entry->modelEntry);
+    refreshProxyIfEntryLoaded(entry);
 
-    Logger_printVerbose("PlayerModelManager: Setting skeleton of handle with internal name '%s' to 0x%X", entry->modelEntry.internalName, skel);
+    Logger_printVerbose("Setting skeleton of handle with internal name '%s' to 0x%X", ModelEntry_getInternalName(entry), skel);
 
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel) {
-    ModelEntryForm *entry = getFormEntryOrPrintErr(h, "PlayerModelManager_setShieldingSkeleton");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setShieldingSkeleton");
+    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
 
     if (!entry) {
         return false;
     }
 
-    entry->shieldingSkel = skel;
+    ModelEntryForm_setShieldingSkeleton(entryForm, skel);
 
     if (skel) {
         if (skel->sh.limbCount != PLAYER_BODY_SHIELD_LIMB_COUNT) {
-            Logger_printError("PlayerModelManager_setShieldingSkeleton: Skeleton with incorrect limb count passed in to PlayerModelManager_setShieldingSkeleton");
+            Logger_printError("Skeleton with incorrect limb count passed in to PlayerModelManager_setShieldingSkeleton");
             return false;
         }
 
@@ -418,9 +392,9 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 
 #define SET_SHIELDING_LIMB_DL(pLimb, entryDL)                                                                                                \
     {                                                                                                                                        \
-        if (!ModelEntry_getDisplayList(&entry->modelEntry, entryDL))                                                                         \
-            entry->modelEntry.setDisplayList(&entry->modelEntry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        refreshProxyDLIfEntryLoaded(&entry->modelEntry, entryDL);                                                                            \
+        if (!ModelEntry_getDisplayList(entry, entryDL))                                                                         \
+            ModelEntry_setDisplayList(entry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
+        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                            \
     }                                                                                                                                        \
     (void)0
 
@@ -431,133 +405,168 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 
 #undef SET_SHIELDING_LIMB_DL
 
-    refreshProxyIfEntryLoaded(&entry->modelEntry);
+    refreshProxyIfEntryLoaded(entry);
 
-    Logger_printVerbose("PlayerModelManager: Setting shielding skeleton of handle with internal name '%s' to 0x%X", entry->modelEntry.internalName, skel);
+    Logger_printVerbose("Setting shielding skeleton of handle with internal name '%s' to 0x%X", ModelEntry_getInternalName(entry), skel);
 
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerHandle h, TexturePtr eyesTextures[]) {
-    ModelEntryForm *entry = getFormEntryOrPrintErr(h, "PlayerModelManager_setEyesTextures");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setEyesTextures");
 
-    if (!entry) {
+    if (!entryForm) {
         return false;
     }
 
+    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
+
     for (int i = 0; i < PLAYER_EYES_MAX; ++i) {
-        entry->eyesTex[i] = eyesTextures[i];
+        ModelEntryForm_setEyesTexture(entryForm, eyesTextures[i], i);
     }
 
-    refreshProxyEyesTexturesIfEntryLoaded(&entry->modelEntry);
+    refreshProxyEyesTexturesIfEntryLoaded(entry);
 
-    Logger_printVerbose("PlayerModelManager: Setting eyes flipbook textures of handle with internal name '%s'", entry->modelEntry.internalName);
+    Logger_printVerbose("Setting eyes flipbook textures of handle with internal name '%s'", ModelEntry_getInternalName(entry));
 
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle h, TexturePtr mouthTextures[]) {
-    ModelEntryForm *entry = getFormEntryOrPrintErr(h, "PlayerModelManager_setMouthTextures");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setMouthTextures");
 
-    if (!entry) {
+    if (!entryForm) {
         return false;
     }
 
+    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
+
     for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        entry->mouthTex[i] = mouthTextures[i];
+        ModelEntryForm_setMouthTexture(entryForm, mouthTextures[i], i);
     }
 
-    refreshProxyMouthTexturesIfEntryLoaded(&entry->modelEntry);
+    refreshProxyMouthTexturesIfEntryLoaded(entry);
 
-    Logger_printVerbose("PlayerModelManager: Setting mouth flipbook textures of handle with internal name '%s'", entry->modelEntry.internalName);
+    Logger_printVerbose("Setting mouth flipbook textures of handle with internal name '%s'", ModelEntry_getInternalName(entry));
 
     return true;
 }
 
 RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dlId) {
     if (apiVersion > PMM_API_VERSION) {
-        Logger_printError("PlayerModelManager_getFormDisplayList: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
+        Logger_printError("Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
         return NULL;
     }
 
     if (form >= PLAYER_FORM_MAX) {
-        Logger_printError("PlayerModelManager_getFormDisplayList: Mod requesting invalid player form %d!", form);
+        Logger_printError("Mod requesting invalid player form %d!", form);
         return NULL;
     }
 
     if (dlId >= LINK_DL_MAX) {
-        Logger_printError("PlayerModelManager_getFormDisplayList: Mod requesting display list ID %d!", dlId);
+        Logger_printError("Mod requesting display list ID %d!", dlId);
         return NULL;
     }
 
-    return &gLinkFormProxies[form].displayLists[dlId];
+    FormProxyId fpId;
+    if (PlayerProxy_getProxyIdFromForm(form, &fpId)) {
+        FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
+        
+        if (fp) {
+            return FormProxy_getCurrentDL(fp, dlId);
+        }
+    }
+
+    return NULL;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long apiVersion, PlayerTransformation form, Link_DisplayList dlId, Gfx *dl) {
     if (sIsAPILocked) {
-        Logger_printError("PlayerModelManager: %s called while API locked. "
+        Logger_printError("%s called while API locked. "
                           "Please only call these functions during a onRegisterModels callback.",
-                          "PlayerModelManager_overrideVanillaDisplayList");
+                          __FUNCTION__);
 
         return false;
     }
 
     if (apiVersion > PMM_API_VERSION) {
-        Logger_printError("PlayerModelManager_overrideVanillaDisplayList: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
+        Logger_printError("Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
         return false;
     }
 
     if (form >= PLAYER_FORM_MAX) {
-        Logger_printError("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid player form %d!", form);
+        Logger_printError("Mod requesting invalid player form %d!", form);
         return false;
     }
 
     if (dlId >= LINK_DL_MAX) {
-        Logger_printError("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid display list ID %d! (ID too high!)", form);
+        Logger_printError("Mod requesting invalid display list ID %d! (ID too high!)", form);
         return false;
     }
 
     if (dlId >= LINK_DL_SWORD1 && dlId <= LINK_DL_CENTER_FLOWER_PROPELLER_CLOSED) {
-        Logger_printError("PlayerModelManager_overrideVanillaDisplayList: Mod requesting invalid display list ID %d! (ID was a shim!)", form);
+        Logger_printError("Mod requesting invalid display list ID %d! (ID was a shim!)", form);
         return false;
     }
 
-    gLinkFormProxies[form].vanilla.models[dlId] = dl;
-    requestRefreshFormProxyDL(&gLinkFormProxies[form], dlId);
+    FormProxyId fpId;
+    if (PlayerProxy_getProxyIdFromForm(form, &fpId)) {
+        FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
+        
+        if (fp) {
+            ModelInfo *fallbackModelInfo = FormProxy_getFallbackModelInfo(fp);
 
-    Logger_printVerbose("PlayerModelManager_overrideVanillaDisplayList: Overriding vanilla DL with ID %d for form %d with new DL at 0x%X.", dlId, form, dl);
+            if (fallbackModelInfo) {
+                ModelInfo_setGfxOverride(fallbackModelInfo, dlId, dl);
+                PlayerProxyManager_refreshDLAll(dlId);
+            }
+        }
+    }
+
+    Logger_printVerbose("Overriding vanilla DL with ID %d for form %d with new DL at 0x%X.", dlId, form, dl);
 
     return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVersion, PlayerTransformation form, Link_EquipmentMatrix mtxId, Mtx *mtx) {
     if (sIsAPILocked) {
-        Logger_printError("PlayerModelManager: %s called while API locked. "
+        Logger_printError("%s called while API locked. "
                           "Please only call these functions during a onRegisterModels callback.",
-                          "PlayerModelManager_overrideVanillaMatrix");
+                          __FUNCTION__);
 
         return false;
     }
 
     if (apiVersion > PMM_API_VERSION) {
-        Logger_printError("PlayerModelManager_overrideVanillaMatrix: Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
+        Logger_printError("Mod requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
         return false;
     }
 
     if (form >= PLAYER_FORM_MAX) {
-        Logger_printError("PlayerModelManager_overrideVanillaMatrix: Mod requesting invalid player form %d!", form);
+        Logger_printError("Mod requesting invalid player form %d!", form);
         return false;
     }
 
     if (mtxId >= LINK_EQUIP_MATRIX_MAX) {
-        Logger_printError("PlayerModelManager_overrideVanillaMatrix: Mod requesting invalid matrix ID %d! (ID too high!)", form);
+        Logger_printError("Mod requesting invalid matrix ID %d! (ID too high!)", form);
         return false;
     }
 
-    gLinkFormProxies[form].vanilla.equipMtx[mtxId] = mtx;
-    requestRefreshFormProxyMtx(&gLinkFormProxies[form], mtxId);
+    FormProxyId fpId;
+    if (PlayerProxy_getProxyIdFromForm(form, &fpId)) {
+        FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
 
-    Logger_printVerbose("PlayerModelManager_overrideVanillaMatrix: Copying matrix at 0x%X to with ID %d for form %d.");
+        if (fp) {
+            ModelInfo *fallbackModelInfo = FormProxy_getFallbackModelInfo(fp);
+
+            if (fallbackModelInfo) {
+                ModelInfo_setMtxOverride(fallbackModelInfo, mtxId, mtx);
+                PlayerProxyManager_refreshMtxAll(mtxId);
+            }
+        }
+    }
+
+    Logger_printVerbose("Copying matrix at 0x%X to with ID %d for form %d.");
 
     return true;
 }
@@ -569,19 +578,26 @@ RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
         return false;
     }
 
-    if (entry->type == PMM_MODEL_TYPE_NONE) {
+    if (ModelEntry_getType(entry) == PMM_MODEL_TYPE_NONE) {
         return false;
     }
 
-    return CMEM_getCurrentEntry(entry->category) == entry;
+    return CMEM_getCurrentEntry(ModelEntry_getCategory(entry)) == entry;
 }
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {
-    setTunicColor(r, g, b, a);
+    PlayerProxy_requestTunicColorOverride(gPlayer1Proxy, (Color_RGBA8){r, g, b, a});
 }
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a) {
-    setFormTunicColor(form, r, g, b, a);
+    FormProxyId fpId;
+    if (PlayerProxy_getProxyIdFromForm(form, &fpId)) {
+        FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
+
+        if (fp) {
+            FormProxy_requestTunicColorOverride(fp, (Color_RGBA8){r, g, b, a});
+        }
+    }
 }
 
 RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form) {
@@ -638,32 +654,32 @@ void doRegisterModels() {
     sIsModelsRegistered = true;
 
     sIsAPILocked = false;
-    Logger_printInfo("PlayerModelManager: Registering models...");
+    Logger_printInfo("Registering models...");
     onRegisterModels();
     sIsAPILocked = true;
     _internal_onFinishedRegisterModels();
-    Logger_printInfo("PlayerModelManager: Finished registering models...");
+    Logger_printInfo("Finished registering models...");
     onReady();
-    Logger_printInfo("PlayerModelManager: Ready");
+    Logger_printInfo("Ready");
 }
 
-RECOMP_CALLBACK(".", _internal_onReadyCMEM)
+RECOMP_CALLBACK(".", _internal_postInitHashObjects)
 void doRegisterModelsCMEMReady() {
     sIsCMEMReady = true;
-    Logger_printVerbose("PlayerModelManager: CustomModelEntryManager is ready.");
+    Logger_printVerbose("ModelEntryManager is ready.");
     doRegisterModels();
 }
 
 MODEL_REPLACER_CALLBACK_ON_REGISTER_REPLACERS
 void doRegisterModelsModelReplacerReady() {
     sIsModelReplacerReady = true;
-    Logger_printVerbose("PlayerModelManager: ModelReplacer compatibility is ready.");
+    Logger_printVerbose("ModelReplacer compatibility is ready.");
     doRegisterModels();
 }
 
 GLOBAL_OBJECTS_CALLBACK_ON_READY
 void doRegisterModelsGlobalObjectsReady() {
     sIsGlobalObjectsReady = true;
-    Logger_printVerbose("PlayerModelManager: GlobalObjects is ready.");
+    Logger_printVerbose("GlobalObjects is ready.");
     doRegisterModels();
 }

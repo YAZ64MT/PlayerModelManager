@@ -1,5 +1,5 @@
-#ifndef __EQUIPMENTOVERRIDES_H__
-#define __EQUIPMENTOVERRIDES_H__
+#ifndef EQUIPMENTOVERRIDES_H
+#define EQUIPMENTOVERRIDES_H
 
 #include "PR/ultratypes.h"
 #include "modelmatrixids.h"
@@ -19,6 +19,6 @@ typedef struct {
     EquipmentOverrideMtxs mtx;
 } EquipmentOverride;
 
-extern const EquipmentOverride gEquipmentOverrideTable[LINK_DL_REPLACE_MAX];
+const EquipmentOverride *EquipmentOverrides_getEquipmentOverride(Link_EquipmentReplacement id);
 
 #endif

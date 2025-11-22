@@ -1,9 +1,8 @@
-#ifndef __MODEL_SHARED_H__
-#define __MODEL_SHARED_H__
+#ifndef MODEL_SHARED_H
+#define MODEL_SHARED_H
 
-#include "global.h"
+typedef struct ModelEntryForm ModelEntryForm;
 
-extern Gfx *gSharedDisplayLists[];
-extern Mtx *gSharedMatrixes[];
+extern ModelEntryForm *gSharedModelEntry;
 
 #endif

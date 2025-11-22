@@ -2,11 +2,13 @@
 #include "modding.h"
 #include "recompdata.h"
 #include "recomputils.h"
-#include "playermodelmanager.h"
+#include "modelmatrixids.h"
 #include "logger.h"
-#include "model_common.h"
 #include "externs_z_player_lib.h"
 #include "maskdls.h"
+#include "playerproxy.h"
+#include "formproxy.h"
+#include "proxyactorext.h"
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "assets/objects/object_link_boy/object_link_boy.h"
@@ -14,6 +16,7 @@
 #include "assets/objects/object_link_goron/object_link_goron.h"
 #include "assets/objects/object_link_zora/object_link_zora.h"
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
+#include "overlays/actors/ovl_En_Arrow/z_en_arrow.h"
 
 typedef struct {
     Gfx *target;
@@ -37,7 +40,7 @@ typedef struct {
 
 typedef struct {
     PlayState *play;
-    Link_FormProxy *formProxy;
+    FormProxy *formProxy;
     const GfxHookLookup *segment04;
     const GfxHookLookup *segment06;
     const GfxHookLookup *segment0A;
@@ -129,7 +132,7 @@ void GfxHookLookup_init(GfxHookLookup *ghl) {
     for (size_t i = 0; i < ghl->numHookDLEntries; ++i) {
         GfxHookDisplayList *currHookDL = &ghl->rawHookDLEntries[i];
         if (!recomputil_u32_value_hashmap_insert(ghl->gfxPtrsToDLs, (uintptr_t)(currHookDL->target), currHookDL->replacementId)) {
-            Logger_printWarning("PlayerModelManager: GfxHookLookup_init: Passed in GfxHookLookup contains duplicate keys!\n");
+            Logger_printWarning("GfxHookLookup_init: Passed in GfxHookLookup contains duplicate keys!\n");
         }
     }
 }
@@ -146,7 +149,7 @@ void initGfxHookReplacmentMaps() {
 }
 
 // assumed hookdat has valid playstate ptr
-void fillGfxHookData(GfxHookData *hookDat, PlayState *play, Link_FormProxy *formProxy, const GfxHookLookup *seg04, const GfxHookLookup *seg06, const GfxHookLookup *seg0A) {
+void fillGfxHookData(GfxHookData *hookDat, PlayState *play, FormProxy *formProxy, const GfxHookLookup *seg04, const GfxHookLookup *seg06, const GfxHookLookup *seg0A) {
     hookDat->play = play;
     hookDat->formProxy = formProxy;
 
@@ -162,6 +165,10 @@ void fillGfxHookData(GfxHookData *hookDat, PlayState *play, Link_FormProxy *form
 }
 
 static void replaceHookedGfxCommands(GfxHookData *hookDat, Gfx *startDL, Gfx *endDL) {
+    if (!hookDat->formProxy) {
+        return;
+    }
+
     Gfx *curr = startDL;
 
     U32HashsetHandle seg04Handle = hookDat->segment04 ? hookDat->segment04->gfxPtrsToDLs : 0;
@@ -269,8 +276,7 @@ static GfxHookData sPlayerDrawGfxHook;
 
 RECOMP_HOOK("Player_Draw")
 void hookGfx_on_Player_Draw(Actor *thisx, PlayState *play) {
-    Player *player = (Player *)thisx;
-    fillGfxHookData(&sPlayerDrawGfxHook, play, &gLinkFormProxies[player->transformation], &sGameplayKeepDLMap, getFormGfxLookup(player->transformation), NULL);
+    fillGfxHookData(&sPlayerDrawGfxHook, play, ProxyActorExt_getFormProxy(thisx), &sGameplayKeepDLMap, getFormGfxLookup(((Player *)thisx)->transformation), NULL);
 }
 
 RECOMP_HOOK_RETURN("Player_Draw")
@@ -283,7 +289,7 @@ static GfxHookData sPlayerDrawBlastMaskGfxHook;
 
 RECOMP_HOOK("Player_DrawBlastMask")
 void hookGfx_on_Player_DrawBlastMask(PlayState *play, Player *player) {
-    fillGfxHookData(&sPlayerDrawBlastMaskGfxHook, play, &gLinkFormProxies[player->transformation], &sGameplayKeepDLMap, NULL, &sBlastMaskDLMap);
+    fillGfxHookData(&sPlayerDrawBlastMaskGfxHook, play, ProxyActorExt_getFormProxy(&player->actor), &sGameplayKeepDLMap, NULL, &sBlastMaskDLMap);
 }
 
 RECOMP_HOOK_RETURN("Player_DrawBlastMask")
@@ -292,11 +298,37 @@ void hookGfx_on_return_Player_DrawBlastMask() {
     replaceHookedXluGfxCommands(&sPlayerDrawBlastMaskGfxHook);
 }
 
+Player *sPlayerInitHookshotIA;
+
+RECOMP_HOOK("Player_InitHookshotIA")
+void assignHookshotProxy_on_Player_InitHookshotIA(PlayState *play, Player *this) {
+    sPlayerInitHookshotIA = this;
+}
+
+RECOMP_HOOK_RETURN("Player_InitHookshotIA")
+void assignHookshotProxy_on_return_Player_InitHookshotIA() {
+    ProxyActorExt_copyProxyInformation(sPlayerInitHookshotIA->heldActor, &sPlayerInitHookshotIA->actor);
+}
+
+static FormProxy *getFormProxyOrFallback(Actor *actor, FormProxyId fallbackId, PlayState *play) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (!fp) {
+        fp = ProxyActorExt_getFormProxy(&(GET_PLAYER(play)->actor));
+    }
+
+    if (!fp) {
+        fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fallbackId);
+    }
+
+    return fp;
+}
+
 static GfxHookData sHookshotGfxHook;
 
 RECOMP_HOOK("ArmsHook_Draw")
 void hookGfx_on_ArmsHook_Draw(Actor *thisx, PlayState *play) {
-    fillGfxHookData(&sHookshotGfxHook, play, &gLinkFormProxies[GET_PLAYER(play)->transformation], &sGameplayKeepDLMap, &sLinkHumanDLMap, NULL);
+    fillGfxHookData(&sHookshotGfxHook, play, getFormProxyOrFallback(thisx, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, &sLinkHumanDLMap, NULL);
 }
 
 RECOMP_HOOK_RETURN("ArmsHook_Draw")
@@ -305,23 +337,27 @@ void hookGfx_on_return_ArmsHook_Draw() {
     replaceHookedXluGfxCommands(&sHookshotGfxHook);
 }
 
+static Player *sPlayerInitEnArrow;
+
+RECOMP_HOOK("func_808306F8")
+void setupArrowProxy_on_func_808306F8(Player *this, PlayState *play) {
+    sPlayerInitEnArrow = this;
+}
+
+RECOMP_HOOK_RETURN("func_808306F8")
+void setupArrowProxy_on_return_func_808306F8() {
+    Actor *heldActor = sPlayerInitEnArrow->heldActor;
+
+    if (heldActor && heldActor->id == ACTOR_EN_ARROW) {
+        ProxyActorExt_copyProxyInformation(heldActor, &sPlayerInitEnArrow->actor);
+    }
+}
+
 static GfxHookData sArrowGfxHook;
 
 RECOMP_HOOK("EnArrow_Draw")
 void hookGfx_on_EnArrow_Draw(Actor *thisx, PlayState *play) {
-    Player *player = GET_PLAYER(play);
-
-    PlayerTransformation form;
-
-    // Account for possibility form has a custom arrow model
-    // otherwise default to human
-    if (gLinkFormProxies[player->transformation].current.modelInfo.models[LINK_DL_BOW_ARROW]) {
-        form = player->transformation;
-    } else {
-        form = PLAYER_FORM_HUMAN;
-    }
-
-    fillGfxHookData(&sArrowGfxHook, play, &gLinkFormProxies[form], &sGameplayKeepDLMap, getFormGfxLookup(form), NULL);
+    fillGfxHookData(&sArrowGfxHook, play, getFormProxyOrFallback(thisx, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
 }
 
 RECOMP_HOOK_RETURN("EnArrow_Draw")
@@ -335,7 +371,14 @@ static GfxHookData sMirrorRayGfxHook;
 RECOMP_HOOK("MirRay3_Draw")
 void hookGfx_on_MirRay_Draw(Actor *thisx, PlayState *play) {
     Player *player = GET_PLAYER(play);
-    fillGfxHookData(&sMirrorRayGfxHook, play, &gLinkFormProxies[player->transformation], &sGameplayKeepDLMap, &sShieldMirrorDLMap, NULL);
+
+    FormProxyId formId;
+
+    if (!PlayerProxy_getProxyIdFromForm(player->transformation, &formId)) {
+        formId = FORM_PROXY_ID_HUMAN;
+    }
+
+    fillGfxHookData(&sMirrorRayGfxHook, play, getFormProxyOrFallback(thisx, formId, play), &sGameplayKeepDLMap, &sShieldMirrorDLMap, NULL);
 }
 
 RECOMP_HOOK_RETURN("MirRay3_Draw")

@@ -17,7 +17,8 @@
                 "YAZMT_PMM_NO_API_IMPORTS",
                 "F3DEX_GBI_2",
                 "F3DEX_GBI_PL",
-                "GBI_DOWHILE"
+                "GBI_DOWHILE",
+                "LOGGER_PROJECT_NAME=\"PlayerModelManager\""
             ],
             "compilerPath": "clang",
             "cStandard": "gnu17",

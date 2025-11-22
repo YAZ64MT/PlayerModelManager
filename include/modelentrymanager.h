@@ -1,6 +1,10 @@
-#ifndef __CUSTOMMODELENTRYMANAGER_H
-#define __CUSTOMMODELENTRYMANAGER_H
-#include "custommodelentry.h"
+#ifndef CUSTOMMODELENTRYMANAGER_H
+#define CUSTOMMODELENTRYMANAGER_H
+
+typedef struct ModelEntry ModelEntry;
+
+#include "playermodelmanager_api.h"
+#include "modelmatrixids.h"
 
 typedef unsigned long PlayerModelManagerHandle;
 
@@ -14,6 +18,8 @@ ModelEntry *CMEM_getEntry(PlayerModelManagerHandle h);
 void CMEM_saveCurrentEntry(Link_CustomModelCategory cat);
 void CMEM_reapplyEntry(Link_CustomModelCategory cat);
 bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry);
+bool CMEM_isEntryHidden(const ModelEntry *ModelEntry);
+void CMEM_setEntryHidden(const ModelEntry *modelEntry, bool isHidden);
 
 PlayerTransformation getFormFromModelType(PlayerModelManagerModelType t);
 Link_CustomModelCategory getCategoryFromModelType(PlayerModelManagerModelType t);

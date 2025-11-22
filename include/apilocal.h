@@ -1,6 +1,11 @@
-#include "global.h"
+#ifndef API_LOCAL_H
+#define API_LOCAL_H
+
+#include "PR/ultratypes.h"
+#include "PR/gbi.h"
+#include "z64player.h"
 #include "playermodelmanager_api.h"
-#include "playermodelmanager.h"
+#include "modelmatrixids.h"
 
 PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType);
 bool PlayerModelManager_setDisplayName(PlayerModelManagerHandle h, const char *displayName);
@@ -23,3 +28,5 @@ bool PlayerModelManager_isApplied(PlayerModelManagerHandle h);
 void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a);
 void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a);
 bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form);
+
+#endif

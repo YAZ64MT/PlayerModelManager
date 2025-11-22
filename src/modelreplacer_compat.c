@@ -3,15 +3,17 @@
 #include "global.h"
 #include "recompdata.h"
 #include "modelreplacer_compat.h"
-#include "playermodelmanager.h"
+#include "modelmatrixids.h"
 #include "globalobjects_api.h"
 #include "modelreplacer_api.h"
 #include "model_shared.h"
-#include "model_common.h"
 #include "recomputils.h"
+#include "modelentry.h"
 
 static U32ValueHashmapHandle sObjectIdToVanillaDLToListenerMapMap;
 static U32ValueHashmapHandle sLinkDLEntryToListeners[PLAYER_FORM_MAX];
+static U32ValueHashmapHandle sListenerDLByForm[PLAYER_FORM_MAX + 1]; // add 1 to account for all forms option
+
 static U32HashsetHandle sExcludedDisplayLists;
 
 bool sIsModelReplacerCompatEnabled;
@@ -20,7 +22,28 @@ bool MRC_isMRCEnabled() {
     return sIsModelReplacerCompatEnabled;
 }
 
-MRC_ListenerInfo *getListenerInfo(ObjectId id, Gfx *vanillaDL) {
+Gfx *MRC_getListenerDL(PlayerTransformation form, Link_DisplayList entryDLId) {
+    if (!MRC_isMRCEnabled()) {
+        return NULL;
+    }
+
+    if (form < 0 || form >= PLAYER_FORM_MAX) {
+        return NULL;
+    }
+
+    uintptr_t dl = 0;
+
+    MRC_ListenerInfo *listener = MRC_getListenerFromFormAndDL(form, entryDLId);
+
+    if (listener) {
+        recomputil_u32_value_hashmap_get(sListenerDLByForm[listener->form], entryDLId, &dl);
+    }
+
+    return (Gfx *)dl;
+
+}
+
+static MRC_ListenerInfo *getListenerInfo(ObjectId id, Gfx *vanillaDL) {
     if (!recomputil_u32_value_hashmap_contains(sObjectIdToVanillaDLToListenerMapMap, id)) {
         return NULL;
     }
@@ -32,7 +55,7 @@ MRC_ListenerInfo *getListenerInfo(ObjectId id, Gfx *vanillaDL) {
 }
 
 MRC_ListenerInfo *MRC_getListenerFromFormAndDL(PlayerTransformation form, Link_DisplayList entryDLId) {
-    if (!sIsModelReplacerCompatEnabled) {
+    if (!MRC_isMRCEnabled()) {
         return NULL;
     }
 
@@ -45,7 +68,7 @@ MRC_ListenerInfo *MRC_getListenerFromFormAndDL(PlayerTransformation form, Link_D
     return NULL;
 }
 
-void createListenerInfo(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId) {
+static void createListenerInfo(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId) {
     if (!recomputil_u32_value_hashmap_contains(sObjectIdToVanillaDLToListenerMapMap, id)) {
         recomputil_u32_value_hashmap_insert(sObjectIdToVanillaDLToListenerMapMap, id, recomputil_create_u32_memory_hashmap(sizeof(MRC_ListenerInfo)));
     }
@@ -74,23 +97,17 @@ void createListenerInfo(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, 
 }
 
 void MRC_setupListenerDL(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId) {
-    if (sIsModelReplacerCompatEnabled) {
+    if (MRC_isMRCEnabled()) {
         createListenerInfo(id, vanillaDL, form, linkDLId);
     }
-
-    Gfx **models = NULL;
-
-    if (form == MRC_PLAYER_FORM_EVERY) {
-        models = gSharedDisplayLists;
-    } else {
-        models = gLinkFormProxies[form].vanilla.models;
-    }
-
-    models[linkDLId] = GlobalObjects_getGlobalGfxPtr(id, vanillaDL);
 }
 
 RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, onModelChange)
 void updateListenerDLs_on_onModelChange(ObjectId id, Gfx *vanillaDL, Gfx *newDL) {
+    if (!MRC_isMRCEnabled()) {
+        return;
+    }
+
     if (recomputil_u32_hashset_contains(sExcludedDisplayLists, (uintptr_t)newDL)) {
         return;
     }
@@ -101,20 +118,17 @@ void updateListenerDLs_on_onModelChange(ObjectId id, Gfx *vanillaDL, Gfx *newDL)
         Link_DisplayList linkDLId = listener->linkDLId;
         PlayerTransformation form = listener->form;
 
-        if (listener->form == MRC_PLAYER_FORM_EVERY) {
-            if (gSharedDisplayLists[linkDLId] != newDL) {
-                gSharedDisplayLists[linkDLId] = newDL;
-
-                for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-                    requestRefreshFormProxyDL(&gLinkFormProxies[i], linkDLId);
-                }
-            }
+        if (newDL == GlobalObjects_getGlobalGfxPtr(listener->objId, listener->vanillaDL)) {
+            recomputil_u32_value_hashmap_erase(sListenerDLByForm[listener->form], linkDLId);
         } else {
-            if (gLinkFormProxies[form].vanilla.models[linkDLId] != newDL) {
-                gLinkFormProxies[form].vanilla.models[linkDLId] = newDL;
-                requestRefreshFormProxyDL(&gLinkFormProxies[form], linkDLId);
-            }
+            recomputil_u32_value_hashmap_insert(sListenerDLByForm[listener->form], linkDLId, (uintptr_t)newDL);
         }
+    }
+}
+
+void MRC_addExcludedDL(Gfx *dl) {
+    if (MRC_isMRCEnabled()) {
+        recomputil_u32_hashset_insert(sExcludedDisplayLists, (uintptr_t)dl);
     }
 }
 
@@ -123,6 +137,9 @@ RECOMP_DECLARE_EVENT(_internal_onReadyModelReplacerCompat());
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initModelReplacerHashObjects() {
     sIsModelReplacerCompatEnabled = recomp_is_dependency_met("yazmt_mm_modelreplacer") == DEPENDENCY_STATUS_FOUND;
+
+    // This compatibility layer is currently prone to crashes (Goron shielding skel is most evident example) so disable for now
+    sIsModelReplacerCompatEnabled = false;
 
     if (!sIsModelReplacerCompatEnabled) {
         return;
@@ -136,10 +153,8 @@ void initModelReplacerHashObjects() {
 
     sExcludedDisplayLists = recomputil_create_u32_hashset();
 
-    for (int i = 0; i < LINK_DL_MAX; ++i) {
-        for (int j = 0; j < PLAYER_FORM_MAX; ++j) {
-            recomputil_u32_hashset_insert(sExcludedDisplayLists, (uintptr_t)&gLinkFormProxies[j].displayLists[i]);
-        }
+    for (int i = 0; i < ARRAY_COUNT(sListenerDLByForm); ++i) {
+        sListenerDLByForm[i] = recomputil_create_u32_value_hashmap();
     }
 }
 

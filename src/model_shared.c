@@ -1,11 +1,9 @@
-#include "modding.h"
 #include "global.h"
+#include "modding.h"
 #include "recompdata.h"
 #include "globalobjects_api.h"
 #include "modelreplacer_api.h"
-#include "playermodelmanager.h"
-#include "playermodelmanager_mm.h"
-#include "playermodelmanager_utils.h"
+#include "utils.h"
 #include "assets/objects/object_link_boy/object_link_boy.h"
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "assets/objects/object_link_zora/object_link_zora.h"
@@ -15,7 +13,10 @@
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "maskdls.h"
 #include "modelreplacer_compat.h"
-#include "model_common.h"
+#include "modelentrymanager.h"
+#include "modelentry.h"
+
+ModelEntryForm *gSharedModelEntry;
 
 // handless first person hookshot
 Gfx gLinkHumanFirstPersonHookshotDL[] = {
@@ -175,10 +176,6 @@ Gfx gLinkHumanFirstPersonBowDL[] = {
     gsSPEndDisplayList(),
 };
 
-Gfx *gSharedDisplayLists[LINK_DL_MAX];
-
-Mtx *gSharedMatrixes[LINK_EQUIP_MATRIX_MAX];
-
 Mtx *getHumanMtx(Mtx *mtx) {
     return (Mtx *)((uintptr_t)GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD) + SEGMENT_OFFSET(mtx));
 }
@@ -187,20 +184,47 @@ Gfx *getGameplayKeepDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, dl);
 }
 
-void initSharedDLs() {
-    Mtx **equipMatrixes = gSharedMatrixes;
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK] = getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx);
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK] = getHumanMtx(&gLinkHumanSheathedRazorSwordMtx);
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD_GILDED_BACK] = getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx);
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_HERO_BACK] = getHumanMtx(&gLinkHumanHerosShieldMtx);
-    equipMatrixes[LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK] = getHumanMtx(&gLinkHumanMirrorShieldMtx);
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL] = &gIdentityMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL_GRABBED] = &gIdentityMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_ARROW_DRAWN] = &gIdentityMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK] = &gIdentityMtx;
-    equipMatrixes[LINK_EQUIP_MATRIX_MASKS] = &gIdentityMtx;
+static void setupSharedFallbackModel() {
+    ModelEntry *modelEntry = CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_shared__"));
 
-    Gfx **models = gSharedDisplayLists;
+    CMEM_setEntryHidden(modelEntry, true);
+
+    gSharedModelEntry = (ModelEntryForm *)modelEntry;
+
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK, getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK, getHumanMtx(&gLinkHumanSheathedRazorSwordMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SWORD_GILDED_BACK, getHumanMtx(&gLinkHumanSheathedKokiriSwordMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SHIELD_HERO_BACK, getHumanMtx(&gLinkHumanHerosShieldMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, getHumanMtx(&gLinkHumanMirrorShieldMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, getHumanMtx(&gLinkHumanMirrorShieldMtx));
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SWORD3_PEDESTAL, &gIdentityMtx);
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_SWORD3_PEDESTAL_GRABBED, &gIdentityMtx);
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_ARROW_DRAWN, &gIdentityMtx);
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK, &gIdentityMtx);
+    ModelEntry_setMatrix(modelEntry, LINK_EQUIP_MATRIX_MASKS, &gIdentityMtx);
+
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gElegyShellHumanDL));
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_FPS_HOOKSHOT, gLinkHumanFirstPersonHookshotDL);
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_FPS_BOW, gLinkHumanFirstPersonBowDL);
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_SWORD_FIERCE_DEITY_HILT, gEmptyDL);
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_SWORD_GREAT_FAIRY_HILT, gEmptyDL);
+}
+
+static void setupSharedListenerDL(ObjectId id, Gfx *vanillaDL, Link_DisplayList linkDLId) {
+    ModelEntry_setDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), linkDLId, GlobalObjects_getGlobalGfxPtr(id, vanillaDL));
+    MRC_setupListenerDL(id, vanillaDL, MRC_PLAYER_FORM_EVERY, linkDLId);
+}
+
+static void initSharedDLs() {
+    GlobalObjectsSegmentMap sharedSegMap = {0};
+    sharedSegMap[0x04] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
+    sharedSegMap[0x06] = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
+
+    // repoint vertices, textures, etc. to static link obj
+    GlobalObjects_rebaseDL(gLinkHumanFirstPersonHookshotDL, sharedSegMap);
+    GlobalObjects_rebaseDL(gLinkHumanFirstPersonBowDL, sharedSegMap);
+
+    setupSharedFallbackModel();
 
     // Gameplay Keep
     setupSharedListenerDL(GAMEPLAY_KEEP, gKokiriSwordHandleDL, LINK_DL_SWORD_KOKIRI_HILT);
@@ -217,7 +241,6 @@ void initSharedDLs() {
     setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellDekuDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU);
     setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellGoronDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON);
     setupSharedListenerDL(GAMEPLAY_KEEP, gElegyShellZoraDL, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA);
-    gSharedDisplayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY] = &gLinkFormProxies[PLAYER_FORM_HUMAN].displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN];
     setupSharedListenerDL(GAMEPLAY_KEEP, gDekuMaskDL, LINK_DL_MASK_DEKU);
     setupSharedListenerDL(GAMEPLAY_KEEP, gGoronMaskDL, LINK_DL_MASK_GORON);
     setupSharedListenerDL(GAMEPLAY_KEEP, gZoraMaskDL, LINK_DL_MASK_ZORA);
@@ -244,19 +267,11 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_CHILD, object_link_child_DL_01D960, LINK_DL_HOOKSHOT_HOOK);
 
     // not in Link obj
-    models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;
-    models[LINK_DL_FPS_BOW] = gLinkHumanFirstPersonBowDL;
-
-    GlobalObjectsSegmentMap sharedSegMap = {0};
-    sharedSegMap[0x04] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
-    sharedSegMap[0x06] = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
-
-    // repoint vertices, textures, etc. to static link obj
-    GlobalObjects_rebaseDL(gLinkHumanFirstPersonHookshotDL, sharedSegMap);
-    GlobalObjects_rebaseDL(gLinkHumanFirstPersonBowDL, sharedSegMap);
+    //models[LINK_DL_FPS_HOOKSHOT] = gLinkHumanFirstPersonHookshotDL;
+    //models[LINK_DL_FPS_BOW] = gLinkHumanFirstPersonBowDL;
 
     setupSharedListenerDL(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
-    models[LINK_DL_SWORD_GREAT_FAIRY_HILT] = gEmptyDL;
+    // models[LINK_DL_SWORD_GREAT_FAIRY_HILT] = gEmptyDL;
 
     setupSharedListenerDL(OBJECT_MASK_TRUTH, object_mask_truth_DL_0001A0, LINK_DL_MASK_TRUTH);
     setupSharedListenerDL(OBJECT_MASK_KERFAY, gKafeisMaskDL, LINK_DL_MASK_KAFEIS_MASK);
@@ -295,7 +310,7 @@ void initSharedDLs() {
 
     // Fierce Deity DLs
     setupSharedListenerDL(OBJECT_LINK_BOY, gLinkFierceDeitySwordDL, LINK_DL_SWORD_FIERCE_DEITY_BLADE);
-    models[LINK_DL_SWORD_FIERCE_DEITY_HILT] = gEmptyDL;
+    // models[LINK_DL_SWORD_FIERCE_DEITY_HILT] = gEmptyDL;
 
     // Deku DLs
     setupSharedListenerDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007390, LINK_DL_PIPE_MOUTH);
@@ -337,7 +352,7 @@ void initSharedDLs() {
     setupSharedListenerDL(OBJECT_LINK_GORON, object_link_goron_DL_016A88, LINK_DL_BODY_SHIELD_ARMS_AND_LEGS);
 }
 
-RECOMP_CALLBACK(".", _internal_onReadyFormProxies)
+RECOMP_CALLBACK(".", _internal_setupVanillaModels)
 void initSharedDLs_on_event() {
     initSharedDLs();
 }

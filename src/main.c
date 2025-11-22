@@ -2,11 +2,7 @@
 #include "global.h"
 #include "recomputils.h"
 #include "recompconfig.h"
-#include "playermodelmanager_mm.h"
-#include "model_common.h"
-#include "model_human.h"
-#include "defines_modelinfo.h"
-#include "playermodelmanager_utils.h"
+#include "utils.h"
 #include "modelreplacer_api.h"
 #include "modelreplacer_compat.h"
 #include "globalobjects_api.h"
@@ -14,25 +10,23 @@
 #include "model_shared.h"
 #include "equipmentoverrides.h"
 #include "z64recomp_api.h"
+#include "playerproxy.h"
+#include "formproxy.h"
+#include "proxyactorext.h"
+#include "playerproxymanager.h"
 
 static bool sShouldSkipFormInterpolation[PLAYER_FORM_MAX];
 static bool sShouldSkipMirrorShieldInterpolation;
 static bool sShouldSkipHookshotInterpolation;
 
-U32ValueHashmapHandle gLinkEquipmentGfxOverrides;
-U32ValueHashmapHandle gLinkEquipmentMtxOverrides;
+PlayerProxy *gPlayer1Proxy;
 
-Link_FormProxy gLinkFormProxies[PLAYER_FORM_MAX];
-
-void changeFormPtrsToProxy(PlayerTransformation playerForm) {
-    Link_FormProxy *formProxy = &gLinkFormProxies[playerForm];
-
-    gPlayerSkeletons[playerForm] = &formProxy->skeleton.flexSkeleton;
+void repointFormPtrsToProxy(FormProxy *formProxy, PlayerTransformation playerForm) {
     gPlayerRightHandOpenDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RHAND];
     gPlayerRightHandOpenDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RHAND];
     gPlayerRightHandClosedDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RFIST];
     gPlayerRightHandClosedDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RFIST];
-    
+
     if (playerForm == PLAYER_FORM_HUMAN || playerForm == PLAYER_FORM_FIERCE_DEITY) {
         gPlayerRightHandInstrumentDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RHAND_OCARINA_TIME];
         gPlayerRightHandInstrumentDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RHAND_OCARINA_TIME];
@@ -40,7 +34,7 @@ void changeFormPtrsToProxy(PlayerTransformation playerForm) {
         gPlayerRightHandInstrumentDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RHAND];
         gPlayerRightHandInstrumentDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RHAND];
     }
-    
+
     gPlayerRightHandHookshotDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RFIST_HOOKSHOT];
     gPlayerRightHandHookshotDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RFIST_HOOKSHOT];
 
@@ -88,7 +82,7 @@ static Gfx **sPlayerMaskDLs = D_801C0B20;
 
 static EnBoomStruct *sPlayerBoomerangInfo = D_808A3078;
 
-void repointSharedModelsToProxy(Link_FormProxy *proxy) {
+void repointSharedModelsToProxy(FormProxy *proxy) {
     sPlayerHandHoldingSwords[0] = &proxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
     sPlayerHandHoldingSwords[1] = &proxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
     sPlayerHandHoldingSwords[2] = &proxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
@@ -177,55 +171,30 @@ RECOMP_DECLARE_EVENT(_internal_setupVanillaModels());
 
 // initialize player models as blank display lists
 void initFormProxies() {
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        Link_FormProxy *formProxy = &gLinkFormProxies[i];
-
-        formProxy->current.gfxOverrides = recomputil_create_u32_value_hashmap();
-
-        formProxy->current.mtxOverrides = recomputil_create_u32_value_hashmap();
-
-        clearLinkModelInfo(&formProxy->current.modelInfo);
-
-        initFormProxy(formProxy, i);
-
-        // vanilla forms share these segmented ptrs
-        for (int j = 0; j < PLAYER_EYES_MAX; ++j) {
-            formProxy->vanilla.eyesTextures[j] = sPlayerEyesTextures[j];
-        }
-
-        for (int j = 0; j < PLAYER_MOUTH_MAX; ++j) {
-            formProxy->vanilla.mouthTextures[j] = sPlayerMouthTextures[j];
-        }
-
-        requestRefreshFormProxy(&gLinkFormProxies[i]);
-
-        changeFormPtrsToProxy(i);
-
-        gLinkFormProxies[i].tunicColor.current.r = 30;
-        gLinkFormProxies[i].tunicColor.current.g = 105;
-        gLinkFormProxies[i].tunicColor.current.b = 27;
-        gLinkFormProxies[i].tunicColor.current.a = 0;
-    }
-
     _internal_setupVanillaModels();
+
+    gPlayer1Proxy = PlayerProxyManager_createPlayerProxy();
 }
 
 RECOMP_HOOK("Player_Draw")
 void updateAssets_on_Player_Draw(Actor *thisx, PlayState *play) {
-    Link_FormProxy *fp = &gLinkFormProxies[((Player *)thisx)->transformation];
-    matchFaceTexturesToProxy(fp);
-    repointSharedModelsToProxy(fp);
+    FormProxy *fp = ProxyActorExt_getFormProxy(thisx);
+
+    if (fp) {
+        Player *player = (Player *)thisx;
+        FormProxy_refreshPlayerFaceTextures(fp);
+        repointSharedModelsToProxy(fp);
+        repointFormPtrsToProxy(fp, player->transformation);
+    }
 }
 
-RECOMP_DECLARE_EVENT(_internal_onReadyFormProxies());
-
-static bool sIsFormProxiesInitialized = false;
-
 void doInitFormProxies() {
-    if (!sIsFormProxiesInitialized) {
-        sIsFormProxiesInitialized = true;
+    static bool isFormProxiesInitialized;
+
+    if (!isFormProxiesInitialized) {
+        isFormProxiesInitialized = true;
         initFormProxies();
-        _internal_onReadyFormProxies();
+        PlayerProxyManager_refreshAll();
     }
 }
 
@@ -243,27 +212,12 @@ void initFormProxies_on_go() {
 
 RECOMP_CALLBACK(".", _internal_onFormModelApplied)
 void refreshSharedModelsOnFormModelApply(Link_CustomModelCategory form) {
-    requestRefreshFormProxy(&gLinkFormProxies[form]);
     sShouldSkipFormInterpolation[form] = true;
-    sShouldSkipMirrorShieldInterpolation = true;
-    sShouldSkipHookshotInterpolation = true;
 }
 
 RECOMP_CALLBACK(".", _internal_onEquipmentModelApplied)
-void refreshEquipmentOnEquipmentModelApplied(Link_EquipmentReplacement eq){
-    const EquipmentOverride *override = &gEquipmentOverrideTable[eq];
-
+void refreshEquipmentOnEquipmentModelApplied(Link_EquipmentReplacement eq) {
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        Link_FormProxy *fp = &gLinkFormProxies[i];
-
-        for (size_t j = 0; j < override->dl.count; ++j) {
-            requestRefreshFormProxyDL(fp, override->dl.overrides[j]);
-        }
-        
-        for (size_t j = 0; j < override->mtx.count; ++j) {
-            requestRefreshFormProxyMtx(fp, override->mtx.overrides[j]);
-        }
-
         sShouldSkipFormInterpolation[i] = true;
     }
 
@@ -276,11 +230,15 @@ void refreshEquipmentOnEquipmentModelApplied(Link_EquipmentReplacement eq){
     }
 }
 
+RECOMP_DECLARE_EVENT(_internal_preInitHashObjects());
 RECOMP_DECLARE_EVENT(_internal_initHashObjects());
+RECOMP_DECLARE_EVENT(_internal_postInitHashObjects());
 
 RECOMP_CALLBACK("*", recomp_on_init)
 void handleInits() {
+    _internal_preInitHashObjects();
     _internal_initHashObjects();
+    _internal_postInitHashObjects();
 }
 
 RECOMP_CALLBACK("*", recomp_on_play_main)
@@ -299,18 +257,19 @@ void skipInterpolationOnPlay(PlayState *play) {
         sShouldSkipFormInterpolation[i] = false;
     }
 
-    if (sShouldSkipMirrorShieldInterpolation || sShouldSkipHookshotInterpolation)  {
+    if (sShouldSkipMirrorShieldInterpolation || sShouldSkipHookshotInterpolation) {
         Actor *actor = play->actorCtx.actorLists[ACTORCAT_ITEMACTION].first;
 
         while (actor) {
-            if (actor->id == ACTOR_MIR_RAY3 || actor->id == ACTOR_ARMS_HOOK) {
+            if ((sShouldSkipMirrorShieldInterpolation && actor->id == ACTOR_MIR_RAY3) ||
+                (sShouldSkipHookshotInterpolation && actor->id == ACTOR_ARMS_HOOK)) {
                 actor_set_interpolation_skipped(actor);
             }
 
             actor = actor->next;
         }
-    }
 
-    sShouldSkipMirrorShieldInterpolation = false;
-    sShouldSkipHookshotInterpolation = false;
+        sShouldSkipMirrorShieldInterpolation = false;
+        sShouldSkipHookshotInterpolation = false;
+    }
 }
