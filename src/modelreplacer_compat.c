@@ -43,7 +43,7 @@ Gfx *MRC_getListenerDL(PlayerTransformation form, Link_DisplayList entryDLId) {
 
 }
 
-MRC_ListenerInfo *getListenerInfo(ObjectId id, Gfx *vanillaDL) {
+static MRC_ListenerInfo *getListenerInfo(ObjectId id, Gfx *vanillaDL) {
     if (!recomputil_u32_value_hashmap_contains(sObjectIdToVanillaDLToListenerMapMap, id)) {
         return NULL;
     }
@@ -68,7 +68,7 @@ MRC_ListenerInfo *MRC_getListenerFromFormAndDL(PlayerTransformation form, Link_D
     return NULL;
 }
 
-void createListenerInfo(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId) {
+static void createListenerInfo(ObjectId id, Gfx *vanillaDL, PlayerTransformation form, Link_DisplayList linkDLId) {
     if (!recomputil_u32_value_hashmap_contains(sObjectIdToVanillaDLToListenerMapMap, id)) {
         recomputil_u32_value_hashmap_insert(sObjectIdToVanillaDLToListenerMapMap, id, recomputil_create_u32_memory_hashmap(sizeof(MRC_ListenerInfo)));
     }
@@ -104,6 +104,10 @@ void MRC_setupListenerDL(ObjectId id, Gfx *vanillaDL, PlayerTransformation form,
 
 RECOMP_CALLBACK(YAZMT_Z64_MODEL_REPLACER_MOD_NAME, onModelChange)
 void updateListenerDLs_on_onModelChange(ObjectId id, Gfx *vanillaDL, Gfx *newDL) {
+    if (!MRC_isMRCEnabled()) {
+        return;
+    }
+
     if (recomputil_u32_hashset_contains(sExcludedDisplayLists, (uintptr_t)newDL)) {
         return;
     }
