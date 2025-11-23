@@ -164,9 +164,11 @@ static void initProxyShims(FormProxy *fp) {
     Gfx **mtxDls = fp->mtxDisplayLists;
     Gfx **shims = fp->shimDisplayListPtrs;
 
+    Gfx *shimArr = recomp_alloc(sizeof(*shimArr) * LINK_SHIMDL_MAX);
+
     // init by pointing all to DF command
     for (int i = 0; i < LINK_SHIMDL_MAX; ++i) {
-        shims[i] = recomp_alloc(sizeof(Gfx));
+        shims[i] = &shimArr[i];
         gSPBranchList(shims[i], gEmptyDL);
     }
 
