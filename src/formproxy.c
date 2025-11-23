@@ -11,6 +11,15 @@
 #include "modelentry.h"
 #include "modelreplacer_compat.h"
 #include "recompconfig.h"
+#include "playermodelconfig.h"
+
+#define PRINT_INVALID_PTR_ERR() Logger_printError("Received invalid FormProxy pointer.")
+
+static U32HashsetHandle sValidFormProxyPtrs;
+
+static bool isValidFormProxy(const FormProxy *fp) {
+    return recomputil_u32_hashset_contains(sValidFormProxyPtrs, (uintptr_t)fp);
+}
 
 static Gfx sPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
@@ -321,6 +330,8 @@ void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, F
         Utils_tryCrashGame();
     }
 
+    recomputil_u32_hashset_insert(sValidFormProxyPtrs, (uintptr_t)fp);
+
     fp->playerProxy = pp;
     fp->form = form;
     fp->fpId = fpId;
@@ -340,10 +351,20 @@ void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, F
 }
 
 FormProxyId FormProxy_getFormProxyId(const FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return PlayerModelConfig_getNumFormIds();
+    }
+
     return fp->fpId;
 }
 
 bool FormProxy_setAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id, FormProxy *alt) {
+    if (!isValidFormProxy(fp) || (alt && !isValidFormProxy(alt))) {
+        PRINT_INVALID_PTR_ERR();
+        return false;
+    }
+
     if (alt == fp) {
         Logger_printWarning("fp == alt! Trying to assign would create circular reference! Ignoring...");
         return false;
@@ -357,38 +378,83 @@ bool FormProxy_setAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id, FormP
 }
 
 bool FormProxy_unsetAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return false;
+    }
+
     return recomputil_u32_value_hashmap_erase(fp->displayListAlternates, id);
 }
 
 ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return NULL;
+    }
+
     return &fp->currentModelInfo;
 }
 
 ModelInfo *FormProxy_getFallbackOverrideModelInfo(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return NULL;
+    }
+
     return fp->fallbackOverrideModelInfo;
 }
 
 ModelInfo *FormProxy_getFallbackModelInfo(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return NULL;
+    }
+
     return fp->fallbackModelInfo;
 }
 
 bool FormProxy_setCurrentOverrideDL(FormProxy *fp, Link_DisplayList dlId, Gfx *dl) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return false;
+    }
+
     return ModelInfo_setGfxOverride(&fp->currentModelInfo, dlId, dl);
 }
 
 bool FormProxy_unsetCurrentOverrideDL(FormProxy *fp, Link_DisplayList dlId) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return false;
+    }
+
     return ModelInfo_unsetGfxOverride(&fp->currentModelInfo, dlId);
 }
 
 bool FormProxy_setCurrentOverrideMtx(FormProxy *fp, Link_EquipmentMatrix mtxId, Mtx *mtx) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return false;
+    }
+
     return ModelInfo_setMtxOverride(&fp->currentModelInfo, mtxId, mtx);
 }
 
 bool FormProxy_unsetCurrentOverrideMtx(FormProxy *fp, Link_EquipmentMatrix mtxId) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return false;
+    }
+
     return ModelInfo_unsetMtxOverride(&fp->currentModelInfo, mtxId);
 }
 
 void FormProxy_refreshSkeletons(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
 #define NO_DISPLAY_LIST LINK_DL_MAX
 
     static const Link_DisplayList limbToDLEntry[PLAYER_LIMB_COUNT] = {
@@ -472,6 +538,11 @@ void FormProxy_refreshSkeletons(FormProxy *fp) {
 }
 
 void FormProxy_refreshDL(FormProxy *fp, Link_DisplayList id) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     Gfx *dl = FormProxy_getDL(fp, id);
 
     if (dl) {
@@ -573,6 +644,11 @@ static void setDLsToShims(FormProxy *fp) {
 }
 
 void FormProxy_refreshAllDLs(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     WrappedDisplayList *wDLs = fp->wrappedDisplayLists;
     ModelInfo *current = &fp->currentModelInfo;
     ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
@@ -614,6 +690,11 @@ void FormProxy_refreshAllDLs(FormProxy *fp) {
 }
 
 void FormProxy_refreshMtx(FormProxy *fp, Link_EquipmentMatrix id) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     Mtx *matrix = ModelInfo_getMtx(&fp->currentModelInfo, id);
 
     if (!matrix) {
@@ -628,35 +709,67 @@ void FormProxy_refreshMtx(FormProxy *fp, Link_EquipmentMatrix id) {
         matrix = ModelEntry_getMatrix(ModelEntryForm_getModelEntry(gSharedModelEntry), id);
     }
 
-    if (matrix) {
-        gSPMatrix(&fp->mtxDisplayLists[id][0], matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+    if (!matrix) {
+        matrix = &gIdentityMtx;
     }
+
+    gSPMatrix(&fp->mtxDisplayLists[id][0], matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
 }
 
 void FormProxy_refreshAllMtxs(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
         FormProxy_refreshMtx(fp, i);
     }
 }
 
 void FormProxy_requestTunicColorOverride(FormProxy *fp, Color_RGBA8 color) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     fp->tunicColor.isOverrideRequested = true;
     fp->tunicColor.requested = color;
 }
 
 bool FormProxy_isTunicColorOverrideRequested(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return false;
+    }
+
     return fp->tunicColor.isOverrideRequested;
 }
 
 Color_RGBA8 FormProxy_getRequestedTunicColor(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return (Color_RGBA8){0, 0, 0, 0};
+    }
+
     return fp->tunicColor.requested;
 }
 
 Color_RGBA8 FormProxy_getCurrentTunicColor(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return (Color_RGBA8){0, 0, 0, 0};
+    }
+
     return fp->tunicColor.current;
 }
 
 void FormProxy_resetTunicColor(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     fp->tunicColor.current = (Color_RGBA8){30, 105, 27, 0};
 }
 
@@ -705,6 +818,11 @@ typedef enum TunicColorConfigOption {
 } TunicColorConfigOption;
 
 void FormProxy_pullCurrentTunicColorFromConfig(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     char *color = recomp_get_config_string("tunic_color");
 
     if (color) {
@@ -721,14 +839,29 @@ void FormProxy_pullCurrentTunicColorFromConfig(FormProxy *fp) {
 }
 
 void FormProxy_pullCurrentTunicColorFromRequested(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     fp->tunicColor.current = fp->tunicColor.requested;
 }
 
 void FormProxy_setCurrentModelFormEntry(FormProxy *fp, ModelEntryForm *modelEntry) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     ModelInfo_setModelEntryForm(&fp->currentModelInfo, modelEntry);
 }
 
 void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     extern TexturePtr sPlayerEyesTextures[];
     extern TexturePtr sPlayerMouthTextures[];
 
@@ -766,16 +899,31 @@ void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
 }
 
 void FormProxy_refresh(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return;
+    }
+
     FormProxy_refreshSkeletons(fp);
     FormProxy_refreshAllDLs(fp);
     FormProxy_refreshAllMtxs(fp);
 }
 
 Mtx *FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return NULL;
+    }
+
     return (Mtx *)fp->mtxDisplayLists[id][0].words.w1;
 }
 
 Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return NULL;
+    }
+
     Gfx *dl = MRC_getListenerDL(fp->form, id);
 
     if (!dl) {
@@ -847,18 +995,38 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
 }
 
 Gfx *FormProxy_getCurrentDL(FormProxy *fp, Link_DisplayList id) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return NULL;
+    }
+
     return &fp->displayLists[id];
 }
 
 FlexSkeletonHeader *FormProxy_getSkeleton(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return NULL;
+    }
+
     return &fp->skeleton.flexSkeleton;
 }
 
 FlexSkeletonHeader *FormProxy_getShieldingSkeleton(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return NULL;
+    }
+
     return &fp->shieldingSkeleton.flexSkeleton;
 }
 
 bool FormProxy_isAdultModelType(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return false;
+    }
+
     ModelEntryForm *curr = ModelInfo_getModelEntryForm(&fp->currentModelInfo);
 
     if (curr) {
@@ -873,9 +1041,24 @@ bool FormProxy_isAdultModelType(FormProxy *fp) {
 }
 
 PlayerProxy *FormProxy_getPlayerProxy(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return NULL;
+    }
+
     return fp->playerProxy;
 }
 
 PlayerTransformation FormProxy_getTargetForm(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return PLAYER_FORM_MAX;
+    }
+
     return fp->form;
+}
+
+RECOMP_CALLBACK(".", _internal_initHashObjects)
+void initFormProxyObjects() {
+    sValidFormProxyPtrs = recomputil_create_u32_hashset();
 }
