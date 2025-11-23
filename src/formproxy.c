@@ -712,6 +712,8 @@ void FormProxy_pullCurrentTunicColorFromConfig(FormProxy *fp) {
             fp->tunicColor.current.r = sToU8(color);
             fp->tunicColor.current.g = sToU8(color + 2);
             fp->tunicColor.current.b = sToU8(color + 4);
+        } else {
+            FormProxy_resetTunicColor(fp);
         }
 
         recomp_free_config_string(color);
