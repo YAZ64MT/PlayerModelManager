@@ -18,6 +18,24 @@ static bool isValidModelEntry(const ModelEntry *entry) {
     return recomputil_u32_hashset_contains(sValidModelEntryPtrs, (uintptr_t)entry);
 }
 
+static U32HashsetHandle sValidModelEntryFormPtrs;
+
+static bool isValidModelEntryForm(const ModelEntryForm *entry) {
+    return recomputil_u32_hashset_contains(sValidModelEntryFormPtrs, (uintptr_t)entry);
+}
+
+static U32HashsetHandle sValidModelEntryEquipmentPtrs;
+
+static bool isValidModelEntryEquipment(const ModelEntryEquipment *entry) {
+    return recomputil_u32_hashset_contains(sValidModelEntryEquipmentPtrs, (uintptr_t)entry);
+}
+
+static U32HashsetHandle sValidModelEntryPackPtrs;
+
+static bool isValidModelEntryPack(const ModelEntryPack *entry) {
+    return recomputil_u32_hashset_contains(sValidModelEntryPackPtrs, (uintptr_t)entry);
+}
+
 typedef struct ModelEntryFunctions {
     bool (*applyToFormProxy)(const struct ModelEntry *entry, FormProxy *fp);
     bool (*removeFromFormProxy)(const struct ModelEntry *entry, FormProxy *fp);
@@ -93,7 +111,7 @@ static bool ModelEntry_setMatrix_default(ModelEntry *entry, Link_EquipmentMatrix
     return true;
 }
 
-bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+static bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
 
     Link_CustomModelCategory cat = getCategoryFromModelType(type);
 
@@ -134,6 +152,7 @@ bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerM
     entry->handle = handle;
     entry->displayListPtrs = recomputil_create_u32_value_hashmap();
     entry->mtxPtrs = recomputil_create_u32_value_hashmap();
+
     recomputil_u32_hashset_insert(sValidModelEntryPtrs, (uintptr_t)entry);
 
     return true;
@@ -180,7 +199,7 @@ bool ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) 
 Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
     if (!isValidModelEntry(entry)) {
         PRINT_INVALID_PTR_ERR();
-        return false;
+        return NULL;
     }
 
     uintptr_t ret = 0;
@@ -258,6 +277,8 @@ static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle 
     entry->shieldingSkel = NULL;
     Lib_MemSet(entry->mouthTex, 0, sizeof(entry->mouthTex));
     Lib_MemSet(entry->eyesTex, 0, sizeof(entry->eyesTex));
+
+    recomputil_u32_hashset_insert(sValidModelEntryFormPtrs, (uintptr_t)entry);
 
     return true;
 }
@@ -406,7 +427,7 @@ ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelM
 }
 
 ModelEntry *ModelEntryForm_getModelEntry(ModelEntryForm *entry) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryForm(entry)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;
     }
@@ -415,7 +436,7 @@ ModelEntry *ModelEntryForm_getModelEntry(ModelEntryForm *entry) {
 }
 
 TexturePtr ModelEntryForm_getEyesTexture(ModelEntryForm *entry, PlayerEyeIndex i) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryForm(entry)) {
         PRINT_INVALID_PTR_ERR();
         return 0;
     }
@@ -424,7 +445,7 @@ TexturePtr ModelEntryForm_getEyesTexture(ModelEntryForm *entry, PlayerEyeIndex i
 }
 
 TexturePtr ModelEntryForm_getMouthTexture(ModelEntryForm *entry, PlayerMouthIndex i) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryForm(entry)) {
         PRINT_INVALID_PTR_ERR();
         return 0;
     }
@@ -433,7 +454,7 @@ TexturePtr ModelEntryForm_getMouthTexture(ModelEntryForm *entry, PlayerMouthInde
 }
 
 void ModelEntryForm_setEyesTexture(ModelEntryForm *entry, TexturePtr tex, PlayerEyeIndex i) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryForm(entry)) {
         PRINT_INVALID_PTR_ERR();
         return;
     }
@@ -447,7 +468,7 @@ void ModelEntryForm_setEyesTexture(ModelEntryForm *entry, TexturePtr tex, Player
 }
 
 void ModelEntryForm_setMouthTexture(ModelEntryForm *entry, TexturePtr tex, PlayerMouthIndex i) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryForm(entry)) {
         PRINT_INVALID_PTR_ERR();
         return;
     }
@@ -471,7 +492,7 @@ void ModelEntryForm_fillDefaultFaceTextures(ModelEntryForm *entry) {
 }
 
 void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryForm(entry)) {
         PRINT_INVALID_PTR_ERR();
         return;
     }
@@ -527,7 +548,7 @@ void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
 }
 
 void ModelEntryForm_setSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryForm(entry)) {
         PRINT_INVALID_PTR_ERR();
         return;
     }
@@ -536,7 +557,7 @@ void ModelEntryForm_setSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel)
 }
 
 FlexSkeletonHeader *ModelEntryForm_getSkeleton(ModelEntryForm *entry) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryForm(entry)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;
     }
@@ -545,7 +566,7 @@ FlexSkeletonHeader *ModelEntryForm_getSkeleton(ModelEntryForm *entry) {
 }
 
 void ModelEntryForm_setShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryForm(entry)) {
         PRINT_INVALID_PTR_ERR();
         return;
     }
@@ -554,7 +575,7 @@ void ModelEntryForm_setShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHead
 }
 
 FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryForm(entry)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;
     }
@@ -685,6 +706,8 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
     entry->modelEntry.virtualFuncs = &funcs;
     entry->equipType = getEquipmentReplacementFromCategory(entry->modelEntry.category);
 
+    recomputil_u32_hashset_insert(sValidModelEntryEquipmentPtrs, (uintptr_t)entry);
+
     return true;
 }
 
@@ -708,7 +731,7 @@ ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, Pl
 }
 
 ModelEntry *ModelEntryEquipment_getModelEntry(ModelEntryEquipment *entry) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryEquipment(entry)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;
     }
@@ -755,6 +778,8 @@ bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle,
     entry->modelEntry.virtualFuncs = &funcs;
     entry->modelEntries = YAZMTCore_IterableU32Set_new();
 
+    recomputil_u32_hashset_insert(sValidModelEntryPackPtrs, (uintptr_t)entry);
+
     return true;
 }
 
@@ -778,7 +803,7 @@ ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, char *intern
 }
 
 ModelEntry *ModelEntryPack_getModelEntry(ModelEntryPack *entry) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryPack(entry)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;
     }
@@ -787,7 +812,7 @@ ModelEntry *ModelEntryPack_getModelEntry(ModelEntryPack *entry) {
 }
 
 ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *entry) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryPack(entry)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;
     }
@@ -796,7 +821,7 @@ ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *en
 }
 
 size_t ModelEntryPack_getModelEntriesCount(const ModelEntryPack *entry) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryPack(entry)) {
         PRINT_INVALID_PTR_ERR();
         return 0;
     }
@@ -839,12 +864,12 @@ static bool isEntryInPack(const ModelEntryPack *pack, const ModelEntry *entry) {
 }
 
 bool ModelEntryPack_addEntryToPack(ModelEntryPack *entry, ModelEntry *entryToAdd) {
-    if (!isValidModelEntry((ModelEntry *)entry)) {
+    if (!isValidModelEntryPack(entry)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;
     }
 
-    if (!isValidModelEntry((ModelEntry *)entryToAdd)) {
+    if (!isValidModelEntry(entryToAdd)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;
     }
@@ -862,4 +887,7 @@ void initModelEntryObjects() {
     sQueuedPacks = YAZMTCore_DynamicU32Array_new();
 
     sValidModelEntryPtrs = recomputil_create_u32_hashset();
+    sValidModelEntryFormPtrs = recomputil_create_u32_hashset();
+    sValidModelEntryEquipmentPtrs = recomputil_create_u32_hashset();
+    sValidModelEntryPackPtrs = recomputil_create_u32_hashset();
 }
