@@ -10,8 +10,9 @@
 #include "modelentry.h"
 
 static void refreshFileList();
+static void onUpOneLevelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata);
 
-typedef struct {
+typedef struct CategoryInfo {
     const char *displayName;
     bool isVisible;
     bool isUsedByCurrentGame;
@@ -101,7 +102,7 @@ static bool isValidCategoryInfoIndex(int i) {
 }
 
 static bool isSelectingCategory() {
-    return sCurrentCategoryInfo == SELECTING_CATEGORY;
+    return false;
 }
 
 static bool isSelectingModel() {
@@ -229,48 +230,55 @@ static void connectListBoxButtons(const RecompuiResource buttons[], size_t n) {
     recompui_set_nav(last, NAVDIRECTION_LEFT, first);
 }
 
-YAZMTCore_IterableU32Set *sListButtons;
+YAZMTCore_IterableU32Set *sModelListButtons;
 
-static const RecompuiResource *getCurrentButtonArray() {
-    return YAZMTCore_IterableU32Set_values(sListButtons);
+static const RecompuiResource *getCurrentModelButtonArray() {
+    return YAZMTCore_IterableU32Set_values(sModelListButtons);
 }
 
-static size_t getCurrentButtonArraySize() {
-    return YAZMTCore_IterableU32Set_size(sListButtons);
+static size_t getCurrentModelButtonArraySize() {
+    return YAZMTCore_IterableU32Set_size(sModelListButtons);
 }
 
-static void pushButtonToList(RecompuiResource button) {
-    YAZMTCore_IterableU32Set_insert(sListButtons, button);
+YAZMTCore_IterableU32Set *sCategoryListButtons;
+
+static const RecompuiResource *getCategoryButtonArray() {
+    return YAZMTCore_IterableU32Set_values(sCategoryListButtons);
 }
 
-RecompuiResource createAndPushButtonToList(RecompuiContext context, RecompuiResource parent, const char *text, RecompuiButtonStyle style) {
+static size_t getCategoryButtonArraySize() {
+    return YAZMTCore_IterableU32Set_size(sCategoryListButtons);
+}
+
+static void pushButtonToList(YAZMTCore_IterableU32Set *buttonList, RecompuiResource button) {
+    YAZMTCore_IterableU32Set_insert(buttonList, button);
+}
+
+RecompuiResource createAndPushButtonToList(RecompuiContext context, RecompuiResource parent, const char *text, RecompuiButtonStyle style, YAZMTCore_IterableU32Set *buttonList) {
     RecompuiResource button = createListBoxButton(context, parent, text, style);
-    pushButtonToList(button);
+    pushButtonToList(buttonList, button);
     return button;
 }
 
-U32ValueHashmapHandle sButtonsToData;
+U32ValueHashmapHandle sModelButtonsToData;
+U32ValueHashmapHandle sCategoryButtonsToData;
 
-static const void *getListButtonData(RecompuiResource button) {
+static const void *getListButtonData(U32ValueHashmapHandle dataMap, RecompuiResource button) {
     u32 out = (uintptr_t)NULL;
-    recomputil_u32_value_hashmap_get(sButtonsToData, button, &out);
+    recomputil_u32_value_hashmap_get(dataMap, button, &out);
     return (void *)out;
 }
 
-static void setListButtonData(RecompuiResource button, const void *data) {
-    if (YAZMTCore_IterableU32Set_contains(sListButtons, button)) {
-        recomputil_u32_value_hashmap_insert(sButtonsToData, button, (uintptr_t)data);
-    }
+static void setListButtonData(U32ValueHashmapHandle dataMap, RecompuiResource button, const void *data) {
+    recomputil_u32_value_hashmap_insert(dataMap, button, (uintptr_t)data);
 }
 
-static bool getListButtonValue(RecompuiResource button, u32 *out) {
-    return recomputil_u32_value_hashmap_get(sButtonsToData, button, out);
+static bool getListButtonValue(U32ValueHashmapHandle dataMap, RecompuiResource button, u32 *out) {
+    return recomputil_u32_value_hashmap_get(dataMap, button, out);
 }
 
-static void setListButtonValue(RecompuiResource button, u32 val) {
-    if (YAZMTCore_IterableU32Set_contains(sListButtons, button)) {
-        recomputil_u32_value_hashmap_insert(sButtonsToData, button, val);
-    }
+static void setListButtonValue(U32ValueHashmapHandle dataMap, RecompuiResource button, u32 val) {
+    recomputil_u32_value_hashmap_insert(dataMap, button, val);
 }
 
 static void setButtonColor(RecompuiResource button, const ButtonColor *color) {
@@ -278,26 +286,42 @@ static void setButtonColor(RecompuiResource button, const ButtonColor *color) {
     recompui_set_border_color(button, &color->borderColor);
 }
 
-static void refreshButtonEntryColors() {
-    if (isSelectingCategory()) {
-        return;
+static void refreshModelButtonEntryColors() {
+    CategoryInfo *catInf = getCurrentCategoryInfo();
+
+    if (catInf) {
+        void *entry = (void *)CMEM_getCurrentEntry(catInf->category);
+        size_t count = getCurrentModelButtonArraySize();
+        const RecompuiResource *buttons = getCurrentModelButtonArray();
+
+        for (size_t i = 0; i < count; ++i) {
+            RecompuiResource button = buttons[i];
+            const void *buttonData = getListButtonData(sModelButtonsToData, button);
+
+            if (entry && entry == buttonData) {
+                setButtonColor(button, &sModelSelectedButtonColor);
+            } else if (buttonData) {
+                setButtonColor(button, &sPrimaryButtonColor);
+            }
+        }
     }
+}
 
-    if (isSelectingModel()) {
-        void *entry = (void *)CMEM_getCurrentEntry(getCurrentCategoryInfo()->category);
-        {
-            size_t count = getCurrentButtonArraySize();
-            const RecompuiResource *buttons = getCurrentButtonArray();
+static void refreshCategoryButtonEntryColors() {
+    CategoryInfo *catInf = getCurrentCategoryInfo();
 
-            for (size_t i = 0; i < count; ++i) {
-                RecompuiResource button = buttons[i];
-                const void *buttonData = getListButtonData(button);
+    if (catInf) {
+        size_t count = getCategoryButtonArraySize();
+        const RecompuiResource *buttons = getCategoryButtonArray();
 
-                if (entry && entry == buttonData) {
-                    setButtonColor(button, &sModelSelectedButtonColor);
-                } else if (buttonData) {
-                    setButtonColor(button, &sPrimaryButtonColor);
-                }
+        for (size_t i = 0; i < count; ++i) {
+            RecompuiResource button = buttons[i];
+            const void *buttonData = getListButtonData(sCategoryButtonsToData, button);
+
+            if (buttonData && buttonData == catInf) {
+                setButtonColor(button, &sModelSelectedButtonColor);
+            } else if (buttonData) {
+                setButtonColor(button, &sPrimaryButtonColor);
             }
         }
     }
@@ -313,11 +337,17 @@ static RecompuiResource sButtonCategoryNext;
 static RecompuiResource sButtonCategoryPrev;
 static RecompuiResource sLabelCategory;
 static RecompuiResource sButtonClose;
-static RecompuiResource sButtonUpOneMenuLevel;
+static RecompuiResource sButtonCategoriesShow;
+
+static RecompuiResource sContainerCategories;
+static bool sIsContainerCategoriesVisible;
+static RecompuiResource sCategoriesListElement;
+static RecompuiResource sCategoriesTopRow;
+static RecompuiResource sButtonCategoriesHide;
 
 static bool sIsUIContextShown = false;
 
-RecompuiResource sContainerListButtons;
+RecompuiResource sModelListElement;
 RecompuiResource sLabelAuthorPrefix;
 RecompuiResource sLabelAuthor;
 
@@ -399,11 +429,9 @@ static void saveAllModels() {
 static void removeAllModelsButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (sIsUIContextShown) {
         if (data->type == UI_EVENT_CLICK) {
-            if (isSelectingCategory()) {
-                Audio_PlaySfx(NA_SE_SY_DECIDE);
-                removeAllModels();
-                saveAllModels();
-            }
+            Audio_PlaySfx(NA_SE_SY_DECIDE);
+            removeAllModels();
+            saveAllModels();
         }
     }
 }
@@ -561,21 +589,7 @@ static void changeCategoryButtonPressed(RecompuiResource resource, const Recompu
     }
 }
 
-static void destroyNextPrevCategoryButtons() {
-    if (sButtonCategoryNext) {
-        recompui_destroy_element(sRowCategory, sButtonCategoryNext);
-        sButtonCategoryNext = 0;
-    }
-
-    if (sButtonCategoryPrev) {
-        recompui_destroy_element(sRowCategory, sButtonCategoryPrev);
-        sButtonCategoryPrev = 0;
-    }
-}
-
 static void createNextPrevCategoryButtons() {
-    destroyNextPrevCategoryButtons();
-
     sButtonCategoryPrev = recompui_create_button(sUIContext, sRowCategory, "◀", BUTTONSTYLE_SECONDARY);
     sButtonCategoryNext = recompui_create_button(sUIContext, sRowCategory, "▶", BUTTONSTYLE_SECONDARY);
 
@@ -583,31 +597,73 @@ static void createNextPrevCategoryButtons() {
     recompui_register_callback(sButtonCategoryNext, changeCategoryButtonPressed, (void *)1);
 }
 
+static void setupContainer(RecompuiResource container, float borderWidth, float borderRadius, RecompuiColor *borderColor, RecompuiColor *modalColor) {
+    recompui_set_height(container, 100.f, UNIT_PERCENT);
+    recompui_set_flex_grow(container, 1.0f);
+    recompui_set_max_width(container, 33.f, UNIT_PERCENT);
+
+    recompui_set_display(container, DISPLAY_FLEX);
+    recompui_set_justify_content(container, JUSTIFY_CONTENT_FLEX_START);
+    recompui_set_flex_direction(container, FLEX_DIRECTION_COLUMN);
+    recompui_set_padding(container, 16.0f, UNIT_DP);
+    recompui_set_gap(container, 16.0f, UNIT_DP);
+    recompui_set_align_items(container, ALIGN_ITEMS_FLEX_START);
+
+    recompui_set_border_width(container, borderWidth, UNIT_DP);
+    recompui_set_border_radius(container, borderRadius, UNIT_DP);
+    recompui_set_border_color(container, borderColor);
+    recompui_set_background_color(container, modalColor);
+}
+
+static void setupScrollingList(RecompuiResource list) {
+    recompui_set_flex_basis(list, 100.0f, UNIT_DP);
+    recompui_set_flex_grow(list, 1.0f);
+    recompui_set_flex_shrink(list, 0.0f);
+    recompui_set_display(list, DISPLAY_FLEX);
+    recompui_set_flex_direction(list, FLEX_DIRECTION_COLUMN);
+    recompui_set_justify_content(list, JUSTIFY_CONTENT_FLEX_START);
+    recompui_set_align_items(list, ALIGN_ITEMS_FLEX_START);
+    recompui_set_gap(list, 16.0f, UNIT_DP);
+    recompui_set_overflow_y(list, OVERFLOW_SCROLL);
+    recompui_set_overflow_x(list, OVERFLOW_HIDDEN);
+}
+
+static void setupRow(RecompuiResource row) {
+    recompui_set_flex_basis(row, 100.0f, UNIT_DP);
+    recompui_set_flex_grow(row, 0);
+    recompui_set_flex_shrink(row, 0);
+    recompui_set_display(row, DISPLAY_FLEX);
+    recompui_set_flex_direction(row, FLEX_DIRECTION_ROW);
+    recompui_set_justify_content(row, JUSTIFY_CONTENT_FLEX_START);
+    recompui_set_align_items(row, ALIGN_ITEMS_FLEX_END);
+    recompui_set_gap(row, 16.0f, UNIT_DP);
+}
+
 RECOMP_CALLBACK(".", _internal_preInitHashObjects)
 void initUIOnRecompInit() {
-    RecompuiColor bg_color;
-    bg_color.r = 255;
-    bg_color.g = 255;
-    bg_color.b = 255;
-    bg_color.a = 0.1f * 255;
+    RecompuiColor backgroundColor;
+    backgroundColor.r = 255;
+    backgroundColor.g = 255;
+    backgroundColor.b = 255;
+    backgroundColor.a = 0.1f * 255;
 
-    RecompuiColor border_color;
-    border_color.r = 255;
-    border_color.g = 255;
-    border_color.b = 255;
-    border_color.a = 0.2f * 255;
+    RecompuiColor borderColor;
+    borderColor.r = 255;
+    borderColor.g = 255;
+    borderColor.b = 255;
+    borderColor.a = 0.2f * 255;
 
-    RecompuiColor modal_color;
-    modal_color.r = 8;
-    modal_color.g = 7;
-    modal_color.b = 13;
-    modal_color.a = 0.9f * 255;
+    RecompuiColor modalColor;
+    modalColor.r = 8;
+    modalColor.g = 7;
+    modalColor.b = 13;
+    modalColor.a = 0.9f * 255;
 
-    const float body_padding = 64.0f;
-    const float modal_height = RECOMPUI_TOTAL_HEIGHT - (2 * body_padding);
-    const float modal_max_width = modal_height * (16.0f / 9.0f);
-    const float modal_border_width = 1.1f;
-    const float modal_border_radius = 16.0f;
+    const float bodyPadding = 64.0f;
+    const float modalHeight = RECOMPUI_TOTAL_HEIGHT - (2 * bodyPadding);
+    const float modalMaxWidth = modalHeight * (16.0f / 9.0f);
+    const float modalBorderWidth = 1.1f;
+    const float modalBorderRadius = 16.0f;
 
     sUIContext = recompui_create_context();
     recompui_open_context(sUIContext);
@@ -623,75 +679,34 @@ void initUIOnRecompInit() {
     recompui_set_height_auto(sUIRoot);
 
     // Set up the sUIRoot element's padding so the modal contents don't touch the screen edges.
-    recompui_set_padding(sUIRoot, body_padding, UNIT_DP);
-    // recompui_set_background_color(sUIRoot, &bg_color);
+    recompui_set_padding(sUIRoot, bodyPadding, UNIT_DP);
 
     // Set up the flexbox properties of the sUIRoot element.
-    recompui_set_flex_direction(sUIRoot, FLEX_DIRECTION_COLUMN);
+    recompui_set_flex_direction(sUIRoot, FLEX_DIRECTION_ROW);
     recompui_set_justify_content(sUIRoot, JUSTIFY_CONTENT_FLEX_START);
     recompui_set_align_items(sUIRoot, ALIGN_ITEMS_FLEX_START);
 
-    // Create a sContainerMain to act as the modal background and hold the elements in the modal.
     sContainerMain = recompui_create_element(sUIContext, sUIRoot);
 
-    // Take up the a fixed height and the full width, up to a maximum width.
-    recompui_set_height(sContainerMain, 25.0f, UNIT_PERCENT);
-    recompui_set_flex_grow(sContainerMain, 1.0f);
-    recompui_set_max_width(sContainerMain, modal_max_width, UNIT_DP);
-    recompui_set_width(sContainerMain, 33.0f, UNIT_PERCENT);
-
-    // Set up the properties of the sContainerMain.
-    recompui_set_display(sContainerMain, DISPLAY_FLEX);
-    recompui_set_justify_content(sContainerMain, JUSTIFY_CONTENT_FLEX_START);
-    recompui_set_flex_direction(sContainerMain, FLEX_DIRECTION_COLUMN);
-    recompui_set_padding(sContainerMain, 16.0f, UNIT_DP);
-    recompui_set_gap(sContainerMain, 16.0f, UNIT_DP);
-    recompui_set_align_items(sContainerMain, ALIGN_ITEMS_FLEX_START);
-
-    // Set up the sContainerMain to be the modal's background.
-    recompui_set_border_width(sContainerMain, modal_border_width, UNIT_DP);
-    recompui_set_border_radius(sContainerMain, modal_border_radius, UNIT_DP);
-    recompui_set_border_color(sContainerMain, &border_color);
-    recompui_set_background_color(sContainerMain, &modal_color);
+    setupContainer(sContainerMain, modalBorderWidth, modalBorderRadius, &borderColor, &modalColor);
 
     sRowTop = recompui_create_element(sUIContext, sContainerMain);
-    recompui_set_flex_basis(sRowTop, 100.0f, UNIT_DP);
-    recompui_set_flex_grow(sRowTop, 0);
-    recompui_set_flex_shrink(sRowTop, 0);
-    recompui_set_display(sRowTop, DISPLAY_FLEX);
-    recompui_set_flex_direction(sRowTop, FLEX_DIRECTION_ROW);
-    recompui_set_justify_content(sRowTop, JUSTIFY_CONTENT_FLEX_START);
-    recompui_set_align_items(sRowTop, ALIGN_ITEMS_FLEX_END);
-    recompui_set_gap(sRowTop, 16.0f, UNIT_DP);
+    setupRow(sRowTop);
 
     sRowCategory = recompui_create_element(sUIContext, sContainerMain);
-    recompui_set_flex_basis(sRowCategory, 100.0f, UNIT_DP);
-    recompui_set_flex_grow(sRowCategory, 0);
-    recompui_set_flex_shrink(sRowCategory, 0);
-    recompui_set_display(sRowCategory, DISPLAY_FLEX);
-    recompui_set_flex_direction(sRowCategory, FLEX_DIRECTION_ROW);
-    recompui_set_justify_content(sRowCategory, JUSTIFY_CONTENT_FLEX_START);
-    recompui_set_align_items(sRowCategory, ALIGN_ITEMS_CENTER);
-    recompui_set_gap(sRowCategory, 16.0f, UNIT_DP);
+    setupRow(sRowCategory);
+    createNextPrevCategoryButtons();
 
     sButtonClose = recompui_create_button(sUIContext, sRowTop, "Apply", BUTTONSTYLE_SECONDARY);
     recompui_set_text_align(sButtonClose, TEXT_ALIGN_CENTER);
 
-    // Bind the shared callback to the two buttons.
+    sButtonCategoriesShow = recompui_create_button(sUIContext, sRowTop, "Show Categories", BUTTONSTYLE_SECONDARY);
+    recompui_register_callback(sButtonCategoriesShow, onUpOneLevelButtonPressed, NULL);
+
     recompui_register_callback(sButtonClose, closeButtonPressed, NULL);
 
-    // set up scrolling sContainerMain for models
-    sContainerListButtons = recompui_create_element(sUIContext, sContainerMain);
-    recompui_set_flex_basis(sContainerListButtons, 100.0f, UNIT_DP);
-    recompui_set_flex_grow(sContainerListButtons, 1.0f);
-    recompui_set_flex_shrink(sContainerListButtons, 0.0f);
-    recompui_set_display(sContainerListButtons, DISPLAY_FLEX);
-    recompui_set_flex_direction(sContainerListButtons, FLEX_DIRECTION_COLUMN);
-    recompui_set_justify_content(sContainerListButtons, JUSTIFY_CONTENT_FLEX_START);
-    recompui_set_align_items(sContainerListButtons, ALIGN_ITEMS_FLEX_START);
-    recompui_set_gap(sContainerListButtons, 16.0f, UNIT_DP);
-    recompui_set_overflow_y(sContainerListButtons, OVERFLOW_SCROLL);
-    recompui_set_overflow_x(sContainerListButtons, OVERFLOW_HIDDEN);
+    sModelListElement = recompui_create_element(sUIContext, sContainerMain);
+    setupScrollingList(sModelListElement);
 
     sRowAuthor = recompui_create_element(sUIContext, sContainerMain);
     recompui_set_flex_basis(sRowAuthor, 100.0f, UNIT_DP);
@@ -702,6 +717,35 @@ void initUIOnRecompInit() {
     recompui_set_justify_content(sRowAuthor, JUSTIFY_CONTENT_FLEX_START);
     recompui_set_align_items(sRowAuthor, ALIGN_ITEMS_FLEX_END);
     recompui_set_gap(sRowAuthor, 0.0f, UNIT_DP);
+
+    // Setup category container
+    sContainerCategories = recompui_create_element(sUIContext, sUIRoot);
+
+    setupContainer(sContainerCategories, modalBorderWidth, modalBorderRadius, &borderColor, &modalColor);
+
+    sCategoriesTopRow = recompui_create_element(sUIContext, sContainerCategories);
+    setupRow(sCategoriesTopRow);
+
+    sButtonCategoriesHide = recompui_create_button(sUIContext, sCategoriesTopRow, "Hide Categories", BUTTONSTYLE_SECONDARY);
+    recompui_register_callback(sButtonCategoriesHide, onUpOneLevelButtonPressed, NULL);
+
+    sCategoriesListElement = recompui_create_element(sUIContext, sContainerCategories);
+    setupScrollingList(sCategoriesListElement);
+
+    recompui_set_visibility(sContainerCategories, VISIBILITY_HIDDEN);
+    sIsContainerCategoriesVisible = false;
+
+    recompui_set_nav(sButtonCategoriesShow, NAVDIRECTION_RIGHT, sButtonCategoryPrev);
+    recompui_set_nav(sButtonCategoriesShow, NAVDIRECTION_DOWN, sButtonCategoryNext);
+
+    recompui_set_nav(sButtonCategoryNext, NAVDIRECTION_UP, sButtonCategoriesShow);
+
+    recompui_set_nav(sButtonCategoryPrev, NAVDIRECTION_LEFT, sButtonCategoriesShow);
+    recompui_set_nav(sButtonCategoryPrev, NAVDIRECTION_UP, sButtonClose);
+
+    recompui_set_nav(sButtonClose, NAVDIRECTION_DOWN, sButtonCategoryPrev);
+    recompui_set_nav(sButtonClose, NAVDIRECTION_RIGHT, sButtonCategoriesShow);
+    recompui_set_nav(sButtonClose, NAVDIRECTION_DOWN, sButtonCategoryPrev);
 
     recompui_close_context(sUIContext);
 
@@ -724,7 +768,7 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
 
                 catInf->realEntry = entryOrNull;
 
-                refreshButtonEntryColors();
+                refreshModelButtonEntryColors();
 
                 catInf->isNeedsDiskSave = true;
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
@@ -791,12 +835,20 @@ static void onCategoryButtonPressed(RecompuiResource resource, const RecompuiEve
 static void onUpOneLevelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (sIsUIContextShown) {
         if (data->type == UI_EVENT_CLICK) {
-            if (isSelectingModel()) {
-                Audio_PlaySfx(NA_SE_SY_DECIDE);
-                sCurrentCategoryInfo = SELECTING_CATEGORY;
-                refreshFileList();
+            Audio_PlaySfx(NA_SE_SY_DECIDE);
+
+            sIsContainerCategoriesVisible = !sIsContainerCategoriesVisible;
+
+            if (sIsContainerCategoriesVisible) {
+                recompui_set_visibility(sContainerCategories, VISIBILITY_VISIBLE);
+                recompui_set_visibility(sButtonCategoriesShow, VISIBILITY_HIDDEN);
+                recompui_set_nav(sButtonClose, NAVDIRECTION_RIGHT, sButtonCategoriesHide);
+                recompui_set_nav(sButtonCategoryNext, NAVDIRECTION_UP, sButtonClose);
             } else {
-                Audio_PlaySfx(NA_SE_SY_ERROR);
+                recompui_set_visibility(sContainerCategories, VISIBILITY_HIDDEN);
+                recompui_set_visibility(sButtonCategoriesShow, VISIBILITY_VISIBLE);
+                recompui_set_nav(sButtonClose, NAVDIRECTION_RIGHT, sButtonCategoriesShow);
+                recompui_set_nav(sButtonCategoryNext, NAVDIRECTION_UP, sButtonCategoriesShow);
             }
         } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
             destroyAuthor();
@@ -808,53 +860,16 @@ static void onUpOneLevelButtonPressed(RecompuiResource resource, const RecompuiE
     }
 }
 
-static void destroyUpOneLevelButton() {
-    if (sButtonUpOneMenuLevel) {
-        recompui_destroy_element(sRowTop, sButtonUpOneMenuLevel);
-        sButtonUpOneMenuLevel = 0;
-    }
-}
-
-static void createUpOneLevelButton() {
-    destroyUpOneLevelButton();
-    sButtonUpOneMenuLevel = recompui_create_button(sUIContext, sRowTop, "[placeholder]", BUTTONSTYLE_SECONDARY);
-    //recompui_register_callback(sButtonUpOneMenuLevel, onUpOneLevelButtonPressed, NULL);
-}
-
 static void destroyModelButtons() {
-    {
-        size_t count = getCurrentButtonArraySize();
-        const RecompuiResource *buttons = getCurrentButtonArray();
+    size_t count = getCurrentModelButtonArraySize();
+    const RecompuiResource *buttons = getCurrentModelButtonArray();
 
-        for (size_t i = 0; i < count; ++i) {
-            recomputil_u32_value_hashmap_erase(sButtonsToData, buttons[i]);
-            recompui_destroy_element(sContainerListButtons, buttons[i]);
-        }
+    for (size_t i = 0; i < count; ++i) {
+        recomputil_u32_value_hashmap_erase(sModelButtonsToData, buttons[i]);
+        recompui_destroy_element(sModelListElement, buttons[i]);
     }
 
-    YAZMTCore_IterableU32Set_clear(sListButtons);
-
-    if (isSelectingCategory()) {
-        destroyNextPrevCategoryButtons();
-        destroyUpOneLevelButton();
-    }
-}
-
-static void createCategoryListButtons() {
-    RecompuiResource removeModelsButton = createAndPushButtonToList(sUIContext, sContainerListButtons, "[Remove All Models]", BUTTONSTYLE_PRIMARY);
-    recompui_register_callback(removeModelsButton, removeAllModelsButtonPressed, NULL);
-    setButtonColor(removeModelsButton, &sModelRemovedButtonColor);
-
-    for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
-        CategoryInfo *curr = &sCategoryInfos[i];
-
-        if (curr->isVisible) {
-            RecompuiResource categoryButton = createAndPushButtonToList(sUIContext, sContainerListButtons, curr->displayName, BUTTONSTYLE_PRIMARY);
-            recompui_register_callback(categoryButton, onCategoryButtonPressed, (void *)i);
-        }
-    }
-
-    connectListBoxButtons(getCurrentButtonArray(), getCurrentButtonArraySize());
+    YAZMTCore_IterableU32Set_clear(sModelListButtons);
 }
 
 static void createModelListButtons() {
@@ -870,7 +885,7 @@ static void createModelListButtons() {
         removeText = "[Remove Equipment Models]";
     }
 
-    RecompuiResource removeModelButton = createAndPushButtonToList(sUIContext, sContainerListButtons, removeText, BUTTONSTYLE_PRIMARY);
+    RecompuiResource removeModelButton = createAndPushButtonToList(sUIContext, sModelListElement, removeText, BUTTONSTYLE_PRIMARY, sModelListButtons);
     setButtonColor(removeModelButton, &sModelRemovedButtonColor);
     recompui_register_callback(removeModelButton, removedCallback, NULL);
 
@@ -890,84 +905,34 @@ static void createModelListButtons() {
                 }
             }
 
-            RecompuiResource modelButton = createAndPushButtonToList(sUIContext, sContainerListButtons, name, BUTTONSTYLE_PRIMARY);
+            RecompuiResource modelButton = createAndPushButtonToList(sUIContext, sModelListElement, name, BUTTONSTYLE_PRIMARY, sModelListButtons);
 
             // Need to cast away constness due to API signature
             // function in pressedCallback should not modify the ModelEntry, though
             recompui_register_callback(modelButton, pressedCallback, (ModelEntry *)modelEntries[i]);
 
-            setListButtonData(modelButton, modelEntries[i]);
+            setListButtonData(sModelButtonsToData, modelButton, modelEntries[i]);
         }
     }
 
-    connectListBoxButtons(getCurrentButtonArray(), getCurrentButtonArraySize());
+    connectListBoxButtons(getCurrentModelButtonArray(), getCurrentModelButtonArraySize());
 }
 
 static void refreshFileList() {
     // MUST CALL INSIDE UI CONTEXT
 
-    if (sButtonUpOneMenuLevel) {
-        setAllNavDirsToAuto(sButtonUpOneMenuLevel);
-    }
-
-    if (sButtonCategoryNext) {
-        setAllNavDirsToAuto(sButtonCategoryNext);
-    }
-
-    if (sButtonCategoryPrev) {
-        setAllNavDirsToAuto(sButtonCategoryPrev);
-    }
-
-    setAllNavDirsToAuto(sButtonClose);
-
     destroyModelButtons();
-    if (isSelectingCategory()) {
-        createCategoryListButtons();
-
-        size_t listCount = getCurrentButtonArraySize();
-
-        if (listCount > 0) {
-            const RecompuiResource *buttons = getCurrentButtonArray();
-            RecompuiResource first = buttons[0];
-            RecompuiResource last = buttons[listCount - 1];
-
-            recompui_set_nav(first, NAVDIRECTION_UP, sButtonClose);
-            recompui_set_nav(first, NAVDIRECTION_LEFT, sButtonClose);
-
-            recompui_set_nav(sButtonClose, NAVDIRECTION_DOWN, first);
-            recompui_set_nav(sButtonClose, NAVDIRECTION_UP, last);
-            recompui_set_nav(sButtonClose, NAVDIRECTION_RIGHT, first);
-
-            recompui_set_nav(last, NAVDIRECTION_DOWN, sButtonClose);
-        }
-    } else if (isSelectingModel()) {
+    
+    if (isSelectingModel()) {
         createModelListButtons();
 
-        refreshButtonEntryColors();
+        refreshModelButtonEntryColors();
+        refreshCategoryButtonEntryColors();
 
-        if (!sButtonUpOneMenuLevel) {
-            createUpOneLevelButton();
-        }
-
-        if (!sButtonCategoryNext || !sButtonCategoryPrev) {
-            createNextPrevCategoryButtons();
-        }
-
-        recompui_set_nav(sButtonUpOneMenuLevel, NAVDIRECTION_RIGHT, sButtonCategoryPrev);
-        recompui_set_nav(sButtonUpOneMenuLevel, NAVDIRECTION_DOWN, sButtonCategoryNext);
-
-        recompui_set_nav(sButtonCategoryNext, NAVDIRECTION_UP, sButtonUpOneMenuLevel);
-
-        recompui_set_nav(sButtonCategoryPrev, NAVDIRECTION_LEFT, sButtonUpOneMenuLevel);
-        recompui_set_nav(sButtonCategoryPrev, NAVDIRECTION_UP, sButtonClose);
-
-        recompui_set_nav(sButtonClose, NAVDIRECTION_RIGHT, sButtonUpOneMenuLevel);
-        recompui_set_nav(sButtonClose, NAVDIRECTION_DOWN, sButtonCategoryPrev);
-
-        size_t listCount = getCurrentButtonArraySize();
+        size_t listCount = getCurrentModelButtonArraySize();
 
         if (listCount > 0) {
-            const RecompuiResource *buttons = getCurrentButtonArray();
+            const RecompuiResource *buttons = getCurrentModelButtonArray();
             RecompuiResource first = buttons[0];
             RecompuiResource last = buttons[listCount - 1];
 
@@ -983,15 +948,15 @@ static void refreshFileList() {
 
             recompui_set_nav(last, NAVDIRECTION_DOWN, sButtonClose);
 
-            recompui_set_nav(sButtonUpOneMenuLevel, NAVDIRECTION_UP, last);
+            recompui_set_nav(sButtonCategoriesShow, NAVDIRECTION_UP, last);
         } else {
-            recompui_set_nav(sButtonCategoryNext, NAVDIRECTION_DOWN, sButtonUpOneMenuLevel);
+            recompui_set_nav(sButtonCategoryNext, NAVDIRECTION_DOWN, sButtonCategoriesShow);
 
             recompui_set_nav(sButtonCategoryPrev, NAVDIRECTION_DOWN, sButtonClose);
 
             recompui_set_nav(sButtonClose, NAVDIRECTION_UP, sButtonCategoryPrev);
 
-            recompui_set_nav(sButtonUpOneMenuLevel, NAVDIRECTION_UP, sButtonCategoryNext);
+            recompui_set_nav(sButtonCategoriesShow, NAVDIRECTION_UP, sButtonCategoryNext);
         }
     }
     refreshCategoryName();
@@ -1068,20 +1033,46 @@ void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play) {
 
 RECOMP_CALLBACK(".", _internal_onFinishedRegisterModels)
 void populateFirstFileList() {
+    recompui_open_context(sUIContext);
+
+    RecompuiResource removeAllButton = createAndPushButtonToList(sUIContext, sCategoriesListElement, "[Remove All Models]", BUTTONSTYLE_PRIMARY, sCategoryListButtons);
+    recompui_register_callback(removeAllButton, removeAllModelsButtonPressed, NULL);
+    setButtonColor(removeAllButton, &sModelRemovedButtonColor);
+
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         size_t count = 0;
         CMEM_getCategoryEntryData(catInf->category, &count);
         catInf->isVisible = catInf->isVisible || (catInf->isUsedByCurrentGame && count > 0);
+
+        if (catInf->isVisible) {
+            RecompuiResource button = createAndPushButtonToList(sUIContext, sCategoriesListElement, catInf->displayName, BUTTONSTYLE_PRIMARY, sCategoryListButtons);
+            recompui_register_callback(button, onCategoryButtonPressed, (void *)i);
+            setListButtonData(sCategoryButtonsToData, button, catInf);
+        }
     }
 
-    recompui_open_context(sUIContext);
+    const RecompuiResource *catButtons = getCategoryButtonArray();
+    size_t catButtonsNum = getCategoryButtonArraySize();
+    connectListBoxButtons(catButtons, catButtonsNum);
+    recompui_set_nav(sButtonCategoriesHide, NAVDIRECTION_DOWN, catButtons[0]);
+    recompui_set_nav(sButtonCategoriesHide, NAVDIRECTION_RIGHT, catButtons[0]);
+    recompui_set_nav(sButtonCategoriesHide, NAVDIRECTION_UP, catButtons[catButtonsNum - 1]);
+    recompui_set_nav(sButtonCategoriesHide, NAVDIRECTION_LEFT, sButtonClose);
+    
+    recompui_set_nav(catButtons[0], NAVDIRECTION_LEFT, sButtonCategoriesHide);
+    recompui_set_nav(catButtons[0], NAVDIRECTION_UP, sButtonCategoriesHide);
+
+    recompui_set_nav(catButtons[catButtonsNum - 1], NAVDIRECTION_DOWN, sButtonCategoriesHide);
+
     refreshFileList();
     recompui_close_context(sUIContext);
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initUiObjects() {
-    sButtonsToData = recomputil_create_u32_value_hashmap();
-    sListButtons = YAZMTCore_IterableU32Set_new();
+    sModelButtonsToData = recomputil_create_u32_value_hashmap();
+    sCategoryButtonsToData = recomputil_create_u32_value_hashmap();
+    sModelListButtons = YAZMTCore_IterableU32Set_new();
+    sCategoryListButtons = YAZMTCore_IterableU32Set_new();
 }
