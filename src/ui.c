@@ -94,7 +94,7 @@ static CategoryInfo sCategoryInfos[] = {
 
 #define SELECTING_CATEGORY -99
 
-static int sCurrentCategoryInfo = SELECTING_CATEGORY;
+static int sCurrentCategoryInfo = 0;
 
 static bool isValidCategoryInfoIndex(int i) {
     return i >= 0 && i < ARRAY_COUNT(sCategoryInfos);
@@ -817,18 +817,14 @@ static void destroyUpOneLevelButton() {
 
 static void createUpOneLevelButton() {
     destroyUpOneLevelButton();
-    sButtonUpOneMenuLevel = recompui_create_button(sUIContext, sRowTop, "▲", BUTTONSTYLE_SECONDARY);
-    recompui_register_callback(sButtonUpOneMenuLevel, onUpOneLevelButtonPressed, NULL);
+    sButtonUpOneMenuLevel = recompui_create_button(sUIContext, sRowTop, "[placeholder]", BUTTONSTYLE_SECONDARY);
+    //recompui_register_callback(sButtonUpOneMenuLevel, onUpOneLevelButtonPressed, NULL);
 }
 
 static void destroyModelButtons() {
     {
         size_t count = getCurrentButtonArraySize();
         const RecompuiResource *buttons = getCurrentButtonArray();
-
-        for (size_t i = 0; i < count; ++i) {
-            setAllNavDirsToAuto(buttons[i]);
-        }
 
         for (size_t i = 0; i < count; ++i) {
             recomputil_u32_value_hashmap_erase(sButtonsToData, buttons[i]);
