@@ -372,16 +372,6 @@ static void fillRealEntries() {
     }
 }
 
-static void restoreCurrentCategoryModel() {
-    if (isSelectingModel()) {
-        if (isPackCategory(getCurrentCategoryInfo()->category)) {
-            applyRealEntries();
-        } else {
-            applyRealEntry(sCurrentCategoryInfo);
-        }
-    }
-}
-
 static void removeAllModels() {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
@@ -550,7 +540,7 @@ static void changeCategoryButtonPressed(RecompuiResource resource, const Recompu
         if (data->type == UI_EVENT_CLICK) {
             Audio_PlaySfx(NA_SE_SY_DECIDE);
 
-            restoreCurrentCategoryModel();
+            applyRealEntries();
 
             bool isNextButton = !!userdata;
 
@@ -561,12 +551,11 @@ static void changeCategoryButtonPressed(RecompuiResource resource, const Recompu
             }
 
             refreshFileList();
-            refreshButtonEntryColors();
         } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
             destroyAuthor();
 
             if (shouldLivePreview()) {
-                restoreCurrentCategoryModel();
+                applyRealEntries();
             }
         }
     }
@@ -746,6 +735,7 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
                 }
 
                 if (shouldLivePreview()) {
+                    applyRealEntries();
                     CMEM_tryApplyEntry(cat, entryOrNull);
                 }
             }
@@ -812,7 +802,7 @@ static void onUpOneLevelButtonPressed(RecompuiResource resource, const RecompuiE
             destroyAuthor();
 
             if (shouldLivePreview()) {
-                restoreCurrentCategoryModel();
+                applyRealEntries();
             }
         }
     }
@@ -956,6 +946,7 @@ static void refreshFileList() {
         }
     } else if (isSelectingModel()) {
         createModelListButtons();
+
         refreshButtonEntryColors();
 
         if (!sButtonUpOneMenuLevel) {
@@ -1008,6 +999,7 @@ static void refreshFileList() {
         }
     }
     refreshCategoryName();
+    applyRealEntries();
 }
 
 typedef enum {
@@ -1089,14 +1081,6 @@ void populateFirstFileList() {
 
     recompui_open_context(sUIContext);
     refreshFileList();
-    refreshButtonEntryColors();
-    recompui_close_context(sUIContext);
-}
-
-RECOMP_CALLBACK(".", _internal_onSavedModelsApplied)
-void refreshButtonsWhenSavedModelApplied() {
-    recompui_open_context(sUIContext);
-    refreshButtonEntryColors();
     recompui_close_context(sUIContext);
 }
 
