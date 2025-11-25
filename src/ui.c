@@ -344,6 +344,7 @@ static bool sIsContainerCategoriesVisible;
 static RecompuiResource sCategoriesListElement;
 static RecompuiResource sCategoriesTopRow;
 static RecompuiResource sButtonCategoriesHide;
+static RecompuiResource sButtonRemoveAllModels;
 
 static bool sIsUIContextShown = false;
 
@@ -726,8 +727,12 @@ void initUIOnRecompInit() {
     sCategoriesTopRow = recompui_create_element(sUIContext, sContainerCategories);
     setupRow(sCategoriesTopRow);
 
-    sButtonCategoriesHide = recompui_create_button(sUIContext, sCategoriesTopRow, "Hide Categories", BUTTONSTYLE_SECONDARY);
+    sButtonCategoriesHide = recompui_create_button(sUIContext, sCategoriesTopRow, "Hide Cat.", BUTTONSTYLE_SECONDARY);
     recompui_register_callback(sButtonCategoriesHide, onUpOneLevelButtonPressed, NULL);
+
+    sButtonRemoveAllModels = recompui_create_button(sUIContext, sCategoriesTopRow, "[Remove All]", BUTTONSTYLE_SECONDARY);
+    recompui_register_callback(sButtonRemoveAllModels, removeAllModelsButtonPressed, NULL);
+    setButtonColor(sButtonRemoveAllModels, &sModelRemovedButtonColor);
 
     sCategoriesListElement = recompui_create_element(sUIContext, sContainerCategories);
     setupScrollingList(sCategoriesListElement);
@@ -1035,10 +1040,6 @@ RECOMP_CALLBACK(".", _internal_onFinishedRegisterModels)
 void populateFirstFileList() {
     recompui_open_context(sUIContext);
 
-    RecompuiResource removeAllButton = createAndPushButtonToList(sUIContext, sCategoriesListElement, "[Remove All Models]", BUTTONSTYLE_PRIMARY, sCategoryListButtons);
-    recompui_register_callback(removeAllButton, removeAllModelsButtonPressed, NULL);
-    setButtonColor(removeAllButton, &sModelRemovedButtonColor);
-
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         size_t count = 0;
@@ -1056,11 +1057,16 @@ void populateFirstFileList() {
     size_t catButtonsNum = getCategoryButtonArraySize();
     connectListBoxButtons(catButtons, catButtonsNum);
     recompui_set_nav(sButtonCategoriesHide, NAVDIRECTION_DOWN, catButtons[0]);
-    recompui_set_nav(sButtonCategoriesHide, NAVDIRECTION_RIGHT, catButtons[0]);
+    recompui_set_nav(sButtonCategoriesHide, NAVDIRECTION_RIGHT, sButtonRemoveAllModels);
     recompui_set_nav(sButtonCategoriesHide, NAVDIRECTION_UP, catButtons[catButtonsNum - 1]);
     recompui_set_nav(sButtonCategoriesHide, NAVDIRECTION_LEFT, sButtonClose);
-    
-    recompui_set_nav(catButtons[0], NAVDIRECTION_LEFT, sButtonCategoriesHide);
+
+    recompui_set_nav(sButtonRemoveAllModels, NAVDIRECTION_DOWN, catButtons[0]);
+    recompui_set_nav(sButtonRemoveAllModels, NAVDIRECTION_RIGHT, catButtons[0]);
+    recompui_set_nav(sButtonRemoveAllModels, NAVDIRECTION_UP, catButtons[catButtonsNum - 1]);
+    recompui_set_nav(sButtonRemoveAllModels, NAVDIRECTION_LEFT, sButtonCategoriesHide);
+
+    recompui_set_nav(catButtons[0], NAVDIRECTION_LEFT, sButtonRemoveAllModels);
     recompui_set_nav(catButtons[0], NAVDIRECTION_UP, sButtonCategoriesHide);
 
     recompui_set_nav(catButtons[catButtonsNum - 1], NAVDIRECTION_DOWN, sButtonCategoriesHide);
