@@ -240,7 +240,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
         return false;
     }
 
-    ModelEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_registerModel");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_registerModel");
 
     if (!entry) {
         return false;
@@ -261,7 +261,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
         return false;
     }
 
-    ModelEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_setMtx");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setMtx");
 
     if (!entry) {
         return false;
