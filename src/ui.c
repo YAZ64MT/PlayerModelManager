@@ -13,6 +13,7 @@ static void refreshFileList();
 static void onUpOneLevelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata);
 
 typedef struct CategoryInfo {
+    int index;
     const char *displayName;
     bool isVisible;
     bool isUsedByCurrentGame;
@@ -485,7 +486,7 @@ static void removePackButtonPressed(RecompuiResource resource, const RecompuiEve
     }
 }
 
-static bool sShouldClearANextFrame;
+static bool sShouldClearAllButtonsNextFrame;
 
 static void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (sIsUIContextShown) {
@@ -513,7 +514,7 @@ static void closeButtonPressed(RecompuiResource resource, const RecompuiEventDat
 
             clearRealEntries();
 
-            sShouldClearANextFrame = true;
+            sShouldClearAllButtonsNextFrame = true;
         } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
             destroyAuthor();
 
@@ -824,11 +825,11 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
 static void onCategoryButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (sIsUIContextShown) {
         if (data->type == UI_EVENT_CLICK) {
-            int index = (int)userdata;
+            CategoryInfo *catInf = userdata;
 
-            if (isValidCategoryInfoIndex(index)) {
+            if (catInf && isValidCategoryInfoIndex(catInf->index)) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
-                sCurrentCategoryInfo = index;
+                sCurrentCategoryInfo = catInf->index;
                 refreshFileList();
             } else {
                 Audio_PlaySfx(NA_SE_SY_ERROR);
@@ -1029,11 +1030,11 @@ void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play) {
         openModelMenu();
     }
 
-    if (sShouldClearANextFrame) {
-        clearPressedInputButtons(CONTROLLER1(&play->state), BTN_A);
+    if (sShouldClearAllButtonsNextFrame) {
+        clearPressedInputButtons(CONTROLLER1(&play->state), 0xFFFFU);
     }
 
-    sShouldClearANextFrame = false;
+    sShouldClearAllButtonsNextFrame = false;
 }
 
 RECOMP_CALLBACK(".", _internal_onFinishedRegisterModels)
@@ -1048,7 +1049,7 @@ void populateFirstFileList() {
 
         if (catInf->isVisible) {
             RecompuiResource button = createAndPushButtonToList(sUIContext, sCategoriesListElement, catInf->displayName, BUTTONSTYLE_PRIMARY, sCategoryListButtons);
-            recompui_register_callback(button, onCategoryButtonPressed, (void *)i);
+            recompui_register_callback(button, onCategoryButtonPressed, catInf);
             setListButtonData(sCategoryButtonsToData, button, catInf);
         }
     }
@@ -1081,4 +1082,11 @@ void initUiObjects() {
     sCategoryButtonsToData = recomputil_create_u32_value_hashmap();
     sModelListButtons = YAZMTCore_IterableU32Set_new();
     sCategoryListButtons = YAZMTCore_IterableU32Set_new();
+}
+
+RECOMP_CALLBACK(".", _internal_preInitHashObjects)
+void preInitUiObjects() {
+    for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
+        sCategoryInfos[i].index = i;
+    }
 }
