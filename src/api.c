@@ -89,6 +89,19 @@ static ModelEntry *getEntryOrPrintErr(PlayerModelManagerHandle h, const char *fu
     return entry;
 }
 
+static ModelEntry *getEntryOrPrintErrLocked(PlayerModelManagerHandle h, const char *funcName) {
+    if (sIsAPILocked) {
+        Logger_printWarning(
+            "%s called while API locked. "
+            "Please only call these functions during a onRegisterModels callback.",
+            funcName);
+
+        return NULL;
+    }
+
+    return getEntryOrPrintErr(h, funcName);
+}
+
 static ModelEntryForm *getFormEntryOrPrintErr(PlayerModelManagerHandle h, const char *funcName) {
     ModelEntry *entry = getEntryOrPrintErrLocked(h, funcName);
 
@@ -104,19 +117,6 @@ static ModelEntryForm *getFormEntryOrPrintErr(PlayerModelManagerHandle h, const 
     return (ModelEntryForm *)entry;
 }
 
-static ModelEntry *getEntryOrPrintErrLocked(PlayerModelManagerHandle h, const char *funcName) {
-    if (sIsAPILocked) {
-        Logger_printWarning(
-            "%s called while API locked. "
-            "Please only call these functions during a onRegisterModels callback.",
-            funcName);
-
-        return NULL;
-    }
-
-    return getEntryOrPrintErr(h, funcName);
-}
-
 RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType) {
     if (apiVersion > PMM_API_VERSION) {
         Logger_printWarning("Model requesting unsupported API version %d! You may need to upgrade PlayerModelManager!");
@@ -128,7 +128,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
         return 0;
     }
 
-    if (!isStrValid("PlayerModelManager_registerModel", internalName, PMM_MAX_INTERNAL_NAME_LENGTH)) {
+    if (!isStrValid(__func__, internalName, PMM_MAX_INTERNAL_NAME_LENGTH)) {
         return 0;
     }
 
@@ -141,7 +141,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
 
     PlayerModelManagerHandle h = CMEM_createMemoryHandle(modelType, YAZMTCore_Utils_StrDup(internalName));
 
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_registerModel");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
         return 0;
@@ -157,11 +157,11 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerHandle h, const char *displayName) {
-    if (!isStrValid("PlayerModelManager_setDisplayName", displayName, PMM_MAX_DISPLAY_NAME_LENGTH)) {
+    if (!isStrValid(__func__, displayName, PMM_MAX_DISPLAY_NAME_LENGTH)) {
         return 0;
     }
 
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setDisplayName");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
         return false;
@@ -175,11 +175,11 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerHandle h,
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerHandle h, const char *author) {
-    if (!isStrValid("PlayerModelManager_setAuthor", author, PMM_MAX_AUTHOR_NAME_LENGTH)) {
+    if (!isStrValid(__func__, author, PMM_MAX_AUTHOR_NAME_LENGTH)) {
         return false;
     }
 
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setAuthor");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
         return false;
@@ -193,7 +193,7 @@ RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerHandle h, cons
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setFlags(PlayerModelManagerHandle h, u64 flags) {
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setFlags");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
         return false;
@@ -207,7 +207,7 @@ RECOMP_EXPORT bool PlayerModelManager_setFlags(PlayerModelManagerHandle h, u64 f
 }
 
 RECOMP_EXPORT bool PlayerModelManager_clearFlags(PlayerModelManagerHandle h, u64 flags) {
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_clearFlags");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
         return false;
@@ -221,7 +221,7 @@ RECOMP_EXPORT bool PlayerModelManager_clearFlags(PlayerModelManagerHandle h, u64
 }
 
 RECOMP_EXPORT bool PlayerModelManager_clearAllFlags(PlayerModelManagerHandle h, u64 flags) {
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_clearAllFlags");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
         return false;
@@ -236,11 +236,11 @@ RECOMP_EXPORT bool PlayerModelManager_clearAllFlags(PlayerModelManagerHandle h, 
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, Link_DisplayList dlId, Gfx *dl) {
     if (dlId >= LINK_DL_MAX || dlId < 0) {
-        Logger_printError("Invalid display list ID passed in to PlayerModelManager_setDisplayList.");
+        Logger_printError("Invalid display list ID passed in to %s.", __func__);
         return false;
     }
 
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_registerModel");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
         return false;
@@ -257,11 +257,11 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
 
 RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix) {
     if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
-        Logger_printError("Invalid matrix ID passed in to PlayerModelManager_setMtx.");
+        Logger_printError("Invalid matrix ID passed in to %s.", __func__);
         return false;
     }
 
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setMtx");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
         return false;
@@ -277,18 +277,18 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
 }
 
 RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h, PlayerModelManagerHandle toAdd) {
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_addHandleToPack");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
         return false;
     }
 
     if (!isPackCategory(ModelEntry_getCategory(entry))) {
-        Logger_printError("Non-model pack passed into first arg of PlayerModelManager_addHandleToPack (Category was %d)", ModelEntry_getCategory(entry));
+        Logger_printError("Non-model pack passed into first arg of %s (Category was %d)", __func__, ModelEntry_getCategory(entry));
         return false;
     }
 
-    ModelEntry *entryToAdd = getEntryOrPrintErrLocked(toAdd, "PlayerModelManager_addHandleToPack");
+    ModelEntry *entryToAdd = getEntryOrPrintErrLocked(toAdd, __func__);
 
     if (!entryToAdd) {
         return false;
@@ -308,7 +308,7 @@ RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerHandle h, PlayerModelManagerEventHandler *callback, void *userdata) {
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, "PlayerModelManager_setCallback");
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
         return false;
@@ -322,7 +322,7 @@ RECOMP_EXPORT bool PlayerModelManager_setCallback(PlayerModelManagerHandle h, Pl
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel) {
-    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setSkeleton");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, __func__);
 
     if (!entryForm) {
         return false;
@@ -335,12 +335,12 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, Fl
     if (skel) {
         StandardLimb **limbs = (StandardLimb **)skel->sh.segment;
 
-#define SET_LIMB_DL(pLimb, entryDL)                                                                                                          \
-    {                                                                                                                                        \
-        if (!ModelEntry_getDisplayList(entry, entryDL))                                                                         \
+#define SET_LIMB_DL(pLimb, entryDL)                                                                                      \
+    {                                                                                                                    \
+        if (!ModelEntry_getDisplayList(entry, entryDL))                                                                  \
             ModelEntry_setDisplayList(entry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                            \
-    }                                                                                                                                        \
+        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                     \
+    }                                                                                                                    \
     (void)0
 
         SET_LIMB_DL(PLAYER_LIMB_WAIST, LINK_DL_WAIST);
@@ -373,7 +373,7 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, Fl
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHandle h, FlexSkeletonHeader *skel) {
-    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setShieldingSkeleton");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, __func__);
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
 
     if (!entry) {
@@ -384,18 +384,18 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 
     if (skel) {
         if (skel->sh.limbCount != PLAYER_BODY_SHIELD_LIMB_COUNT) {
-            Logger_printError("Skeleton with incorrect limb count passed in to PlayerModelManager_setShieldingSkeleton");
+            Logger_printError("Skeleton with incorrect limb count passed in to %s", __func__);
             return false;
         }
 
         StandardLimb **limbs = (StandardLimb **)skel->sh.segment;
 
-#define SET_SHIELDING_LIMB_DL(pLimb, entryDL)                                                                                                \
-    {                                                                                                                                        \
-        if (!ModelEntry_getDisplayList(entry, entryDL))                                                                         \
+#define SET_SHIELDING_LIMB_DL(pLimb, entryDL)                                                                            \
+    {                                                                                                                    \
+        if (!ModelEntry_getDisplayList(entry, entryDL))                                                                  \
             ModelEntry_setDisplayList(entry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                            \
-    }                                                                                                                                        \
+        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                     \
+    }                                                                                                                    \
     (void)0
 
         SET_SHIELDING_LIMB_DL(LINK_BODY_SHIELD_LIMB_BODY, LINK_DL_BODY_SHIELD_BODY);
@@ -413,7 +413,7 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerHandle h, TexturePtr eyesTextures[]) {
-    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setEyesTextures");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, __func__);
 
     if (!entryForm) {
         return false;
@@ -433,7 +433,7 @@ RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerHandle h
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle h, TexturePtr mouthTextures[]) {
-    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, "PlayerModelManager_setMouthTextures");
+    ModelEntryForm *entryForm = getFormEntryOrPrintErr(h, __func__);
 
     if (!entryForm) {
         return false;
@@ -471,7 +471,7 @@ RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersio
     FormProxyId fpId;
     if (PlayerProxy_getProxyIdFromForm(form, &fpId)) {
         FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
-        
+
         if (fp) {
             return FormProxy_getCurrentDL(fp, dlId);
         }
@@ -484,7 +484,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long a
     if (sIsAPILocked) {
         Logger_printError("%s called while API locked. "
                           "Please only call these functions during a onRegisterModels callback.",
-                          __FUNCTION__);
+                          __func__);
 
         return false;
     }
@@ -512,7 +512,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long a
     FormProxyId fpId;
     if (PlayerProxy_getProxyIdFromForm(form, &fpId)) {
         FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
-        
+
         if (fp) {
             ModelInfo *fallbackModelInfo = FormProxy_getFallbackModelInfo(fp);
 
@@ -532,7 +532,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVer
     if (sIsAPILocked) {
         Logger_printError("%s called while API locked. "
                           "Please only call these functions during a onRegisterModels callback.",
-                          __FUNCTION__);
+                          __func__);
 
         return false;
     }
@@ -572,7 +572,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVer
 }
 
 RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
-    ModelEntry *entry = getEntryOrPrintErr(h, __FUNCTION__);
+    ModelEntry *entry = getEntryOrPrintErr(h, __func__);
 
     if (!entry) {
         return false;
@@ -658,9 +658,9 @@ void doRegisterModels() {
     onRegisterModels();
     sIsAPILocked = true;
     _internal_onFinishedRegisterModels();
-    Logger_printInfo("Finished registering models...");
+    Logger_printInfo("Finished registering models.");
     onReady();
-    Logger_printInfo("Ready");
+    Logger_printInfo("Ready!");
 }
 
 RECOMP_CALLBACK(".", _internal_postInitHashObjects)

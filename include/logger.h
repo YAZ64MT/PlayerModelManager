@@ -22,7 +22,7 @@ extern LoggerLevel gLoggerLevel;
 #define __FILE_NAME__ __FILE__
 #endif
 
-#define Logger_printCurrentFuncAndLine(prefix) recomp_printf("%s %s:%s:%d:%s: ", prefix, LOGGER_PROJECT_NAME, __FILE_NAME__, __LINE__, __FUNCTION__)
+#define Logger_printCurrentFuncAndLine(prefix) recomp_printf("%s %s:%s:%d:%s: ", prefix, LOGGER_PROJECT_NAME, __FILE_NAME__, __LINE__, __func__)
 
 #define Logger_printLine(...)       \
     {                               \
