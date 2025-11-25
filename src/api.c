@@ -90,7 +90,7 @@ static ModelEntry *getEntryOrPrintErr(PlayerModelManagerHandle h, const char *fu
 }
 
 static ModelEntryForm *getFormEntryOrPrintErr(PlayerModelManagerHandle h, const char *funcName) {
-    ModelEntry *entry = getEntryOrPrintErr(h, funcName);
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, funcName);
 
     if (!entry) {
         return NULL;
@@ -572,7 +572,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVer
 }
 
 RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
-    ModelEntry *entry = getEntryOrPrintErr(h, "PlayerModelManager_isApplied");
+    ModelEntry *entry = getEntryOrPrintErr(h, __FUNCTION__);
 
     if (!entry) {
         return false;
