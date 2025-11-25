@@ -177,6 +177,7 @@ static void initProxyShims(FormProxy *fp) {
 #define SHIM_ITEM_RFIST(item) SHIM_ITEM_HAND(RFIST, item)
 #define SHIM_ITEM_LHAND(item) SHIM_ITEM_HAND(LHAND, item)
 #define SHIM_ITEM_RHAND(item) SHIM_ITEM_HAND(RHAND, item)
+#define SHIM_ITEM_RHAND_OCARINA(item) shims[LINK_SHIMDL_RHAND_##item] = Utils_createShimDisplayList(2, &dls[LINK_DL_##item], &dls[LINK_DL_RHAND_OCARINA])
 #define SHIM_HILT_BACK(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_HILT_BACK] = Utils_createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SWORD##swordNum##_BACK], &dls[LINK_DL_SWORD##swordNum##_HILT], sPopModelViewMtx)
 #define SHIM_SWORD_SHEATHED(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHEATHED] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_SHEATH], &dls[LINK_DL_SWORD##swordNum##_HILT_BACK])
 #define SHIM_SHIELD_BACK(shieldNum) shims[LINK_SHIMDL_SHIELD##shieldNum##_BACK] = Utils_createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD##shieldNum##_BACK], &dls[LINK_DL_SHIELD##shieldNum], sPopModelViewMtx)
@@ -257,8 +258,8 @@ static void initProxyShims(FormProxy *fp) {
     SHIM_ITEM_LFIST(HAMMER);
     SHIM_ITEM_RFIST(BOW);
     SHIM_ITEM_RFIST(HOOKSHOT);
-    SHIM_ITEM_RHAND(OCARINA_FAIRY);
-    SHIM_ITEM_RHAND(OCARINA_TIME);
+    SHIM_ITEM_RHAND_OCARINA(OCARINA_FAIRY);
+    SHIM_ITEM_RHAND_OCARINA(OCARINA_TIME);
     SHIM_ITEM_LFIST(BOOMERANG);
 
     shims[LINK_SHIMDL_FPS_RHAND_SLINGSHOT] = Utils_createShimDisplayList(2, &dls[LINK_DL_SLINGSHOT], &dls[LINK_DL_FPS_RHAND]);
@@ -945,47 +946,51 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
         dl = ModelInfo_getGfx(current, id);
     }
 
-    // Use third person models in first person if third person model exists but not first person
+    // Fallback models for certain DLs
     if (!dl) {
-        Link_DisplayList thirdPersonTarget = id;
-        bool hasThirdPersonTarget = true;
+        Link_DisplayList alternateDL = id;
+        bool hasAlternate = true;
 
         switch (id) {
             case LINK_DL_FPS_HOOKSHOT:
-                thirdPersonTarget = LINK_DL_HOOKSHOT;
+                alternateDL = LINK_DL_HOOKSHOT;
                 break;
 
             case LINK_DL_FPS_BOW:
-                thirdPersonTarget = LINK_DL_BOW;
+                alternateDL = LINK_DL_BOW;
                 break;
 
             case LINK_DL_FPS_SLINGSHOT:
-                thirdPersonTarget = LINK_DL_SLINGSHOT;
+                alternateDL = LINK_DL_SLINGSHOT;
+                break;
+
+            case LINK_DL_RHAND_OCARINA:
+                alternateDL = LINK_DL_RHAND;
                 break;
 
             default:
-                hasThirdPersonTarget = false;
+                hasAlternate = false;
                 break;
         }
 
-        if (hasThirdPersonTarget) {
-            dl = ModelInfo_getGfx(current, thirdPersonTarget);
+        if (hasAlternate) {
+            dl = ModelInfo_getGfx(current, alternateDL);
         }
 
         if (!dl) {
             dl = ModelInfo_getGfx(fallbackOverride, id);
         }
 
-        if (!dl && hasThirdPersonTarget) {
-            dl = ModelInfo_getGfx(fallbackOverride, thirdPersonTarget);
+        if (!dl && hasAlternate) {
+            dl = ModelInfo_getGfx(fallbackOverride, alternateDL);
         }
 
         if (!dl) {
             dl = ModelInfo_getGfx(fallback, id);
         }
 
-        if (!dl && hasThirdPersonTarget) {
-            dl = ModelInfo_getGfx(fallback, thirdPersonTarget);
+        if (!dl && hasAlternate) {
+            dl = ModelInfo_getGfx(fallback, alternateDL);
         }
     }
 

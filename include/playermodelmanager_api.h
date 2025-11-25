@@ -40,6 +40,7 @@ typedef enum {
     PMM_DL_LHAND_BOTTLE,
     PMM_DL_LHAND_GUITAR,
     PMM_DL_RFIST,
+    PMM_DL_RHAND_OCARINA = 230,
 
     // Swords:
     //      1: Kokiri Sword
@@ -48,7 +49,7 @@ typedef enum {
     //      4: Giant's Knife / Biggoron Sword / Fierce Deity's Sword
     //      5: Great Fairy Sword
 
-    PMM_DL_SWORD1_SHEATH,
+    PMM_DL_SWORD1_SHEATH = 22,
     PMM_DL_SWORD2_SHEATH,
     PMM_DL_SWORD3_SHEATH,
     PMM_DL_SWORD4_SHEATH,
@@ -314,7 +315,7 @@ typedef enum {
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_OPEN,
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_CLOSED,
 
-    PMM_DL_MAX = 230
+    PMM_DL_MAX = 231
 } PlayerModelManagerDisplayListId;
 
 #define PMM_DL_SWORD_KOKIRI_HILT PMM_DL_SWORD1_HILT

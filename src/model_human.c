@@ -50,6 +50,45 @@ Gfx gLinkHumanOcarinaDL[] = {
     gsSPEndDisplayList(),
 };
 
+// ocarina-less hand
+Gfx gLinkHumanRightHandOcarinaDL[] = {
+    gsDPPipeSync(),
+    gsDPSetTextureLUT(G_TT_RGBA16),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPLoadTextureBlock(object_link_child_Tex_00DB08, G_IM_FMT_CI, G_IM_SIZ_8b, 16, 16, 0, G_TX_NOMIRROR | G_TX_CLAMP,
+                         G_TX_NOMIRROR | G_TX_CLAMP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
+    gsDPLoadTLUT_pal256(object_link_child_TLUT_00DA80),
+    gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, 1, COMBINED, 0, PRIMITIVE, 0, 0, 0, 0, COMBINED),
+    gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2),
+    gsSPClearGeometryMode(G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR),
+    gsSPSetGeometryMode(G_CULL_BACK | G_FOG | G_LIGHTING),
+    gsDPSetPrimColor(0, 0, 255, 255, 255, 255),
+    gsSPVertex(object_link_childVtx_00E858, 32, 0),
+    gsSP2Triangles(0, 1, 2, 0, 3, 4, 5, 0),
+    gsSP2Triangles(2, 1, 6, 0, 7, 5, 4, 0),
+    gsSP2Triangles(8, 0, 2, 0, 6, 1, 0, 0),
+    gsSP2Triangles(9, 8, 2, 0, 10, 2, 6, 0),
+    gsSP2Triangles(2, 10, 9, 0, 0, 9, 11, 0),
+    gsSP2Triangles(12, 13, 14, 0, 15, 12, 14, 0),
+    gsSP2Triangles(15, 16, 17, 0, 14, 16, 15, 0),
+    gsSP2Triangles(0, 8, 9, 0, 14, 18, 16, 0),
+    gsSP2Triangles(16, 19, 17, 0, 20, 21, 5, 0),
+    gsSP2Triangles(5, 7, 20, 0, 22, 4, 3, 0),
+    gsSP2Triangles(23, 24, 25, 0, 17, 19, 13, 0),
+    gsSP2Triangles(25, 26, 23, 0, 27, 28, 29, 0),
+    gsSPVertex(&object_link_childVtx_00E858[30], 23, 0),
+    gsSP2Triangles(0, 1, 2, 0, 2, 1, 3, 0),
+    gsSP2Triangles(4, 5, 6, 0, 7, 8, 9, 0),
+    gsSP2Triangles(10, 11, 12, 0, 13, 9, 8, 0),
+    gsSP2Triangles(12, 14, 10, 0, 15, 16, 17, 0),
+    gsSP2Triangles(17, 12, 11, 0, 18, 11, 10, 0),
+    gsSP2Triangles(19, 3, 20, 0, 20, 1, 0, 0),
+    gsSP2Triangles(3, 19, 2, 0, 19, 21, 22, 0),
+    gsSP2Triangles(22, 2, 19, 0, 2, 22, 0, 0),
+    gsSP2Triangles(20, 0, 21, 0, 0, 22, 21, 0),
+    gsSPEndDisplayList(),
+};
+
 // first person arm
 Gfx gLinkHumanFirstPersonArmDL[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
@@ -205,20 +244,24 @@ static void setupHumanFallbackModel() {
 
     SET_ENTRY_DL(LINK_DL_RFIST, getHumanDL(gLinkHumanRightHandClosedDL));
 
+    GlobalObjectsSegmentMap segments = {0};
+    segments[4] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
+    segments[6] = human;
+
+    GlobalObjects_rebaseDL(gLinkHumanRightHandOcarinaDL, segments); // repoint vertices, textures, etc. to static link obj
+    SET_ENTRY_DL(LINK_DL_RHAND_OCARINA, gLinkHumanRightHandOcarinaDL);
+
     // First Person
     SET_ENTRY_DL(LINK_DL_FPS_LFOREARM, getHumanDL(gLinkHumanLeftForearmDL));
     SET_ENTRY_DL(LINK_DL_FPS_LHAND, getHumanDL(gLinkHumanLeftHandClosedDL));
     SET_ENTRY_DL(LINK_DL_FPS_RFOREARM, gEmptyDL);
 
-    GlobalObjectsSegmentMap segments = {0};
-    segments[4] = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
-    segments[6] = human;
-    SET_ENTRY_DL(LINK_DL_FPS_RHAND, gLinkHumanFirstPersonArmDL);
     GlobalObjects_rebaseDL(gLinkHumanFirstPersonArmDL, segments); // repoint vertices, textures, etc. to static link obj
+    SET_ENTRY_DL(LINK_DL_FPS_RHAND, gLinkHumanFirstPersonArmDL);
 
     // items
-    SET_ENTRY_DL(LINK_DL_OCARINA_TIME, gLinkHumanOcarinaDL);
     GlobalObjects_rebaseDL(gLinkHumanOcarinaDL, segments); // repoint vertices, textures, etc. to static link obj
+    SET_ENTRY_DL(LINK_DL_OCARINA_TIME, gLinkHumanOcarinaDL);
 
 #undef SET_ENTRY_DL
 }

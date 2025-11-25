@@ -286,7 +286,7 @@ typedef enum Link_DisplayList {
     LINK_DL_SWORD3_PEDESTAL,         // Master Sword rotated to be inside pedestal
     LINK_DL_SWORD3_PEDESTAL_GRABBED, // Master Sword rotated for grabbed from pedestal
 
-    // Left First + Items
+    // Left Fist + Items
     LINK_DL_LFIST_HAMMER,
     LINK_DL_LFIST_BOOMERANG,
     LINK_DL_RFIST_BOW,
@@ -317,6 +317,8 @@ typedef enum Link_DisplayList {
 
     // Mirror Shield Projection Beam
     LINK_DL_SHIELD3_RAY_BEAM,
+
+    LINK_DL_RHAND_OCARINA,
 
     LINK_DL_MAX
 } Link_DisplayList;
