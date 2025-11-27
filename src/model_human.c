@@ -249,7 +249,7 @@ static void setupHumanFallbackModel() {
     segments[6] = human;
 
     GlobalObjects_rebaseDL(gLinkHumanRightHandOcarinaDL, segments); // repoint vertices, textures, etc. to static link obj
-    SET_ENTRY_DL(LINK_DL_RHAND_OCARINA, gLinkHumanRightHandOcarinaDL);
+    SET_ENTRY_DL(LINK_DL_OPT_RHAND_OCARINA, gLinkHumanRightHandOcarinaDL);
 
     // First Person
     SET_ENTRY_DL(LINK_DL_FPS_LFOREARM, getHumanDL(gLinkHumanLeftForearmDL));

@@ -19,23 +19,42 @@ static bool shouldUseAdultFixes(Player *player) {
     return fp && FormProxy_isAdultModelType(fp);
 }
 
-Gfx **gFirstPersonDList;
-FormProxy *sFormProxyFpsRightForearm;
+static Gfx **sFirstPersonOverrideDLPtr;
+static Gfx *sFirstPersonDLToOverrideWith;
 
 RECOMP_HOOK("Player_OverrideLimbDrawGameplayFirstPerson")
 void addFPSrightForearm_on_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
-    if (limbIndex == PLAYER_LIMB_RIGHT_FOREARM) {
-        sFormProxyFpsRightForearm = ProxyActorExt_getFormProxy(actor);
-        gFirstPersonDList = dList;
-    } else {
-        sFormProxyFpsRightForearm = NULL;
+    sFirstPersonOverrideDLPtr = dList;
+    sFirstPersonDLToOverrideWith = NULL;
+
+    if (limbIndex == PLAYER_LIMB_LEFT_SHOULDER) {
+        FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+        if (fp) {
+            if (Player_IsHoldingHookshot((Player *)actor)) {
+                sFirstPersonDLToOverrideWith = FormProxy_getCurrentDL(fp, LINK_DL_OPT_FPS_LSHOULDER_HOOKSHOT);
+            } else {
+                sFirstPersonDLToOverrideWith = FormProxy_getCurrentDL(fp, LINK_DL_OPT_FPS_LSHOULDER_BOW);
+            }
+        }
+    }
+    else if (limbIndex == PLAYER_LIMB_RIGHT_FOREARM) {
+        FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+        if (fp) {
+            if (Player_IsHoldingHookshot((Player *)actor)) {
+                sFirstPersonDLToOverrideWith = FormProxy_getCurrentDL(fp, LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT);
+            } else {
+                sFirstPersonDLToOverrideWith = FormProxy_getCurrentDL(fp, LINK_DL_OPT_FPS_RFOREARM_BOW);
+            }
+        }
     }
 }
 
 RECOMP_HOOK_RETURN("Player_OverrideLimbDrawGameplayFirstPerson")
 void addFPSrightForearm_on_return_OverrideLimbDrawFirstPerson() {
-    if (sFormProxyFpsRightForearm) {
-        *gFirstPersonDList = FormProxy_getCurrentDL(sFormProxyFpsRightForearm, LINK_DL_FPS_RFOREARM);
+    if (sFirstPersonDLToOverrideWith) {
+        *sFirstPersonOverrideDLPtr = sFirstPersonDLToOverrideWith;
     }
 }
 
