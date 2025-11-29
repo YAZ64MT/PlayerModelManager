@@ -77,6 +77,9 @@ static void setupGoronFallbackModel() {
     SET_ENTRY_DL(LINK_DL_FPS_LHAND, getGoronDL(gLinkGoronLeftHandClosedDL));
     SET_ENTRY_DL(LINK_DL_FPS_RFOREARM, getGoronDL(gLinkGoronRightForearmDL));
     SET_ENTRY_DL(LINK_DL_FPS_RHAND, getGoronDL(gLinkGoronRightHandClosedDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL);
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);
 
 #undef SET_ENTRY_DL
 }
