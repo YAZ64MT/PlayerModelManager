@@ -1001,6 +1001,8 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
             case LINK_DL_OPT_FPS_LSHOULDER_BOW:
             case LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT:
                 alternateDL = LINK_DL_FPS_LSHOULDER;
+                hasAlternate2 = true;
+                alternate2DL = LINK_DL_LSHOULDER;
                 break;
 
             case LINK_DL_OPT_FPS_LFOREARM_HOOKSHOT:
