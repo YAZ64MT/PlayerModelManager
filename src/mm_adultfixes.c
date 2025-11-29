@@ -50,15 +50,12 @@ void initAdultLinkAgeProperties() {
     gAdultLinkAgeProps.unk_28 = 44.6f;
     gAdultLinkAgeProps.unk_3C = 15.0f;
     gAdultLinkAgeProps.unk_44 = fdProps->unk_44;
-    gAdultLinkAgeProps.unk_4A->x = fdProps->unk_4A->x;
-    gAdultLinkAgeProps.unk_4A->y = fdProps->unk_4A->y;
-    gAdultLinkAgeProps.unk_4A->z = fdProps->unk_4A->z;
-    gAdultLinkAgeProps.unk_62->x = fdProps->unk_62->x;
-    gAdultLinkAgeProps.unk_62->y = fdProps->unk_62->y;
-    gAdultLinkAgeProps.unk_62->z = fdProps->unk_62->z;
-    gAdultLinkAgeProps.unk_7A->x = fdProps->unk_7A->x;
-    gAdultLinkAgeProps.unk_7A->y = fdProps->unk_7A->y;
-    gAdultLinkAgeProps.unk_7A->z = fdProps->unk_7A->z;
+
+    for (int i = 0; i < ARRAY_COUNT(gAdultLinkAgeProps.unk_4A); ++i) {
+        gAdultLinkAgeProps.unk_4A[i] = fdProps->unk_4A[i];
+        gAdultLinkAgeProps.unk_62[i] = fdProps->unk_62[i];
+        gAdultLinkAgeProps.unk_7A[i] = fdProps->unk_7A[i];
+    }
     gAdultLinkAgeProps.voiceSfxIdOffset = SFX_VOICE_BANK_SIZE * 0;
     gAdultLinkAgeProps.surfaceSfxIdOffset = 0x80;
 }
