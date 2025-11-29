@@ -1081,7 +1081,7 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
         }
 
         if (!dl && hasAlternate2) {
-            dl = ModelInfo_getGfx(ModelEntryForm_getModelEntry(gSharedModelEntry), alternate2DL);
+            dl = ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), alternate2DL);
         }
     }
 
