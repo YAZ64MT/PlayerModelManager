@@ -46,6 +46,7 @@ typedef enum {
     PMM_DL_OPT_LHAND_GUITAR,
     PMM_DL_OPT_LFIST_SWORD = 230,
     PMM_DL_OPT_LFIST_SWORD_TWO_HANDED,
+    PMM_DL_OPT_LFIST_DEKU_STICK,
     PMM_DL_OPT_LFIST_HAMMER,
     PMM_DL_OPT_LFIST_BOOMERANG,
     PMM_DL_RFIST = 21,
@@ -335,7 +336,7 @@ typedef enum {
     PMM_DL_SHIM_SWORD3_PEDESTAL,         // Master Sword rotated to be inside pedestal
     PMM_DL_SHIM_SWORD3_PEDESTAL_GRABBED, // Master Sword rotated for grabbed from pedestal
 
-    // Left First + Items
+    // Left Fist + Items
     PMM_DL_SHIM_LFIST_HAMMER,
     PMM_DL_SHIM_LFIST_BOOMERANG,
     PMM_DL_SHIM_RFIST_BOW,
