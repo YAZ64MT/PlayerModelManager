@@ -13,6 +13,11 @@ typedef unsigned long PlayerModelManagerHandle;
 #define PMM_MAX_AUTHOR_NAME_LENGTH 64
 #define PMM_MAX_DISPLAY_NAME_LENGTH 32
 
+// NOTE: If a DL is prefixed with PMM_DL_OPT_, specifying it is OPTIONAL,
+// and a fallback will be used if available.
+// (e.g. not specifying a DL for PMM_DL_OPT_RHAND_OCARINA will result in
+// the DL registered to PMM_DL_RHAND being used)
+
 typedef enum {
 
     // Main skeleton DLs
@@ -38,9 +43,19 @@ typedef enum {
     // Other hand DLs
     PMM_DL_LFIST,
     PMM_DL_LHAND_BOTTLE,
-    PMM_DL_LHAND_GUITAR,
-    PMM_DL_RFIST,
-    PMM_DL_RHAND_OCARINA = 230,
+    PMM_DL_OPT_LHAND_GUITAR,
+    PMM_DL_OPT_LFIST_SWORD = 230,
+    PMM_DL_OPT_LFIST_SWORD_TWO_HANDED,
+    PMM_DL_OPT_LFIST_HAMMER,
+    PMM_DL_OPT_LFIST_BOOMERANG,
+    PMM_DL_RFIST = 21,
+    PMM_DL_OPT_RHAND_OCARINA = 235,
+    PMM_DL_OPT_RFIST_SHIELD,
+    PMM_DL_OPT_RFIST_SWORD_TWO_HANDED,
+    PMM_DL_OPT_RFIST_DEKU_STICK,
+    PMM_DL_OPT_RFIST_BOW,
+    PMM_DL_OPT_RFIST_SLINGSHOT,
+    PMM_DL_OPT_RFIST_HOOKSHOT,
 
     // Swords:
     //      1: Kokiri Sword
@@ -80,29 +95,54 @@ typedef enum {
     PMM_DL_OCARINA_TIME,
     PMM_DL_DEKU_STICK,
     PMM_DL_BOW,
-    PMM_DL_FPS_BOW = 226,
+    PMM_DL_OPT_FPS_BOW = 226,
     PMM_DL_BOW_STRING = 49,
     PMM_DL_BOW_ARROW,
     PMM_DL_SLINGSHOT,
-    PMM_DL_FPS_SLINGSHOT = 227,
+    PMM_DL_OPT_FPS_SLINGSHOT = 227,
     PMM_DL_SLINGSHOT_STRING = 52,
     PMM_DL_HOOKSHOT,
     PMM_DL_HOOKSHOT_CHAIN,
     PMM_DL_HOOKSHOT_HOOK,
     PMM_DL_HOOKSHOT_RETICLE,
-    PMM_DL_FPS_HOOKSHOT,
+    PMM_DL_OPT_FPS_HOOKSHOT,
     PMM_DL_BOOMERANG,        // Boomerang model while held in hand
     PMM_DL_BOOMERANG_FLYING, // Boomerang model after being thrown
     PMM_DL_HAMMER,
 
     // First Person
-    PMM_DL_FPS_LFOREARM,
-    PMM_DL_FPS_LHAND,
-    PMM_DL_FPS_RFOREARM,
-    PMM_DL_FPS_RHAND,
+    PMM_DL_OPT_FPS_LSHOULDER = 242,
+    PMM_DL_OPT_FPS_LSHOULDER_HOOKSHOT,
+    PMM_DL_OPT_FPS_LSHOULDER_BOW,
+    PMM_DL_OPT_FPS_LSHOULDER_SLINGSHOT,
+
+    PMM_DL_FPS_LFOREARM = 61,
+    PMM_DL_OPT_FPS_LFOREARM_HOOKSHOT = 246,
+    PMM_DL_OPT_FPS_LFOREARM_BOW,
+    PMM_DL_OPT_FPS_LFOREARM_SLINGSHOT,
+
+    PMM_DL_FPS_LHAND = 62,
+    PMM_DL_OPT_FPS_LHAND_HOOKSHOT = 249,
+    PMM_DL_OPT_FPS_LHAND_BOW,
+    PMM_DL_OPT_FPS_LHAND_SLINGSHOT,
+    
+    PMM_DL_OPT_FPS_RSHOULDER,
+    PMM_DL_OPT_FPS_RSHOULDER_HOOKSHOT,
+    PMM_DL_OPT_FPS_RSHOULDER_BOW,
+    PMM_DL_OPT_FPS_RSHOULDER_SLINGSHOT,
+
+    PMM_DL_FPS_RFOREARM = 63,
+    PMM_DL_OPT_FPS_RFOREARM_HOOKSHOT = 256,
+    PMM_DL_OPT_FPS_RFOREARM_BOW,
+    PMM_DL_OPT_FPS_RFOREARM_SLINGSHOT,
+
+    PMM_DL_FPS_RHAND = 64,
+    PMM_DL_OPT_FPS_RHAND_HOOKSHOT = 259,
+    PMM_DL_OPT_FPS_RHAND_BOW,
+    PMM_DL_OPT_FPS_RHAND_SLINGSHOT,
 
     // Masks
-    PMM_DL_MASK_SKULL,
+    PMM_DL_MASK_SKULL = 65,
     PMM_DL_MASK_SPOOKY,
     PMM_DL_MASK_GERUDO,
     PMM_DL_MASK_TRUTH,
@@ -126,14 +166,14 @@ typedef enum {
     PMM_DL_MASK_BLAST_COOLING_DOWN,
     PMM_DL_MASK_SCENTS,
     PMM_DL_MASK_GIANT,
-    PMM_DL_MASK_DEKU,         // Only used if model is Deku
-    PMM_DL_MASK_GORON,        // Only used if model is Goron
-    PMM_DL_MASK_ZORA,         // Only used if model is Zora
-    PMM_DL_MASK_FIERCE_DEITY, // Only used if model is Fierce Deity
-    PMM_DL_MASK_DEKU_SCREAM,  // Only used if model is Deku
-    PMM_DL_MASK_GORON_SCREAM, // Only used if model is Goron
-    PMM_DL_MASK_ZORA_SCREAM,  // Only used if model is Zora
-    PMM_DL_MASK_FIERCE_DEITY_SCREAM,
+    PMM_DL_MASK_DEKU,                // Only used if model is Deku
+    PMM_DL_MASK_GORON,               // Only used if model is Goron
+    PMM_DL_MASK_ZORA,                // Only used if model is Zora
+    PMM_DL_MASK_FIERCE_DEITY,        // Only used if model is Fierce Deity
+    PMM_DL_MASK_DEKU_SCREAM,         // Only used if model is Deku
+    PMM_DL_MASK_GORON_SCREAM,        // Only used if model is Goron
+    PMM_DL_MASK_ZORA_SCREAM,         // Only used if model is Zora
+    PMM_DL_MASK_FIERCE_DEITY_SCREAM, // Only used if model is Fierce Deity
 
     // Elegy of Emptiness statues
     PMM_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN,              // Only used if model is human
@@ -315,9 +355,16 @@ typedef enum {
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_OPEN,
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_CLOSED,
 
-    PMM_DL_MAX = 231
+    PMM_DL_MAX = 262
 } PlayerModelManagerDisplayListId;
 
+// Keep these defines for backwards compatibility
+#define PMM_DL_LHAND_GUITAR PMM_DL_OPT_LHAND_GUITAR
+#define PMM_DL_FPS_HOOKSHOT PMM_DL_OPT_FPS_HOOKSHOT
+#define PMM_DL_FPS_BOW PMM_DL_OPT_FPS_BOW
+#define PMM_DL_FPS_SLINGSHOT PMM_DL_OPT_FPS_SLINGSHOT
+
+// Other helper defines
 #define PMM_DL_SWORD_KOKIRI_HILT PMM_DL_SWORD1_HILT
 #define PMM_DL_SWORD_KOKIRI_BLADE PMM_DL_SWORD1_BLADE
 #define PMM_DL_SWORD_KOKIRI_SHEATH PMM_DL_SWORD1_SHEATH

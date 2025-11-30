@@ -19,23 +19,40 @@ static bool shouldUseAdultFixes(Player *player) {
     return fp && FormProxy_isAdultModelType(fp);
 }
 
-Gfx **gFirstPersonDList;
-FormProxy *sFormProxyFpsRightForearm;
+static Gfx **sFirstPersonOverrideDLPtr;
+static Gfx *sFirstPersonDLToOverrideWith;
+
+static void setFirstPersonPlayerDLOverride(Player *player, Link_DisplayList hookshotDLId, Link_DisplayList bowDLId) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
+
+    if (fp) {
+        if (Player_IsHoldingHookshot(player)) {
+            sFirstPersonDLToOverrideWith = FormProxy_getCurrentDL(fp, hookshotDLId);
+        } else {
+            sFirstPersonDLToOverrideWith = FormProxy_getCurrentDL(fp, bowDLId);
+        }
+    }
+}
 
 RECOMP_HOOK("Player_OverrideLimbDrawGameplayFirstPerson")
-void addFPSrightForearm_on_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
-    if (limbIndex == PLAYER_LIMB_RIGHT_FOREARM) {
-        sFormProxyFpsRightForearm = ProxyActorExt_getFormProxy(actor);
-        gFirstPersonDList = dList;
-    } else {
-        sFormProxyFpsRightForearm = NULL;
+void addFPSrightForearm_on_Player_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
+    sFirstPersonOverrideDLPtr = dList;
+    sFirstPersonDLToOverrideWith = NULL;
+    Player *player = (Player *)actor;
+
+    if (player->unk_AA5 == PLAYER_UNKAA5_3) { // vanilla first person limb override doesn't draw unless this condition is met
+        if (limbIndex == PLAYER_LIMB_LEFT_SHOULDER) {
+            setFirstPersonPlayerDLOverride(player, LINK_DL_OPT_FPS_LSHOULDER_HOOKSHOT, LINK_DL_OPT_FPS_LSHOULDER_BOW);
+        } else if (limbIndex == PLAYER_LIMB_RIGHT_FOREARM) {
+            setFirstPersonPlayerDLOverride(player, LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT, LINK_DL_OPT_FPS_RFOREARM_BOW);
+        }
     }
 }
 
 RECOMP_HOOK_RETURN("Player_OverrideLimbDrawGameplayFirstPerson")
-void addFPSrightForearm_on_return_OverrideLimbDrawFirstPerson() {
-    if (sFormProxyFpsRightForearm) {
-        *gFirstPersonDList = FormProxy_getCurrentDL(sFormProxyFpsRightForearm, LINK_DL_FPS_RFOREARM);
+void addFPSrightForearm_on_return_Player_OverrideLimbDrawFirstPerson() {
+    if (sFirstPersonDLToOverrideWith) {
+        *sFirstPersonOverrideDLPtr = sFirstPersonDLToOverrideWith;
     }
 }
 

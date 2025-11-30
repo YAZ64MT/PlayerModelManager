@@ -21,11 +21,22 @@ static bool sShouldSkipHookshotInterpolation;
 
 PlayerProxy *gPlayer1Proxy;
 
-void repointFormPtrsToProxy(FormProxy *formProxy, PlayerTransformation playerForm) {
+void repointFormPtrsToProxy(Player *player, FormProxy *formProxy, PlayerTransformation playerForm) {
+    Link_DisplayList rightFistDL = LINK_DL_RFIST;
+    Link_DisplayList leftFistDL = LINK_DL_LFIST;
+
+    if (player->itemAction == PLAYER_IA_DEKU_STICK) {
+        rightFistDL = LINK_DL_OPT_RFIST_DEKU_STICK;
+        leftFistDL = LINK_DL_OPT_LFIST_DEKU_STICK;
+    } else if (player->itemAction == PLAYER_IA_SWORD_TWO_HANDED) {
+        rightFistDL = LINK_DL_OPT_RFIST_SWORD_TWO_HANDED;
+    }
+
     gPlayerRightHandOpenDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RHAND];
     gPlayerRightHandOpenDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RHAND];
-    gPlayerRightHandClosedDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RFIST];
-    gPlayerRightHandClosedDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RFIST];
+
+    gPlayerRightHandClosedDLs[playerForm * 2 + 0] = &formProxy->displayLists[rightFistDL];
+    gPlayerRightHandClosedDLs[playerForm * 2 + 1] = &formProxy->displayLists[rightFistDL];
 
     if (playerForm == PLAYER_FORM_HUMAN || playerForm == PLAYER_FORM_FIERCE_DEITY) {
         gPlayerRightHandInstrumentDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RHAND_OCARINA_TIME];
@@ -40,8 +51,9 @@ void repointFormPtrsToProxy(FormProxy *formProxy, PlayerTransformation playerFor
 
     gPlayerLeftHandOpenDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_LHAND];
     gPlayerLeftHandOpenDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_LHAND];
-    gPlayerLeftHandClosedDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_LFIST];
-    gPlayerLeftHandClosedDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_LFIST];
+
+    gPlayerLeftHandClosedDLs[playerForm * 2 + 0] = &formProxy->displayLists[leftFistDL];
+    gPlayerLeftHandClosedDLs[playerForm * 2 + 1] = &formProxy->displayLists[leftFistDL];
 
     Gfx *twoHandedSwordDL = &formProxy->displayLists[LINK_DL_LFIST_SWORD_GREAT_FAIRY];
     if (playerForm == PLAYER_FORM_FIERCE_DEITY) {
@@ -58,9 +70,16 @@ void repointFormPtrsToProxy(FormProxy *formProxy, PlayerTransformation playerFor
     gPlayerRightHandBowDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RFIST_BOW];
     gPlayerRightHandBowDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RFIST_BOW];
 
-    sPlayerFirstPersonLeftForearmDLs[playerForm] = &formProxy->displayLists[LINK_DL_FPS_LFOREARM];
-    sPlayerFirstPersonLeftHandDLs[playerForm] = &formProxy->displayLists[LINK_DL_FPS_LHAND];
-    sPlayerFirstPersonRightShoulderDLs[playerForm] = &formProxy->displayLists[LINK_DL_RSHOULDER];
+    if (Player_IsHoldingHookshot(player)) {
+        sPlayerFirstPersonLeftForearmDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_LFOREARM_HOOKSHOT];
+        sPlayerFirstPersonLeftHandDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_LHAND_HOOKSHOT];
+        sPlayerFirstPersonRightShoulderDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_RSHOULDER_HOOKSHOT];
+    } else {
+        sPlayerFirstPersonLeftForearmDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_LFOREARM_BOW];
+        sPlayerFirstPersonLeftHandDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_LHAND_BOW];
+        sPlayerFirstPersonRightShoulderDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_RSHOULDER_BOW];
+    }
+    
     sPlayerFirstPersonRightHandDLs[playerForm] = &formProxy->displayLists[LINK_DL_FPS_RHAND_BOW];
     sPlayerFirstPersonRightHandHookshotDLs[playerForm] = &formProxy->displayLists[LINK_DL_FPS_RHAND_HOOKSHOT];
 
@@ -184,7 +203,7 @@ void updateAssets_on_Player_Draw(Actor *thisx, PlayState *play) {
         Player *player = (Player *)thisx;
         FormProxy_refreshPlayerFaceTextures(fp);
         repointSharedModelsToProxy(fp);
-        repointFormPtrsToProxy(fp, player->transformation);
+        repointFormPtrsToProxy(player, fp, player->transformation);
     }
 }
 

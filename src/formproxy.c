@@ -173,11 +173,16 @@ static void initProxyShims(FormProxy *fp) {
     }
 
 #define SHIM_ITEM_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item] = Utils_createShimDisplayList(2, &dls[LINK_DL_##item], &dls[LINK_DL_##hand])
+#define SHIM_ITEM_OPT_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item] = Utils_createShimDisplayList(2, &dls[LINK_DL_##item], &dls[LINK_DL_OPT_##hand##_##item])
 #define SHIM_ITEM_LFIST(item) SHIM_ITEM_HAND(LFIST, item)
+#define SHIM_ITEM_OPT_LFIST(item) SHIM_ITEM_OPT_HAND(LFIST, item)
 #define SHIM_ITEM_RFIST(item) SHIM_ITEM_HAND(RFIST, item)
+#define SHIM_ITEM_OPT_RFIST(item) SHIM_ITEM_OPT_HAND(RFIST, item)
 #define SHIM_ITEM_LHAND(item) SHIM_ITEM_HAND(LHAND, item)
+#define SHIM_ITEM_OPT_LHAND(item) SHIM_ITEM_OPT_HAND(LHAND, item)
 #define SHIM_ITEM_RHAND(item) SHIM_ITEM_HAND(RHAND, item)
-#define SHIM_ITEM_RHAND_OCARINA(item) shims[LINK_SHIMDL_RHAND_##item] = Utils_createShimDisplayList(2, &dls[LINK_DL_##item], &dls[LINK_DL_RHAND_OCARINA])
+#define SHIM_ITEM_OPT_RHAND(item) SHIM_ITEM_OPT_HAND(RHAND, item)
+#define SHIM_ITEM_RHAND_OCARINA(item) shims[LINK_SHIMDL_RHAND_##item] = Utils_createShimDisplayList(2, &dls[LINK_DL_##item], &dls[LINK_DL_OPT_RHAND_OCARINA])
 #define SHIM_HILT_BACK(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_HILT_BACK] = Utils_createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SWORD##swordNum##_BACK], &dls[LINK_DL_SWORD##swordNum##_HILT], sPopModelViewMtx)
 #define SHIM_SWORD_SHEATHED(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHEATHED] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_SHEATH], &dls[LINK_DL_SWORD##swordNum##_HILT_BACK])
 #define SHIM_SHIELD_BACK(shieldNum) shims[LINK_SHIMDL_SHIELD##shieldNum##_BACK] = Utils_createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD##shieldNum##_BACK], &dls[LINK_DL_SHIELD##shieldNum], sPopModelViewMtx)
@@ -243,24 +248,24 @@ static void initProxyShims(FormProxy *fp) {
     SHIM_SWORD_SHIELD_SHEATHED(5, 2);
     SHIM_SWORD_SHIELD_SHEATHED(5, 3);
 
-    SHIM_SWORD_LFIST(1);
-    SHIM_SWORD_LFIST(2);
-    SHIM_SWORD_LFIST(3);
-    SHIM_SWORD_LFIST(3_PEDESTAL_GRABBED);
-    SHIM_SWORD_LFIST(4);
-    SHIM_SWORD_LFIST(4_BROKEN);
-    SHIM_SWORD_LFIST(5);
+    shims[LINK_SHIMDL_LFIST_SWORD1] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD1], &dls[LINK_DL_OPT_LFIST_SWORD]);
+    shims[LINK_SHIMDL_LFIST_SWORD2] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD2], &dls[LINK_DL_OPT_LFIST_SWORD]);
+    shims[LINK_SHIMDL_LFIST_SWORD3] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD3], &dls[LINK_DL_OPT_LFIST_SWORD]);
+    shims[LINK_SHIMDL_LFIST_SWORD3_PEDESTAL_GRABBED] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD3_PEDESTAL_GRABBED], &dls[LINK_DL_OPT_LFIST_SWORD]);
+    shims[LINK_SHIMDL_LFIST_SWORD4] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD4], &dls[LINK_DL_OPT_LFIST_SWORD]);
+    shims[LINK_SHIMDL_LFIST_SWORD4_BROKEN] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD4_BROKEN], &dls[LINK_DL_OPT_LFIST_SWORD_TWO_HANDED]);
+    shims[LINK_SHIMDL_LFIST_SWORD5] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD5], &dls[LINK_DL_OPT_LFIST_SWORD_TWO_HANDED]);
 
-    SHIM_SHIELD_RFIST(1);
-    SHIM_SHIELD_RFIST(2);
-    SHIM_SHIELD_RFIST(3);
+    shims[LINK_SHIMDL_RFIST_SHIELD1] = Utils_createShimDisplayList(2, &dls[LINK_DL_SHIELD1], &dls[LINK_DL_OPT_RFIST_SHIELD]);
+    shims[LINK_SHIMDL_RFIST_SHIELD2] = Utils_createShimDisplayList(2, &dls[LINK_DL_SHIELD2], &dls[LINK_DL_OPT_RFIST_SHIELD]);
+    shims[LINK_SHIMDL_RFIST_SHIELD3] = Utils_createShimDisplayList(2, &dls[LINK_DL_SHIELD3], &dls[LINK_DL_OPT_RFIST_SHIELD]);
 
-    SHIM_ITEM_LFIST(HAMMER);
-    SHIM_ITEM_RFIST(BOW);
-    SHIM_ITEM_RFIST(HOOKSHOT);
+    SHIM_ITEM_OPT_LFIST(HAMMER);
+    SHIM_ITEM_OPT_RFIST(BOW);
+    SHIM_ITEM_OPT_RFIST(HOOKSHOT);
     SHIM_ITEM_RHAND_OCARINA(OCARINA_FAIRY);
     SHIM_ITEM_RHAND_OCARINA(OCARINA_TIME);
-    SHIM_ITEM_LFIST(BOOMERANG);
+    SHIM_ITEM_OPT_LFIST(BOOMERANG);
 
     shims[LINK_SHIMDL_FPS_RHAND_SLINGSHOT] = Utils_createShimDisplayList(2, &dls[LINK_DL_SLINGSHOT], &dls[LINK_DL_FPS_RHAND]);
     shims[LINK_SHIMDL_FPS_RHAND_BOW] = Utils_createShimDisplayList(2, &dls[LINK_DL_FPS_BOW], &dls[LINK_DL_FPS_RHAND]);
@@ -278,6 +283,11 @@ static void initProxyShims(FormProxy *fp) {
 #undef SHIM_ITEM_RFIST
 #undef SHIM_ITEM_LHAND
 #undef SHIM_ITEM_RHAND
+#undef SHIM_OPT_ITEM_HAND
+#undef SHIM_OPT_ITEM_LFIST
+#undef SHIM_OPT_ITEM_RFIST
+#undef SHIM_OPT_ITEM_LHAND
+#undef SHIM_OPT_ITEM_RHAND
 #undef SHIM_HILT_BACK
 #undef SHIM_SWORD_SHEATHED
 #undef SHIM_SHIELD_BACK
@@ -950,22 +960,81 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
     if (!dl) {
         Link_DisplayList alternateDL = id;
         bool hasAlternate = true;
+        Link_DisplayList alternate2DL = id;
+        bool hasAlternate2 = false;
 
         switch (id) {
-            case LINK_DL_FPS_HOOKSHOT:
+            case LINK_DL_OPT_FPS_HOOKSHOT:
                 alternateDL = LINK_DL_HOOKSHOT;
                 break;
 
-            case LINK_DL_FPS_BOW:
+            case LINK_DL_OPT_FPS_BOW:
                 alternateDL = LINK_DL_BOW;
                 break;
 
-            case LINK_DL_FPS_SLINGSHOT:
+            case LINK_DL_OPT_FPS_SLINGSHOT:
                 alternateDL = LINK_DL_SLINGSHOT;
                 break;
 
-            case LINK_DL_RHAND_OCARINA:
+            case LINK_DL_OPT_LFIST_SWORD:
+            case LINK_DL_OPT_LFIST_SWORD_TWO_HANDED:
+            case LINK_DL_OPT_LFIST_DEKU_STICK:
+            case LINK_DL_OPT_LFIST_HAMMER:
+            case LINK_DL_OPT_LFIST_BOOMERANG:
+                alternateDL = LINK_DL_LFIST;
+                break;
+
+            case LINK_DL_OPT_RHAND_OCARINA:
                 alternateDL = LINK_DL_RHAND;
+                break;
+
+            case LINK_DL_OPT_RFIST_SHIELD:
+            case LINK_DL_OPT_RFIST_SWORD_TWO_HANDED:
+            case LINK_DL_OPT_RFIST_DEKU_STICK:
+            case LINK_DL_OPT_RFIST_BOW:
+            case LINK_DL_OPT_RFIST_SLINGSHOT:
+            case LINK_DL_OPT_RFIST_HOOKSHOT:
+                alternateDL = LINK_DL_RFIST;
+                break;
+
+            case LINK_DL_OPT_FPS_LSHOULDER_HOOKSHOT:
+            case LINK_DL_OPT_FPS_LSHOULDER_BOW:
+            case LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT:
+                alternateDL = LINK_DL_FPS_LSHOULDER;
+                hasAlternate2 = true;
+                alternate2DL = LINK_DL_LSHOULDER;
+                break;
+
+            case LINK_DL_OPT_FPS_LFOREARM_HOOKSHOT:
+            case LINK_DL_OPT_FPS_LFOREARM_BOW:
+            case LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT:
+                alternateDL = LINK_DL_FPS_LFOREARM;
+                break;
+
+            case LINK_DL_OPT_FPS_LHAND_HOOKSHOT:
+            case LINK_DL_OPT_FPS_LHAND_BOW:
+            case LINK_DL_OPT_FPS_LHAND_SLINGSHOT:
+                alternateDL = LINK_DL_FPS_LHAND;
+                break;
+
+            case LINK_DL_OPT_FPS_RSHOULDER_HOOKSHOT:
+            case LINK_DL_OPT_FPS_RSHOULDER_BOW:
+            case LINK_DL_OPT_FPS_RSHOULDER_SLINGSHOT:
+                alternateDL = LINK_DL_OPT_FPS_RSHOULDER;
+                hasAlternate2 = true;
+                alternate2DL = LINK_DL_RSHOULDER;
+                break;
+
+            case LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT:
+            case LINK_DL_OPT_FPS_RFOREARM_BOW:
+            case LINK_DL_OPT_FPS_RFOREARM_SLINGSHOT:
+                alternateDL = LINK_DL_FPS_RFOREARM;
+                break;
+
+            case LINK_DL_OPT_FPS_RHAND_HOOKSHOT:
+            case LINK_DL_OPT_FPS_RHAND_BOW:
+            case LINK_DL_OPT_FPS_RHAND_SLINGSHOT:
+                alternateDL = LINK_DL_FPS_RHAND;
                 break;
 
             default:
@@ -973,8 +1042,12 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
                 break;
         }
 
-        if (hasAlternate) {
+        if (!dl && hasAlternate) {
             dl = ModelInfo_getGfx(current, alternateDL);
+        }
+
+        if (!dl && hasAlternate2) {
+            dl = ModelInfo_getGfx(current, alternate2DL);
         }
 
         if (!dl) {
@@ -985,6 +1058,10 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
             dl = ModelInfo_getGfx(fallbackOverride, alternateDL);
         }
 
+        if (!dl && hasAlternate2) {
+            dl = ModelInfo_getGfx(fallbackOverride, alternate2DL);
+        }
+
         if (!dl) {
             dl = ModelInfo_getGfx(fallback, id);
         }
@@ -992,10 +1069,22 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
         if (!dl && hasAlternate) {
             dl = ModelInfo_getGfx(fallback, alternateDL);
         }
-    }
 
-    if (!dl) {
-        dl = ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), id);
+        if (!dl && hasAlternate2) {
+            dl = ModelInfo_getGfx(fallback, alternate2DL);
+        }
+
+        if (!dl) {
+            dl = ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), id);
+        }
+
+        if (!dl && hasAlternate) {
+            dl = ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), alternateDL);
+        }
+
+        if (!dl && hasAlternate2) {
+            dl = ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), alternate2DL);
+        }
     }
 
     return dl;

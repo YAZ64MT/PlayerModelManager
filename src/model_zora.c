@@ -74,6 +74,9 @@ static void setupZoraFallbackModel() {
     SET_ENTRY_DL(LINK_DL_FPS_LHAND, getZoraDL(gLinkZoraLeftHandClosedDL));
     SET_ENTRY_DL(LINK_DL_FPS_RFOREARM, getZoraDL(gLinkZoraRightForearmDL));
     SET_ENTRY_DL(LINK_DL_FPS_RHAND, getZoraDL(gLinkZoraRightHandClosedDL));
+    SET_ENTRY_DL(LINK_DL_FPS_LSHOULDER, gEmptyDL);
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);
 
 #undef SET_ENTRY_DL
 }
