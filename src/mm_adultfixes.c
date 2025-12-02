@@ -322,3 +322,56 @@ void fixBowProperties_on_return_Player_Draw() {
         D_801C0D98 = sChildBowStringData;
     }
 }
+
+extern Vec3f D_801C08C0[PLAYER_FORM_MAX];
+
+static Vec3f sTmpAdjustSingleLegVec;
+
+extern f32 D_801C08FC[PLAYER_FORM_MAX];
+extern f32 D_801C0910[PLAYER_FORM_MAX];
+extern f32 D_801C0924[PLAYER_FORM_MAX];
+extern f32 D_801C0938[PLAYER_FORM_MAX];
+
+typedef struct SingleLegFloat {
+    f32 *vanillaArr;
+    f32 tmp;
+} SingleLegFloat;
+
+SingleLegFloat sSingleLegFloatsTmp[] = {
+    {.vanillaArr = D_801C08FC},
+    {.vanillaArr = D_801C0910},
+    {.vanillaArr = D_801C0924},
+    {.vanillaArr = D_801C0938},
+};
+
+static bool sIsSingleLegAdjusted;
+
+RECOMP_HOOK("Player_AdjustSingleLeg")
+void adjustAdultLeg_on_Player_AdjustSingleLeg(PlayState *play, Player *player, SkelAnime *skelAnime, Vec3f *pos, Vec3s *rot,
+                            s32 thighLimbIndex, s32 shinLimbIndex, s32 footLimbIndex) {
+    sIsSingleLegAdjusted = shouldUseAdultFixes(player);
+
+    if (sIsSingleLegAdjusted) {
+        sTmpAdjustSingleLegVec = D_801C08C0[PLAYER_FORM_HUMAN];
+
+        for (int i = 0; i < ARRAY_COUNT(sSingleLegFloatsTmp); ++i) {
+            SingleLegFloat *curr = &sSingleLegFloatsTmp[i];
+
+            curr->tmp = curr->vanillaArr[PLAYER_FORM_HUMAN];
+            curr->vanillaArr[PLAYER_FORM_HUMAN] = curr->vanillaArr[PLAYER_FORM_FIERCE_DEITY];
+        }
+    }
+}
+
+RECOMP_HOOK_RETURN("Player_AdjustSingleLeg")
+void adjustAdultLeg_on_return_Player_AdjustSingleLeg() {
+    if (sIsSingleLegAdjusted) {
+        D_801C08C0[PLAYER_FORM_HUMAN] = sTmpAdjustSingleLegVec;
+
+        for (int i = 0; i < ARRAY_COUNT(sSingleLegFloatsTmp); ++i) {
+            SingleLegFloat *curr = &sSingleLegFloatsTmp[i];
+
+            curr->vanillaArr[PLAYER_FORM_HUMAN] = curr->tmp;
+        }
+    }
+}
