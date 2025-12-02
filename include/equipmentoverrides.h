@@ -4,17 +4,17 @@
 #include "PR/ultratypes.h"
 #include "modelmatrixids.h"
 
-typedef struct {
+typedef struct EquipmentOverrideDLs {
     Link_DisplayList *overrides;
     size_t count;
 } EquipmentOverrideDLs;
 
-typedef struct {
+typedef struct EquipmentOverrideMtxs {
     Link_EquipmentMatrix *overrides;
     size_t count;
 } EquipmentOverrideMtxs;
 
-typedef struct {
+typedef struct EquipmentOverride {
     EquipmentOverrideDLs dl;
     EquipmentOverrideMtxs mtx;
 } EquipmentOverride;
