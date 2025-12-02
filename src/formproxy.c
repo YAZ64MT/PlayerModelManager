@@ -432,6 +432,10 @@ bool FormProxy_setCurrentOverrideDL(FormProxy *fp, Link_DisplayList dlId, Gfx *d
         return false;
     }
 
+    if (!dl) {
+        return FormProxy_unsetCurrentOverrideDL(fp, dlId);
+    }
+
     return ModelInfo_setGfxOverride(&fp->currentModelInfo, dlId, dl);
 }
 
@@ -448,6 +452,10 @@ bool FormProxy_setCurrentOverrideMtx(FormProxy *fp, Link_EquipmentMatrix mtxId, 
     if (!isValidFormProxy(fp)) {
         PRINT_INVALID_PTR_ERR();
         return false;
+    }
+
+    if (!mtx) {
+        return FormProxy_unsetCurrentOverrideMtx(fp, mtxId);
     }
 
     return ModelInfo_setMtxOverride(&fp->currentModelInfo, mtxId, mtx);

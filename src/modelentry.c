@@ -662,16 +662,12 @@ bool ModelEntryEquipment_removeFromFormProxy(const ModelEntry *thisx, FormProxy 
         if (override) {
             for (size_t i = 0; i < override->dl.count; ++i) {
                 Link_DisplayList id = override->dl.overrides[i];
-                uintptr_t dl = 0;
-                recomputil_u32_value_hashmap_get(this->modelEntry.displayListPtrs, id, &dl);
                 PlayerProxy_setOverrideDL(pp, id, NULL);
                 PlayerProxy_refreshDL(pp, id);
             }
 
             for (size_t i = 0; i < override->mtx.count; ++i) {
                 Link_EquipmentMatrix id = override->mtx.overrides[i];
-                uintptr_t mtx = 0;
-                recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &mtx);
                 PlayerProxy_setOverrideMtx(pp, id, NULL);
                 PlayerProxy_refreshMtx(pp, id);
             }

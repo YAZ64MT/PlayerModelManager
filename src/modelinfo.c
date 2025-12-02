@@ -46,8 +46,9 @@ Gfx *ModelInfo_getGfx(ModelInfo *modelInfo, Link_DisplayList id) {
     }
 
     uintptr_t gfx = 0;
+    recomputil_u32_value_hashmap_get(modelInfo->gfxOverrides, id, &gfx);
 
-    if (!recomputil_u32_value_hashmap_get(modelInfo->gfxOverrides, id, &gfx)) {
+    if (!gfx) {
         if (modelInfo->modelEntryForm) {
             gfx = (uintptr_t)ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(modelInfo->modelEntryForm), id);
         }
@@ -68,8 +69,9 @@ Mtx *ModelInfo_getMtx(ModelInfo *modelInfo, Link_EquipmentMatrix id) {
     }
 
     uintptr_t mtx = 0;
+    recomputil_u32_value_hashmap_get(modelInfo->mtxOverrides, id, &mtx);
 
-    if (!recomputil_u32_value_hashmap_get(modelInfo->mtxOverrides, id, &mtx)) {
+    if (!mtx) {
         if (modelInfo->modelEntryForm) {
             mtx = (uintptr_t)ModelEntry_getMatrix(ModelEntryForm_getModelEntry(modelInfo->modelEntryForm), id);
         }
