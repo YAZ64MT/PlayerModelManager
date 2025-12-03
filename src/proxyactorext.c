@@ -6,6 +6,7 @@
 #include "proxyactorext.h"
 #include "playermodelconfig.h"
 #include "logger.h"
+#include "assets/objects/object_link_goron/object_link_goron.h"
 
 static ActorExtensionId sActorExtIdPlayerProxy;
 static ActorExtensionId sActorExtIdFormProxyId;
@@ -117,37 +118,6 @@ void setupPlayerFormProxy_on_Player_Init(Actor *thisx, PlayState *play) {
         if (PlayerProxy_getProxyIdFromForm(form, &id)) {
             ProxyActorExt_setPlayerProxy(thisx, gPlayer1Proxy);
             ProxyActorExt_setFormProxyId(thisx, id);
-        }
-        FormProxy *fp = ProxyActorExt_getFormProxy(thisx);
-
-        // Replace player skeleton before init
-        if (fp) {
-            FlexSkeletonHeader *skel = FormProxy_getSkeleton(fp);
-            if (skel) {
-                gPlayerSkeletons[form] = skel;
-            }
-        }
-    }
-}
-
-static Player *sPlayerInitCommonGoron;
-
-RECOMP_HOOK("Player_InitCommon")
-void replaceGoronShieldingSkel_on_Player_InitCommon(Player *this, PlayState *play, FlexSkeletonHeader *skelHeader) {
-    sPlayerInitCommonGoron = this->transformation == PLAYER_FORM_GORON ? this : NULL;
-}
-
-RECOMP_HOOK_RETURN("Player_InitCommon")
-void replaceGoronShieldingSkel_on_return_Player_InitCommon() {
-    if (sPlayerInitCommonGoron) {
-        FormProxy *fp = ProxyActorExt_getFormProxy(&sPlayerInitCommonGoron->actor);
-
-        if (fp) {
-            FlexSkeletonHeader *shieldingSkel = FormProxy_getShieldingSkeleton(fp);
-
-            if (shieldingSkel && shieldingSkel->sh.segment) {
-                sPlayerInitCommonGoron->unk_2C8.skeleton = shieldingSkel->sh.segment;
-            }
         }
     }
 }

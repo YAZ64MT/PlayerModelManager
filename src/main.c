@@ -217,6 +217,20 @@ void updateAssets_on_Player_Draw(Actor *thisx, PlayState *play) {
         FormProxy_refreshPlayerFaceTextures(fp);
         repointSharedModelsToProxy(fp);
         repointFormPtrsToProxy(player, fp);
+        FlexSkeletonHeader *skel = FormProxy_getSkeleton(fp);
+        if (skel) {
+            player->skelAnime.dListCount = player->skelAnimeUpper.dListCount = skel->dListCount;
+            player->skelAnime.skeleton = player->skelAnimeUpper.skeleton = skel->sh.segment;
+        }
+
+        if (player->transformation == PLAYER_FORM_GORON) {
+            FlexSkeletonHeader *shieldingSkel = FormProxy_getShieldingSkeleton(fp);
+
+            if (shieldingSkel) {
+                player->unk_2C8.dListCount = shieldingSkel->dListCount;
+                player->unk_2C8.skeleton = shieldingSkel->sh.segment;
+            }
+        }
     }
 }
 
