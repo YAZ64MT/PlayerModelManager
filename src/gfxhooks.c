@@ -223,7 +223,11 @@ static void replaceHookedGfxCommands(GfxHookData *hookDat, Gfx *startDL, Gfx *en
             if (hashmap) {
                 unsigned long tmp;
                 if (recomputil_u32_value_hashmap_get(hashmap, curr->words.w1, &tmp)) {
-                    gSPDisplayList(curr, &hookDat->formProxy->displayLists[tmp]);
+                    Gfx *dl = FormProxy_getCurrentDL(hookDat->formProxy, tmp);
+
+                    if (dl) {
+                        gSPDisplayList(curr, dl);
+                    }
                 }
             }
         }

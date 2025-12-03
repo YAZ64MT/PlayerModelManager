@@ -21,70 +21,93 @@ static bool sShouldSkipHookshotInterpolation;
 
 PlayerProxy *gPlayer1Proxy;
 
-void repointFormPtrsToProxy(Player *player, FormProxy *formProxy, PlayerTransformation playerForm) {
-    Link_DisplayList rightFistDL = LINK_DL_RFIST;
-    Link_DisplayList leftFistDL = LINK_DL_LFIST;
+static void tryReplaceCodeDL(FormProxy *fp, Link_DisplayList dlId, Gfx **dest) {
+    Gfx *newDL = FormProxy_getCurrentDL(fp, dlId);
+    if (newDL) {
+        *dest = newDL;
+    }
+}
+
+static void tryReplaceCodeLodDL(FormProxy *fp, Link_DisplayList dlId, Gfx *dest[]) {
+    Gfx *newDL = FormProxy_getCurrentDL(fp, dlId);
+    if (newDL) {
+        dest[0] = newDL;
+        dest[1] = newDL;
+    }
+}
+
+void repointFormPtrsToProxy(Player *player, FormProxy *formProxy) {
+    PlayerTransformation playerForm = player->transformation;
+
+    Link_DisplayList rightFistDLId = LINK_DL_RFIST;
+    Link_DisplayList leftFistDLId = LINK_DL_LFIST;
 
     if (player->itemAction == PLAYER_IA_DEKU_STICK) {
-        rightFistDL = LINK_DL_OPT_RFIST_DEKU_STICK;
-        leftFistDL = LINK_DL_OPT_LFIST_DEKU_STICK;
+        rightFistDLId = LINK_DL_OPT_RFIST_DEKU_STICK;
+        leftFistDLId = LINK_DL_OPT_LFIST_DEKU_STICK;
     } else if (player->itemAction == PLAYER_IA_SWORD_TWO_HANDED) {
-        rightFistDL = LINK_DL_OPT_RFIST_SWORD_TWO_HANDED;
+        rightFistDLId = LINK_DL_OPT_RFIST_SWORD_TWO_HANDED;
+        leftFistDLId = LINK_DL_OPT_LFIST_SWORD_TWO_HANDED;
     }
 
-    gPlayerRightHandOpenDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RHAND];
-    gPlayerRightHandOpenDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RHAND];
+    tryReplaceCodeLodDL(formProxy, LINK_DL_RHAND, &gPlayerRightHandOpenDLs[playerForm * 2]);
 
-    gPlayerRightHandClosedDLs[playerForm * 2 + 0] = &formProxy->displayLists[rightFistDL];
-    gPlayerRightHandClosedDLs[playerForm * 2 + 1] = &formProxy->displayLists[rightFistDL];
+    tryReplaceCodeLodDL(formProxy, rightFistDLId, &gPlayerRightHandClosedDLs[playerForm * 2]);
 
+    Link_DisplayList rightHandHoldingInstrumentDLId;
     if (playerForm == PLAYER_FORM_HUMAN || playerForm == PLAYER_FORM_FIERCE_DEITY) {
-        gPlayerRightHandInstrumentDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RHAND_OCARINA_TIME];
-        gPlayerRightHandInstrumentDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RHAND_OCARINA_TIME];
+        rightHandHoldingInstrumentDLId = LINK_DL_RHAND_OCARINA_TIME;
     } else {
-        gPlayerRightHandInstrumentDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RHAND];
-        gPlayerRightHandInstrumentDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RHAND];
+        rightHandHoldingInstrumentDLId = LINK_DL_OPT_RHAND_OCARINA;
     }
 
-    gPlayerRightHandHookshotDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RFIST_HOOKSHOT];
-    gPlayerRightHandHookshotDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RFIST_HOOKSHOT];
+    tryReplaceCodeLodDL(formProxy, rightHandHoldingInstrumentDLId, &gPlayerRightHandInstrumentDLs[playerForm * 2]);
 
-    gPlayerLeftHandOpenDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_LHAND];
-    gPlayerLeftHandOpenDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_LHAND];
+    tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_HOOKSHOT, &gPlayerRightHandHookshotDLs[playerForm * 2]);
 
-    gPlayerLeftHandClosedDLs[playerForm * 2 + 0] = &formProxy->displayLists[leftFistDL];
-    gPlayerLeftHandClosedDLs[playerForm * 2 + 1] = &formProxy->displayLists[leftFistDL];
+    tryReplaceCodeLodDL(formProxy, LINK_DL_LHAND, &gPlayerLeftHandOpenDLs[playerForm * 2]);
 
-    Gfx *twoHandedSwordDL = &formProxy->displayLists[LINK_DL_LFIST_SWORD_GREAT_FAIRY];
+    tryReplaceCodeLodDL(formProxy, leftFistDLId, &gPlayerLeftHandClosedDLs[playerForm * 2]);
+
+    Link_DisplayList leftHandHoldingTwoHandedSwordDLId;
     if (playerForm == PLAYER_FORM_FIERCE_DEITY) {
-        twoHandedSwordDL = &formProxy->displayLists[LINK_DL_LFIST_SWORD_FIERCE_DEITY];
-    }
-
-    gPlayerLeftHandTwoHandSwordDLs[playerForm * 2 + 0] = twoHandedSwordDL;
-    gPlayerLeftHandTwoHandSwordDLs[playerForm * 2 + 1] = twoHandedSwordDL;
-    gPlayerLeftHandOneHandSwordDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
-    gPlayerLeftHandOneHandSwordDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
-    gPlayerLeftHandBottleDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_LHAND_BOTTLE];
-    gPlayerLeftHandBottleDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_LHAND_BOTTLE];
-
-    gPlayerRightHandBowDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_RFIST_BOW];
-    gPlayerRightHandBowDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_RFIST_BOW];
-
-    if (Player_IsHoldingHookshot(player)) {
-        sPlayerFirstPersonLeftForearmDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_LFOREARM_HOOKSHOT];
-        sPlayerFirstPersonLeftHandDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_LHAND_HOOKSHOT];
-        sPlayerFirstPersonRightShoulderDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_RSHOULDER_HOOKSHOT];
+        leftHandHoldingTwoHandedSwordDLId = LINK_DL_LFIST_SWORD_FIERCE_DEITY;
     } else {
-        sPlayerFirstPersonLeftForearmDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_LFOREARM_BOW];
-        sPlayerFirstPersonLeftHandDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_LHAND_BOW];
-        sPlayerFirstPersonRightShoulderDLs[playerForm] = &formProxy->displayLists[LINK_DL_OPT_FPS_RSHOULDER_BOW];
+        leftHandHoldingTwoHandedSwordDLId = LINK_DL_LFIST_SWORD_GREAT_FAIRY;
     }
-    
-    sPlayerFirstPersonRightHandDLs[playerForm] = &formProxy->displayLists[LINK_DL_FPS_RHAND_BOW];
-    sPlayerFirstPersonRightHandHookshotDLs[playerForm] = &formProxy->displayLists[LINK_DL_FPS_RHAND_HOOKSHOT];
 
-    gPlayerWaistDLs[playerForm * 2 + 0] = &formProxy->displayLists[LINK_DL_WAIST];
-    gPlayerWaistDLs[playerForm * 2 + 1] = &formProxy->displayLists[LINK_DL_WAIST];
+    tryReplaceCodeLodDL(formProxy, leftHandHoldingTwoHandedSwordDLId, &gPlayerLeftHandTwoHandSwordDLs[playerForm * 2]);
+
+    tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_KOKIRI, &gPlayerLeftHandOneHandSwordDLs[playerForm * 2]);
+
+    tryReplaceCodeLodDL(formProxy, LINK_DL_LHAND_BOTTLE, &gPlayerLeftHandBottleDLs[playerForm * 2]);
+
+    tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_BOW, &gPlayerRightHandBowDLs[playerForm * 2]);
+
+    Link_DisplayList firstPersonLeftForearmDlId;
+    Link_DisplayList firstPersonLeftHandDlId;
+    Link_DisplayList firstPersonRightShoulderDlId;
+    if (Player_IsHoldingHookshot(player)) {
+        firstPersonLeftForearmDlId = LINK_DL_OPT_FPS_LFOREARM_HOOKSHOT;
+        firstPersonLeftHandDlId = LINK_DL_OPT_FPS_LHAND_HOOKSHOT;
+        firstPersonRightShoulderDlId = LINK_DL_OPT_FPS_RSHOULDER_HOOKSHOT;
+    } else {
+        firstPersonLeftForearmDlId = LINK_DL_OPT_FPS_LFOREARM_BOW;
+        firstPersonLeftHandDlId = LINK_DL_OPT_FPS_LHAND_BOW;
+        firstPersonRightShoulderDlId = LINK_DL_OPT_FPS_RSHOULDER_BOW;
+    }
+
+    tryReplaceCodeDL(formProxy, firstPersonLeftForearmDlId, &sPlayerFirstPersonLeftForearmDLs[playerForm]);
+
+    tryReplaceCodeDL(formProxy, firstPersonLeftHandDlId, &sPlayerFirstPersonLeftHandDLs[playerForm]);
+
+    tryReplaceCodeDL(formProxy, firstPersonRightShoulderDlId, &sPlayerFirstPersonRightShoulderDLs[playerForm]);
+
+    tryReplaceCodeDL(formProxy, LINK_DL_FPS_RHAND_BOW, &sPlayerFirstPersonRightHandDLs[playerForm]);
+
+    tryReplaceCodeDL(formProxy, LINK_DL_FPS_RHAND_HOOKSHOT, &sPlayerFirstPersonRightHandHookshotDLs[playerForm]);
+
+    tryReplaceCodeLodDL(formProxy, LINK_DL_WAIST, &gPlayerWaistDLs[playerForm * 2]);
 }
 
 static Gfx **sPlayerHandHoldingSwords = D_801C018C;
@@ -101,58 +124,48 @@ static Gfx **sPlayerMaskDLs = D_801C0B20;
 
 static EnBoomStruct *sPlayerBoomerangInfo = D_808A3078;
 
-void repointSharedModelsToProxy(FormProxy *proxy) {
-    sPlayerHandHoldingSwords[0] = &proxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
-    sPlayerHandHoldingSwords[1] = &proxy->displayLists[LINK_DL_LFIST_SWORD_KOKIRI];
-    sPlayerHandHoldingSwords[2] = &proxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
-    sPlayerHandHoldingSwords[3] = &proxy->displayLists[LINK_DL_LFIST_SWORD_RAZOR];
-    sPlayerHandHoldingSwords[4] = &proxy->displayLists[LINK_DL_LFIST_SWORD_GILDED];
-    sPlayerHandHoldingSwords[5] = &proxy->displayLists[LINK_DL_LFIST_SWORD_GILDED];
+void repointSharedModelsToProxy(FormProxy *formProxy) {
+    tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_KOKIRI, &sPlayerHandHoldingSwords[PLAYER_SWORD_KOKIRI * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_RAZOR, &sPlayerHandHoldingSwords[PLAYER_SWORD_RAZOR * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_GILDED, &sPlayerHandHoldingSwords[PLAYER_SWORD_GILDED * 2]);
 
-    gPlayerShields[0] = &proxy->displayLists[LINK_DL_SHIELD_HERO_BACK];
-    gPlayerShields[1] = &proxy->displayLists[LINK_DL_SHIELD_HERO_BACK];
-    gPlayerShields[2] = &proxy->displayLists[LINK_DL_SHIELD_MIRROR_BACK];
-    gPlayerShields[3] = &proxy->displayLists[LINK_DL_SHIELD_MIRROR_BACK];
+    int shieldHeroIndex = PLAYER_SHIELD_HEROS_SHIELD - 1;
+    int shieldMirrorIndex = PLAYER_SHIELD_MIRROR_SHIELD - 1;
 
-    gPlayerHandHoldingShields[0] = &proxy->displayLists[LINK_DL_RFIST_SHIELD_HERO];
-    gPlayerHandHoldingShields[1] = &proxy->displayLists[LINK_DL_RFIST_SHIELD_HERO];
-    gPlayerHandHoldingShields[2] = &proxy->displayLists[LINK_DL_RFIST_SHIELD_MIRROR];
-    gPlayerHandHoldingShields[3] = &proxy->displayLists[LINK_DL_RFIST_SHIELD_MIRROR];
+    tryReplaceCodeLodDL(formProxy, LINK_DL_SHIELD_HERO_BACK, &gPlayerShields[shieldHeroIndex * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_SHIELD_MIRROR_BACK, &gPlayerShields[shieldMirrorIndex * 2]);
 
-    gPlayerSheathedSwords[0] = &proxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
-    gPlayerSheathedSwords[1] = &proxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATHED];
-    gPlayerSheathedSwords[2] = &proxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATHED];
-    gPlayerSheathedSwords[3] = &proxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATHED];
-    gPlayerSheathedSwords[4] = &proxy->displayLists[LINK_DL_SWORD_GILDED_SHEATHED];
-    gPlayerSheathedSwords[5] = &proxy->displayLists[LINK_DL_SWORD_GILDED_SHEATHED];
+    tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_SHIELD_HERO, &gPlayerHandHoldingShields[shieldHeroIndex * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_SHIELD_MIRROR, &gPlayerHandHoldingShields[shieldMirrorIndex * 2]);
 
-    gPlayerSwordSheaths[0] = &proxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATH];
-    gPlayerSwordSheaths[1] = &proxy->displayLists[LINK_DL_SWORD_KOKIRI_SHEATH];
-    gPlayerSwordSheaths[2] = &proxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATH];
-    gPlayerSwordSheaths[3] = &proxy->displayLists[LINK_DL_SWORD_RAZOR_SHEATH];
-    gPlayerSwordSheaths[4] = &proxy->displayLists[LINK_DL_SWORD_GILDED_SHEATH];
-    gPlayerSwordSheaths[5] = &proxy->displayLists[LINK_DL_SWORD_GILDED_SHEATH];
+    tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_KOKIRI_SHEATHED, &gPlayerSheathedSwords[PLAYER_SWORD_KOKIRI * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_RAZOR_SHEATHED, &gPlayerSheathedSwords[PLAYER_SWORD_RAZOR * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_GILDED_SHEATHED, &gPlayerSheathedSwords[PLAYER_SWORD_GILDED * 2]);
 
-    sPlayerFins[0] = &proxy->displayLists[LINK_DL_LFIN];
-    sPlayerFins[1] = &proxy->displayLists[LINK_DL_RFIN];
+    tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_KOKIRI_SHEATH, &gPlayerSwordSheaths[PLAYER_SWORD_KOKIRI * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_RAZOR_SHEATH, &gPlayerSwordSheaths[PLAYER_SWORD_RAZOR * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_GILDED_SHEATH, &gPlayerSwordSheaths[PLAYER_SWORD_GILDED * 2]);
 
-    sPlayerSwimFins[0] = &proxy->displayLists[LINK_DL_LFIN_SWIM];
-    sPlayerSwimFins[1] = &proxy->displayLists[LINK_DL_RFIN_SWIM];
+    tryReplaceCodeDL(formProxy, LINK_DL_LFIN, &sPlayerFins[0]);
+    tryReplaceCodeDL(formProxy, LINK_DL_RFIN, &sPlayerFins[1]);
 
-    sPlayerPads[0] = &proxy->displayLists[LINK_DL_PAD_GRASS];
-    sPlayerPads[1] = &proxy->displayLists[LINK_DL_PAD_WOOD];
-    sPlayerPads[2] = &proxy->displayLists[LINK_DL_PAD_OPENING];
+    tryReplaceCodeDL(formProxy, LINK_DL_LFIN_SWIM, &sPlayerSwimFins[0]);
+    tryReplaceCodeDL(formProxy, LINK_DL_RFIN_SWIM, &sPlayerSwimFins[1]);
 
-    sPlayerBoomerangInfo[0].unk_00 = &proxy->displayLists[LINK_DL_LFIN_BOOMERANG];
-    sPlayerBoomerangInfo[1].unk_00 = &proxy->displayLists[LINK_DL_RFIN_BOOMERANG];
+    tryReplaceCodeDL(formProxy, LINK_DL_PAD_GRASS, &sPlayerPads[0]);
+    tryReplaceCodeDL(formProxy, LINK_DL_PAD_WOOD, &sPlayerPads[1]);
+    tryReplaceCodeDL(formProxy, LINK_DL_PAD_OPENING, &sPlayerPads[2]);
 
-    sShellDLists[PLAYER_FORM_HUMAN] = &proxy->displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN];
-    sShellDLists[PLAYER_FORM_DEKU] = &proxy->displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU];
-    sShellDLists[PLAYER_FORM_GORON] = &proxy->displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON];
-    sShellDLists[PLAYER_FORM_ZORA] = &proxy->displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA];
-    sShellDLists[PLAYER_FORM_FIERCE_DEITY] = &proxy->displayLists[LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY];
+    tryReplaceCodeDL(formProxy, LINK_DL_LFIN_BOOMERANG, &sPlayerBoomerangInfo[0].unk_00);
+    tryReplaceCodeDL(formProxy, LINK_DL_RFIN_BOOMERANG, &sPlayerBoomerangInfo[1].unk_00);
 
-#define SET_MASK_DL(playerMaskIndex, linkDLIndex) (sPlayerMaskDLs[playerMaskIndex - 1] = &proxy->displayLists[linkDLIndex])
+    tryReplaceCodeDL(formProxy, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN, &sShellDLists[0]);
+    tryReplaceCodeDL(formProxy, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU, &sShellDLists[1]);
+    tryReplaceCodeDL(formProxy, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON, &sShellDLists[2]);
+    tryReplaceCodeDL(formProxy, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA, &sShellDLists[3]);
+    tryReplaceCodeDL(formProxy, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY, &sShellDLists[4]);
+
+#define SET_MASK_DL(playerMaskIndex, linkDLIndex) tryReplaceCodeDL(formProxy, linkDLIndex, &sPlayerMaskDLs[playerMaskIndex - 1])
 
     SET_MASK_DL(PLAYER_MASK_TRUTH, LINK_DL_MASK_TRUTH);
     SET_MASK_DL(PLAYER_MASK_KAFEIS_MASK, LINK_DL_MASK_KAFEIS_MASK);
@@ -203,7 +216,7 @@ void updateAssets_on_Player_Draw(Actor *thisx, PlayState *play) {
         Player *player = (Player *)thisx;
         FormProxy_refreshPlayerFaceTextures(fp);
         repointSharedModelsToProxy(fp);
-        repointFormPtrsToProxy(player, fp, player->transformation);
+        repointFormPtrsToProxy(player, fp);
     }
 }
 
