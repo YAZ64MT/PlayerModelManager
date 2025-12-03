@@ -8,6 +8,7 @@
 #include "overlays/actors/ovl_En_Railgibud/z_en_railgibud.h"
 #include "overlays/actors/ovl_En_Talk_Gibud/z_en_talk_gibud.h"
 #include "overlays/actors/ovl_Arms_Hook/z_arms_hook.h"
+#include "assets/objects/gameplay_keep/gameplay_keep.h"
 
 static bool shouldUseAdultFixes(Player *player) {
     if (player->transformation != PLAYER_FORM_HUMAN) {
@@ -349,7 +350,7 @@ static bool sIsSingleLegAdjusted;
 RECOMP_HOOK("Player_AdjustSingleLeg")
 void adjustAdultLeg_on_Player_AdjustSingleLeg(PlayState *play, Player *player, SkelAnime *skelAnime, Vec3f *pos, Vec3s *rot,
                             s32 thighLimbIndex, s32 shinLimbIndex, s32 footLimbIndex) {
-    sIsSingleLegAdjusted = shouldUseAdultFixes(player);
+    sIsSingleLegAdjusted = shouldUseAdultFixes(player) && player->skelAnime.animation != &gPlayerAnim_cl_maskoff;
 
     if (sIsSingleLegAdjusted) {
         sTmpAdjustSingleLegVec = D_801C08C0[PLAYER_FORM_HUMAN];
