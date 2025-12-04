@@ -139,8 +139,8 @@ void replaceDoorAnim_on_Player_Door_Knob(PlayState *play, Player *this, Actor *d
         for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
             sDoorAAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i];
             sDoorBAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i];
-            PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i] = D_8085BE84[PLAYER_ANIMGROUP_doorA_free][i];
-            PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i] = D_8085BE84[PLAYER_ANIMGROUP_doorB_free][i];
+            PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA_free][i];
+            PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB_free][i];
         }
     }
 }
