@@ -305,7 +305,7 @@ static void initBowWrapper(FormProxy *fp) {
 }
 
 static void initProxyWrappers(FormProxy *fp) {
-    for (int i = 0; i < LINK_DL_MAX; ++i) {
+    for (size_t i = 0; i < fp->numDLs; ++i) {
         gSPDisplayList(&fp->wrappedDisplayLists[i].displayList[WRAPPED_DL_PREDRAW], sStartDLWrapper);
         gSPDisplayList(&fp->wrappedDisplayLists[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
         gSPBranchList(&fp->wrappedDisplayLists[i].displayList[WRAPPED_DL_POSTDRAW], sEndDLWrapper);
@@ -315,7 +315,7 @@ static void initProxyWrappers(FormProxy *fp) {
 }
 
 static void initProxyDLs(FormProxy *fp) {
-    for (int i = 0; i < LINK_DL_MAX; ++i) {
+    for (size_t i = 0; i < fp->numDLs; ++i) {
         MRC_addExcludedDL(&fp->displayLists[i]);
         MRC_addExcludedDL(fp->wrappedDisplayLists[i].displayList);
         gSPBranchList(&fp->displayLists[i], fp->wrappedDisplayLists[i].displayList);
@@ -353,6 +353,9 @@ void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, F
     fp->fallbackModelInfo = fallback;
     fp->displayListAlternates = recomputil_create_u32_value_hashmap();
     fp->tunicColor.isOverrideRequested = false;
+    fp->numDLs = LINK_DL_MAX;
+    fp->displayLists = recomp_alloc(fp->numDLs * sizeof(*fp->displayLists));
+    fp->wrappedDisplayLists = recomp_alloc(fp->numDLs * sizeof(*fp->wrappedDisplayLists));
     initSkeleton(fp);
     initShieldingSkeleton(fp);
     initMatrixes(fp);
@@ -675,13 +678,13 @@ void FormProxy_refreshAllDLs(FormProxy *fp) {
     ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
     ModelInfo *fallback = fp->fallbackModelInfo;
 
-    for (int i = 0; i < LINK_DL_MAX; ++i) {
+    for (size_t i = 0; i < fp->numDLs; ++i) {
         gSPDisplayList(&wDLs[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
     }
 
     setDLsToShims(fp);
 
-    for (Link_DisplayList i = 0; i < LINK_DL_MAX; ++i) {
+    for (size_t i = 0; i < fp->numDLs; ++i) {
         FormProxy_refreshDL(fp, i);
     }
 
