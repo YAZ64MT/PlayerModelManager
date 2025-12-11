@@ -151,16 +151,14 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
         ModelEntry_setFlags(entry, MODELENTRY_FLAG_IS_ADULT);
     }
 
+    ModelEntry_setDisplayName(entry, internalName);
+
     Logger_printVerbose("Registered new model '%s' with model type %d", ModelEntry_getInternalName(entry), modelType);
 
     return h;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerHandle h, const char *displayName) {
-    if (!isStrValid(__func__, displayName, PMM_MAX_DISPLAY_NAME_LENGTH)) {
-        return 0;
-    }
-
     ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
@@ -175,10 +173,6 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayName(PlayerModelManagerHandle h,
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerHandle h, const char *author) {
-    if (!isStrValid(__func__, author, PMM_MAX_AUTHOR_NAME_LENGTH)) {
-        return false;
-    }
-
     ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {

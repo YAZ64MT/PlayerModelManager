@@ -514,7 +514,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerHandle PlayerModelManager_re
 
 // Sets the name that will appear in the menu for the passed in model handle.
 //
-// Limited to 32 characters.
+// Limited to 32 characters. Longer names will be truncated.
 //
 // This function can only be used during the PlayerModelManager_onRegisterModels event.
 //
@@ -523,7 +523,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayName(PlayerM
 
 // Sets the name that will appear in the author field of the menu.
 //
-// Limited to 64 characters.
+// Limited to 64 characters. Longer names will be truncated.
 //
 // This function can only be used during the PlayerModelManager_onRegisterModels event.
 //

@@ -9,6 +9,7 @@
 #include "modelentrymanager.h"
 #include "logger.h"
 #include "defaultfacetex.h"
+#include "libc/string.h"
 
 #define PRINT_INVALID_PTR_ERR() Logger_printError("Received invalid pointer.")
 
@@ -301,6 +302,24 @@ const char *ModelEntry_getDisplayName(const ModelEntry *entry) {
     return entry->displayName;
 }
 
+static char *duplicateStringAndTruncate(const char *s, size_t maxSize) {
+    size_t len = strlen(s);
+
+    if (len > maxSize) {
+        len = maxSize;
+    }
+
+    char *newStr = recomp_alloc(len + 1);
+
+    for (size_t i = 0; i < len; ++i) {
+        newStr[i] = s[i];
+    }
+
+    newStr[len] = '\0';
+
+    return newStr;
+}
+
 void ModelEntry_setDisplayName(ModelEntry *entry, const char *name) {
     if (!isValidModelEntry(entry)) {
         PRINT_INVALID_PTR_ERR();
@@ -309,7 +328,11 @@ void ModelEntry_setDisplayName(ModelEntry *entry, const char *name) {
 
     recomp_free(entry->displayName);
 
-    entry->displayName = name ? YAZMTCore_Utils_StrDup(name) : NULL;
+    if (name) {
+        entry->displayName = duplicateStringAndTruncate(name, PMM_MAX_DISPLAY_NAME_LENGTH);
+    } else if (entry->internalName) {
+        ModelEntry_setDisplayName(entry, entry->internalName);
+    }
 }
 
 const char *ModelEntry_getAuthorName(const ModelEntry *entry) {
@@ -329,7 +352,11 @@ void ModelEntry_setAuthorName(ModelEntry *entry, const char *name) {
 
     recomp_free(entry->authorName);
 
-    entry->authorName = name ? YAZMTCore_Utils_StrDup(name) : NULL;
+    if (name) {
+        entry->authorName = duplicateStringAndTruncate(name, PMM_MAX_AUTHOR_NAME_LENGTH);
+    } else {
+        entry->authorName = NULL;
+    }
 }
 
 Link_CustomModelCategory ModelEntry_getCategory(const ModelEntry *entry) {
