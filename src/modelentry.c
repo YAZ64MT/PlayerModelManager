@@ -460,7 +460,7 @@ void ModelEntryForm_setEyesTexture(ModelEntryForm *entry, TexturePtr tex, Player
     }
 
     if (i < 0 || i >= PLAYER_EYES_MAX) {
-        Logger_printWarning("%s received invalid index %d", __PRETTY_FUNCTION__, i);
+        Logger_printWarning("Received invalid index %d", i);
         return;
     }
 
@@ -474,7 +474,7 @@ void ModelEntryForm_setMouthTexture(ModelEntryForm *entry, TexturePtr tex, Playe
     }
 
     if (i < 0 || i >= PLAYER_MOUTH_MAX) {
-        Logger_printWarning("%s received invalid index %d", __PRETTY_FUNCTION__, i);
+        Logger_printWarning("Received invalid index %d", i);
         return;
     }
 
