@@ -155,6 +155,10 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
 
     Logger_printVerbose("Registered new model '%s' with model type %d", ModelEntry_getInternalName(entry), modelType);
 
+    if (apiVersion < 3UL && isFormCategory(ModelEntry_getCategory(entry))) {
+        ModelEntry_setDisplayList(entry, LINK_DL_FPS_RFOREARM, gEmptyDL);
+    }
+
     return h;
 }
 
