@@ -952,8 +952,8 @@ typedef struct DisplayListAltList {
 
 #define DECLARE_ALT_LIST(dl, altArr) {.target = dl, .alternates = altArr, .numAlts = ARRAY_COUNT(altArr)}
 
-Link_DisplayList sFpsHookshotAlts[] = {LINK_DL_HOOKSHOT};
-Link_DisplayList sFpsBowAlts[] = {LINK_DL_BOW};
+Link_DisplayList sFpsHookshotAlts[] = {LINK_DL_FPS_HOOKSHOT, LINK_DL_HOOKSHOT};
+Link_DisplayList sFpsBowAlts[] = {LINK_DL_FPS_BOW, LINK_DL_BOW};
 Link_DisplayList sFpsSlingshotAlts[] = {LINK_DL_SLINGSHOT};
 Link_DisplayList sFpsAlts[] = {LINK_DL_SLINGSHOT};
 Link_DisplayList sLeftFistSwordAlts[] = {LINK_DL_LFIST};
@@ -989,8 +989,8 @@ Link_DisplayList sRightHandSlingshotFirstPersonAlts[] = {LINK_DL_FPS_RHAND, LINK
 
 static DisplayListAltList sDisplayListAlts[] = {
     DECLARE_ALT_LIST(LINK_DL_FPS_HOOKSHOT, sFpsHookshotAlts),
-    DECLARE_ALT_LIST(LINK_DL_FPS_BOW, sFpsHookshotAlts),
-    DECLARE_ALT_LIST(LINK_DL_FPS_SLINGSHOT, sFpsHookshotAlts),
+    DECLARE_ALT_LIST(LINK_DL_FPS_BOW, sFpsBowAlts),
+    DECLARE_ALT_LIST(LINK_DL_FPS_SLINGSHOT, sFpsSlingshotAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD, sLeftFistSwordAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD_TWO_HANDED, sLeftFistSword2HandAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_DEKU_STICK, sLeftFistDekuStickAlts),
