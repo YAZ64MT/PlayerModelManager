@@ -942,6 +942,131 @@ Mtx *FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id) {
     return (Mtx *)fp->mtxDisplayLists[id][0].words.w1;
 }
 
+static U32ValueHashmapHandle sDLToAltLists;
+
+typedef struct DisplayListAltList {
+    Link_DisplayList target;
+    Link_DisplayList *alternates;
+    size_t numAlts;
+} DisplayListAltList;
+
+#define DECLARE_ALT_LIST(dl, altArr) {.target = dl, .alternates = altArr, .numAlts = ARRAY_COUNT(altArr)}
+
+Link_DisplayList sFpsHookshotAlts[] = {LINK_DL_HOOKSHOT};
+Link_DisplayList sFpsBowAlts[] = {LINK_DL_BOW};
+Link_DisplayList sFpsSlingshotAlts[] = {LINK_DL_SLINGSHOT};
+Link_DisplayList sFpsAlts[] = {LINK_DL_SLINGSHOT};
+Link_DisplayList sLeftFistSwordAlts[] = {LINK_DL_LFIST};
+Link_DisplayList sLeftFistSword2HandAlts[] = {LINK_DL_OPT_LFIST_SWORD, LINK_DL_LFIST};
+Link_DisplayList sLeftFistDekuStickAlts[] = {LINK_DL_LFIST};
+Link_DisplayList sLeftFistHammerAlts[] = {LINK_DL_LFIST};
+Link_DisplayList sLeftFistBoomerangAlts[] = {LINK_DL_LFIST};
+Link_DisplayList sRightHandOcarinaAlts[] = {LINK_DL_RHAND};
+Link_DisplayList sRightFistShieldAlts[] = {LINK_DL_RFIST};
+Link_DisplayList sRightFistSwordTwoHandedAlts[] = {LINK_DL_RFIST};
+Link_DisplayList sRightFistDekuStickAlts[] = {LINK_DL_RFIST};
+Link_DisplayList sRightFistBowAlts[] = {LINK_DL_RFIST};
+Link_DisplayList sRightFistSlingshotAlts[] = {LINK_DL_RFIST};
+Link_DisplayList sRightFistHookshotAlts[] = {LINK_DL_RFIST};
+Link_DisplayList sLeftShoulderHookshotFirstPersonAlts[] = {LINK_DL_FPS_LSHOULDER, LINK_DL_LSHOULDER};
+Link_DisplayList sLeftForearmHookshotFirstPersonAlts[] = {LINK_DL_FPS_LFOREARM, LINK_DL_LFOREARM};
+Link_DisplayList sLeftHandHookshotFirstPersonAlts[] = {LINK_DL_FPS_LHAND, LINK_DL_LHAND};
+Link_DisplayList sRightShoulderHookshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER, LINK_DL_RSHOULDER};
+Link_DisplayList sRightForearmHookshotFirstPersonAlts[] = {LINK_DL_FPS_RFOREARM, LINK_DL_RFOREARM};
+Link_DisplayList sRightHandHookshotFirstPersonAlts[] = {LINK_DL_FPS_RHAND, LINK_DL_RHAND};
+Link_DisplayList sLeftShoulderBowFirstPersonAlts[] = {LINK_DL_FPS_LSHOULDER, LINK_DL_LSHOULDER};
+Link_DisplayList sLeftForearmBowFirstPersonAlts[] = {LINK_DL_FPS_LFOREARM, LINK_DL_LFOREARM};
+Link_DisplayList sLeftHandBowFirstPersonAlts[] = {LINK_DL_FPS_LHAND, LINK_DL_LHAND};
+Link_DisplayList sRightShoulderBowFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER, LINK_DL_RSHOULDER};
+Link_DisplayList sRightForearmBowFirstPersonAlts[] = {LINK_DL_FPS_RFOREARM, LINK_DL_RFOREARM};
+Link_DisplayList sRightHandBowFirstPersonAlts[] = {LINK_DL_FPS_RHAND, LINK_DL_RHAND};
+Link_DisplayList sLeftShoulderSlingshotFirstPersonAlts[] = {LINK_DL_FPS_LSHOULDER, LINK_DL_LSHOULDER};
+Link_DisplayList sLeftForearmSlingshotFirstPersonAlts[] = {LINK_DL_FPS_LFOREARM, LINK_DL_LFOREARM};
+Link_DisplayList sLeftHandSlingshotFirstPersonAlts[] = {LINK_DL_FPS_LHAND, LINK_DL_LHAND};
+Link_DisplayList sRightShoulderSlingshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER, LINK_DL_RSHOULDER};
+Link_DisplayList sRightForearmSlingshotFirstPersonAlts[] = {LINK_DL_FPS_RFOREARM, LINK_DL_RFOREARM};
+Link_DisplayList sRightHandSlingshotFirstPersonAlts[] = {LINK_DL_FPS_RHAND, LINK_DL_RHAND};
+
+static DisplayListAltList sDisplayListAlts[] = {
+    DECLARE_ALT_LIST(LINK_DL_FPS_HOOKSHOT, sFpsHookshotAlts),
+    DECLARE_ALT_LIST(LINK_DL_FPS_BOW, sFpsHookshotAlts),
+    DECLARE_ALT_LIST(LINK_DL_FPS_SLINGSHOT, sFpsHookshotAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD, sLeftFistSwordAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD_TWO_HANDED, sLeftFistSword2HandAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_DEKU_STICK, sLeftFistDekuStickAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_HAMMER, sLeftFistHammerAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_BOOMERANG, sLeftFistBoomerangAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RHAND_OCARINA, sRightHandOcarinaAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_SHIELD, sRightFistShieldAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_SWORD_TWO_HANDED, sRightFistSwordTwoHandedAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_DEKU_STICK, sRightFistDekuStickAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_BOW, sRightFistBowAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_SLINGSHOT, sRightFistSlingshotAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_HOOKSHOT, sRightFistHookshotAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LSHOULDER_HOOKSHOT, sLeftShoulderHookshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LFOREARM_HOOKSHOT, sLeftForearmHookshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LHAND_HOOKSHOT, sLeftHandHookshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RSHOULDER_HOOKSHOT, sRightShoulderHookshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT, sRightForearmHookshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RHAND_HOOKSHOT, sRightHandHookshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LSHOULDER_BOW, sLeftShoulderBowFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LFOREARM_BOW, sLeftForearmBowFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LHAND_BOW, sLeftHandBowFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RSHOULDER_BOW, sRightShoulderBowFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RFOREARM_BOW, sRightForearmBowFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RHAND_BOW, sRightHandBowFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, sLeftShoulderSlingshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, sLeftForearmSlingshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, sLeftHandSlingshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RSHOULDER_SLINGSHOT, sRightShoulderSlingshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RFOREARM_SLINGSHOT, sRightForearmSlingshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RHAND_SLINGSHOT, sRightHandSlingshotFirstPersonAlts),
+};
+
+static DisplayListAltList *getAltList(Link_DisplayList dlId) {
+    uintptr_t out = (uintptr_t)NULL;
+
+    recomputil_u32_value_hashmap_get(sDLToAltLists, dlId, &out);
+
+    return (DisplayListAltList *)out;
+}
+
+static Gfx *getDLOrAltFromModelEntry(ModelEntry *me, Link_DisplayList dlId) {
+    Gfx *result = ModelEntry_getDisplayList(me, dlId);
+
+    if (!result) {
+        DisplayListAltList *alts = getAltList(dlId);
+
+        if (alts) {
+            for (size_t i = 0; i < alts->numAlts && !result; ++i) {
+                Link_DisplayList curr = alts->alternates[i];
+
+                result = ModelEntry_getDisplayList(me, curr);
+            }
+        }
+    }
+
+    return result;
+}
+
+static Gfx *getDLOrAltFromModelInfo(ModelInfo *mi, Link_DisplayList dlId) {
+    Gfx *result = ModelInfo_getGfx(mi, dlId);
+
+    if (!result) {
+        DisplayListAltList *alts = getAltList(dlId);
+
+        if (alts) {
+            for (size_t i = 0; i < alts->numAlts && !result; ++i) {
+                Link_DisplayList curr = alts->alternates[i];
+
+                result = ModelInfo_getGfx(mi, curr);
+            }
+        }
+    }
+
+    return result;
+}
+
 Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
     if (!isValidFormProxy(fp)) {
         PRINT_INVALID_PTR_ERR();
@@ -964,138 +1089,19 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
     ModelInfo *fallback = fp->fallbackModelInfo;
 
     if (!dl) {
-        dl = ModelInfo_getGfx(current, id);
+        dl = getDLOrAltFromModelInfo(current, id);
     }
 
-    // Fallback models for certain DLs
     if (!dl) {
-        Link_DisplayList alternateDL = id;
-        bool hasAlternate = true;
-        Link_DisplayList alternate2DL = id;
-        bool hasAlternate2 = false;
+        dl = getDLOrAltFromModelInfo(fallbackOverride, id);
+    }
 
-        switch (id) {
-            case LINK_DL_OPT_FPS_HOOKSHOT:
-                alternateDL = LINK_DL_HOOKSHOT;
-                break;
+    if (!dl) {
+        dl = getDLOrAltFromModelInfo(fallback, id);
+    }
 
-            case LINK_DL_OPT_FPS_BOW:
-                alternateDL = LINK_DL_BOW;
-                break;
-
-            case LINK_DL_OPT_FPS_SLINGSHOT:
-                alternateDL = LINK_DL_SLINGSHOT;
-                break;
-
-            case LINK_DL_OPT_LFIST_SWORD:
-            case LINK_DL_OPT_LFIST_SWORD_TWO_HANDED:
-            case LINK_DL_OPT_LFIST_DEKU_STICK:
-            case LINK_DL_OPT_LFIST_HAMMER:
-            case LINK_DL_OPT_LFIST_BOOMERANG:
-                alternateDL = LINK_DL_LFIST;
-                break;
-
-            case LINK_DL_OPT_RHAND_OCARINA:
-                alternateDL = LINK_DL_RHAND;
-                break;
-
-            case LINK_DL_OPT_RFIST_SHIELD:
-            case LINK_DL_OPT_RFIST_SWORD_TWO_HANDED:
-            case LINK_DL_OPT_RFIST_DEKU_STICK:
-            case LINK_DL_OPT_RFIST_BOW:
-            case LINK_DL_OPT_RFIST_SLINGSHOT:
-            case LINK_DL_OPT_RFIST_HOOKSHOT:
-                alternateDL = LINK_DL_RFIST;
-                break;
-
-            case LINK_DL_OPT_FPS_LSHOULDER_HOOKSHOT:
-            case LINK_DL_OPT_FPS_LSHOULDER_BOW:
-            case LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT:
-                alternateDL = LINK_DL_FPS_LSHOULDER;
-                hasAlternate2 = true;
-                alternate2DL = LINK_DL_LSHOULDER;
-                break;
-
-            case LINK_DL_OPT_FPS_LFOREARM_HOOKSHOT:
-            case LINK_DL_OPT_FPS_LFOREARM_BOW:
-            case LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT:
-                alternateDL = LINK_DL_FPS_LFOREARM;
-                break;
-
-            case LINK_DL_OPT_FPS_LHAND_HOOKSHOT:
-            case LINK_DL_OPT_FPS_LHAND_BOW:
-            case LINK_DL_OPT_FPS_LHAND_SLINGSHOT:
-                alternateDL = LINK_DL_FPS_LHAND;
-                break;
-
-            case LINK_DL_OPT_FPS_RSHOULDER_HOOKSHOT:
-            case LINK_DL_OPT_FPS_RSHOULDER_BOW:
-            case LINK_DL_OPT_FPS_RSHOULDER_SLINGSHOT:
-                alternateDL = LINK_DL_OPT_FPS_RSHOULDER;
-                hasAlternate2 = true;
-                alternate2DL = LINK_DL_RSHOULDER;
-                break;
-
-            case LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT:
-            case LINK_DL_OPT_FPS_RFOREARM_BOW:
-            case LINK_DL_OPT_FPS_RFOREARM_SLINGSHOT:
-                alternateDL = LINK_DL_FPS_RFOREARM;
-                break;
-
-            case LINK_DL_OPT_FPS_RHAND_HOOKSHOT:
-            case LINK_DL_OPT_FPS_RHAND_BOW:
-            case LINK_DL_OPT_FPS_RHAND_SLINGSHOT:
-                alternateDL = LINK_DL_FPS_RHAND;
-                break;
-
-            default:
-                hasAlternate = false;
-                break;
-        }
-
-        if (!dl && hasAlternate) {
-            dl = ModelInfo_getGfx(current, alternateDL);
-        }
-
-        if (!dl && hasAlternate2) {
-            dl = ModelInfo_getGfx(current, alternate2DL);
-        }
-
-        if (!dl) {
-            dl = ModelInfo_getGfx(fallbackOverride, id);
-        }
-
-        if (!dl && hasAlternate) {
-            dl = ModelInfo_getGfx(fallbackOverride, alternateDL);
-        }
-
-        if (!dl && hasAlternate2) {
-            dl = ModelInfo_getGfx(fallbackOverride, alternate2DL);
-        }
-
-        if (!dl) {
-            dl = ModelInfo_getGfx(fallback, id);
-        }
-
-        if (!dl && hasAlternate) {
-            dl = ModelInfo_getGfx(fallback, alternateDL);
-        }
-
-        if (!dl && hasAlternate2) {
-            dl = ModelInfo_getGfx(fallback, alternate2DL);
-        }
-
-        if (!dl) {
-            dl = ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), id);
-        }
-
-        if (!dl && hasAlternate) {
-            dl = ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), alternateDL);
-        }
-
-        if (!dl && hasAlternate2) {
-            dl = ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(gSharedModelEntry), alternate2DL);
-        }
+    if (!dl) {
+        dl = getDLOrAltFromModelEntry(ModelEntryForm_getModelEntry(gSharedModelEntry), id);
     }
 
     return dl;
@@ -1165,7 +1171,20 @@ PlayerTransformation FormProxy_getTargetForm(FormProxy *fp) {
     return fp->form;
 }
 
+static void setupAltLists() {
+    sDLToAltLists = recomputil_create_u32_value_hashmap();
+
+    for (int i = 0; i < ARRAY_COUNT(sDisplayListAlts); ++i) {
+        DisplayListAltList *curr = &sDisplayListAlts[i];
+
+        if (!recomputil_u32_value_hashmap_insert(sDLToAltLists, curr->target, (uintptr_t)curr)) {
+            Logger_printWarning("Duplicate target with value of %d inserted into sDLToAltLists!", curr->target);
+        }
+    }
+}
+
 RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initFormProxyObjects() {
     sValidFormProxyPtrs = recomputil_create_u32_hashset();
+    setupAltLists();
 }
