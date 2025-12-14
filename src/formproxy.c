@@ -952,8 +952,8 @@ typedef struct DisplayListAltList {
 
 #define DECLARE_ALT_LIST(dl, altArr) {.target = dl, .alternates = altArr, .numAlts = ARRAY_COUNT(altArr)}
 
-Link_DisplayList sFpsHookshotAlts[] = {LINK_DL_FPS_HOOKSHOT, LINK_DL_HOOKSHOT};
-Link_DisplayList sFpsBowAlts[] = {LINK_DL_FPS_BOW, LINK_DL_BOW};
+Link_DisplayList sFpsHookshotAlts[] = {LINK_DL_HOOKSHOT};
+Link_DisplayList sFpsBowAlts[] = {LINK_DL_BOW};
 Link_DisplayList sFpsSlingshotAlts[] = {LINK_DL_SLINGSHOT};
 Link_DisplayList sFpsAlts[] = {LINK_DL_SLINGSHOT};
 Link_DisplayList sLeftFistSwordAlts[] = {LINK_DL_LFIST};
