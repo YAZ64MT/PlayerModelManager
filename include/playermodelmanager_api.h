@@ -30,7 +30,7 @@ typedef unsigned long PlayerModelManagerHandle;
 //      2: Hylian Shield / Hero's Shield
 //      3: Mirror Shield
 
-typedef enum {
+typedef enum PlayerModelManagerDisplayListId {
 
     // Main skeleton DLs
     PMM_DL_WAIST = 0,
@@ -128,11 +128,11 @@ typedef enum {
     PMM_DL_HOOKSHOT_HOOK,
     PMM_DL_HOOKSHOT_RETICLE,
     PMM_DL_OPT_FPS_HOOKSHOT,
-    LINK_DL_OPT_LONGSHOT = 230,
-    LINK_DL_OPT_LONGSHOT_CHAIN,
-    LINK_DL_OPT_LONGSHOT_HOOK,
-    LINK_DL_OPT_LONGSHOT_RETICLE,
-    LINK_DL_OPT_FPS_LONGSHOT,
+    PMM_DL_OPT_LONGSHOT = 230,
+    PMM_DL_OPT_LONGSHOT_CHAIN,
+    PMM_DL_OPT_LONGSHOT_HOOK,
+    PMM_DL_OPT_LONGSHOT_RETICLE,
+    PMM_DL_OPT_FPS_LONGSHOT,
     PMM_DL_BOOMERANG = 58,   // Boomerang model while held in hand
     PMM_DL_BOOMERANG_FLYING, // Boomerang model after being thrown
     PMM_DL_HAMMER,
@@ -376,16 +376,18 @@ typedef enum {
     // Right Fist + Items
     PMM_DL_SHIM_RFIST_SLINGSHOT,
     PMM_DL_SHIM_RFIST_HOOKSHOT,
-    PMM_DL_SHIM_RHAND_OCARINA_FAIRY,
+    PMM_DL_SHIM_RFIST_LONGSHOT = 289,
+    PMM_DL_SHIM_RHAND_OCARINA_FAIRY = 219,
     PMM_DL_SHIM_RHAND_OCARINA_TIME,
 
     // First Person Right Hand + Items
     PMM_DL_SHIM_FPS_RHAND_BOW,
     PMM_DL_SHIM_FPS_RHAND_SLINGSHOT,
     PMM_DL_SHIM_FPS_RHAND_HOOKSHOT,
+    PMM_DL_SHIM_FPS_RHAND_LONGSHOT = 290,
 
     // Deku Link flower propellers
-    PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_OPEN,
+    PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_OPEN = 224,
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_CLOSED,
 
     PMM_DL_MAX = 289
@@ -452,7 +454,7 @@ typedef enum {
 #define PMM_MTX_SHIELD_HYLIAN_BACK PMM_MTX_SHIELD2_BACK
 #define PMM_MTX_SHIELD_MIRROR_BACK PMM_MTX_SHIELD3_BACK
 
-typedef enum {
+typedef enum PlayerModelManagerModelType {
     PMM_MODEL_TYPE_NONE,
     PMM_MODEL_TYPE_CHILD,
     PMM_MODEL_TYPE_ADULT,
@@ -521,7 +523,7 @@ typedef enum {
 #define PMM_MODEL_TYPE_SHIELD_HERO PMM_MODEL_TYPE_SHIELD2
 #define PMM_MODEL_TYPE_SHIELD_MIRROR PMM_MODEL_TYPE_SHIELD3
 
-typedef enum {
+typedef enum PlayerModelManagerModelEvent {
     PMM_EVENT_MODEL_APPLIED,
     PMM_EVENT_MODEL_REMOVED,
 } PlayerModelManagerModelEvent;
