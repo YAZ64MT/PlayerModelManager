@@ -952,52 +952,90 @@ typedef struct DisplayListAltList {
 
 #define DECLARE_ALT_LIST(dl, altArr) {.target = dl, .alternates = altArr, .numAlts = ARRAY_COUNT(altArr)}
 
-Link_DisplayList sFpsHookshotAlts[] = {LINK_DL_HOOKSHOT};
-Link_DisplayList sFpsBowAlts[] = {LINK_DL_BOW};
-Link_DisplayList sFpsSlingshotAlts[] = {LINK_DL_SLINGSHOT};
-Link_DisplayList sFpsAlts[] = {LINK_DL_SLINGSHOT};
-Link_DisplayList sLeftFistSwordAlts[] = {LINK_DL_LFIST};
-Link_DisplayList sLeftFistSword2HandAlts[] = {LINK_DL_OPT_LFIST_SWORD, LINK_DL_LFIST};
-Link_DisplayList sLeftFistDekuStickAlts[] = {LINK_DL_LFIST};
-Link_DisplayList sLeftFistHammerAlts[] = {LINK_DL_LFIST};
-Link_DisplayList sLeftFistBoomerangAlts[] = {LINK_DL_LFIST};
-Link_DisplayList sRightHandOcarinaAlts[] = {LINK_DL_RHAND};
-Link_DisplayList sRightFistShieldAlts[] = {LINK_DL_RFIST};
-Link_DisplayList sRightFistSwordTwoHandedAlts[] = {LINK_DL_RFIST};
-Link_DisplayList sRightFistDekuStickAlts[] = {LINK_DL_RFIST};
-Link_DisplayList sRightFistBowAlts[] = {LINK_DL_RFIST};
-Link_DisplayList sRightFistSlingshotAlts[] = {LINK_DL_RFIST};
-Link_DisplayList sRightFistHookshotAlts[] = {LINK_DL_RFIST};
-Link_DisplayList sLeftShoulderHookshotFirstPersonAlts[] = {LINK_DL_FPS_LSHOULDER, LINK_DL_LSHOULDER};
-Link_DisplayList sLeftForearmHookshotFirstPersonAlts[] = {LINK_DL_FPS_LFOREARM, LINK_DL_LFOREARM};
-Link_DisplayList sLeftHandHookshotFirstPersonAlts[] = {LINK_DL_FPS_LHAND, LINK_DL_LHAND};
-Link_DisplayList sRightShoulderHookshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER, LINK_DL_RSHOULDER};
-Link_DisplayList sRightForearmHookshotFirstPersonAlts[] = {LINK_DL_FPS_RFOREARM, LINK_DL_RFOREARM};
-Link_DisplayList sRightHandHookshotFirstPersonAlts[] = {LINK_DL_FPS_RHAND, LINK_DL_RHAND};
-Link_DisplayList sLeftShoulderBowFirstPersonAlts[] = {LINK_DL_FPS_LSHOULDER, LINK_DL_LSHOULDER};
-Link_DisplayList sLeftForearmBowFirstPersonAlts[] = {LINK_DL_FPS_LFOREARM, LINK_DL_LFOREARM};
-Link_DisplayList sLeftHandBowFirstPersonAlts[] = {LINK_DL_FPS_LHAND, LINK_DL_LHAND};
-Link_DisplayList sRightShoulderBowFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER, LINK_DL_RSHOULDER};
-Link_DisplayList sRightForearmBowFirstPersonAlts[] = {LINK_DL_FPS_RFOREARM, LINK_DL_RFOREARM};
-Link_DisplayList sRightHandBowFirstPersonAlts[] = {LINK_DL_FPS_RHAND, LINK_DL_RHAND};
-Link_DisplayList sLeftShoulderSlingshotFirstPersonAlts[] = {LINK_DL_FPS_LSHOULDER, LINK_DL_LSHOULDER};
-Link_DisplayList sLeftForearmSlingshotFirstPersonAlts[] = {LINK_DL_FPS_LFOREARM, LINK_DL_LFOREARM};
-Link_DisplayList sLeftHandSlingshotFirstPersonAlts[] = {LINK_DL_FPS_LHAND, LINK_DL_LHAND};
-Link_DisplayList sRightShoulderSlingshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER, LINK_DL_RSHOULDER};
-Link_DisplayList sRightForearmSlingshotFirstPersonAlts[] = {LINK_DL_FPS_RFOREARM, LINK_DL_RFOREARM};
-Link_DisplayList sRightHandSlingshotFirstPersonAlts[] = {LINK_DL_FPS_RHAND, LINK_DL_RHAND};
+static Link_DisplayList sFpsHookshotAlts[] = {LINK_DL_HOOKSHOT};
+static Link_DisplayList sLongshotAlts[] = {LINK_DL_HOOKSHOT};
+static Link_DisplayList sLongshotChainAlts[] = {LINK_DL_HOOKSHOT_CHAIN};
+static Link_DisplayList sLongshotHookAlts[] = {LINK_DL_HOOKSHOT_HOOK};
+static Link_DisplayList sLongshotReticleAlts[] = {LINK_DL_HOOKSHOT_RETICLE};
+static Link_DisplayList sFpsLongshotAlts[] = {LINK_DL_OPT_LONGSHOT, LINK_DL_FPS_HOOKSHOT, LINK_DL_HOOKSHOT};
+static Link_DisplayList sFpsBowAlts[] = {LINK_DL_BOW};
+static Link_DisplayList sFpsSlingshotAlts[] = {LINK_DL_SLINGSHOT};
+static Link_DisplayList sFpsAlts[] = {LINK_DL_SLINGSHOT};
+static Link_DisplayList sLeftFistSwordAlts[] = {LINK_DL_OPT_LFIST_ITEM, LINK_DL_LFIST};
+static Link_DisplayList sLeftFistSword1Alts[] = {LINK_DL_OPT_LFIST_SWORD, LINK_DL_OPT_LFIST_ITEM, LINK_DL_LFIST};
+static Link_DisplayList sLeftFistSword2Alts[] = {LINK_DL_OPT_LFIST_SWORD, LINK_DL_OPT_LFIST_ITEM, LINK_DL_LFIST};
+static Link_DisplayList sLeftFistSword3Alts[] = {LINK_DL_OPT_LFIST_SWORD, LINK_DL_OPT_LFIST_ITEM, LINK_DL_LFIST};
+static Link_DisplayList sLeftFistSword4Alts[] = {LINK_DL_OPT_LFIST_SWORD_TWO_HANDED, LINK_DL_OPT_LFIST_SWORD, LINK_DL_OPT_LFIST_ITEM, LINK_DL_LFIST};
+static Link_DisplayList sLeftFistSword5Alts[] = {LINK_DL_OPT_LFIST_SWORD_TWO_HANDED, LINK_DL_OPT_LFIST_SWORD, LINK_DL_OPT_LFIST_ITEM, LINK_DL_LFIST};
+static Link_DisplayList sLeftFistSword2HandAlts[] = {LINK_DL_OPT_LFIST_SWORD, LINK_DL_OPT_LFIST_ITEM, LINK_DL_LFIST};
+static Link_DisplayList sLeftFistDekuStickAlts[] = {LINK_DL_OPT_LFIST_ITEM, LINK_DL_LFIST};
+static Link_DisplayList sLeftFistHammerAlts[] = {LINK_DL_OPT_LFIST_ITEM, LINK_DL_LFIST};
+static Link_DisplayList sLeftFistBoomerangAlts[] = {LINK_DL_OPT_LFIST_ITEM, LINK_DL_LFIST};
+static Link_DisplayList sRightHandOcarinaAlts[] = {LINK_DL_RHAND};
+static Link_DisplayList sRightFistShieldAlts[] = {LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistShield1Alts[] = {LINK_DL_OPT_RFIST_SHIELD, LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistShield2Alts[] = {LINK_DL_OPT_RFIST_SHIELD, LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistShield3Alts[] = {LINK_DL_OPT_RFIST_SHIELD, LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistSwordTwoHandedAlts[] = {LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistSword4Alts[] = {LINK_DL_OPT_LFIST_SWORD_TWO_HANDED, LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistSword5Alts[] = {LINK_DL_OPT_LFIST_SWORD_TWO_HANDED, LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistDekuStickAlts[] = {LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistBowAlts[] = {LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistSlingshotAlts[] = {LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistHookshotAlts[] = {LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sRightFistLongshotAlts[] = {LINK_DL_OPT_RFIST_ITEM, LINK_DL_RFIST};
+static Link_DisplayList sLeftShoulderHookshotFirstPersonAlts[] = {LINK_DL_FPS_LSHOULDER, LINK_DL_LSHOULDER};
+static Link_DisplayList sLeftForearmHookshotFirstPersonAlts[] = {LINK_DL_FPS_LFOREARM, LINK_DL_LFOREARM};
+static Link_DisplayList sLeftHandHookshotFirstPersonAlts[] = {LINK_DL_FPS_LHAND, LINK_DL_LHAND};
+static Link_DisplayList sRightShoulderHookshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER, LINK_DL_RSHOULDER};
+static Link_DisplayList sRightForearmHookshotFirstPersonAlts[] = {LINK_DL_FPS_RFOREARM, LINK_DL_RFOREARM};
+static Link_DisplayList sRightHandHookshotFirstPersonAlts[] = {LINK_DL_FPS_RHAND, LINK_DL_RHAND};
+static Link_DisplayList sLeftShoulderLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_LSHOULDER_HOOKSHOT, LINK_DL_FPS_LSHOULDER, LINK_DL_LSHOULDER};
+static Link_DisplayList sLeftForearmLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_LFOREARM_HOOKSHOT, LINK_DL_FPS_LFOREARM, LINK_DL_LFOREARM};
+static Link_DisplayList sLeftHandLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_LHAND_HOOKSHOT, LINK_DL_FPS_LHAND, LINK_DL_LHAND};
+static Link_DisplayList sRightShoulderLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER_HOOKSHOT, LINK_DL_OPT_FPS_RSHOULDER, LINK_DL_RSHOULDER};
+static Link_DisplayList sRightForearmLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT, LINK_DL_FPS_RFOREARM, LINK_DL_RFOREARM};
+static Link_DisplayList sRightHandLongshotFirstPersonAlts[] = {LINK_DL_FPS_RHAND_HOOKSHOT, LINK_DL_FPS_RHAND, LINK_DL_RHAND};
+static Link_DisplayList sLeftShoulderBowFirstPersonAlts[] = {LINK_DL_FPS_LSHOULDER, LINK_DL_LSHOULDER};
+static Link_DisplayList sLeftForearmBowFirstPersonAlts[] = {LINK_DL_FPS_LFOREARM, LINK_DL_LFOREARM};
+static Link_DisplayList sLeftHandBowFirstPersonAlts[] = {LINK_DL_FPS_LHAND, LINK_DL_LHAND};
+static Link_DisplayList sRightShoulderBowFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER, LINK_DL_RSHOULDER};
+static Link_DisplayList sRightForearmBowFirstPersonAlts[] = {LINK_DL_FPS_RFOREARM, LINK_DL_RFOREARM};
+static Link_DisplayList sRightHandBowFirstPersonAlts[] = {LINK_DL_FPS_RHAND, LINK_DL_RHAND};
+static Link_DisplayList sLeftShoulderSlingshotFirstPersonAlts[] = {LINK_DL_FPS_LSHOULDER, LINK_DL_LSHOULDER};
+static Link_DisplayList sLeftForearmSlingshotFirstPersonAlts[] = {LINK_DL_FPS_LFOREARM, LINK_DL_LFOREARM};
+static Link_DisplayList sLeftHandSlingshotFirstPersonAlts[] = {LINK_DL_FPS_LHAND, LINK_DL_LHAND};
+static Link_DisplayList sRightShoulderSlingshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER, LINK_DL_RSHOULDER};
+static Link_DisplayList sRightForearmSlingshotFirstPersonAlts[] = {LINK_DL_FPS_RFOREARM, LINK_DL_RFOREARM};
+static Link_DisplayList sRightHandSlingshotFirstPersonAlts[] = {LINK_DL_FPS_RHAND, LINK_DL_RHAND};
 
 static DisplayListAltList sDisplayListAlts[] = {
     DECLARE_ALT_LIST(LINK_DL_FPS_HOOKSHOT, sFpsHookshotAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LONGSHOT, sLongshotAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LONGSHOT_CHAIN, sLongshotChainAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LONGSHOT_HOOK, sLongshotHookAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LONGSHOT_RETICLE, sLongshotReticleAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LONGSHOT, sFpsLongshotAlts),
     DECLARE_ALT_LIST(LINK_DL_FPS_BOW, sFpsBowAlts),
     DECLARE_ALT_LIST(LINK_DL_FPS_SLINGSHOT, sFpsSlingshotAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD, sLeftFistSwordAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD1, sLeftFistSword1Alts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD2, sLeftFistSword2Alts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD3, sLeftFistSword3Alts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD4, sLeftFistSword4Alts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD5, sLeftFistSword5Alts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD_TWO_HANDED, sLeftFistSword2HandAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD4, sRightFistSword4Alts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD5, sRightFistSword5Alts),
     DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_SWORD_TWO_HANDED, sLeftFistSword2HandAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_DEKU_STICK, sLeftFistDekuStickAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_HAMMER, sLeftFistHammerAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_LFIST_BOOMERANG, sLeftFistBoomerangAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_RHAND_OCARINA, sRightHandOcarinaAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_SHIELD, sRightFistShieldAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_SHIELD1, sRightFistShield1Alts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_SHIELD2, sRightFistShield2Alts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_SHIELD3, sRightFistShield3Alts),
     DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_SWORD_TWO_HANDED, sRightFistSwordTwoHandedAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_DEKU_STICK, sRightFistDekuStickAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_BOW, sRightFistBowAlts),
@@ -1009,6 +1047,13 @@ static DisplayListAltList sDisplayListAlts[] = {
     DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RSHOULDER_HOOKSHOT, sRightShoulderHookshotFirstPersonAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT, sRightForearmHookshotFirstPersonAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RHAND_HOOKSHOT, sRightHandHookshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_RFIST_LONGSHOT, sRightFistLongshotAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LSHOULDER_LONGSHOT, sLeftShoulderLongshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LFOREARM_LONGSHOT, sLeftForearmLongshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LHAND_LONGSHOT, sLeftHandLongshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RSHOULDER_LONGSHOT, sRightShoulderLongshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RFOREARM_LONGSHOT, sRightForearmLongshotFirstPersonAlts),
+    DECLARE_ALT_LIST(LINK_DL_OPT_FPS_RHAND_LONGSHOT, sRightHandLongshotFirstPersonAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LSHOULDER_BOW, sLeftShoulderBowFirstPersonAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LFOREARM_BOW, sLeftForearmBowFirstPersonAlts),
     DECLARE_ALT_LIST(LINK_DL_OPT_FPS_LHAND_BOW, sLeftHandBowFirstPersonAlts),
