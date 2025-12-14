@@ -155,7 +155,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
 
     Logger_printVerbose("Registered new model '%s' with model type %d", ModelEntry_getInternalName(entry), modelType);
 
-    if (apiVersion < 3UL && isFormCategory(ModelEntry_getCategory(entry))) {
+    if (apiVersion < 3UL && (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT)) {
         ModelEntry_setDisplayList(entry, LINK_DL_FPS_RFOREARM, gEmptyDL);
     }
 
