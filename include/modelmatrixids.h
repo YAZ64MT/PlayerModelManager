@@ -393,6 +393,11 @@ typedef enum Link_DisplayList {
     LINK_DL_RFIST_LONGSHOT,
     LINK_DL_FPS_RHAND_LONGSHOT,
 
+    // Bomb DLs
+    LINK_DL_BOMB_BODY_2D,
+    LINK_DL_BOMB_BODY_3D,
+    LINK_DL_BOMB_FUSE,
+
     LINK_DL_MAX
 } Link_DisplayList;
 
