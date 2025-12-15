@@ -396,10 +396,11 @@ typedef enum Link_DisplayList {
     // Bomb DLs
     LINK_DL_BOMB_BODY_2D,
     LINK_DL_BOMB_BODY_3D,
-    LINK_DL_BOMB_FUSE,
+    LINK_DL_BOMB_CAP,
     LINK_DL_POWDER_KEG_BODY,
     LINK_DL_POWDER_KEG_FUSE1,
     LINK_DL_POWDER_KEG_FUSE2,
+    LINK_DL_BOMBCHU,
 
     LINK_DL_MAX
 } Link_DisplayList;
