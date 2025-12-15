@@ -69,10 +69,10 @@ static void setupFierceDeityFallbackModel() {
     SET_ENTRY_DL(LINK_DL_RFIST, getFierceDeityDL(gLinkFierceDeityRightHandDL));
 
     // First Person
-    SET_ENTRY_DL(LINK_DL_FPS_LFOREARM, getFierceDeityDL(gLinkFierceDeityLeftForearmDL));
-    SET_ENTRY_DL(LINK_DL_FPS_LHAND, getFierceDeityDL(gLinkFierceDeityLeftHandDL));
-    SET_ENTRY_DL(LINK_DL_FPS_RFOREARM, getFierceDeityDL(gLinkFierceDeityRightForearmDL));
-    SET_ENTRY_DL(LINK_DL_FPS_RHAND, getFierceDeityDL(gLinkFierceDeityRightHandDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM, getFierceDeityDL(gLinkFierceDeityLeftForearmDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND, getFierceDeityDL(gLinkFierceDeityLeftHandDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_RFOREARM, getFierceDeityDL(gLinkFierceDeityRightForearmDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_RHAND, getFierceDeityDL(gLinkFierceDeityRightHandDL));
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);

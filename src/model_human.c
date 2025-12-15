@@ -73,14 +73,14 @@ static void setupHumanFallbackModel() {
     SET_ENTRY_DL(LINK_DL_OPT_RHAND_OCARINA, gLinkHumanRightHandOcarinaDL);
 
     // First Person
-    SET_ENTRY_DL(LINK_DL_FPS_LFOREARM, getHumanDL(gLinkHumanLeftForearmDL));
-    SET_ENTRY_DL(LINK_DL_FPS_LHAND, getHumanDL(gLinkHumanLeftHandClosedDL));
-    SET_ENTRY_DL(LINK_DL_FPS_RFOREARM, gEmptyDL);
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM, getHumanDL(gLinkHumanLeftForearmDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND, getHumanDL(gLinkHumanLeftHandClosedDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_RFOREARM, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);
 
-    SET_ENTRY_DL(LINK_DL_FPS_RHAND, gLinkHumanFirstPersonArmDL);
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_RHAND, gLinkHumanFirstPersonArmDL);
 
     // items
     SET_ENTRY_DL(LINK_DL_OCARINA_TIME, gLinkHumanOcarinaDL);

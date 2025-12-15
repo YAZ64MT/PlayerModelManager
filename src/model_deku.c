@@ -69,10 +69,10 @@ static void setupDekuFallbackModel() {
     SET_ENTRY_DL(LINK_DL_RFIST, getDekuDL(gLinkDekuRightHandDL));
 
     // First Person
-    SET_ENTRY_DL(LINK_DL_FPS_LFOREARM, getDekuDL(gLinkDekuLeftForearmDL));
-    SET_ENTRY_DL(LINK_DL_FPS_LHAND, getDekuDL(gLinkDekuLeftHandDL));
-    SET_ENTRY_DL(LINK_DL_FPS_RFOREARM, getDekuDL(gLinkDekuRightForearmDL));
-    SET_ENTRY_DL(LINK_DL_FPS_RHAND, getDekuDL(gLinkDekuRightHandDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM, getDekuDL(gLinkDekuLeftForearmDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND, getDekuDL(gLinkDekuLeftHandDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_RFOREARM, getDekuDL(gLinkDekuRightForearmDL));
+    SET_ENTRY_DL(LINK_DL_OPT_FPS_RHAND, getDekuDL(gLinkDekuRightHandDL));
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);

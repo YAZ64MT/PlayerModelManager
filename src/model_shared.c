@@ -49,7 +49,7 @@ static void setupSharedFallbackModel() {
     ModelEntry_setDisplayList(modelEntry, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gElegyShellHumanDL));
     ModelEntry_setDisplayList(modelEntry, LINK_DL_FPS_HOOKSHOT, gLinkHumanFirstPersonHookshotDL);
     ModelEntry_setDisplayList(modelEntry, LINK_DL_FPS_BOW, gLinkHumanFirstPersonBowDL);
-    ModelEntry_setDisplayList(modelEntry, LINK_DL_FPS_LSHOULDER, gEmptyDL);
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_OPT_FPS_LSHOULDER, gEmptyDL);
     ModelEntry_setDisplayList(modelEntry, LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);
     ModelEntry_setDisplayList(modelEntry, LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
     ModelEntry_setDisplayList(modelEntry, LINK_DL_SWORD_FIERCE_DEITY_HILT, gEmptyDL);

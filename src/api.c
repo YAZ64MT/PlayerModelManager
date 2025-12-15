@@ -13,6 +13,31 @@
 #include "playerproxymanager.h"
 #include "modelentry.h"
 #include "formproxy.h"
+#include "customdls.h"
+
+static Gfx sBelowV3OcarinaHandDL[] = {
+    gsSPBranchList(gLinkHumanRightHandOcarinaDL),
+};
+
+static Gfx sBelowV3OcarinaDL[] = {
+    gsSPBranchList(gLinkHumanOcarinaDL),
+};
+
+static Gfx sBelowV3FirstPersonRightForearmDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sBelowV3FirstPersonRightHandDL[] = {
+    gsSPBranchList(gLinkHumanFirstPersonArmDL),
+};
+
+static Gfx sBelowV3FirstPersonHookshotDL[] = {
+    gsSPBranchList(gLinkHumanFirstPersonHookshotDL),
+};
+
+static Gfx sBelowV3FirstPersonBowDL[] = {
+    gsSPBranchList(gLinkHumanFirstPersonBowDL),
+};
 
 static bool isEntryLoaded(ModelEntry *entry) {
     if (entry) {
@@ -156,7 +181,13 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
     Logger_printVerbose("Registered new model '%s' with model type %d", ModelEntry_getInternalName(entry), modelType);
 
     if (apiVersion < 3UL && (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT)) {
-        ModelEntry_setDisplayList(entry, LINK_DL_FPS_RFOREARM, gEmptyDL);
+
+        FormProxy *humanFp = PlayerProxy_getFormProxy(gPlayer1Proxy, FORM_PROXY_ID_HUMAN);
+
+        ModelEntry_setDisplayList(entry, LINK_DL_OPT_FPS_RFOREARM, sBelowV3FirstPersonRightForearmDL);
+        ModelEntry_setDisplayList(entry, LINK_DL_OPT_FPS_RHAND, sBelowV3FirstPersonRightHandDL);
+        ModelEntry_setDisplayList(entry, LINK_DL_FPS_HOOKSHOT, sBelowV3FirstPersonHookshotDL);
+        ModelEntry_setDisplayList(entry, LINK_DL_FPS_BOW, sBelowV3FirstPersonBowDL);
     }
 
     return h;
@@ -517,6 +548,30 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long a
             if (fallbackModelInfo) {
                 ModelInfo_setGfxOverride(fallbackModelInfo, dlId, dl);
                 PlayerProxyManager_refreshDLAll(dlId);
+
+                // preserve model behavior of old API versions
+                if (form == PLAYER_FORM_HUMAN) {
+                    switch (dlId) {
+                        case LINK_DL_FPS_BOW:
+                            gSPBranchList(sBelowV3FirstPersonBowDL, dl);
+                            break;
+
+                        case LINK_DL_FPS_HOOKSHOT:
+                            gSPBranchList(sBelowV3FirstPersonHookshotDL, dl);
+                            break;
+
+                        case LINK_DL_OPT_FPS_RFOREARM:
+                            gSPBranchList(sBelowV3FirstPersonRightForearmDL, dl);
+                            break;
+
+                        case LINK_DL_OPT_FPS_RHAND:
+                            gSPBranchList(sBelowV3FirstPersonRightHandDL, dl);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
             }
         }
     }
@@ -628,6 +683,32 @@ RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation 
     }
 
     return !!CMEM_getCurrentEntry(cat);
+}
+
+RECOMP_EXPORT Gfx *PlayerModelManager_getCustomDL(PlayerModelManagerCustomDL customDLId) {
+    switch (customDLId) {
+        case PMM_CUSTOM_DL_HUMAN_OCARINA_TIME:
+            return gLinkHumanOcarinaDL;
+            break;
+
+        case PMM_CUSTOM_DL_HUMAN_RHAND_OCARINA:
+            return gLinkHumanRightHandOcarinaDL;
+            break;
+
+        case PMM_CUSTOM_DL_HUMAN_FPS_RHAND:
+            return gLinkHumanFirstPersonArmDL;
+            break;
+
+        case PMM_CUSTOM_DL_HUMAN_FPS_HOOKSHOT:
+            return gLinkHumanFirstPersonHookshotDL;
+            break;
+
+        case PMM_CUSTOM_DL_HUMAN_FPS_BOW:
+            return gLinkHumanFirstPersonBowDL;
+            break;
+    }
+
+    return NULL;
 }
 
 RECOMP_DECLARE_EVENT(onRegisterModels());

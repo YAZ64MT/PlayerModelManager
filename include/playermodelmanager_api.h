@@ -68,7 +68,9 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_OPT_LFIST_HAMMER,
     PMM_DL_OPT_LFIST_BOOMERANG,
     PMM_DL_RFIST = 21,
-    PMM_DL_OPT_RHAND_OCARINA = 248,
+    PMM_DL_OPT_RHAND_OCARINA = 246,
+    PMM_DL_OPT_RHAND_OCARINA_FAIRY,
+    PMM_DL_OPT_RHAND_OCARINA_TIME,
     PMM_DL_OPT_RFIST_ITEM,
     PMM_DL_OPT_RFIST_SHIELD,
     PMM_DL_OPT_RFIST_SHIELD1,
@@ -144,13 +146,13 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_OPT_FPS_LSHOULDER_BOW,
     PMM_DL_OPT_FPS_LSHOULDER_SLINGSHOT,
 
-    PMM_DL_FPS_LFOREARM = 61,
+    PMM_DL_OPT_FPS_LFOREARM = 61,
     PMM_DL_OPT_FPS_LFOREARM_HOOKSHOT = 268,
     PMM_DL_OPT_FPS_LFOREARM_LONGSHOT,
     PMM_DL_OPT_FPS_LFOREARM_BOW,
     PMM_DL_OPT_FPS_LFOREARM_SLINGSHOT,
 
-    PMM_DL_FPS_LHAND = 62,
+    PMM_DL_OPT_FPS_LHAND = 62,
     PMM_DL_OPT_FPS_LHAND_HOOKSHOT = 272,
     PMM_DL_OPT_FPS_LHAND_LONGSHOT,
     PMM_DL_OPT_FPS_LHAND_BOW,
@@ -162,13 +164,13 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_OPT_FPS_RSHOULDER_BOW,
     PMM_DL_OPT_FPS_RSHOULDER_SLINGSHOT,
 
-    PMM_DL_FPS_RFOREARM = 63,
+    PMM_DL_OPT_FPS_RFOREARM = 63,
     PMM_DL_OPT_FPS_RFOREARM_HOOKSHOT = 281,
     PMM_DL_OPT_FPS_RFOREARM_LONGSHOT,
     PMM_DL_OPT_FPS_RFOREARM_BOW,
     PMM_DL_OPT_FPS_RFOREARM_SLINGSHOT,
 
-    PMM_DL_FPS_RHAND = 64,
+    PMM_DL_OPT_FPS_RHAND = 64,
     PMM_DL_OPT_FPS_RHAND_HOOKSHOT = 285,
     PMM_DL_OPT_FPS_RHAND_LONGSHOT,
     PMM_DL_OPT_FPS_RHAND_BOW,
@@ -390,7 +392,7 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_OPEN = 224,
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_CLOSED,
 
-    PMM_DL_MAX = 289
+    PMM_DL_MAX = 291
 } PlayerModelManagerDisplayListId;
 
 // Keep these defines for backwards compatibility
@@ -398,6 +400,10 @@ typedef enum PlayerModelManagerDisplayListId {
 #define PMM_DL_FPS_HOOKSHOT PMM_DL_OPT_FPS_HOOKSHOT
 #define PMM_DL_FPS_BOW PMM_DL_OPT_FPS_BOW
 #define PMM_DL_FPS_SLINGSHOT PMM_DL_OPT_FPS_SLINGSHOT
+#define PMM_DL_FPS_LFOREARM PMM_DL_OPT_FPS_LFOREARM
+#define PMM_DL_FPS_LHAND PMM_DL_OPT_FPS_LHAND
+#define PMM_DL_FPS_RFOREARM PMM_DL_OPT_FPS_RFOREARM
+#define PMM_DL_FPS_RHAND PMM_DL_OPT_FPS_RHAND
 
 // Other helper defines
 #define PMM_DL_SWORD_KOKIRI_HILT PMM_DL_SWORD1_HILT
@@ -530,6 +536,14 @@ typedef enum PlayerModelManagerModelEvent {
 
 typedef void PlayerModelManagerEventHandler(PlayerModelManagerHandle handle, PlayerModelManagerModelEvent event, void *userdata);
 
+typedef enum PlayerModelManagerCustomDL {
+    PMM_CUSTOM_DL_HUMAN_OCARINA_TIME,
+    PMM_CUSTOM_DL_HUMAN_RHAND_OCARINA,
+    PMM_CUSTOM_DL_HUMAN_FPS_RHAND,
+    PMM_CUSTOM_DL_HUMAN_FPS_HOOKSHOT,
+    PMM_CUSTOM_DL_HUMAN_FPS_BOW,
+} PlayerModelManagerCustomDL;
+
 #ifndef YAZMT_PMM_NO_API_IMPORTS
 
 #include "global.h"
@@ -655,6 +669,10 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_overrideVanillaMatrix(
 
 // Returns true if there is a custom player model applied to the passed in form, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form));
+
+// PlayerModelManager defines some custom display lists internally, usually to "unglue" certain DLs.
+// If you would like to manually specify these for some of your models, you can access them via the following function.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getCustomDL(PlayerModelManagerCustomDL customDLId));
 
 // Helper define for register models event.
 #define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
