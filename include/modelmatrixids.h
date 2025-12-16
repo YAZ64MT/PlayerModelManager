@@ -397,9 +397,14 @@ typedef enum Link_DisplayList {
     LINK_DL_BOMB_BODY_2D,
     LINK_DL_BOMB_BODY_3D,
     LINK_DL_BOMB_CAP,
+
+    // Powder Keg DLs (currently unused)
+    // Reason: Models are stored in bomb overlay
     LINK_DL_POWDER_KEG_BODY,
     LINK_DL_POWDER_KEG_FUSE1,
     LINK_DL_POWDER_KEG_FUSE2,
+
+    // Bombchu DL
     LINK_DL_BOMBCHU,
 
     LINK_DL_MAX
