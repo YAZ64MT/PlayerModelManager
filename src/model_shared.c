@@ -54,6 +54,11 @@ static void setupSharedFallbackModel() {
     ModelEntry_setDisplayList(modelEntry, LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
     ModelEntry_setDisplayList(modelEntry, LINK_DL_SWORD_FIERCE_DEITY_HILT, gEmptyDL);
     ModelEntry_setDisplayList(modelEntry, LINK_DL_SWORD_GREAT_FAIRY_HILT, gEmptyDL);
+
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_BOMB_BODY_2D, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gBombBodyDL));
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_BOMB_BODY_3D, gEmptyDL);
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_BOMB_CAP, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gBombCapDL));
+    ModelEntry_setDisplayList(modelEntry, LINK_DL_BOMBCHU, GlobalObjects_getGlobalGfxPtr(GAMEPLAY_KEEP, gBombchuDL));
 }
 
 static void setupSharedListenerDL(ObjectId id, Gfx *vanillaDL, Link_DisplayList linkDLId) {

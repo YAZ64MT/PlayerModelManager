@@ -17,6 +17,7 @@
 #include "assets/objects/object_link_zora/object_link_zora.h"
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "overlays/actors/ovl_En_Arrow/z_en_arrow.h"
+#include "overlays/actors/ovl_En_Bom/z_en_bom.h"
 
 typedef struct {
     Gfx *target;
@@ -119,6 +120,9 @@ static GfxHookDisplayList sGameplayKeepDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(gameplay_keep_DL_014370, LINK_DL_BOW_ARROW),
     DECLARE_GFX_HOOK_DL(gHookshotChainDL, LINK_DL_HOOKSHOT_CHAIN),
     DECLARE_GFX_HOOK_DL(gHookshotReticleDL, LINK_DL_HOOKSHOT_RETICLE),
+    DECLARE_GFX_HOOK_DL(gBombBodyDL, LINK_DL_BOMB_BODY_2D),
+    DECLARE_GFX_HOOK_DL(gBombCapDL, LINK_DL_BOMB_CAP),
+    DECLARE_GFX_HOOK_DL(gBombchuDL, LINK_DL_BOMBCHU),
 };
 static GfxHookLookup sGameplayKeepDLMap = DECLARE_GFX_HOOK_LUT(sGameplayKeepDLReplacements);
 
@@ -389,4 +393,67 @@ RECOMP_HOOK_RETURN("MirRay3_Draw")
 void hookGfx_on_return_MirRay_Draw() {
     replaceHookedOpaGfxCommands(&sMirrorRayGfxHook);
     replaceHookedXluGfxCommands(&sMirrorRayGfxHook);
+}
+
+Player *sPlayerInitExplosiveIA;
+
+RECOMP_HOOK("Player_InitExplosiveIA")
+void setupBombProxy_on_Player_InitExplosiveIA(PlayState *play, Player *this) {
+    sPlayerInitExplosiveIA = this;
+}
+
+RECOMP_HOOK_RETURN("Player_InitExplosiveIA")
+void setupBombProxy_on_return_Player_InitExplosiveIA() {
+    Actor *heldActor = sPlayerInitExplosiveIA->heldActor;
+
+    if (heldActor && (heldActor->id == ACTOR_EN_BOM || heldActor->id == ACTOR_EN_BOM_CHU)) {
+        ProxyActorExt_copyProxyInformation(heldActor, &sPlayerInitExplosiveIA->actor);
+    }
+}
+
+static GfxHookData sBombGfxHook;
+
+RECOMP_HOOK("EnBom_Draw")
+void hookGfx_on_EnBom_Draw(Actor *thisx, PlayState *play) {
+    fillGfxHookData(&sBombGfxHook, play, getFormProxyOrFallback(thisx, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
+
+    EnBom *this = (EnBom *)thisx;
+
+    if (this->actor.params == BOMB_TYPE_BODY && !this->isPowderKeg) {
+        FormProxy *fp = getFormProxyOrFallback(&this->actor, FORM_PROXY_ID_HUMAN, play);
+
+        if (fp) {
+            Gfx *bombBody3DDL = FormProxy_getCurrentDL(fp, LINK_DL_BOMB_BODY_3D);
+
+            if (bombBody3DDL) {
+                Gfx_SetupDL25_Opa(play->state.gfxCtx);
+
+                OPEN_DISPS(play->state.gfxCtx);
+                MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, play->state.gfxCtx);
+                gDPPipeSync(POLY_OPA_DISP++);
+                gDPSetEnvColor(POLY_OPA_DISP++, (s8)this->unk_1F4, 0, 40, 255);
+                gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, (s8)this->unk_1F4, 0, 40, 255);
+                gSPDisplayList(POLY_OPA_DISP++, bombBody3DDL);
+
+                CLOSE_DISPS();
+            }
+        }
+    }
+}
+
+RECOMP_HOOK_RETURN("EnBom_Draw")
+void hookGfx_on_return_EnBom_Draw() {
+    replaceHookedOpaGfxCommands(&sBombGfxHook);
+}
+
+static GfxHookData sBombchuGfxHook;
+
+RECOMP_HOOK("EnBomChu_Draw")
+void hookGfx_on_EnBomChu_Draw(Actor *thisx, PlayState *play) {
+    fillGfxHookData(&sBombchuGfxHook, play, getFormProxyOrFallback(thisx, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
+}
+
+RECOMP_HOOK_RETURN("EnBomChu_Draw")
+void hookGfx_on_return_EnBomChu_Draw() {
+    replaceHookedOpaGfxCommands(&sBombchuGfxHook);
 }
