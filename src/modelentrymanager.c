@@ -83,7 +83,9 @@ static SavedModelName sSavedModelNames[LINK_CMC_MAX] = {
     {.key = "pmm_saved_mask_goron"},
     {.key = "pmm_saved_mask_zora"},
     {.key = "pmm_saved_mask_fierce_deity"},
-    {.key = "pmm_saved_model_pack"} // FAKE!
+    {.key = "pmm_saved_model_pack"}, // FAKE!
+    {.key = "pmm_saved_bomb"},
+    {.key = "pmm_saved_bombchu"},
 };
 
 // Returns PLAYER_FORM_MAX on invalid type passed in
@@ -332,6 +334,14 @@ Link_CustomModelCategory getCategoryFromModelType(PlayerModelManagerModelType t)
             return LINK_CMC_MODEL_PACK;
             break;
 
+        case PMM_MODEL_TYPE_BOMB:
+            return LINK_CMC_BOMB;
+            break;
+
+        case PMM_MODEL_TYPE_BOMBCHU:
+            return LINK_CMC_BOMBCHU;
+            break;
+
         default:
             break;
     }
@@ -558,6 +568,14 @@ Link_EquipmentReplacement getEquipmentReplacementFromCategory(Link_CustomModelCa
             return LINK_DL_REPLACE_MASK_FIERCE_DEITY;
             break;
 
+        case LINK_CMC_BOMB:
+            return LINK_DL_REPLACE_BOMB;
+            break;
+
+        case LINK_CMC_BOMBCHU:
+            return LINK_DL_REPLACE_BOMBCHU;
+            break;
+
         default:
             break;
     }
@@ -574,7 +592,7 @@ static void applyByInternalName(Link_CustomModelCategory cat, const char *name) 
 }
 
 bool isEquipmentCategory(Link_CustomModelCategory cat) {
-    return cat > LINK_CMC_FIERCE_DEITY && cat < LINK_CMC_MODEL_PACK;
+    return (cat > LINK_CMC_FIERCE_DEITY && cat < LINK_CMC_MODEL_PACK) || cat == LINK_CMC_BOMB || cat == LINK_CMC_BOMBCHU;
 }
 
 bool isFormCategory(Link_CustomModelCategory cat) {

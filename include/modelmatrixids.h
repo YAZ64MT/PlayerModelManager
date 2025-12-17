@@ -670,6 +670,8 @@ typedef enum Link_EquipmentReplacement {
     LINK_DL_REPLACE_MASK_GORON,
     LINK_DL_REPLACE_MASK_ZORA,
     LINK_DL_REPLACE_MASK_FIERCE_DEITY,
+    LINK_DL_REPLACE_BOMB,
+    LINK_DL_REPLACE_BOMBCHU,
     LINK_DL_REPLACE_MAX,
 } Link_EquipmentReplacement;
 
@@ -729,6 +731,8 @@ typedef enum Link_CustomModelCategory {
     LINK_CMC_MASK_ZORA,
     LINK_CMC_MASK_FIERCE_DEITY,
     LINK_CMC_MODEL_PACK,
+    LINK_CMC_BOMB,
+    LINK_CMC_BOMBCHU,
     LINK_CMC_MAX,
 } Link_CustomModelCategory;
 

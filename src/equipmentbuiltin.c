@@ -345,6 +345,18 @@ static Gfx sCallMaskDekuScreamDL[] = {
     gsSPEndDisplayList(),
 };
 
+static Gfx sCallBombBodyDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallBombCapDL[] = {
+    gsSPEndDisplayList(),
+};
+
+static Gfx sCallBombchuDL[] = {
+    gsSPEndDisplayList(),
+};
+
 #undef DECLARE_STATIC_MATRIX_WRAPPED_DL
 
 static Mtx sHookshotHookAndChainAdultMtx;
@@ -483,6 +495,10 @@ static void initCustomDLs() {
     gSPBranchList(sCallMaskZoraScreamDL, getRepointedMMDL(OBJECT_MASK_ZORA, object_mask_zora_DL_000DB0));
     gSPBranchList(sCallMaskDekuDL, getRepointedMMDL(GAMEPLAY_KEEP, gDekuMaskDL));
     gSPBranchList(sCallMaskDekuScreamDL, getRepointedMMDL(OBJECT_MASK_NUTS, object_mask_nuts_DL_001D90));
+
+    gSPBranchList(sCallBombBodyDL, getRepointedMMDL(GAMEPLAY_KEEP, gBombBodyDL));
+    gSPBranchList(sCallBombCapDL, getRepointedMMDL(GAMEPLAY_KEEP, gBombCapDL));
+    gSPBranchList(sCallBombchuDL, getRepointedMMDL(GAMEPLAY_KEEP, gBombchuDL));
 }
 
 static void registerMaskDL(PlayerModelManagerHandle pack, const char *internalName, const char *displayName, PlayerModelManagerModelType modelType, Link_DisplayList dlId, Gfx *dl) {
@@ -803,4 +819,24 @@ void registerMMEquipment() {
     registerMaskDL2(vanillaPack, "mm_mask_goron_c", "Goron Mask", PMM_MODEL_TYPE_MASK_GORON, LINK_DL_MASK_GORON, sCallMaskGoronDL, LINK_DL_MASK_GORON_SCREAM, sCallMaskGoronScreamDL);
     registerMaskDL2(vanillaPack, "mm_mask_zora_c", "Zora Mask", PMM_MODEL_TYPE_MASK_ZORA, LINK_DL_MASK_ZORA, sCallMaskZoraDL, LINK_DL_MASK_ZORA_SCREAM, sCallMaskZoraScreamDL);
     registerMaskDL2(vanillaPack, "mm_mask_deku_c", "Deku Mask", PMM_MODEL_TYPE_MASK_DEKU, LINK_DL_MASK_DEKU, sCallMaskDekuDL, LINK_DL_MASK_DEKU_SCREAM, sCallMaskDekuScreamDL);
+
+    // Bomb
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "bomb", PMM_MODEL_TYPE_BOMB);
+        PlayerModelManager_setDisplayName(h, "Bomb");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOMB_BODY_2D, sCallBombBodyDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOMB_BODY_3D, gEmptyDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOMB_CAP, sCallBombCapDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
+    }
+
+    // Bombchu
+    {
+        PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "bombchu", PMM_MODEL_TYPE_BOMBCHU);
+        PlayerModelManager_setDisplayName(h, "Bombchu");
+        PlayerModelManager_setAuthor(h, "Nintendo");
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOMBCHU, sCallBombchuDL);
+        PlayerModelManager_addHandleToPack(vanillaPack, h);
+    }
 }

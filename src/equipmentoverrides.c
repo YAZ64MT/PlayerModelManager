@@ -100,6 +100,10 @@ static Link_DisplayList sMaskZoraDLs[] = {LINK_DL_MASK_ZORA, LINK_DL_MASK_ZORA_S
 
 static Link_DisplayList sMaskFierceDeityDLs[] = {LINK_DL_MASK_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY_SCREAM};
 
+static Link_DisplayList sBombDLs[] = {LINK_DL_BOMB_BODY_2D, LINK_DL_BOMB_BODY_3D, LINK_DL_BOMB_CAP};
+
+static Link_DisplayList sBombchuDLs[] = {LINK_DL_BOMBCHU};
+
 // clang-format off
 #define DECLARE_OVERRIDE_TABLE_ENTRY(disps, mtxs) {.dl = {.overrides = disps, .count = ARRAY_COUNT(disps)}, .mtx = {.overrides = mtxs, .count = ARRAY_COUNT(mtxs)}}
 #define DECLARE_OVERRIDE_TABLE_ENTRY_NO_MTX(disps) {.dl = {.overrides = disps, .count = ARRAY_COUNT(disps)}, .mtx = {.overrides = NULL, .count = 0}}
@@ -153,6 +157,8 @@ static const EquipmentOverride sEquipmentOverrideTable[LINK_DL_REPLACE_MAX] = {
     DECLARE_OVERRIDE_TABLE_ENTRY_NO_MTX(sMaskGoronDLs),        // LINK_DL_REPLACE_MASK_GORON
     DECLARE_OVERRIDE_TABLE_ENTRY_NO_MTX(sMaskZoraDLs),         // LINK_DL_REPLACE_MASK_ZORA
     DECLARE_OVERRIDE_TABLE_ENTRY_NO_MTX(sMaskFierceDeityDLs),  // LINK_DL_REPLACE_MASK_FIERCE_DEITY
+    DECLARE_OVERRIDE_TABLE_ENTRY_NO_MTX(sBombDLs),             // LINK_DL_REPLACE_BOMB
+    DECLARE_OVERRIDE_TABLE_ENTRY_NO_MTX(sBombchuDLs),          // LINK_DL_REPLACE_BOMBCHU
 };
 
 #undef DECLARE_OVERRIDE_TABLE_ENTRY

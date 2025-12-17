@@ -516,6 +516,8 @@ typedef enum PlayerModelManagerModelType {
     PMM_MODEL_TYPE_MASK_ZORA,
     PMM_MODEL_TYPE_MASK_FIERCE_DEITY,
     PMM_MODEL_TYPE_MODEL_PACK,
+    PMM_MODEL_TYPE_BOMB,
+    PMM_MODEL_TYPE_BOMBCHU,
     PMM_MODEL_TYPE_MAX
 } PlayerModelManagerModelType;
 
