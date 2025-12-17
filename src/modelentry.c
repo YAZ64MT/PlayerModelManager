@@ -37,11 +37,55 @@ static bool isValidModelEntryPack(const ModelEntryPack *entry) {
     return recomputil_u32_hashset_contains(sValidModelEntryPackPtrs, (uintptr_t)entry);
 }
 
+typedef struct ModelVisuals {
+    U32ValueHashmapHandle displayListPtrs;
+    U32ValueHashmapHandle matrixPtrs;
+} ModelVisuals;
+
+static void ModelVisuals_init(ModelVisuals *modelVisuals) {
+    modelVisuals->displayListPtrs = recomputil_create_u32_value_hashmap();
+    modelVisuals->matrixPtrs = recomputil_create_u32_value_hashmap();
+}
+
+static void ModelVisuals_setDL(ModelVisuals *modelVisuals, Link_DisplayList dlId, Gfx *dl) {
+    if (dl) {
+        recomputil_u32_value_hashmap_insert(modelVisuals->displayListPtrs, dlId, (uintptr_t)dl);
+    } else {
+        recomputil_u32_value_hashmap_erase(modelVisuals->displayListPtrs, dlId);
+    }
+}
+
+static Gfx *ModelVisuals_getDL(const ModelVisuals *modelVisuals, Link_DisplayList id) {
+    uintptr_t out = (uintptr_t)NULL;
+
+    recomputil_u32_value_hashmap_get(modelVisuals->displayListPtrs, id, &out);
+
+    return (Gfx *)out;
+}
+
+static void ModelVisuals_setMtx(ModelVisuals *modelVisuals, Link_EquipmentMatrix id, Mtx *mtx) {
+    if (mtx) {
+        recomputil_u32_value_hashmap_insert(modelVisuals->matrixPtrs, id, (uintptr_t)mtx);
+    } else {
+        recomputil_u32_value_hashmap_erase(modelVisuals->matrixPtrs, id);
+    }
+}
+
+static Mtx *ModelVisuals_getMtx(const ModelVisuals *modelVisuals, Link_EquipmentMatrix id) {
+    uintptr_t out = (uintptr_t)NULL;
+
+    recomputil_u32_value_hashmap_get(modelVisuals->matrixPtrs, id, &out);
+
+    return (Mtx *)out;
+}
+
 typedef struct ModelEntryFunctions {
     bool (*applyToFormProxy)(const struct ModelEntry *entry, FormProxy *fp);
     bool (*removeFromFormProxy)(const struct ModelEntry *entry, FormProxy *fp);
     bool (*setDisplayList)(struct ModelEntry *entry, Link_DisplayList id, Gfx *dl);
+    Gfx *(*getDisplayList)(const struct ModelEntry *entry, Link_DisplayList id);
     bool (*setMatrix)(struct ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx);
+    Mtx *(*getMatrix)(const struct ModelEntry *entry, Link_EquipmentMatrix id);
 } ModelEntryVirtualFunctions;
 
 typedef struct ModelEntry {
@@ -55,12 +99,11 @@ typedef struct ModelEntry {
     void *callbackData;
     PlayerModelManagerHandle handle;
     u64 flags;
-    U32ValueHashmapHandle displayListPtrs;
-    U32ValueHashmapHandle mtxPtrs;
 } ModelEntry;
 
 typedef struct ModelEntryForm {
     ModelEntry modelEntry;
+    ModelVisuals modelVisuals;
     FlexSkeletonHeader *skel;
     FlexSkeletonHeader *shieldingSkel;
     TexturePtr eyesTex[PLAYER_EYES_MAX];
@@ -69,6 +112,8 @@ typedef struct ModelEntryForm {
 
 typedef struct ModelEntryEquipment {
     ModelEntry modelEntry;
+    ModelVisuals fallbackModelVisuals;
+    U32ValueHashmapHandle formModelVisuals;
     Link_EquipmentReplacement equipType;
 } ModelEntryEquipment;
 
@@ -80,36 +125,32 @@ typedef struct ModelEntryPack {
 RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
 RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement eq));
 
+const char FORMATTED_DEFAULT_VIRTUAL_FUNCTION_OVERRIDE_ERROR[] = "Model Entry with internal name %s is using function that should have been overriden!\n";
+
 static bool ModelEntry_applyToFormProxy_default(const ModelEntry *entry, FormProxy *fp) {
-    Logger_printError("Model Entry with internal name %s is using ModelEntry_applyToFormProxy (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
-    Utils_tryCrashGame();
+    Logger_printError(FORMATTED_DEFAULT_VIRTUAL_FUNCTION_OVERRIDE_ERROR, entry->internalName ? entry->internalName : "[UNKNOWN]");
     return false;
 }
 
 static bool ModelEntry_removeFromFormProxy_default(const ModelEntry *entry, FormProxy *fp) {
-    Logger_printError("Model Entry with internal name %s is using ModelEntry_removeFromFormProxy (should have been overriden!)\n", entry->internalName ? entry->internalName : "[UNKNOWN]");
-    Utils_tryCrashGame();
+    Logger_printError(FORMATTED_DEFAULT_VIRTUAL_FUNCTION_OVERRIDE_ERROR, entry->internalName ? entry->internalName : "[UNKNOWN]");
     return false;
 }
 
 static bool ModelEntry_setDisplayList_default(ModelEntry *entry, Link_DisplayList id, Gfx *dl) {
-    if (id >= LINK_DL_MAX || id < 0) {
-        return false;
-    }
+    return false;
+}
 
-    recomputil_u32_value_hashmap_insert(entry->displayListPtrs, id, (uintptr_t)dl);
-
-    return true;
+static Gfx *ModelEntry_getDisplayList_default(const ModelEntry *entry, Link_DisplayList id) {
+    return NULL;
 }
 
 static bool ModelEntry_setMatrix_default(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *mtx) {
-    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
-        return false;
-    }
+    return false;
+}
 
-    recomputil_u32_value_hashmap_insert(entry->mtxPtrs, id, (uintptr_t)mtx);
-
-    return true;
+static Mtx *ModelEntry_getMatrix_default(const ModelEntry *entry, Link_EquipmentMatrix id) {
+    return NULL;
 }
 
 static bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
@@ -138,7 +179,9 @@ static bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, 
         .applyToFormProxy = ModelEntry_applyToFormProxy_default,
         .removeFromFormProxy = ModelEntry_removeFromFormProxy_default,
         .setDisplayList = ModelEntry_setDisplayList_default,
+        .getDisplayList = ModelEntry_getDisplayList_default,
         .setMatrix = ModelEntry_setMatrix_default,
+        .getMatrix = ModelEntry_getMatrix_default,
     };
 
     entry->virtualFuncs = &funcs;
@@ -151,8 +194,6 @@ static bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, 
     entry->callback = NULL;
     entry->callbackData = NULL;
     entry->handle = handle;
-    entry->displayListPtrs = recomputil_create_u32_value_hashmap();
-    entry->mtxPtrs = recomputil_create_u32_value_hashmap();
 
     recomputil_u32_hashset_insert(sValidModelEntryPtrs, (uintptr_t)entry);
 
@@ -183,9 +224,7 @@ Gfx *ModelEntry_getDisplayList(const ModelEntry *entry, Link_DisplayList id) {
         return false;
     }
 
-    uintptr_t ret = 0;
-    recomputil_u32_value_hashmap_get(entry->displayListPtrs, id, &ret);
-    return (Gfx *)ret;
+    return entry->virtualFuncs->getDisplayList(entry, id);
 }
 
 bool ModelEntry_setDisplayList(ModelEntry *entry, Link_DisplayList id, Gfx *dl) {
@@ -203,9 +242,7 @@ Mtx *ModelEntry_getMatrix(const ModelEntry *entry, Link_EquipmentMatrix id) {
         return NULL;
     }
 
-    uintptr_t ret = 0;
-    recomputil_u32_value_hashmap_get(entry->mtxPtrs, id, &ret);
-    return (Mtx *)ret;
+    return entry->virtualFuncs->getMatrix(entry, id);
 }
 
 bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *matrix) {
@@ -217,7 +254,7 @@ bool ModelEntry_setMatrix(ModelEntry *entry, Link_EquipmentMatrix id, Mtx *matri
     return entry->virtualFuncs->setMatrix(entry, id, matrix);
 }
 
-bool ModelEntryForm_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
+static bool ModelEntryForm_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
     PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
 
     if (pp) {
@@ -234,7 +271,7 @@ bool ModelEntryForm_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
     return false;
 }
 
-bool ModelEntryForm_removeFromFormProxy(const ModelEntry *thisx, FormProxy *fp) {
+static bool ModelEntryForm_removeFromFormProxy(const ModelEntry *thisx, FormProxy *fp) {
     PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
 
     if (pp) {
@@ -251,6 +288,28 @@ bool ModelEntryForm_removeFromFormProxy(const ModelEntry *thisx, FormProxy *fp) 
     return false;
 }
 
+static bool ModelEntryForm_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
+    ModelEntryForm *this = (ModelEntryForm *)thisx;
+    ModelVisuals_setDL(&this->modelVisuals, id, dl);
+    return true;
+}
+
+static Gfx *ModelEntryForm_getDisplayList(const ModelEntry *thisx, Link_DisplayList id) {
+    ModelEntryForm *this = (ModelEntryForm *)thisx;
+    return ModelVisuals_getDL(&this->modelVisuals, id);
+}
+
+static bool ModelEntryForm_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *mtx) {
+    ModelEntryForm *this = (ModelEntryForm *)thisx;
+    ModelVisuals_setMtx(&this->modelVisuals, id, mtx);
+    return true;
+}
+
+static Mtx *ModelEntryForm_getMatrix(const ModelEntry *thisx, Link_EquipmentMatrix id) {
+    ModelEntryForm *this = (ModelEntryForm *)thisx;
+    return ModelVisuals_getMtx(&this->modelVisuals, id);
+}
+
 static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
     if (!ModelEntry_init(&entry->modelEntry, handle, type, internalName)) {
         return false;
@@ -262,18 +321,23 @@ static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle 
         return false;
     }
 
-    for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        ModelEntry_setMatrix_default(&entry->modelEntry, i, NULL);
-    }
-
     static ModelEntryVirtualFunctions funcs = {
         .applyToFormProxy = ModelEntryForm_applyToFormProxy,
         .removeFromFormProxy = ModelEntryForm_removeFromFormProxy,
-        .setDisplayList = ModelEntry_setDisplayList_default,
-        .setMatrix = ModelEntry_setMatrix_default,
+        .setDisplayList = ModelEntryForm_setDisplayList,
+        .getDisplayList = ModelEntryForm_getDisplayList,
+        .setMatrix = ModelEntryForm_setMatrix,
+        .getMatrix = ModelEntryForm_getMatrix,
     };
 
     entry->modelEntry.virtualFuncs = &funcs;
+
+    ModelVisuals_init(&entry->modelVisuals);
+
+    for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
+        ModelVisuals_setMtx(&entry->modelVisuals, i, NULL);
+    }
+
     entry->skel = NULL;
     entry->shieldingSkel = NULL;
     Lib_MemSet(entry->mouthTex, 0, sizeof(entry->mouthTex));
@@ -524,12 +588,12 @@ void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
         return;
     }
 
-#define SET_LIMB_DL(pLimb, id)                                                                                                                   \
-    {                                                                                                                                            \
-        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                                \
-            ModelEntry_setDisplayList_default(&entry->modelEntry, id, (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL); \
-        }                                                                                                                                        \
-    }                                                                                                                                            \
+#define SET_LIMB_DL(pLimb, id)                                                                                                      \
+    {                                                                                                                               \
+        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                   \
+            ModelVisuals_setDL(&entry->modelVisuals, id, (limbs[pLimb - 1]->dLists[0]) ? (limbs[pLimb - 1]->dLists[0]) : gEmptyDL); \
+        }                                                                                                                           \
+    }                                                                                                                               \
     (void)0
 
     if (entry->skel) {
@@ -556,12 +620,12 @@ void ModelEntryForm_setDLsFromSkeletons(ModelEntryForm *entry) {
 
 #undef SET_LIMB_DL
 
-#define SET_SHIELDING_LIMB_DL(pLimb, id)                                                                                                 \
-    {                                                                                                                                    \
-        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                                        \
-            ModelEntry_setDisplayList_default(&entry->modelEntry, id, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        }                                                                                                                                \
-    }                                                                                                                                    \
+#define SET_SHIELDING_LIMB_DL(pLimb, id)                                                                                    \
+    {                                                                                                                       \
+        if (!ModelEntry_getDisplayList(&entry->modelEntry, id)) {                                                           \
+            ModelVisuals_setDL(&entry->modelVisuals, id, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
+        }                                                                                                                   \
+    }                                                                                                                       \
     (void)0
 
     if (entry->shieldingSkel) {
@@ -610,7 +674,7 @@ FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry) {
     return entry->shieldingSkel;
 }
 
-bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
+static bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
     const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
@@ -619,7 +683,8 @@ bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, 
         // Count generally is very small (count < 10), so a simple linear search will do
         for (size_t i = 0; i < override->dl.count; ++i) {
             if (id == override->dl.overrides[i]) {
-                return ModelEntry_setDisplayList_default(thisx, id, dl);
+                ModelVisuals_setDL(&this->fallbackModelVisuals, id, dl);
+                return true;
             }
         }
     }
@@ -627,7 +692,12 @@ bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, 
     return false;
 }
 
-bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *mtx) {
+static Gfx *ModelEntryEquipment_getDisplayList(const ModelEntry *thisx, Link_DisplayList id) {
+    const ModelEntryEquipment *this = (ModelEntryEquipment *)thisx;
+    return ModelVisuals_getDL(&this->fallbackModelVisuals, id);
+}
+
+static bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *mtx) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
     const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
@@ -636,7 +706,8 @@ bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, M
         // Count generally is very small (count < 10), so a simple linear search will do
         for (size_t i = 0; i < override->mtx.count; ++i) {
             if (id == override->mtx.overrides[i]) {
-                return ModelEntry_setMatrix_default(thisx, id, mtx);
+                ModelVisuals_setMtx(&this->fallbackModelVisuals, id, mtx);
+                return true;
             }
         }
     }
@@ -644,7 +715,12 @@ bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, M
     return false;
 }
 
-bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
+static Mtx *ModelEntryEquipment_getMatrix(const ModelEntry *thisx, Link_EquipmentMatrix id) {
+    ModelEntryEquipment *this = (ModelEntryEquipment *)thisx;
+    return ModelVisuals_getMtx(&this->fallbackModelVisuals, id);
+}
+
+static bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
     PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
 
     if (pp) {
@@ -655,17 +731,15 @@ bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp
         if (override) {
             for (size_t i = 0; i < override->dl.count; ++i) {
                 Link_DisplayList id = override->dl.overrides[i];
-                uintptr_t dl = 0;
-                recomputil_u32_value_hashmap_get(this->modelEntry.displayListPtrs, id, &dl);
-                PlayerProxy_setOverrideDL(pp, id, (Gfx *)dl);
+                Gfx *dl = ModelVisuals_getDL(&this->fallbackModelVisuals, id);
+                PlayerProxy_setOverrideDL(pp, id, dl);
                 PlayerProxy_refreshDL(pp, id);
             }
 
             for (size_t i = 0; i < override->mtx.count; ++i) {
                 Link_EquipmentMatrix id = override->mtx.overrides[i];
-                uintptr_t mtx = 0;
-                recomputil_u32_value_hashmap_get(this->modelEntry.mtxPtrs, id, &mtx);
-                PlayerProxy_setOverrideMtx(pp, id, (Mtx *)mtx);
+                Mtx *mtx = ModelVisuals_getMtx(&this->fallbackModelVisuals, id);
+                PlayerProxy_setOverrideMtx(pp, id, mtx);
                 PlayerProxy_refreshMtx(pp, id);
             }
 
@@ -678,7 +752,7 @@ bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp
     return false;
 }
 
-bool ModelEntryEquipment_removeFromFormProxy(const ModelEntry *thisx, FormProxy *fp) {
+static bool ModelEntryEquipment_removeFromFormProxy(const ModelEntry *thisx, FormProxy *fp) {
     PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
 
     if (pp) {
@@ -723,10 +797,14 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
         .applyToFormProxy = ModelEntryEquipment_applyToFormProxy,
         .removeFromFormProxy = ModelEntryEquipment_removeFromFormProxy,
         .setDisplayList = ModelEntryEquipment_setDisplayList,
+        .getDisplayList = ModelEntryEquipment_getDisplayList,
         .setMatrix = ModelEntryEquipment_setMatrix,
+        .getMatrix = ModelEntryEquipment_getMatrix,
     };
 
     entry->modelEntry.virtualFuncs = &funcs;
+    ModelVisuals_init(&entry->fallbackModelVisuals);
+    entry->formModelVisuals = recomputil_create_u32_memory_hashmap(sizeof(ModelVisuals));
     entry->equipType = getEquipmentReplacementFromCategory(entry->modelEntry.category);
 
     recomputil_u32_hashset_insert(sValidModelEntryEquipmentPtrs, (uintptr_t)entry);
