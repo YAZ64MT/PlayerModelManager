@@ -181,9 +181,6 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
     Logger_printVerbose("Registered new model '%s' with model type %d", ModelEntry_getInternalName(entry), modelType);
 
     if (apiVersion < 3UL && (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT)) {
-
-        FormProxy *humanFp = PlayerProxy_getFormProxy(gPlayer1Proxy, FORM_PROXY_ID_HUMAN);
-
         ModelEntry_setDisplayList(entry, LINK_DL_OPT_FPS_RFOREARM, sBelowV3FirstPersonRightForearmDL);
         ModelEntry_setDisplayList(entry, LINK_DL_OPT_FPS_RHAND, sBelowV3FirstPersonRightHandDL);
         ModelEntry_setDisplayList(entry, LINK_DL_FPS_HOOKSHOT, sBelowV3FirstPersonHookshotDL);
