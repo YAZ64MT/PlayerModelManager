@@ -56,6 +56,9 @@ FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry);
 
 ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
 ModelEntry *ModelEntryEquipment_getModelEntry(ModelEntryEquipment *entry);
+bool ModelEntryEquipment_setDisplayListForModelType(ModelEntryEquipment *entry, PlayerModelManagerModelType type, Link_DisplayList id, Gfx *dl);
+bool ModelEntryEquipment_setMatrixForModelType(ModelEntryEquipment *entry, PlayerModelManagerModelType type, Link_EquipmentMatrix id, Mtx *mtx);
+
 ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, char *internalName);
 ModelEntry *ModelEntryPack_getModelEntry(ModelEntryPack *entry);
 ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *entry);

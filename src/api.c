@@ -265,7 +265,7 @@ RECOMP_EXPORT bool PlayerModelManager_clearAllFlags(PlayerModelManagerHandle h, 
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, Link_DisplayList dlId, Gfx *dl) {
     if (dlId >= LINK_DL_MAX || dlId < 0) {
-        Logger_printError("Invalid display list ID passed in to %s.", __func__);
+        Logger_printError("Invalid display list ID passed in.");
         return false;
     }
 
@@ -284,9 +284,41 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
     return false;
 }
 
+RECOMP_EXPORT bool PlayerModelManager_setDisplayListOnModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_DisplayList dlId, Gfx *dl) {
+    if (dlId >= LINK_DL_MAX || dlId < 0) {
+        Logger_printError("Invalid display list ID passed in.");
+        return false;
+    }
+
+    if (type >= PMM_MODEL_TYPE_MAX || type < 0) {
+        Logger_printError("Invalid model type passed in.");
+        return false;
+    }
+
+    ModelEntry *entryx = getEntryOrPrintErrLocked(h, __func__);
+
+    if (!entryx) {
+        return false;
+    }
+
+    if (!isEquipmentCategory(ModelEntry_getCategory(entryx))) {
+        Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
+    }
+
+    ModelEntryEquipment *entry = (ModelEntryEquipment *)entry;
+
+    if (ModelEntryEquipment_setDisplayListForModelType(entry, type, dlId, dl)) {
+        refreshProxyDLIfEntryLoaded(entryx, dlId);
+        Logger_printVerbose("Setting DL id %d for type %d on handle with internal name '%s' to 0x%X", dlId, type, ModelEntry_getInternalName(entryx), dl);
+        return true;
+    }
+
+    return false;
+}
+
 RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix) {
     if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
-        Logger_printError("Invalid matrix ID passed in to %s.", __func__);
+        Logger_printError("Invalid matrix ID passed in.");
         return false;
     }
 
