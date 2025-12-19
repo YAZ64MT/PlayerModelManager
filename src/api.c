@@ -547,7 +547,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long a
 
             if (fallbackModelInfo) {
                 ModelInfo_setGfxOverride(fallbackModelInfo, dlId, dl);
-                PlayerProxyManager_refreshDLAll(dlId);
+                PlayerProxyManager_refreshAll();
 
                 // preserve model behavior of old API versions
                 if (form == PLAYER_FORM_HUMAN) {
@@ -614,7 +614,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVer
 
             if (fallbackModelInfo) {
                 ModelInfo_setMtxOverride(fallbackModelInfo, mtxId, mtx);
-                PlayerProxyManager_refreshMtxAll(mtxId);
+                PlayerProxyManager_refreshAll();
             }
         }
     }

@@ -10,6 +10,7 @@
 #include "logger.h"
 #include "defaultfacetex.h"
 #include "libc/string.h"
+#include "playermodelconfig.h"
 
 #define PRINT_INVALID_PTR_ERR() Logger_printError("Received invalid pointer.")
 
@@ -113,7 +114,7 @@ typedef struct ModelEntryForm {
 typedef struct ModelEntryEquipment {
     ModelEntry modelEntry;
     ModelVisuals fallbackModelVisuals;
-    U32ValueHashmapHandle formModelVisuals;
+    U32ValueHashmapHandle modelTypeToModelVisuals;
     Link_EquipmentReplacement equipType;
 } ModelEntryEquipment;
 
@@ -260,8 +261,7 @@ static bool ModelEntryForm_applyToFormProxy(const ModelEntry *thisx, FormProxy *
     if (pp) {
         FormProxy_setCurrentModelFormEntry(fp, (ModelEntryForm *)thisx);
 
-        FormProxy_refresh(fp);
-        PlayerProxy_refreshAlternateDLs(pp);
+        PlayerProxy_refresh(pp);
 
         _internal_onFormModelApplied(FormProxy_getTargetForm(fp));
 
@@ -277,8 +277,7 @@ static bool ModelEntryForm_removeFromFormProxy(const ModelEntry *thisx, FormProx
     if (pp) {
         FormProxy_setCurrentModelFormEntry(fp, NULL);
 
-        FormProxy_refresh(fp);
-        PlayerProxy_refreshAlternateDLs(pp);
+        PlayerProxy_refresh(pp);
 
         _internal_onFormModelApplied(FormProxy_getTargetForm(fp));
 
@@ -697,6 +696,47 @@ static Gfx *ModelEntryEquipment_getDisplayList(const ModelEntry *thisx, Link_Dis
     return ModelVisuals_getDL(&this->fallbackModelVisuals, id);
 }
 
+static ModelVisuals *ModelEntryEquipment_getModelTypeModelVisual(ModelEntryEquipment *entry, PlayerModelManagerModelType type) {
+    return recomputil_u32_memory_hashmap_get(entry->modelTypeToModelVisuals, type);
+}
+
+static ModelVisuals *ModelEntryEquipment_getOrCreateModelTypeModelVisual(ModelEntryEquipment *entry, PlayerModelManagerModelType type) {
+    ModelVisuals *modelVisuals = ModelEntryEquipment_getModelTypeModelVisual(entry, type);
+
+    if (!modelVisuals) {
+        recomputil_u32_memory_hashmap_create(entry->modelTypeToModelVisuals, type);
+        modelVisuals = recomputil_u32_memory_hashmap_get(entry->modelTypeToModelVisuals, type);
+        if (modelVisuals) {
+            ModelVisuals_init(modelVisuals);
+        }
+    }
+
+    return modelVisuals;
+}
+
+bool ModelEntryEquipment_setDisplayListForModelType(ModelEntryEquipment *entry, PlayerModelManagerModelType type, Link_DisplayList id, Gfx *dl) {
+    ModelVisuals *modelVisuals = ModelEntryEquipment_getOrCreateModelTypeModelVisual(entry, type);
+
+    if (modelVisuals) {
+        ModelVisuals_setDL(modelVisuals, id, dl);
+        return true;
+    }
+
+    return false;
+}
+
+static Gfx *ModelEntryEquipment_getDisplayListForModelType(ModelEntryEquipment *entry, PlayerModelManagerModelType type, Link_DisplayList id) {
+    Gfx *dl = NULL;
+
+    ModelVisuals *overrideModelVisuals = ModelEntryEquipment_getModelTypeModelVisual(entry, type);
+
+    if (overrideModelVisuals) {
+        dl = ModelVisuals_getDL(overrideModelVisuals, id);
+    }
+
+    return dl;
+}
+
 static bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *mtx) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
@@ -720,28 +760,71 @@ static Mtx *ModelEntryEquipment_getMatrix(const ModelEntry *thisx, Link_Equipmen
     return ModelVisuals_getMtx(&this->fallbackModelVisuals, id);
 }
 
+bool ModelEntryEquipment_setMatrixForModelType(ModelEntryEquipment *entry, PlayerModelManagerModelType type, Link_EquipmentMatrix id, Mtx *mtx) {
+    ModelVisuals *modelVisuals = ModelEntryEquipment_getOrCreateModelTypeModelVisual(entry, type);
+
+    if (modelVisuals) {
+        ModelVisuals_setMtx(modelVisuals, id, mtx);
+        return true;
+    }
+
+    return false;
+}
+
+Mtx *ModelEntryEquipment_getMatrixForModelType(ModelEntryEquipment *entry, PlayerModelManagerModelType type, Link_EquipmentMatrix id) {
+    Mtx *mtx = NULL;
+
+    ModelVisuals *overrideModelVisuals = ModelEntryEquipment_getModelTypeModelVisual(entry, type);
+
+    if (overrideModelVisuals) {
+        mtx = ModelVisuals_getMtx(overrideModelVisuals, id);
+    }
+
+    return mtx;
+}
+
 static bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
     PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
 
     if (pp) {
+        FormProxyId maxFormIds = PlayerModelConfig_getNumFormIds();
+
         ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
         const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
 
         if (override) {
-            for (size_t i = 0; i < override->dl.count; ++i) {
-                Link_DisplayList id = override->dl.overrides[i];
-                Gfx *dl = ModelVisuals_getDL(&this->fallbackModelVisuals, id);
-                PlayerProxy_setOverrideDL(pp, id, dl);
-                PlayerProxy_refreshDL(pp, id);
+            for (FormProxyId i = 0; i < maxFormIds; i++) {
+                FormProxy *currFp = PlayerProxy_getFormProxy(pp, i);
+                if (currFp) {
+                    PlayerModelManagerModelType type = FormProxy_getModelType(currFp);
+
+                    for (size_t j = 0; j < override->dl.count; ++j) {
+                        Link_DisplayList id = override->dl.overrides[j];
+
+                        Gfx *allFormsDL = ModelVisuals_getDL(&this->fallbackModelVisuals, id);
+                        PlayerProxy_setOverrideDL(pp, id, allFormsDL);
+
+                        Gfx *singleFormDL = ModelEntryEquipment_getDisplayListForModelType(this, type, id);
+                        if (singleFormDL) {
+                            FormProxy_setCurrentOverrideDL(currFp, id, singleFormDL);
+                        }
+                    }
+
+                    for (size_t j = 0; j < override->mtx.count; ++j) {
+                        Link_EquipmentMatrix id = override->mtx.overrides[j];
+                        Mtx *allFormsMtx = ModelVisuals_getMtx(&this->fallbackModelVisuals, id);
+                        PlayerProxy_setOverrideMtx(pp, id, allFormsMtx);
+
+                        Mtx *singleFormMtx = ModelEntryEquipment_getMatrixForModelType(this, type, id);
+                        if (singleFormMtx) {
+                            FormProxy_setCurrentOverrideMtx(currFp, id, singleFormMtx);
+                        }
+                    }
+                }
             }
 
-            for (size_t i = 0; i < override->mtx.count; ++i) {
-                Link_EquipmentMatrix id = override->mtx.overrides[i];
-                Mtx *mtx = ModelVisuals_getMtx(&this->fallbackModelVisuals, id);
-                PlayerProxy_setOverrideMtx(pp, id, mtx);
-                PlayerProxy_refreshMtx(pp, id);
-            }
+            PlayerProxy_refresh(pp);
 
             _internal_onEquipmentModelApplied(this->equipType);
 
@@ -764,14 +847,14 @@ static bool ModelEntryEquipment_removeFromFormProxy(const ModelEntry *thisx, For
             for (size_t i = 0; i < override->dl.count; ++i) {
                 Link_DisplayList id = override->dl.overrides[i];
                 PlayerProxy_setOverrideDL(pp, id, NULL);
-                PlayerProxy_refreshDL(pp, id);
             }
 
             for (size_t i = 0; i < override->mtx.count; ++i) {
                 Link_EquipmentMatrix id = override->mtx.overrides[i];
                 PlayerProxy_setOverrideMtx(pp, id, NULL);
-                PlayerProxy_refreshMtx(pp, id);
             }
+
+            PlayerProxy_refresh(pp);
 
             _internal_onEquipmentModelApplied(this->equipType);
 
@@ -804,7 +887,7 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
 
     entry->modelEntry.virtualFuncs = &funcs;
     ModelVisuals_init(&entry->fallbackModelVisuals);
-    entry->formModelVisuals = recomputil_create_u32_memory_hashmap(sizeof(ModelVisuals));
+    entry->modelTypeToModelVisuals = recomputil_create_u32_memory_hashmap(sizeof(ModelVisuals));
     entry->equipType = getEquipmentReplacementFromCategory(entry->modelEntry.category);
 
     recomputil_u32_hashset_insert(sValidModelEntryEquipmentPtrs, (uintptr_t)entry);

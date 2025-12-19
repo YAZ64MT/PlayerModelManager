@@ -4,6 +4,7 @@
 #include "modelmatrixids.h"
 #include "modelinfo.h"
 #include "z64recomp_api.h"
+#include "playermodelmanager_api.h"
 
 typedef struct PlayerProxy PlayerProxy;
 
@@ -65,11 +66,6 @@ bool FormProxy_setCurrentOverrideMtx(FormProxy *fp, Link_EquipmentMatrix mtxId, 
 bool FormProxy_unsetCurrentOverrideMtx(FormProxy *fp, Link_EquipmentMatrix mtxId);
 bool FormProxy_setAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id, FormProxy *alt);
 bool FormProxy_unsetAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id);
-void FormProxy_refreshSkeletons(FormProxy *fp);
-void FormProxy_refreshDL(FormProxy *fp, Link_DisplayList id);
-void FormProxy_refreshAllDLs(FormProxy *fp);
-void FormProxy_refreshMtx(FormProxy *fp, Link_EquipmentMatrix id);
-void FormProxy_refreshAllMtxs(FormProxy *fp);
 void FormProxy_requestTunicColorOverride(FormProxy *fp, Color_RGBA8 color);
 bool FormProxy_isTunicColorOverrideRequested(FormProxy *fp);
 Color_RGBA8 FormProxy_getRequestedTunicColor(FormProxy *fp);
@@ -78,8 +74,8 @@ void FormProxy_resetTunicColor(FormProxy *fp);
 void FormProxy_pullCurrentTunicColorFromConfig(FormProxy *fp);
 void FormProxy_pullCurrentTunicColorFromRequested(FormProxy *fp);
 void FormProxy_setCurrentModelFormEntry(FormProxy *fp, ModelEntryForm *modelEntry);
-void FormProxy_refreshPlayerFaceTextures(FormProxy *fp);
-void FormProxy_refresh(FormProxy *fp);
+void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp);
+void FormProxy_requestRefresh(FormProxy *fp);
 Mtx *FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id);
 Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id);
 Gfx *FormProxy_getCurrentDL(FormProxy *fp, Link_DisplayList id);
@@ -88,5 +84,6 @@ FlexSkeletonHeader *FormProxy_getShieldingSkeleton(FormProxy *fp);
 bool FormProxy_isAdultModelType(FormProxy *fp);
 PlayerProxy *FormProxy_getPlayerProxy(FormProxy *fp);
 PlayerTransformation FormProxy_getTargetForm(FormProxy *fp);
+PlayerModelManagerModelType FormProxy_getModelType(FormProxy *fp);
 
 #endif

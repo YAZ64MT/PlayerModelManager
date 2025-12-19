@@ -115,38 +115,11 @@ void PlayerProxy_refresh(PlayerProxy *pp) {
         FormProxy *currFp = PlayerProxy_getFormProxy(pp, i);
 
         if (currFp) {
-            FormProxy_refresh(currFp);
+            FormProxy_requestRefresh(currFp);
         }
     }
 }
 
-void PlayerProxy_refreshAlternateDLs(PlayerProxy *pp) {
-    FormProxyId idMax = PlayerModelConfig_getNumFormIds();
-
-    for (int i = 0; i < ARRAY_COUNT(sFormAlternates); ++i) {
-        const FormAlternateDL *currAlt = &sFormAlternates[i];
-
-        for (FormProxyId j = 0; j < idMax; ++j) {
-            FormProxy *currFp = PlayerProxy_getFormProxy(pp, j);
-
-            if (currFp && currAlt->formProxyId != j) {
-                FormProxy_refreshDL(currFp, currAlt->formProxyId);
-            }
-        }
-    }
-}
-
-void PlayerProxy_refreshDL(PlayerProxy *pp, Link_DisplayList dlId) {
-    FormProxyId idMax = PlayerModelConfig_getNumFormIds();
-
-    for (FormProxyId i = 0; i < idMax; ++i) {
-        FormProxy *currFp = PlayerProxy_getFormProxy(pp, i);
-
-        if (currFp) {
-            FormProxy_refreshDL(currFp, dlId);
-        }
-    }
-}
 
 void PlayerProxy_setOverrideDL(PlayerProxy *pp, Link_DisplayList dlId, Gfx *dl) {
     FormProxyId idMax = PlayerModelConfig_getNumFormIds();
@@ -156,18 +129,6 @@ void PlayerProxy_setOverrideDL(PlayerProxy *pp, Link_DisplayList dlId, Gfx *dl) 
 
         if (currFp) {
             FormProxy_setCurrentOverrideDL(currFp, dlId, dl);
-        }
-    }
-}
-
-void PlayerProxy_refreshMtx(PlayerProxy *pp, Link_EquipmentMatrix mtxId) {
-    FormProxyId idMax = PlayerModelConfig_getNumFormIds();
-
-    for (FormProxyId i = 0; i < idMax; ++i) {
-        FormProxy *currFp = PlayerProxy_getFormProxy(pp, i);
-
-        if (currFp) {
-            FormProxy_refreshMtx(currFp, mtxId);
         }
     }
 }
