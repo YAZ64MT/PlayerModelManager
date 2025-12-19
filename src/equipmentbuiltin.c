@@ -524,7 +524,7 @@ static void registerMaskDL2(PlayerModelManagerHandle pack, const char *internalN
     PlayerModelManager_addHandleToPack(pack, h);
 }
 
-static PlayerModelManagerModelType sModelTypesAdult[] = {PMM_MODEL_TYPE_ADULT, PMM_MODEL_TYPE_ZORA, PMM_MODEL_TYPE_GORON};
+static PlayerModelManagerModelType sModelTypesAdult[] = {PMM_MODEL_TYPE_ADULT, PMM_MODEL_TYPE_ZORA, PMM_MODEL_TYPE_GORON, PMM_MODEL_TYPE_FIERCE_DEITY};
 
 static void setAdultModelTypeDL(PlayerModelManagerHandle h, Link_DisplayList id, Gfx *dl) {
     for (int i = 0; i < ARRAY_COUNT(sModelTypesAdult); ++i) {
