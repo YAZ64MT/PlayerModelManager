@@ -423,10 +423,10 @@ static void initCustomDLs() {
     guPosition(&sAdultGildedSwordBackMtx, 0.f, 0.f, 0.f, 1.f, -578.f * SWORD_SCALE_FACTOR, -221.f * SWORD_SCALE_FACTOR, -32.f * SWORD_SCALE_FACTOR);
 
     gSPBranchList(sCallGreatFairySwordDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL));
-    guPosition(&sGreatFairySwordResizerMtx, 0.f, 0.f, 0.f, 1.1f, -30.f, 75.f, -75.f);
+    guPosition(&sGreatFairySwordResizerMtx, 0.f, 0.f, 0.f, 1.1f, -30.f, 125.f, -100.f);
 
     gSPBranchList(sCallFierceDeitySwordDL, getRepointedMMDL(OBJECT_LINK_BOY, gLinkFierceDeitySwordDL));
-    guPosition(&sFierceDeitySwordResizerMtx, 0.f, 0.f, 0.f, 0.9f, 30.f, -75.f, 75.f);
+    guPosition(&sFierceDeitySwordResizerMtx, 0.f, 0.f, 0.f, 0.9f, 0.f, -200.f, 25.f);
 
     gSPBranchList(sCallHookshotDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanHookshotDL));
     guPosition(&sHookshotResizerMtx, 0.f, 0.f, 0.f, 1.4f, 50.f, 105.f, 0.f);
