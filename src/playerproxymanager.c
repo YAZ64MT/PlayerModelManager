@@ -54,7 +54,7 @@ void PlayerProxyManager_refreshFullAllWithModelEntry(ModelEntry *modelEntry) {
         PlayerProxy *currPp = proxies[i];
 
         for (FormProxyId j = 0, numFormIds = PlayerModelConfig_getNumFormIds(); j < numFormIds; ++j) {
-            FormProxy *currFp = PlayerProxy_getFormProxy(currPp, i);
+            FormProxy *currFp = PlayerProxy_getFormProxy(currPp, j);
 
             if (currFp) {
                 if (isModelEntryInModelInfo(FormProxy_getCurrentModelInfo(currFp), modelEntry) ||
