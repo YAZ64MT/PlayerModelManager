@@ -305,7 +305,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayListOnModelType(PlayerModelManag
         Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
     }
 
-    ModelEntryEquipment *entry = (ModelEntryEquipment *)entry;
+    ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
 
     if (ModelEntryEquipment_setDisplayListForModelType(entry, type, dlId, dl)) {
         refreshProxyDLIfEntryLoaded(entryx, dlId);
@@ -330,7 +330,38 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
 
     if (ModelEntry_setMatrix(entry, mtxId, matrix)) {
         refreshProxyMtxIfEntryLoaded(entry, mtxId);
-        Logger_printVerbose("Copying matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix, ModelEntry_getInternalName(entry));
+        Logger_printVerbose("Setting matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix, ModelEntry_getInternalName(entry));
+        return true;
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_setMatrixOnModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_EquipmentMatrix mtxId, Mtx *matrix) {
+    if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
+        Logger_printError("Invalid matrix ID passed in.");
+        return false;
+    }
+
+    if (type >= PMM_MODEL_TYPE_MAX || type < 0) {
+        Logger_printCurrentFuncAndLine("Invalid model type passed in.");
+    }
+
+    ModelEntry *entryx = getEntryOrPrintErrLocked(h, __func__);
+
+    if (!entryx) {
+        return false;
+    }
+
+    if (!isEquipmentCategory(ModelEntry_getCategory(entryx))) {
+        Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
+    }
+
+    ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
+
+    if (ModelEntryEquipment_setMatrixForModelType(entry, type, mtxId, matrix)) {
+        refreshProxyMtxIfEntryLoaded(entryx, mtxId);
+        Logger_printVerbose("Setting matrix with id %d for type %d at 0x%X into handle with internal name '%s'", mtxId, type, matrix, ModelEntry_getInternalName(entryx));
         return true;
     }
 
