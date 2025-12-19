@@ -1126,7 +1126,7 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
     Gfx *dl = MRC_getListenerDL(fp->form, id);
 
     if (!dl) {
-        FormProxy *fpAlt;
+        FormProxy *fpAlt = NULL;
         recomputil_u32_value_hashmap_get(fp->displayListAlternates, id, (uintptr_t *)&fpAlt);
         if (fpAlt) {
             if (fpAlt && fpAlt != fp) {
