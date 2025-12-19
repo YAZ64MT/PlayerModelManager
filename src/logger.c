@@ -20,7 +20,7 @@ void setupLoggerFirstTime() {
 }
 
 RECOMP_HOOK("Play_Main")
-void updateLoggerLevelOnPlayMain() {
+void updateLoggerLevel_on_Play_Main(GameState *thisx) {
     LoggerLevel level = recomp_get_config_u32("logging_level");
 
     if (level != gLoggerLevel) {
