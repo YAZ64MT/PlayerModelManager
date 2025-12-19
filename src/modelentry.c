@@ -704,10 +704,11 @@ static ModelVisuals *ModelEntryEquipment_getOrCreateModelTypeModelVisual(ModelEn
     ModelVisuals *modelVisuals = ModelEntryEquipment_getModelTypeModelVisual(entry, type);
 
     if (!modelVisuals) {
-        recomputil_u32_memory_hashmap_create(entry->modelTypeToModelVisuals, type);
-        modelVisuals = recomputil_u32_memory_hashmap_get(entry->modelTypeToModelVisuals, type);
-        if (modelVisuals) {
-            ModelVisuals_init(modelVisuals);
+        if (recomputil_u32_memory_hashmap_create(entry->modelTypeToModelVisuals, type)) {
+            modelVisuals = recomputil_u32_memory_hashmap_get(entry->modelTypeToModelVisuals, type);
+            if (modelVisuals) {
+                ModelVisuals_init(modelVisuals);
+            }
         }
     }
 
