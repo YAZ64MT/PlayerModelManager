@@ -680,8 +680,6 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_GREAT_FAIRY_HILT, gEmptyDL);
 
         setChildModelTypeDL(h, LINK_DL_SWORD_GREAT_FAIRY_BLADE, sFierceDeitySwordChildDL);
-
-        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Great Fairy's Sword
@@ -707,8 +705,6 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayList(h, LINK_DL_SWORD_FIERCE_DEITY_HILT, gEmptyDL);
 
         setAdultModelTypeDL(h, LINK_DL_SWORD_FIERCE_DEITY_BLADE, sGreatFairySwordAdultDL);
-
-        PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
 
     // Hookshot (MM)
