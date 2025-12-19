@@ -167,7 +167,7 @@ void initVanillaProps_on_Player_Init(Actor *thisx, PlayState *play) {
 
 // Need to do this every frame or adult Link clips into the floor on unpause
 RECOMP_HOOK("Play_Main")
-void Play_Main(GameState *thisx) {
+void updateAdultProperties_on_Play_Main(GameState *thisx) {
     PlayState *play = (PlayState *)thisx;
 
     Player *player = GET_PLAYER(play);
