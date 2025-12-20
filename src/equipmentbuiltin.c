@@ -375,8 +375,18 @@ static void *getMMObject(ObjectId id) {
     return GlobalObjects_getGlobalObject(id);
 }
 
+static void setupResizedSwordMatrixes(Mtx *hiltResizeMtx, Mtx *bladeResizeMtx, Mtx *sheathResizeMtx, Mtx *hiltBackMtx, f32 scale, Vec3f *translation, Vec3f *hiltBackBaseTranslation) {
+    guPosition(hiltResizeMtx, 0.f, 0.f, 0.f, scale, translation->x, translation->y, translation->z);
+    guPosition(bladeResizeMtx, 0.f, 0.f, 0.f, scale, translation->x, translation->y, translation->z);
+    guPosition(sheathResizeMtx, 0.f, 0.f, 0.f, scale, 0.f, 0.f, 0.f);
+    guPosition(hiltBackMtx, 0.f, 0.f, 0.f, 1.f,
+               hiltBackBaseTranslation->x * scale - translation->x,
+               hiltBackBaseTranslation->y * scale - translation->y,
+               hiltBackBaseTranslation->z * scale - translation->z);
+}
+
 static void initCustomDLs() {
-    const f32 SWORD_SCALE_FACTOR = 1.3f;
+    const f32 ADULT_SWORD_SCALE_FACTOR = 1.3f;
 
     void *human = getMMObject(OBJECT_LINK_CHILD);
 
@@ -397,26 +407,33 @@ static void initCustomDLs() {
     gSPBranchList(sCallKokiriSwordHiltDL, getRepointedMMDL(GAMEPLAY_KEEP, gKokiriSwordHandleDL));
     gSPBranchList(sCallKokiriSwordBladeDL, getRepointedMMDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL));
     gSPBranchList(sCallKokiriSwordSheathDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanKokiriSwordSheathDL));
-    guPosition(&sKokiriSwordHiltResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sKokiriSwordBladeResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sKokiriSwordSheathResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sAdultKokiriSwordBackMtx, 0.f, 0.f, 0.f, 1.f, -578.f * SWORD_SCALE_FACTOR, -221.f * SWORD_SCALE_FACTOR, -32.f * SWORD_SCALE_FACTOR);
+    guPosition(&sKokiriSwordHiltResizerMtx, 0.f, 0.f, 0.f, ADULT_SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sKokiriSwordBladeResizerMtx, 0.f, 0.f, 0.f, ADULT_SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sKokiriSwordSheathResizerMtx, 0.f, 0.f, 0.f, ADULT_SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sAdultKokiriSwordBackMtx, 0.f, 0.f, 0.f, 1.f, -578.f * ADULT_SWORD_SCALE_FACTOR, -221.f * ADULT_SWORD_SCALE_FACTOR, -32.f * ADULT_SWORD_SCALE_FACTOR);
+    static Vec3f kokiriSwordTranslation = {75.f, 25.f, -115.f};
+    static Vec3f kokiriSwordBackBaseTranslation = {-578.f, -221.f, -32.f};
+    setupResizedSwordMatrixes(&sKokiriSwordHiltResizerMtx, &sKokiriSwordBladeResizerMtx, &sKokiriSwordSheathResizerMtx,
+                              &sAdultKokiriSwordBackMtx, ADULT_SWORD_SCALE_FACTOR,
+                              &kokiriSwordTranslation, &kokiriSwordBackBaseTranslation);
 
     gSPBranchList(sCallRazorSwordHiltDL, getRepointedMMDL(GAMEPLAY_KEEP, gRazorSwordHandleDL));
     gSPBranchList(sCallRazorSwordBladeDL, getRepointedMMDL(GAMEPLAY_KEEP, gRazorSwordBladeDL));
     gSPBranchList(sCallRazorSwordSheathDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanRazorSwordSheathDL));
-    guPosition(&sRazorSwordHiltResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sRazorSwordBladeResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sRazorSwordSheathResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sAdultRazorSwordBackMtx, 0.f, 0.f, 0.f, 1.f, -480.f * SWORD_SCALE_FACTOR, -240.f * SWORD_SCALE_FACTOR, -14.f * SWORD_SCALE_FACTOR);
+    static Vec3f razorSwordTranslation = {75.f, 25.f, -115.f};
+    static Vec3f razorSwordBackBaseTranslation = {-480.f, -240.f, -14.f};
+    setupResizedSwordMatrixes(&sRazorSwordHiltResizerMtx, &sRazorSwordBladeResizerMtx, &sRazorSwordSheathResizerMtx,
+                              &sAdultRazorSwordBackMtx, ADULT_SWORD_SCALE_FACTOR, &razorSwordTranslation,
+                              &razorSwordBackBaseTranslation);
 
     gSPBranchList(sCallGildedSwordHiltDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordHandleDL));
     gSPBranchList(sCallGildedSwordBladeDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordBladeDL));
     gSPBranchList(sCallGildedSwordSheathDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL));
-    guPosition(&sGildedSwordHiltResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sGildedSwordBladeResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sGildedSwordSheathResizerMtx, 0.f, 0.f, 0.f, SWORD_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sAdultGildedSwordBackMtx, 0.f, 0.f, 0.f, 1.f, -578.f * SWORD_SCALE_FACTOR, -221.f * SWORD_SCALE_FACTOR, -32.f * SWORD_SCALE_FACTOR);
+    static Vec3f gildedSwordTranslation = {-25.f, 25.f, -100.f};
+    static Vec3f gildedSwordBackBaseTranslation = {-578.f, -221.f, -32.f};
+    setupResizedSwordMatrixes(&sGildedSwordHiltResizerMtx, &sGildedSwordBladeResizerMtx, &sGildedSwordSheathResizerMtx,
+                              &sAdultGildedSwordBackMtx, ADULT_SWORD_SCALE_FACTOR, &gildedSwordTranslation,
+                              &gildedSwordBackBaseTranslation);
 
     gSPBranchList(sCallGreatFairySwordDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL));
 
