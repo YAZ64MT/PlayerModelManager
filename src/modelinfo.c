@@ -35,7 +35,7 @@ bool ModelInfo_hasModelEntry(ModelInfo *modelInfo) {
     return modelInfo->modelEntryForm;
 }
 
-Gfx *ModelInfo_getGfx(ModelInfo *modelInfo, Link_DisplayList id) {
+Gfx *ModelInfo_getDL(ModelInfo *modelInfo, Link_DisplayList id) {
     if (!isValidModelInfoPtr(modelInfo)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;
@@ -45,16 +45,16 @@ Gfx *ModelInfo_getGfx(ModelInfo *modelInfo, Link_DisplayList id) {
         Logger_printWarning("Invalid display list ID %d.", id);
     }
 
-    uintptr_t gfx = 0;
-    recomputil_u32_value_hashmap_get(modelInfo->gfxOverrides, id, &gfx);
+    uintptr_t dl = 0;
+    recomputil_u32_value_hashmap_get(modelInfo->gfxOverrides, id, &dl);
 
-    if (!gfx) {
+    if (!dl) {
         if (modelInfo->modelEntryForm) {
-            gfx = (uintptr_t)ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(modelInfo->modelEntryForm), id);
+            dl = (uintptr_t)ModelEntry_getDisplayList(ModelEntryForm_getModelEntry(modelInfo->modelEntryForm), id);
         }
     }
 
-    return (Gfx *)gfx;
+    return (Gfx *)dl;
 }
 
 Mtx *ModelInfo_getMtx(ModelInfo *modelInfo, Link_EquipmentMatrix id) {

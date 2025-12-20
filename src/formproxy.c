@@ -1102,7 +1102,7 @@ static Gfx *getDLOrAltFromModelEntry(ModelEntry *me, Link_DisplayList dlId) {
 }
 
 static Gfx *getDLOrAltFromModelInfo(ModelInfo *mi, Link_DisplayList dlId) {
-    Gfx *result = ModelInfo_getGfx(mi, dlId);
+    Gfx *result = ModelInfo_getDL(mi, dlId);
 
     if (!result) {
         DisplayListAltList *alts = getAltList(dlId);
@@ -1111,7 +1111,7 @@ static Gfx *getDLOrAltFromModelInfo(ModelInfo *mi, Link_DisplayList dlId) {
             for (size_t i = 0; i < alts->numAlts && !result; ++i) {
                 Link_DisplayList curr = alts->alternates[i];
 
-                result = ModelInfo_getGfx(mi, curr);
+                result = ModelInfo_getDL(mi, curr);
             }
         }
     }
