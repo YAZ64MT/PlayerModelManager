@@ -569,7 +569,7 @@ void FormProxy_refreshDL(FormProxy *fp, Link_DisplayList id) {
         return;
     }
 
-    Gfx *dl = FormProxy_getDL(fp, id);
+    Gfx *dl = FormProxy_getNextRefreshDL(fp, id);
 
     if (dl) {
         gSPDisplayList(&fp->wrappedDisplayLists[id].displayList[WRAPPED_DL_DRAW], dl);
@@ -1119,7 +1119,7 @@ static Gfx *getDLOrAltFromModelInfo(ModelInfo *mi, Link_DisplayList dlId) {
     return result;
 }
 
-Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
+Gfx *FormProxy_getNextRefreshDL(FormProxy *fp, Link_DisplayList id) {
     if (!isValidFormProxy(fp)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;
@@ -1132,7 +1132,7 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
         recomputil_u32_value_hashmap_get(fp->displayListAlternates, id, (uintptr_t *)&fpAlt);
         if (fpAlt) {
             if (fpAlt && fpAlt != fp) {
-                dl = FormProxy_getDL(fpAlt, id);
+                dl = FormProxy_getNextRefreshDL(fpAlt, id);
             }
         }
     }
@@ -1160,7 +1160,7 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
     return dl;
 }
 
-Gfx *FormProxy_getCurrentDL(FormProxy *fp, Link_DisplayList id) {
+Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
     if (!isValidFormProxy(fp)) {
         PRINT_INVALID_PTR_ERR();
         return NULL;

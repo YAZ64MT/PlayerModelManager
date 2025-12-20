@@ -649,7 +649,7 @@ RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersio
         FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
 
         if (fp) {
-            return FormProxy_getCurrentDL(fp, dlId);
+            return FormProxy_getDL(fp, dlId);
         }
     }
 

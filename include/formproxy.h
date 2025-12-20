@@ -77,8 +77,8 @@ void FormProxy_setCurrentModelFormEntry(FormProxy *fp, ModelEntryForm *modelEntr
 void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp);
 void FormProxy_requestRefresh(FormProxy *fp);
 Mtx *FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id);
+Gfx *FormProxy_getNextRefreshDL(FormProxy *fp, Link_DisplayList id);
 Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id);
-Gfx *FormProxy_getCurrentDL(FormProxy *fp, Link_DisplayList id);
 FlexSkeletonHeader *FormProxy_getSkeleton(FormProxy *fp);
 FlexSkeletonHeader *FormProxy_getShieldingSkeleton(FormProxy *fp);
 bool FormProxy_isAdultModelType(FormProxy *fp);

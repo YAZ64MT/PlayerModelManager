@@ -22,14 +22,14 @@ static bool sShouldSkipHookshotInterpolation;
 PlayerProxy *gPlayer1Proxy;
 
 static void tryReplaceCodeDL(FormProxy *fp, Link_DisplayList dlId, Gfx **dest) {
-    Gfx *newDL = FormProxy_getCurrentDL(fp, dlId);
+    Gfx *newDL = FormProxy_getDL(fp, dlId);
     if (newDL) {
         *dest = newDL;
     }
 }
 
 static void tryReplaceCodeLodDL(FormProxy *fp, Link_DisplayList dlId, Gfx *dest[]) {
-    Gfx *newDL = FormProxy_getCurrentDL(fp, dlId);
+    Gfx *newDL = FormProxy_getDL(fp, dlId);
     if (newDL) {
         dest[0] = newDL;
         dest[1] = newDL;

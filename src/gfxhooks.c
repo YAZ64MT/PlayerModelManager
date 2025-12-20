@@ -227,7 +227,7 @@ static void replaceHookedGfxCommands(GfxHookData *hookDat, Gfx *startDL, Gfx *en
             if (hashmap) {
                 unsigned long tmp;
                 if (recomputil_u32_value_hashmap_get(hashmap, curr->words.w1, &tmp)) {
-                    Gfx *dl = FormProxy_getCurrentDL(hookDat->formProxy, tmp);
+                    Gfx *dl = FormProxy_getDL(hookDat->formProxy, tmp);
 
                     if (dl) {
                         gSPDisplayList(curr, dl);
@@ -423,7 +423,7 @@ void hookGfx_on_EnBom_Draw(Actor *thisx, PlayState *play) {
         FormProxy *fp = getFormProxyOrFallback(&this->actor, FORM_PROXY_ID_HUMAN, play);
 
         if (fp) {
-            Gfx *bombBody3DDL = FormProxy_getCurrentDL(fp, LINK_DL_BOMB_BODY_3D);
+            Gfx *bombBody3DDL = FormProxy_getDL(fp, LINK_DL_BOMB_BODY_3D);
 
             if (bombBody3DDL) {
                 Gfx_SetupDL25_Opa(play->state.gfxCtx);

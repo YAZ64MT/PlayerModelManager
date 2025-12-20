@@ -28,9 +28,9 @@ static void setFirstPersonPlayerDLOverride(Player *player, Link_DisplayList hook
 
     if (fp) {
         if (Player_IsHoldingHookshot(player)) {
-            sFirstPersonDLToOverrideWith = FormProxy_getCurrentDL(fp, hookshotDLId);
+            sFirstPersonDLToOverrideWith = FormProxy_getDL(fp, hookshotDLId);
         } else {
-            sFirstPersonDLToOverrideWith = FormProxy_getCurrentDL(fp, bowDLId);
+            sFirstPersonDLToOverrideWith = FormProxy_getDL(fp, bowDLId);
         }
     }
 }
