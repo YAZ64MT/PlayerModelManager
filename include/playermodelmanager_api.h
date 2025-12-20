@@ -601,10 +601,38 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setShieldingSkeleton(P
 // Returns true upon successful display list set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, PlayerModelManagerDisplayListId dlId, Gfx *dl));
 
+// Targetted display list replacement for equipment model types.
+//
+// When an equipment model is used on a model with the passed in type, the display list specified here will be used instead.
+//
+// Any unspecified forms will use the display list passed into PlayerModelManager_setDisplayList if one is set.
+//
+// Returns true if display list was successfully set, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayListForModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, PlayerModelManagerDisplayListId dlId, Gfx *dl));
+
+// Array version of PlayerModelManager_setDisplayListForModelType that takes an array with n elements.
+//
+// Returns true if display list was set for the passed in model types, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayListForModelTypeArray(PlayerModelManagerHandle h, PlayerModelManagerModelType types[], size_t n, PlayerModelManagerDisplayListId dlId, Gfx *dl));
+
 // Sets a matrix on the custom model.
 //
 // Returns true if matrix was successfully set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, PlayerModelManagerMatrixId mtxId, Mtx *matrix));
+
+// Targetted matrix setting for equipment model types.
+//
+// When an equipment model is used on a model with the passed in type, the matrix specified here will be used instead.
+//
+// Any unspecified forms will use the matrix passed into PlayerModelManager_setMatrix if one is set.
+//
+// Returns true if matrix was successfully set, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMatrixForModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, PlayerModelManagerMatrixId mtxId, Mtx *matrix));
+
+// Array version of PlayerModelManager_setMatrixForModelType that takes an array with n elements.
+//
+// Returns true if matrix was set for the passed in model types, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMatrixForModelTypeArray(PlayerModelManagerHandle h, PlayerModelManagerModelType types[], size_t n, PlayerModelManagerMatrixId mtxId, Mtx *matrix));
 
 // Adds a handle to a model pack. Models will be applied in the order that their handles are added in.
 //

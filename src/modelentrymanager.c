@@ -668,6 +668,14 @@ void CMEM_reapplyEntry(Link_CustomModelCategory cat) {
     }
 }
 
+static void reapplyAllEquipmentEntries() {
+    for (Link_CustomModelCategory i = 0; i < LINK_CMC_MAX; ++i) {
+        if (isEquipmentCategory(i)) {
+            CMEM_reapplyEntry(i);
+        }
+    }
+}
+
 bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry) {
     const ModelEntry *currEntry = CMEM_getCurrentEntry(cat);
 
@@ -685,6 +693,10 @@ bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEnt
 
         if (newEntry) {
             ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_APPLIED);
+        }
+
+        if (cat == LINK_CMC_HUMAN) {
+            reapplyAllEquipmentEntries();
         }
 
         return true;
@@ -741,12 +753,15 @@ void CMEM_removeModel(Link_CustomModelCategory cat) {
     const ModelEntry *entry = sCurrentModelEntries[cat];
 
     if (entry) {
-
         ModelEntry_doCallback(entry, PMM_EVENT_MODEL_REMOVED);
 
         CMEM_setCurrentEntry(cat, NULL);
 
         ModelEntry_removeFromFormProxy(entry, getLocalFormProxyFromCategory(cat));
+
+        if (cat == LINK_CMC_HUMAN) {
+            reapplyAllEquipmentEntries();
+        }
     }
 }
 

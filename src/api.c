@@ -262,7 +262,7 @@ RECOMP_EXPORT bool PlayerModelManager_clearAllFlags(PlayerModelManagerHandle h, 
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, Link_DisplayList dlId, Gfx *dl) {
     if (dlId >= LINK_DL_MAX || dlId < 0) {
-        Logger_printError("Invalid display list ID passed in to %s.", __func__);
+        Logger_printError("Invalid display list ID passed in.");
         return false;
     }
 
@@ -281,9 +281,85 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
     return false;
 }
 
+RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_DisplayList dlId, Gfx *dl) {
+    if (dlId >= LINK_DL_MAX || dlId < 0) {
+        Logger_printError("Invalid display list ID passed in.");
+        return false;
+    }
+
+    if (type >= PMM_MODEL_TYPE_MAX || type < 0) {
+        Logger_printError("Invalid model type passed in.");
+        return false;
+    }
+
+    ModelEntry *entryx = getEntryOrPrintErrLocked(h, __func__);
+
+    if (!entryx) {
+        return false;
+    }
+
+    if (!isEquipmentCategory(ModelEntry_getCategory(entryx))) {
+        Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
+        return false;
+    }
+
+    ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
+
+    if (ModelEntryEquipment_setDisplayListForModelType(entry, type, dlId, dl)) {
+        refreshProxyDLIfEntryLoaded(entryx, dlId);
+        Logger_printVerbose("Setting DL id %d for type %d on handle with internal name '%s' to 0x%X", dlId, type, ModelEntry_getInternalName(entryx), dl);
+        return true;
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelTypeArray(PlayerModelManagerHandle h, PlayerModelManagerModelType types[], size_t n, Link_DisplayList dlId, Gfx *dl) {
+    if (dlId >= LINK_DL_MAX || dlId < 0) {
+        Logger_printError("Invalid display list ID passed in.");
+        return false;
+    }
+
+    if (n <= 0) {
+        Logger_printError("Invalid array size %d passed in.", n);
+        return false;
+    }
+
+    for (size_t i = 0; i < n; ++i) {
+        PlayerModelManagerModelType type = types[i];
+        if (type >= PMM_MODEL_TYPE_MAX || type < 0) {
+            Logger_printError("Invalid model type %d passed in.", type);
+            return false;
+        }
+    }
+
+    ModelEntry *entryx = getEntryOrPrintErrLocked(h, __func__);
+
+    if (!entryx) {
+        return false;
+    }
+
+    if (!isEquipmentCategory(ModelEntry_getCategory(entryx))) {
+        Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
+        return false;
+    }
+
+    ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
+
+    for (size_t i = 0; i < n; ++i) {
+        PlayerModelManagerModelType type = types[i];
+        if (ModelEntryEquipment_setDisplayListForModelType(entry, type, dlId, dl)) {
+            refreshProxyDLIfEntryLoaded(entryx, dlId);
+            Logger_printVerbose("Setting DL id %d for type %d on handle with internal name '%s' to 0x%X", dlId, type, ModelEntry_getInternalName(entryx), dl);
+        }
+    }
+
+    return true;
+}
+
 RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix) {
     if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
-        Logger_printError("Invalid matrix ID passed in to %s.", __func__);
+        Logger_printError("Invalid matrix ID passed in.");
         return false;
     }
 
@@ -295,11 +371,85 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
 
     if (ModelEntry_setMatrix(entry, mtxId, matrix)) {
         refreshProxyMtxIfEntryLoaded(entry, mtxId);
-        Logger_printVerbose("Copying matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix, ModelEntry_getInternalName(entry));
+        Logger_printVerbose("Setting matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix, ModelEntry_getInternalName(entry));
         return true;
     }
 
     return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_setMatrixForModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_EquipmentMatrix mtxId, Mtx *matrix) {
+    if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
+        Logger_printError("Invalid matrix ID passed in.");
+        return false;
+    }
+
+    if (type >= PMM_MODEL_TYPE_MAX || type < 0) {
+        Logger_printCurrentFuncAndLine("Invalid model type passed in.");
+    }
+
+    ModelEntry *entryx = getEntryOrPrintErrLocked(h, __func__);
+
+    if (!entryx) {
+        return false;
+    }
+
+    if (!isEquipmentCategory(ModelEntry_getCategory(entryx))) {
+        Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
+        return false;
+    }
+
+    ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
+
+    if (ModelEntryEquipment_setMatrixForModelType(entry, type, mtxId, matrix)) {
+        refreshProxyMtxIfEntryLoaded(entryx, mtxId);
+        Logger_printVerbose("Setting matrix with id %d for type %d at 0x%X into handle with internal name '%s'", mtxId, type, matrix, ModelEntry_getInternalName(entryx));
+        return true;
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_setMatrixForModelTypeArray(PlayerModelManagerHandle h, PlayerModelManagerModelType types[], size_t n, Link_EquipmentMatrix mtxId, Mtx *matrix) {
+    if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
+        Logger_printError("Invalid matrix ID passed in.");
+        return false;
+    }
+
+    if (n <= 0) {
+        Logger_printError("Invalid array size %d passed in.", n);
+        return false;
+    }
+
+    for (size_t i = 0; i < n; ++i) {
+        PlayerModelManagerModelType type = types[i];
+        if (type >= PMM_MODEL_TYPE_MAX || type < 0) {
+            Logger_printCurrentFuncAndLine("Invalid model type passed in.");
+        }
+    }
+
+    ModelEntry *entryx = getEntryOrPrintErrLocked(h, __func__);
+
+    if (!entryx) {
+        return false;
+    }
+
+    if (!isEquipmentCategory(ModelEntry_getCategory(entryx))) {
+        Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
+        return false;
+    }
+
+    ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
+
+    for (size_t i = 0; i < n; ++i) {
+        PlayerModelManagerModelType type = types[i];
+        if (ModelEntryEquipment_setMatrixForModelType(entry, type, mtxId, matrix)) {
+            refreshProxyMtxIfEntryLoaded(entryx, mtxId);
+            Logger_printVerbose("Setting matrix with id %d for type %d at 0x%X into handle with internal name '%s'", mtxId, type, matrix, ModelEntry_getInternalName(entryx));
+        }
+    }
+
+    return true;
 }
 
 RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h, PlayerModelManagerHandle toAdd) {
@@ -544,7 +694,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long a
 
             if (fallbackModelInfo) {
                 ModelInfo_setGfxOverride(fallbackModelInfo, dlId, dl);
-                PlayerProxyManager_refreshDLAll(dlId);
+                PlayerProxyManager_refreshAll();
 
                 // preserve model behavior of old API versions
                 if (form == PLAYER_FORM_HUMAN) {
@@ -611,7 +761,7 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVer
 
             if (fallbackModelInfo) {
                 ModelInfo_setMtxOverride(fallbackModelInfo, mtxId, mtx);
-                PlayerProxyManager_refreshMtxAll(mtxId);
+                PlayerProxyManager_refreshAll();
             }
         }
     }

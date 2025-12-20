@@ -884,7 +884,7 @@ void FormProxy_setCurrentModelFormEntry(FormProxy *fp, ModelEntryForm *modelEntr
     ModelInfo_setModelEntryForm(&fp->currentModelInfo, modelEntry);
 }
 
-void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
+void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp) {
     if (!isValidFormProxy(fp)) {
         PRINT_INVALID_PTR_ERR();
         return;
@@ -926,7 +926,7 @@ void FormProxy_refreshPlayerFaceTextures(FormProxy *fp) {
     }
 }
 
-void FormProxy_refresh(FormProxy *fp) {
+static void FormProxy_refresh(FormProxy *fp) {
     if (!isValidFormProxy(fp)) {
         PRINT_INVALID_PTR_ERR();
         return;
@@ -1128,8 +1128,9 @@ Gfx *FormProxy_getDL(FormProxy *fp, Link_DisplayList id) {
     Gfx *dl = MRC_getListenerDL(fp->form, id);
 
     if (!dl) {
-        FormProxy *fpAlt;
-        if (recomputil_u32_value_hashmap_get(fp->displayListAlternates, id, (uintptr_t *)&fpAlt)) {
+        FormProxy *fpAlt = NULL;
+        recomputil_u32_value_hashmap_get(fp->displayListAlternates, id, (uintptr_t *)&fpAlt);
+        if (fpAlt) {
             if (fpAlt && fpAlt != fp) {
                 dl = FormProxy_getDL(fpAlt, id);
             }
@@ -1223,6 +1224,35 @@ PlayerTransformation FormProxy_getTargetForm(FormProxy *fp) {
     return fp->form;
 }
 
+PlayerModelManagerModelType FormProxy_getModelType(FormProxy *fp) {
+    if (!isValidFormProxy(fp)) {
+        PRINT_INVALID_PTR_ERR();
+        return PMM_MODEL_TYPE_NONE;
+    }
+
+    ModelEntryForm *entry = ModelInfo_getModelEntryForm(&fp->currentModelInfo);
+
+    if (!entry) {
+        entry = ModelInfo_getModelEntryForm(fp->fallbackOverrideModelInfo);
+    }
+
+    if (!entry) {
+        entry = ModelInfo_getModelEntryForm(fp->fallbackModelInfo);
+    }
+
+    if (entry) {
+        return ModelEntry_getType(ModelEntryForm_getModelEntry(entry));
+    }
+
+    return PMM_MODEL_TYPE_NONE;
+}
+
+static YAZMTCore_IterableU32Set *sQueuedRefreshes;
+
+void FormProxy_requestRefresh(FormProxy *fp) {
+    YAZMTCore_IterableU32Set_insert(sQueuedRefreshes, (uintptr_t)fp);
+}
+
 static void setupAltLists() {
     sDLToAltLists = recomputil_create_u32_value_hashmap();
 
@@ -1239,4 +1269,22 @@ RECOMP_CALLBACK(".", _internal_initHashObjects)
 void initFormProxyObjects() {
     sValidFormProxyPtrs = recomputil_create_u32_hashset();
     setupAltLists();
+    sQueuedRefreshes = YAZMTCore_IterableU32Set_new();
+}
+
+RECOMP_HOOK("Play_Main")
+void processRefreshRequests_on_Play_Main(GameState *thisx) {
+    size_t numRequests = YAZMTCore_IterableU32Set_size(sQueuedRefreshes);
+
+    if (numRequests > 0) {
+        FormProxy **proxies = (FormProxy **)YAZMTCore_IterableU32Set_values(sQueuedRefreshes);
+
+        for (size_t i = 0; i < numRequests; ++i) {
+            FormProxy *curr = proxies[i];
+
+            FormProxy_refresh(curr);
+        }
+
+        YAZMTCore_IterableU32Set_clear(sQueuedRefreshes);
+    }
 }

@@ -60,42 +60,8 @@ void PlayerProxyManager_refreshFullAllWithModelEntry(ModelEntry *modelEntry) {
                 if (isModelEntryInModelInfo(FormProxy_getCurrentModelInfo(currFp), modelEntry) ||
                     isModelEntryInModelInfo(FormProxy_getFallbackModelInfo(currFp), modelEntry) ||
                     isModelEntryInModelInfo(FormProxy_getFallbackOverrideModelInfo(currFp), modelEntry)) {
-                    FormProxy_refresh(currFp);
+                    PlayerProxy_refresh(currPp);
                 }                
-            }
-        }
-    }
-}
-
-void PlayerProxyManager_refreshDLAll(Link_DisplayList dlId) {
-    PlayerProxy *const *proxies = (PlayerProxy *const *)YAZMTCore_IterableU32Set_values(sPlayerProxies);
-    size_t numProxies = YAZMTCore_IterableU32Set_size(sPlayerProxies);
-
-    for (size_t i = 0; i < numProxies; ++i) {
-        PlayerProxy *currPp = proxies[i];
-
-        for (FormProxyId j = 0, numFormIds = PlayerModelConfig_getNumFormIds(); j < numFormIds; ++j) {
-            FormProxy *currFp = PlayerProxy_getFormProxy(currPp, i);
-
-            if (currFp) {
-                FormProxy_refreshDL(currFp, dlId);
-            }
-        }
-    }
-}
-
-void PlayerProxyManager_refreshMtxAll(Link_EquipmentMatrix mtxId) {
-    PlayerProxy *const *proxies = (PlayerProxy *const *)YAZMTCore_IterableU32Set_values(sPlayerProxies);
-    size_t numProxies = YAZMTCore_IterableU32Set_size(sPlayerProxies);
-
-    for (size_t i = 0; i < numProxies; ++i) {
-        PlayerProxy *currPp = proxies[i];
-
-        for (FormProxyId j = 0, numFormIds = PlayerModelConfig_getNumFormIds(); j < numFormIds; ++j) {
-            FormProxy *currFp = PlayerProxy_getFormProxy(currPp, i);
-
-            if (currFp) {
-                FormProxy_refreshMtx(currFp, mtxId);
             }
         }
     }

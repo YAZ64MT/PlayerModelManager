@@ -214,7 +214,7 @@ void updateAssets_on_Player_Draw(Actor *thisx, PlayState *play) {
 
     if (fp) {
         Player *player = (Player *)thisx;
-        FormProxy_refreshPlayerFaceTextures(fp);
+        FormProxy_repointPlayerFaceTexturePtrs(fp);
         repointSharedModelsToProxy(fp);
         repointFormPtrsToProxy(player, fp);
         FlexSkeletonHeader *skel = FormProxy_getSkeleton(fp);
