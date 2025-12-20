@@ -803,23 +803,22 @@ static bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormPr
                     for (size_t j = 0; j < override->dl.count; ++j) {
                         Link_DisplayList id = override->dl.overrides[j];
 
-                        Gfx *allFormsDL = ModelVisuals_getDL(&this->fallbackModelVisuals, id);
-                        PlayerProxy_setOverrideDL(pp, id, allFormsDL);
-
                         Gfx *singleFormDL = ModelEntryEquipment_getDisplayListForModelType(this, type, id);
                         if (singleFormDL) {
                             FormProxy_setCurrentOverrideDL(currFp, id, singleFormDL);
+                        } else {
+                            FormProxy_setCurrentOverrideDL(currFp, id, ModelVisuals_getDL(&this->fallbackModelVisuals, id));
                         }
                     }
 
                     for (size_t j = 0; j < override->mtx.count; ++j) {
                         Link_EquipmentMatrix id = override->mtx.overrides[j];
-                        Mtx *allFormsMtx = ModelVisuals_getMtx(&this->fallbackModelVisuals, id);
-                        PlayerProxy_setOverrideMtx(pp, id, allFormsMtx);
 
                         Mtx *singleFormMtx = ModelEntryEquipment_getMatrixForModelType(this, type, id);
                         if (singleFormMtx) {
                             FormProxy_setCurrentOverrideMtx(currFp, id, singleFormMtx);
+                        } else {
+                            FormProxy_setCurrentOverrideMtx(currFp, id, ModelVisuals_getMtx(&this->fallbackModelVisuals, id));
                         }
                     }
                 }
