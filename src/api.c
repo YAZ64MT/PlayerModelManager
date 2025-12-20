@@ -300,6 +300,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelType(PlayerModelMana
 
     if (!isEquipmentCategory(ModelEntry_getCategory(entryx))) {
         Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
+        return false;
     }
 
     ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
@@ -352,6 +353,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrixForModelType(PlayerModelManagerHa
 
     if (!isEquipmentCategory(ModelEntry_getCategory(entryx))) {
         Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
+        return false;
     }
 
     ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
