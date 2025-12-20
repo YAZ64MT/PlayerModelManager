@@ -527,29 +527,21 @@ static void registerMaskDL2(PlayerModelManagerHandle pack, const char *internalN
 static PlayerModelManagerModelType sModelTypesAdult[] = {PMM_MODEL_TYPE_ADULT, PMM_MODEL_TYPE_ZORA, PMM_MODEL_TYPE_GORON, PMM_MODEL_TYPE_FIERCE_DEITY};
 
 static void setAdultModelTypeDL(PlayerModelManagerHandle h, Link_DisplayList id, Gfx *dl) {
-    for (int i = 0; i < ARRAY_COUNT(sModelTypesAdult); ++i) {
-        PlayerModelManager_setDisplayListForModelType(h, sModelTypesAdult[i], id, dl);
-    }
+    PlayerModelManager_setDisplayListForModelTypeArray(h, sModelTypesAdult, ARRAY_COUNT(sModelTypesAdult), id, dl);
 }
 
 static void setAdultModelTypeMtx(PlayerModelManagerHandle h, Link_EquipmentMatrix id, Mtx *mtx) {
-    for (int i = 0; i < ARRAY_COUNT(sModelTypesAdult); ++i) {
-        PlayerModelManager_setMatrixForModelType(h, sModelTypesAdult[i], id, mtx);
-    }
+    PlayerModelManager_setMatrixForModelTypeArray(h, sModelTypesAdult, ARRAY_COUNT(sModelTypesAdult), id, mtx);
 }
 
 static PlayerModelManagerModelType sModelTypesChild[] = {PMM_MODEL_TYPE_CHILD, PMM_MODEL_TYPE_DEKU};
 
 static void setChildModelTypeDL(PlayerModelManagerHandle h, Link_DisplayList id, Gfx *dl) {
-    for (int i = 0; i < ARRAY_COUNT(sModelTypesChild); ++i) {
-        PlayerModelManager_setDisplayListForModelType(h, sModelTypesChild[i], id, dl);
-    }
+    PlayerModelManager_setDisplayListForModelTypeArray(h, sModelTypesChild, ARRAY_COUNT(sModelTypesChild), id, dl);
 }
 
 static void setChildModelTypeMtx(PlayerModelManagerHandle h, Link_EquipmentMatrix id, Mtx *mtx) {
-    for (int i = 0; i < ARRAY_COUNT(sModelTypesChild); ++i) {
-        PlayerModelManager_setMatrixForModelType(h, sModelTypesChild[i], id, mtx);
-    }
+    PlayerModelManager_setMatrixForModelTypeArray(h, sModelTypesChild, ARRAY_COUNT(sModelTypesChild), id, mtx);
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
