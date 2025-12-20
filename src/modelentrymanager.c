@@ -671,7 +671,9 @@ void CMEM_reapplyEntry(Link_CustomModelCategory cat) {
 static void reapplyAllEquipmentEntries() {
     for (Link_CustomModelCategory i = 0; i < LINK_CMC_MAX; ++i) {
         if (isEquipmentCategory(i)) {
-            CMEM_reapplyEntry(i);
+            const ModelEntry *tmp = CMEM_getCurrentEntry(i);
+            CMEM_removeModel(i);
+            CMEM_tryApplyEntry(i, tmp);
         }
     }
 }
