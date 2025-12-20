@@ -760,7 +760,7 @@ void registerMMEquipment() {
     // Ocarina of Time
     {
         PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "__mm_ocarina2_time__", PMM_MODEL_TYPE_OCARINA_TIME);
-        PlayerModelManager_setDisplayName(h, "Ocarina of Time (Child)");
+        PlayerModelManager_setDisplayName(h, "Ocarina of Time");
         PlayerModelManager_setAuthor(h, "Nintendo");
         PlayerModelManager_setDisplayList(h, LINK_DL_OCARINA_TIME, sCallOcarinaDL);
 
