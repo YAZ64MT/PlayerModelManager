@@ -281,7 +281,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
     return false;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_setDisplayListOnModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_DisplayList dlId, Gfx *dl) {
+RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_DisplayList dlId, Gfx *dl) {
     if (dlId >= LINK_DL_MAX || dlId < 0) {
         Logger_printError("Invalid display list ID passed in.");
         return false;
@@ -334,7 +334,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
     return false;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_setMatrixOnModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_EquipmentMatrix mtxId, Mtx *matrix) {
+RECOMP_EXPORT bool PlayerModelManager_setMatrixForModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_EquipmentMatrix mtxId, Mtx *matrix) {
     if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
         Logger_printError("Invalid matrix ID passed in.");
         return false;

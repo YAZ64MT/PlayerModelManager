@@ -528,13 +528,13 @@ static PlayerModelManagerModelType sModelTypesAdult[] = {PMM_MODEL_TYPE_ADULT, P
 
 static void setAdultModelTypeDL(PlayerModelManagerHandle h, Link_DisplayList id, Gfx *dl) {
     for (int i = 0; i < ARRAY_COUNT(sModelTypesAdult); ++i) {
-        PlayerModelManager_setDisplayListOnModelType(h, sModelTypesAdult[i], id, dl);
+        PlayerModelManager_setDisplayListForModelType(h, sModelTypesAdult[i], id, dl);
     }
 }
 
 static void setAdultModelTypeMtx(PlayerModelManagerHandle h, Link_EquipmentMatrix id, Mtx *mtx) {
     for (int i = 0; i < ARRAY_COUNT(sModelTypesAdult); ++i) {
-        PlayerModelManager_setMatrixOnModelType(h, sModelTypesAdult[i], id, mtx);
+        PlayerModelManager_setMatrixForModelType(h, sModelTypesAdult[i], id, mtx);
     }
 }
 
@@ -542,13 +542,13 @@ static PlayerModelManagerModelType sModelTypesChild[] = {PMM_MODEL_TYPE_CHILD, P
 
 static void setChildModelTypeDL(PlayerModelManagerHandle h, Link_DisplayList id, Gfx *dl) {
     for (int i = 0; i < ARRAY_COUNT(sModelTypesChild); ++i) {
-        PlayerModelManager_setDisplayListOnModelType(h, sModelTypesChild[i], id, dl);
+        PlayerModelManager_setDisplayListForModelType(h, sModelTypesChild[i], id, dl);
     }
 }
 
 static void setChildModelTypeMtx(PlayerModelManagerHandle h, Link_EquipmentMatrix id, Mtx *mtx) {
     for (int i = 0; i < ARRAY_COUNT(sModelTypesChild); ++i) {
-        PlayerModelManager_setMatrixOnModelType(h, sModelTypesChild[i], id, mtx);
+        PlayerModelManager_setMatrixForModelType(h, sModelTypesChild[i], id, mtx);
     }
 }
 
