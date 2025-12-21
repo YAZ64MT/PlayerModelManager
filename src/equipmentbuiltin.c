@@ -572,7 +572,7 @@ void registerMMEquipment() {
     void *zora = getMMObject(OBJECT_LINK_ZORA);
     void *deity = getMMObject(OBJECT_LINK_BOY);
 
-    PlayerModelManagerHandle vanillaPack = PlayerModelManager_registerModel(PMM_API_VERSION, "__mm_vanilla_equipment__c", PMM_MODEL_TYPE_MODEL_PACK);
+    PlayerModelManagerHandle vanillaPack = PlayerModelManager_registerModel(PMM_API_VERSION, "__mm_vanilla_equipment__", PMM_MODEL_TYPE_MODEL_PACK);
     PlayerModelManager_setAuthor(vanillaPack, "Nintendo");
     PlayerModelManager_setDisplayName(vanillaPack, "MM Equipment");
 
@@ -834,30 +834,30 @@ void registerMMEquipment() {
     }
 
     // Masks
-    registerMaskDL(vanillaPack, "__mm_mask_truth__c", "Mask of Truth", PMM_MODEL_TYPE_MASK_TRUTH, LINK_DL_MASK_TRUTH, sCallMaskTruthDL);
-    registerMaskDL(vanillaPack, "__mm_mask_kafei__c", "Kafei's Mask", PMM_MODEL_TYPE_MASK_KAFEIS_MASK, LINK_DL_MASK_KAFEIS_MASK, sCallMaskKafeiDL);
-    registerMaskDL(vanillaPack, "__mm_mask_all_night__c", "All Night Mask", PMM_MODEL_TYPE_MASK_ALL_NIGHT, LINK_DL_MASK_ALL_NIGHT, sCallMaskAllNightDL);
-    registerMaskDL(vanillaPack, "__mm_mask_bunny_hood__c", "Bunny Hood", PMM_MODEL_TYPE_MASK_BUNNY, LINK_DL_MASK_BUNNY, sCallMaskBunnyHoodDL);
-    registerMaskDL(vanillaPack, "__mm_mask_keaton__c", "Keaton Mask", PMM_MODEL_TYPE_MASK_KEATON, LINK_DL_MASK_KEATON, sCallMaskKeatonDL);
-    registerMaskDL(vanillaPack, "__mm_mask_garo__c", "Garo's Mask", PMM_MODEL_TYPE_MASK_GARO, LINK_DL_MASK_GARO, sCallMaskGaroDL);
-    registerMaskDL(vanillaPack, "__mm_mask_romani__c", "Romani's Mask", PMM_MODEL_TYPE_MASK_ROMANI, LINK_DL_MASK_ROMANI, sCallMaskRomaniDL);
-    registerMaskDL(vanillaPack, "__mm_mask_circus_leader__c", "Circus Leader's Mask", PMM_MODEL_TYPE_MASK_CIRCUS_LEADER, LINK_DL_MASK_CIRCUS_LEADER, sCallMaskCircusLeaderDL);
-    registerMaskDL(vanillaPack, "__mm_mask_postman__c", "Postman's Hat", PMM_MODEL_TYPE_MASK_POSTMAN, LINK_DL_MASK_POSTMAN, sCallMaskPostmanDL);
-    registerMaskDL(vanillaPack, "__mm_mask_couple__c", "Couple's Mask", PMM_MODEL_TYPE_MASK_COUPLE, LINK_DL_MASK_COUPLE, sCallMaskCoupleDL);
-    registerMaskDL(vanillaPack, "__mm_mask_great_fairy__c", "Great Fairy Mask", PMM_MODEL_TYPE_MASK_GREAT_FAIRY, LINK_DL_MASK_GREAT_FAIRY, sCallMaskGreatFairyDL);
-    registerMaskDL(vanillaPack, "__mm_mask_gibdo__c", "Gibdo Mask", PMM_MODEL_TYPE_MASK_GIBDO, LINK_DL_MASK_GIBDO, sCallMaskGibdoDL);
-    registerMaskDL(vanillaPack, "__mm_mask_don_gero__c", "Don Gero's Mask", PMM_MODEL_TYPE_MASK_DON_GERO, LINK_DL_MASK_DON_GERO, sCallMaskDonGeroDL);
-    registerMaskDL(vanillaPack, "__mm_mask_kamaro__c", "Kamaro's Mask", PMM_MODEL_TYPE_MASK_KAMARO, LINK_DL_MASK_KAMARO, sCallMaskKamaroDL);
-    registerMaskDL(vanillaPack, "__mm_mask_captain__c", "Captain's Hat", PMM_MODEL_TYPE_MASK_CAPTAIN, LINK_DL_MASK_CAPTAIN, sCallMaskCaptainDL);
-    registerMaskDL(vanillaPack, "__mm_mask_stone__c", "Stone Mask", PMM_MODEL_TYPE_MASK_STONE, LINK_DL_MASK_STONE, sCallMaskStoneDL);
-    registerMaskDL(vanillaPack, "__mm_mask_bremen__c", "Bremen Mask", PMM_MODEL_TYPE_MASK_BREMEN, LINK_DL_MASK_BREMEN, sCallMaskBremenDL);
-    registerMaskDL(vanillaPack, "__mm_mask_scents__c", "Mask of Scents", PMM_MODEL_TYPE_MASK_SCENTS, LINK_DL_MASK_SCENTS, sCallMaskScentsDL);
-    registerMaskDL2(vanillaPack, "__mm_mask_blast", "Blast Mask", PMM_MODEL_TYPE_MASK_BLAST, LINK_DL_MASK_BLAST, sCallMaskBlastDL, LINK_DL_MASK_BLAST_COOLING_DOWN, sCallMaskBlastCooldownDL);
-    registerMaskDL(vanillaPack, "__mm__mask_giant__c", "Giant's Mask", PMM_MODEL_TYPE_MASK_GIANT, LINK_DL_MASK_GIANT, sCallMaskGiantDL);
-    registerMaskDL2(vanillaPack, "__mm_mask_fierce_deity__c", "Fierce Deity's Mask", PMM_MODEL_TYPE_MASK_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY, sCallMaskFierceDeityDL, LINK_DL_MASK_FIERCE_DEITY_SCREAM, sCallMaskFierceDeityScreamDL);
-    registerMaskDL2(vanillaPack, "__mm_mask_goron__c", "Goron Mask", PMM_MODEL_TYPE_MASK_GORON, LINK_DL_MASK_GORON, sCallMaskGoronDL, LINK_DL_MASK_GORON_SCREAM, sCallMaskGoronScreamDL);
-    registerMaskDL2(vanillaPack, "__mm_mask_zora__c", "Zora Mask", PMM_MODEL_TYPE_MASK_ZORA, LINK_DL_MASK_ZORA, sCallMaskZoraDL, LINK_DL_MASK_ZORA_SCREAM, sCallMaskZoraScreamDL);
-    registerMaskDL2(vanillaPack, "__mm_mask_deku__c", "Deku Mask", PMM_MODEL_TYPE_MASK_DEKU, LINK_DL_MASK_DEKU, sCallMaskDekuDL, LINK_DL_MASK_DEKU_SCREAM, sCallMaskDekuScreamDL);
+    registerMaskDL(vanillaPack, "__mm_mask_truth__", "Mask of Truth", PMM_MODEL_TYPE_MASK_TRUTH, LINK_DL_MASK_TRUTH, sCallMaskTruthDL);
+    registerMaskDL(vanillaPack, "__mm_mask_kafei__", "Kafei's Mask", PMM_MODEL_TYPE_MASK_KAFEIS_MASK, LINK_DL_MASK_KAFEIS_MASK, sCallMaskKafeiDL);
+    registerMaskDL(vanillaPack, "__mm_mask_all_night__", "All Night Mask", PMM_MODEL_TYPE_MASK_ALL_NIGHT, LINK_DL_MASK_ALL_NIGHT, sCallMaskAllNightDL);
+    registerMaskDL(vanillaPack, "__mm_mask_bunny_hood__", "Bunny Hood", PMM_MODEL_TYPE_MASK_BUNNY, LINK_DL_MASK_BUNNY, sCallMaskBunnyHoodDL);
+    registerMaskDL(vanillaPack, "__mm_mask_keaton__", "Keaton Mask", PMM_MODEL_TYPE_MASK_KEATON, LINK_DL_MASK_KEATON, sCallMaskKeatonDL);
+    registerMaskDL(vanillaPack, "__mm_mask_garo__", "Garo's Mask", PMM_MODEL_TYPE_MASK_GARO, LINK_DL_MASK_GARO, sCallMaskGaroDL);
+    registerMaskDL(vanillaPack, "__mm_mask_romani__", "Romani's Mask", PMM_MODEL_TYPE_MASK_ROMANI, LINK_DL_MASK_ROMANI, sCallMaskRomaniDL);
+    registerMaskDL(vanillaPack, "__mm_mask_circus_leader__", "Circus Leader's Mask", PMM_MODEL_TYPE_MASK_CIRCUS_LEADER, LINK_DL_MASK_CIRCUS_LEADER, sCallMaskCircusLeaderDL);
+    registerMaskDL(vanillaPack, "__mm_mask_postman__", "Postman's Hat", PMM_MODEL_TYPE_MASK_POSTMAN, LINK_DL_MASK_POSTMAN, sCallMaskPostmanDL);
+    registerMaskDL(vanillaPack, "__mm_mask_couple__", "Couple's Mask", PMM_MODEL_TYPE_MASK_COUPLE, LINK_DL_MASK_COUPLE, sCallMaskCoupleDL);
+    registerMaskDL(vanillaPack, "__mm_mask_great_fairy__", "Great Fairy Mask", PMM_MODEL_TYPE_MASK_GREAT_FAIRY, LINK_DL_MASK_GREAT_FAIRY, sCallMaskGreatFairyDL);
+    registerMaskDL(vanillaPack, "__mm_mask_gibdo__", "Gibdo Mask", PMM_MODEL_TYPE_MASK_GIBDO, LINK_DL_MASK_GIBDO, sCallMaskGibdoDL);
+    registerMaskDL(vanillaPack, "__mm_mask_don_gero__", "Don Gero's Mask", PMM_MODEL_TYPE_MASK_DON_GERO, LINK_DL_MASK_DON_GERO, sCallMaskDonGeroDL);
+    registerMaskDL(vanillaPack, "__mm_mask_kamaro__", "Kamaro's Mask", PMM_MODEL_TYPE_MASK_KAMARO, LINK_DL_MASK_KAMARO, sCallMaskKamaroDL);
+    registerMaskDL(vanillaPack, "__mm_mask_captain__", "Captain's Hat", PMM_MODEL_TYPE_MASK_CAPTAIN, LINK_DL_MASK_CAPTAIN, sCallMaskCaptainDL);
+    registerMaskDL(vanillaPack, "__mm_mask_stone__", "Stone Mask", PMM_MODEL_TYPE_MASK_STONE, LINK_DL_MASK_STONE, sCallMaskStoneDL);
+    registerMaskDL(vanillaPack, "__mm_mask_bremen__", "Bremen Mask", PMM_MODEL_TYPE_MASK_BREMEN, LINK_DL_MASK_BREMEN, sCallMaskBremenDL);
+    registerMaskDL(vanillaPack, "__mm_mask_scents__", "Mask of Scents", PMM_MODEL_TYPE_MASK_SCENTS, LINK_DL_MASK_SCENTS, sCallMaskScentsDL);
+    registerMaskDL2(vanillaPack, "__mm_mask_blast__", "Blast Mask", PMM_MODEL_TYPE_MASK_BLAST, LINK_DL_MASK_BLAST, sCallMaskBlastDL, LINK_DL_MASK_BLAST_COOLING_DOWN, sCallMaskBlastCooldownDL);
+    registerMaskDL(vanillaPack, "__mm__mask_giant__", "Giant's Mask", PMM_MODEL_TYPE_MASK_GIANT, LINK_DL_MASK_GIANT, sCallMaskGiantDL);
+    registerMaskDL2(vanillaPack, "__mm_mask_fierce_deity__", "Fierce Deity's Mask", PMM_MODEL_TYPE_MASK_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY, sCallMaskFierceDeityDL, LINK_DL_MASK_FIERCE_DEITY_SCREAM, sCallMaskFierceDeityScreamDL);
+    registerMaskDL2(vanillaPack, "__mm_mask_goron__", "Goron Mask", PMM_MODEL_TYPE_MASK_GORON, LINK_DL_MASK_GORON, sCallMaskGoronDL, LINK_DL_MASK_GORON_SCREAM, sCallMaskGoronScreamDL);
+    registerMaskDL2(vanillaPack, "__mm_mask_zora__", "Zora Mask", PMM_MODEL_TYPE_MASK_ZORA, LINK_DL_MASK_ZORA, sCallMaskZoraDL, LINK_DL_MASK_ZORA_SCREAM, sCallMaskZoraScreamDL);
+    registerMaskDL2(vanillaPack, "__mm_mask_deku__", "Deku Mask", PMM_MODEL_TYPE_MASK_DEKU, LINK_DL_MASK_DEKU, sCallMaskDekuDL, LINK_DL_MASK_DEKU_SCREAM, sCallMaskDekuScreamDL);
 
     // Bomb
     {
