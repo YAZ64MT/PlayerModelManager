@@ -459,12 +459,13 @@ static void initCustomDLs() {
     guPosition(&sHookshotHookAndChainAdultMtx, 0.f, 0.f, 0.f, 1.f, 50.f, 420.f, 0.f);
 
     const f32 BOW_SCALE_FACTOR = 1.3f;
+    const f32 BOW_Y_OFFSET = 40.f;
     gSPBranchList(sCallBowDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanBowDL));
     gSPBranchList(sCallBowStringDL, getRepointedMMDL(OBJECT_LINK_CHILD, object_link_child_DL_017818));
     gSPBranchList(sCallArrowDL, getRepointedMMDL(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0));
-    guPosition(&sBowResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sBowFirstPersonResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, 0.f, 0.f);
-    guPosition(&sBowStringResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, 0.f, 0.f);
+    guPosition(&sBowResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, BOW_Y_OFFSET, 0.f);
+    guPosition(&sBowFirstPersonResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, BOW_Y_OFFSET, 0.f);
+    guScale(&sBowStringResizerMtx, BOW_SCALE_FACTOR, BOW_SCALE_FACTOR, 0.7f);
 
     gSPBranchList(sCallBottleGlassDL, getRepointedMMDL(GAMEPLAY_KEEP, gBottleGlassDL));
     gSPBranchList(sCallBottleContentsDL, getRepointedMMDL(GAMEPLAY_KEEP, gBottleContentsDL));
