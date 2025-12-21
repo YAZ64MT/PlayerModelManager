@@ -392,7 +392,7 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_OPEN = 224,
     PMM_DL_SHIM_CENTER_FLOWER_PROPELLER_CLOSED,
 
-    PMM_DL_MAX = 291
+    PMM_DL_MAX = 298
 } PlayerModelManagerDisplayListId;
 
 // Keep these defines for backwards compatibility
