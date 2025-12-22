@@ -1,0 +1,21 @@
+---
+BasedOnStyle: LLVM
+UseTab: Never
+IndentWidth: 4
+TabWidth: 4
+BreakBeforeBraces: Attach
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: true
+ColumnLimit: 0
+AccessModifierOffset: -4
+SortIncludes: false
+IndentExternBlock: Indent
+AttributeMacros:
+    - RECOMP_IMPORT
+    - RECOMP_EXPORT
+    - RECOMP_PATCH
+    - RECOMP_FORCE_PATCH
+    - RECOMP_DECLARE_EVENT
+    - RECOMP_CALLBACK
+    - RECOMP_HOOK
+    - RECOMP_HOOK_RETURN
