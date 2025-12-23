@@ -16,12 +16,10 @@ void initMirrorShieldActorExtensions() {
 extern Vec3f sSheathLimbModelShieldOnBackPos;
 extern Vec3s sSheathLimbModelShieldOnBackZyxRot;
 
-RECOMP_HOOK("Player_PostLimbDrawGameplay")
-void setMirrorShieldMtxF_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
+void setMirrorShieldMtxF_on_Player_PostLimbDrawGameplay(Player *player, s32 limbIndex) {
     if (limbIndex == PLAYER_LIMB_SHEATH) {
-        Player *player = (Player *)actor;
         if (player->actor.scale.y >= 0.0f) {
-            FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+            FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
             if (fp) {
                 MtxF *currMf = Matrix_GetCurrent();
@@ -30,7 +28,7 @@ void setMirrorShieldMtxF_on_Player_PostLimbDrawGameplay(PlayState *play, s32 lim
                 MtxF formProxyMf;
                 Matrix_MtxToMtxF(formProxyM, &formProxyMf);
 
-                MtxF *dest = z64recomp_get_extended_actor_data(actor, gPlayerExtIdMirrorShieldBackMf);
+                MtxF *dest = z64recomp_get_extended_actor_data(&player->actor, gPlayerExtIdMirrorShieldBackMf);
 
                 SkinMatrix_MtxFMtxFMult(currMf, &formProxyMf, dest);
             }
@@ -41,23 +39,20 @@ void setMirrorShieldMtxF_on_Player_PostLimbDrawGameplay(PlayState *play, s32 lim
 static MtxF sRealShieldMf;
 static Player *sMirRay3Player;
 
-RECOMP_HOOK("MirRay3_Draw")
-void overwriteShieldMtx_on_MirRay3_Draw(Actor *thisx, PlayState *play) {
-    MirRay3 *this = (MirRay3 *)thisx;
+void overwriteShieldMtx_on_MirRay3_Draw(MirRay3 *mirRay3, PlayState *play) {
     Player *player = GET_PLAYER(play);
 
     sRealShieldMf = player->shieldMf;
     sMirRay3Player = player;
 
-    if (!(this->unk_210 & 1) && Player_HasMirrorShieldEquipped(play) && (player->rightHandType != PLAYER_MODELTYPE_RH_SHIELD) &&
+    if (!(mirRay3->unk_210 & 1) && Player_HasMirrorShieldEquipped(play) && (player->rightHandType != PLAYER_MODELTYPE_RH_SHIELD) &&
         (player->rightHandType != PLAYER_MODELTYPE_RH_FF)) {
-        MtxF *shieldMtx = z64recomp_get_extended_actor_data((Actor *)player, gPlayerExtIdMirrorShieldBackMf);
+        MtxF *shieldMtx = z64recomp_get_extended_actor_data(&player->actor, gPlayerExtIdMirrorShieldBackMf);
 
         player->shieldMf = *shieldMtx;
     }
 }
 
-RECOMP_HOOK_RETURN("MirRay3_Draw")
 void overwriteShieldMtx_on_return_MirRay3_Draw() {
     sMirRay3Player->shieldMf = sRealShieldMf;
 }

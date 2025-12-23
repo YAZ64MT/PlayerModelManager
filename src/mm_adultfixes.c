@@ -20,7 +20,6 @@ static bool shouldUseAdultFixes(Player *player) {
     return fp && FormProxy_isAdultModelType(fp);
 }
 
-static Gfx **sFirstPersonOverrideDLPtr;
 static Gfx *sFirstPersonDLToOverrideWith;
 
 static void setFirstPersonPlayerDLOverride(Player *player, Link_DisplayList hookshotDLId, Link_DisplayList bowDLId) {
@@ -35,11 +34,8 @@ static void setFirstPersonPlayerDLOverride(Player *player, Link_DisplayList hook
     }
 }
 
-RECOMP_HOOK("Player_OverrideLimbDrawGameplayFirstPerson")
-void addFPSrightForearm_on_Player_OverrideLimbDrawFirstPerson(PlayState *play, s32 limbIndex, Gfx **dList, Vec3f *pos, Vec3s *rot, Actor *actor) {
-    sFirstPersonOverrideDLPtr = dList;
+void addCustomFirstPersonDLs_on_Player_OverrideLimbDrawFirstPerson(Player *player, s32 limbIndex) {
     sFirstPersonDLToOverrideWith = NULL;
-    Player *player = (Player *)actor;
 
     if (player->unk_AA5 == PLAYER_UNKAA5_3) { // vanilla first person limb override doesn't draw unless this condition is met
         if (limbIndex == PLAYER_LIMB_LEFT_SHOULDER) {
@@ -50,10 +46,9 @@ void addFPSrightForearm_on_Player_OverrideLimbDrawFirstPerson(PlayState *play, s
     }
 }
 
-RECOMP_HOOK_RETURN("Player_OverrideLimbDrawGameplayFirstPerson")
-void addFPSrightForearm_on_return_Player_OverrideLimbDrawFirstPerson() {
+void addCustomFirstPersonDLs_on_return_Player_OverrideLimbDrawFirstPerson(Gfx **dList) {
     if (sFirstPersonDLToOverrideWith) {
-        *sFirstPersonOverrideDLPtr = sFirstPersonDLToOverrideWith;
+        *dList = sFirstPersonDLToOverrideWith;
     }
 }
 
@@ -81,16 +76,14 @@ void initAdultLinkAgeProperties() {
 extern u8 sPlayerMass[PLAYER_FORM_MAX];
 static u8 sHumanMass;
 
-RECOMP_HOOK("Player_UpdateCommon")
-void changePlayerMass_on_Player_UpdateCommon(Player *this, PlayState *play, Input *input) {
+void changePlayerMass_on_Player_UpdateCommon(Player *player) {
     sHumanMass = sPlayerMass[PLAYER_FORM_HUMAN];
 
-    if (shouldUseAdultFixes(this)) {
+    if (shouldUseAdultFixes(player)) {
         sPlayerMass[PLAYER_FORM_HUMAN] = sPlayerMass[PLAYER_FORM_ZORA];
     }
 }
 
-RECOMP_HOOK_RETURN("Player_UpdateCommon")
 void changePlayerMass_on_return_Player_UpdateCommon() {
     sPlayerMass[PLAYER_FORM_HUMAN] = sHumanMass;
 }
@@ -108,7 +101,6 @@ static void copyBootProperties(s16 *dest, s16 *src) {
 s16 sBootsPropsTemp[NUM_BOOT_PROPERTIES];
 static bool sIsBootsOverwritten;
 
-RECOMP_HOOK("func_80123140")
 void setAdultBootData_on_func_80123140(PlayState *play, Player *player) {
     sIsBootsOverwritten = shouldUseAdultFixes(player);
 
@@ -118,8 +110,7 @@ void setAdultBootData_on_func_80123140(PlayState *play, Player *player) {
     }
 }
 
-RECOMP_HOOK("func_80123140")
-void setAdultBootData_on_return_func_80123140(PlayState *play, Player *player) {
+void setAdultBootData_on_return_func_80123140() {
     if (sIsBootsOverwritten) {
         copyBootProperties(PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN], sBootsPropsTemp);
     }
@@ -132,9 +123,8 @@ static PlayerAnimationHeader *sDoorAAnimsTmp[PLAYER_ANIMTYPE_MAX];
 static PlayerAnimationHeader *sDoorBAnimsTmp[PLAYER_ANIMTYPE_MAX];
 bool sWasDoorAnimChanged;
 
-RECOMP_HOOK("Player_Door_Knob")
-void replaceDoorAnim_on_Player_Door_Knob(PlayState *play, Player *this, Actor *door) {
-    if (shouldUseAdultFixes(this)) {
+void replaceDoorAnim_on_Player_Door_Knob(Player *player) {
+    if (shouldUseAdultFixes(player)) {
         sWasDoorAnimChanged = true;
         for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
             sDoorAAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i];
@@ -145,7 +135,6 @@ void replaceDoorAnim_on_Player_Door_Knob(PlayState *play, Player *this, Actor *d
     }
 }
 
-RECOMP_HOOK_RETURN("Player_Door_Knob")
 void replaceDoorAnim_on_return_Player_Door_Knob() {
     if (sWasDoorAnimChanged) {
         sWasDoorAnimChanged = false;
@@ -156,8 +145,7 @@ void replaceDoorAnim_on_return_Player_Door_Knob() {
     }
 }
 
-RECOMP_HOOK("Player_Init")
-void initVanillaProps_on_Player_Init(Actor *thisx, PlayState *play) {
+void initVanillaProps_on_Player_Init() {
     static bool isFirstTimeInitDone;
     if (!isFirstTimeInitDone) {
         isFirstTimeInitDone = true;
@@ -166,10 +154,7 @@ void initVanillaProps_on_Player_Init(Actor *thisx, PlayState *play) {
 }
 
 // Need to do this every frame or adult Link clips into the floor on unpause
-RECOMP_HOOK("Play_Main")
-void updateAdultProperties_on_Play_Main(GameState *thisx) {
-    PlayState *play = (PlayState *)thisx;
-
+void updateAdultProperties_on_Play_UpdateMain(PlayState *play) {
     Player *player = GET_PLAYER(play);
 
     while (player) {
@@ -185,12 +170,9 @@ void updateAdultProperties_on_Play_Main(GameState *thisx) {
     }
 }
 
-static Player *sPlayerFromHeight;
 static PlayerTransformation sRealPlayerFormHeight;
 
-RECOMP_HOOK("Player_GetHeight")
 void adjustHeight_on_Player_GetHeight(Player *player) {
-    sPlayerFromHeight = player;
     sRealPlayerFormHeight = player->transformation;
 
     if (shouldUseAdultFixes(player)) {
@@ -198,35 +180,29 @@ void adjustHeight_on_Player_GetHeight(Player *player) {
     }
 }
 
-RECOMP_HOOK_RETURN("Player_GetHeight")
-void adjustHeight_on_return_Player_GetHeight() {
-    sPlayerFromHeight->transformation = sRealPlayerFormHeight;
+void adjustHeight_on_return_Player_GetHeight(Player *player) {
+    player->transformation = sRealPlayerFormHeight;
 }
 
 // Use adult camera for first person bow/hookshot
 static PlayerTransformation sRealPlayerFormFPCamera = PLAYER_FORM_HUMAN;
-static Player *sPlayerFPCamera;
 
-RECOMP_HOOK("func_8083868C")
-void fixFPCmaera_on_func_8083868C(PlayState *play, Player *this) {
+void fixFPCamera_on_func_8083868C(Player *this) {
     sRealPlayerFormFPCamera = this->transformation;
-    sPlayerFPCamera = this;
 
     if (shouldUseAdultFixes(this)) {
         this->transformation = PLAYER_FORM_ZORA;
     }
 }
 
-RECOMP_HOOK_RETURN("func_8083868C")
-void fixFPCmaera_on_return_func_8083868C() {
-    sPlayerFPCamera->transformation = sRealPlayerFormFPCamera;
+void fixFPCamera_on_return_func_8083868C(Player *player) {
+    player->transformation = sRealPlayerFormFPCamera;
 }
 
 static PlayerTransformation sRealPlayerFormEnRdGrab;
 static Player *sPlayerEnRdGrab;
 
-RECOMP_HOOK("EnRd_Grab")
-void fixEnemyHeight_on_EnRd_Grab(EnRd *this, PlayState *play) {
+void fixEnemyHeight_on_EnRd_Grab(PlayState *play) {
     Player *player = sPlayerEnRdGrab = GET_PLAYER(play);
 
     sRealPlayerFormEnRdGrab = player->transformation;
@@ -236,7 +212,6 @@ void fixEnemyHeight_on_EnRd_Grab(EnRd *this, PlayState *play) {
     }
 }
 
-RECOMP_HOOK_RETURN("EnRd_Grab")
 void fixEnemyHeight_on_return_EnRd_Grab() {
     sPlayerEnRdGrab->transformation = sRealPlayerFormEnRdGrab;
 }
@@ -244,8 +219,7 @@ void fixEnemyHeight_on_return_EnRd_Grab() {
 // Music Box Gibdo height fix
 static PlayerTransformation sRealPlayerFormIdealPosMusicBox;
 
-RECOMP_HOOK("EnRailgibud_MoveToIdealGrabPositionAndRotation")
-void fixEnemyHeight_on_EnRailgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
+void fixEnemyHeight_on_EnRailgibud_MoveToIdealGrabPositionAndRotation(PlayState *play) {
     sRealPlayerFormIdealPosMusicBox = GET_PLAYER_FORM;
 
     if (shouldUseAdultFixes(GET_PLAYER(play))) {
@@ -253,16 +227,14 @@ void fixEnemyHeight_on_EnRailgibud_MoveToIdealGrabPositionAndRotation(EnRailgibu
     }
 }
 
-RECOMP_HOOK_RETURN("EnRailgibud_MoveToIdealGrabPositionAndRotation")
-void fixEnemyHeight_on_return_EnRailgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
+void fixEnemyHeight_on_return_EnRailgibud_MoveToIdealGrabPositionAndRotation() {
     gSaveContext.save.playerForm = sRealPlayerFormIdealPosMusicBox;
 }
 
 // Talking Redead/Gibdo height fix
 static PlayerTransformation sRealPlayerFormIdealPosTalk;
 
-RECOMP_HOOK("EnTalkGibud_MoveToIdealGrabPositionAndRotation")
-void fixEnemyHeight_on_EnTalkgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
+void fixEnemyHeight_on_EnTalkgibud_MoveToIdealGrabPositionAndRotation(PlayState *play) {
     sRealPlayerFormIdealPosTalk = GET_PLAYER_FORM;
 
     if (shouldUseAdultFixes(GET_PLAYER(play))) {
@@ -270,24 +242,16 @@ void fixEnemyHeight_on_EnTalkgibud_MoveToIdealGrabPositionAndRotation(EnRailgibu
     }
 }
 
-RECOMP_HOOK_RETURN("EnTalkGibud_MoveToIdealGrabPositionAndRotation")
-void fixEnemyHeight_on_return_EnTalkgibud_MoveToIdealGrabPositionAndRotation(EnRailgibud *this, PlayState *play) {
+void fixEnemyHeight_on_return_EnTalkgibud_MoveToIdealGrabPositionAndRotation() {
     gSaveContext.save.playerForm = sRealPlayerFormIdealPosTalk;
 }
 
 // Move adult models higher on Epona
 #define EPONA_HEIGHT_OFFSET 1100.f
-static Player *sPlayerEponaFix;
 
-RECOMP_HOOK("Player_UpdateCommon")
-void doEponaHeightOffset_on_Player_UpdateCommon(Player *this, PlayState *play, Input *input) {
-    sPlayerEponaFix = this;
-}
-
-RECOMP_HOOK_RETURN("Player_UpdateCommon")
-void doEponaHeightOffset_on_return_Player_UpdateCommon(void) {
-    if (shouldUseAdultFixes(sPlayerEponaFix) && sPlayerEponaFix->stateFlags1 & PLAYER_STATE1_800000) {
-        sPlayerEponaFix->actor.shape.yOffset -= EPONA_HEIGHT_OFFSET;
+void doEponaHeightOffset_on_return_Player_UpdateCommon(Player *player) {
+    if (shouldUseAdultFixes(player) && player->stateFlags1 & PLAYER_STATE1_800000) {
+        player->actor.shape.yOffset -= EPONA_HEIGHT_OFFSET;
     }
 }
 
@@ -301,10 +265,7 @@ static Vec3f sAdultBowStringData = {0.0f, -360.4f, 0.0f}; // From OoT
 
 static bool sIsAdultBowData = false;
 
-RECOMP_HOOK("Player_Draw")
-void fixBowProperties_on_Player_Draw(Actor *thisx, PlayState *play) {
-    Player *player = (Player *)thisx;
-
+void fixBowProperties_on_Player_Draw(Player *player, PlayState *play) {
     sIsAdultBowData = shouldUseAdultFixes(player);
 
     if (sIsAdultBowData) {
@@ -316,7 +277,6 @@ void fixBowProperties_on_Player_Draw(Actor *thisx, PlayState *play) {
     }
 }
 
-RECOMP_HOOK_RETURN("Player_Draw")
 void fixBowProperties_on_return_Player_Draw() {
     if (sIsAdultBowData) {
         D_801C0D6C = sChildArrowOffset;
@@ -347,9 +307,7 @@ SingleLegFloat sSingleLegFloatsTmp[] = {
 
 static bool sIsSingleLegAdjusted;
 
-RECOMP_HOOK("Player_AdjustSingleLeg")
-void adjustAdultLeg_on_Player_AdjustSingleLeg(PlayState *play, Player *player, SkelAnime *skelAnime, Vec3f *pos, Vec3s *rot,
-                            s32 thighLimbIndex, s32 shinLimbIndex, s32 footLimbIndex) {
+void adjustAdultLeg_on_Player_AdjustSingleLeg(Player *player) {
     sIsSingleLegAdjusted = shouldUseAdultFixes(player) && player->skelAnime.animation != &gPlayerAnim_cl_maskoff;
 
     if (sIsSingleLegAdjusted) {
@@ -364,7 +322,6 @@ void adjustAdultLeg_on_Player_AdjustSingleLeg(PlayState *play, Player *player, S
     }
 }
 
-RECOMP_HOOK_RETURN("Player_AdjustSingleLeg")
 void adjustAdultLeg_on_return_Player_AdjustSingleLeg() {
     if (sIsSingleLegAdjusted) {
         D_801C08C0[PLAYER_FORM_HUMAN] = sTmpAdjustSingleLegVec;

@@ -1272,8 +1272,7 @@ void initFormProxyObjects() {
     sQueuedRefreshes = YAZMTCore_IterableU32Set_new();
 }
 
-RECOMP_HOOK("Play_Main")
-void processRefreshRequests_on_Play_Main(GameState *thisx) {
+void processFormProxyRefreshRequests_on_Play_Draw() {
     size_t numRequests = YAZMTCore_IterableU32Set_size(sQueuedRefreshes);
 
     if (numRequests > 0) {

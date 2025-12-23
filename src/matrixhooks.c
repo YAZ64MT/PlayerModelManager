@@ -5,20 +5,17 @@
 #include "formproxy.h"
 #include "proxyactorext.h"
 
-static bool sPushedMaskMatrix = false;
+static bool sIsMaskMatrixPushed = false;
 
-RECOMP_HOOK("Player_PostLimbDrawGameplay")
-void useMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
-    sPushedMaskMatrix = false;
+void handleMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Player *player) {
+    sIsMaskMatrixPushed = false;
 
     if (limbIndex == PLAYER_LIMB_HEAD) {
-        FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+        FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
         if (fp) {
             Mtx *maskMtx = FormProxy_getMatrix(fp, LINK_EQUIP_MATRIX_MASKS);
-
             if (maskMtx) {
-                Player *player = (Player *)actor;
                 if (((*dList1 != NULL) && ((u32)player->currentMask != PLAYER_MASK_NONE)) &&
                     (((player->transformation == PLAYER_FORM_HUMAN) &&
                       ((player->skelAnime.animation != &gPlayerAnim_cl_setmask) || (player->skelAnime.curFrame >= 12.0f))) ||
@@ -28,7 +25,7 @@ void useMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, G
                     s32 maskMinusOne = player->currentMask - 1;
                     OPEN_DISPS(play->state.gfxCtx);
                     Matrix_Push();
-                    sPushedMaskMatrix = true;
+                    sIsMaskMatrixPushed = true;
                     static MtxF sMaskMtxF;
                     Matrix_MtxToMtxF(maskMtx, &sMaskMtxF);
                     Matrix_Mult(&sMaskMtxF, MTXMODE_APPLY);
@@ -40,9 +37,8 @@ void useMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, G
     }
 }
 
-RECOMP_HOOK_RETURN("Player_PostLimbDrawGameplay")
-void useMaskMtx_on_return_Player_PostLimbDrawGameplay(void) {
-    if (sPushedMaskMatrix) {
+void handleMaskMtx_on_return_Player_PostLimbDrawGameplay() {
+    if (sIsMaskMatrixPushed) {
         Matrix_Pop();
     }
 }
@@ -50,17 +46,14 @@ void useMaskMtx_on_return_Player_PostLimbDrawGameplay(void) {
 #define ADULT_LINK_BREMEN_HEIGHT_MODIFIER 1250.0f
 static bool sPushedMatrixBremen = false;
 
-RECOMP_HOOK("Player_Draw")
-void fixAdultBremen_on_Player_Draw(Actor *thisx, PlayState *play) {
+void fixAdultBremen_on_Player_Draw(Player *player, PlayState *play) {
     sPushedMatrixBremen = false;
 
-    FormProxy *fp = ProxyActorExt_getFormProxy(thisx);
+    FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
     if (fp) {
-        Player *this = (Player *)thisx;
-
-        if (this->transformation == PLAYER_FORM_HUMAN && FormProxy_isAdultModelType(fp)) {
-            if (this->stateFlags3 & PLAYER_STATE3_20000000) {
+        if (player->transformation == PLAYER_FORM_HUMAN && FormProxy_isAdultModelType(fp)) {
+            if (player->stateFlags3 & PLAYER_STATE3_20000000) {
                 OPEN_DISPS(play->state.gfxCtx);
                 Matrix_Push();
                 sPushedMatrixBremen = true;
@@ -72,21 +65,17 @@ void fixAdultBremen_on_Player_Draw(Actor *thisx, PlayState *play) {
     }
 }
 
-RECOMP_HOOK_RETURN("Player_Draw")
 void fixAdultBremen_on_return_Player_Draw() {
     if (sPushedMatrixBremen) {
         Matrix_Pop();
     }
 }
 
-RECOMP_HOOK("Player_PostLimbDrawGameplay")
-void repositionHeldActors_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Gfx **dList2, Vec3s *rot, Actor *actor) {
-    Player *player = (Player *)actor;
-
+void repositionHeldActors_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Player *player) {
     if (player->actor.scale.y >= 0.f) {
         Actor *heldActor = player->heldActor;
 
-        FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+        FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
         if (heldActor) {
             if (limbIndex == PLAYER_LIMB_LEFT_HAND && player->rightHandType == PLAYER_MODELTYPE_RH_BOW) {

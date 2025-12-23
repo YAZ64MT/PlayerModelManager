@@ -1026,7 +1026,6 @@ void allowUIOnReady() {
 }
 
 // Hook Play_UpdateMain to check if the L button is pressed and show this mod's UI if so.
-RECOMP_HOOK("Play_UpdateMain")
 void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play) {
     if (isOpenMenuComboPressed(play) && sIsModelManagerReady) {
         openModelMenu();

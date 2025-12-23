@@ -51,11 +51,8 @@ typedef enum {
     TUNIC_COLOR_FORCE,
 } TunicColorConfigOption;
 
-RECOMP_HOOK("Player_Draw")
-void readTunicColor_on_Player_Draw(Actor *thisx, PlayState *play) {
-    Player *player = (Player *)thisx;
-
-    FormProxy *fp = ProxyActorExt_getFormProxy(thisx);
+void readTunicColor_on_Player_Draw(Player *player, PlayState *play) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
     if (fp) {
         switch (recomp_get_config_u32("is_modify_tunic_color")) {
@@ -87,29 +84,21 @@ void readTunicColor_on_Player_Draw(Actor *thisx, PlayState *play) {
     }
 }
 
-// Handle Masks and other DLs that might potentially set the env color
-static PlayState *sPlayStatePostLimbDraw;
-
-RECOMP_HOOK("Player_PostLimbDrawGameplay")
-void refresh_color_on_Player_PostLimbDrawGameplay(PlayState* play, s32 limbIndex, Gfx** dList1, Gfx** dList2, Vec3s* rot, Actor* actor) {
-    sPlayStatePostLimbDraw = play;
-
-    OPEN_DISPS(sPlayStatePostLimbDraw->state.gfxCtx);
+void refreshColor_on_Player_PostLimbDrawGameplay(PlayState *play) {
+    OPEN_DISPS(play->state.gfxCtx);
     gEXPushEnvColor(POLY_OPA_DISP++);
-    CLOSE_DISPS(sPlayStatePostLimbDraw->state.gfxCtx);
+    CLOSE_DISPS(play->state.gfxCtx);
 }
 
-RECOMP_HOOK_RETURN("Player_PostLimbDrawGameplay")
-void refresh_color_on_return_Player_PostLimbDrawGameplay() {
-    OPEN_DISPS(sPlayStatePostLimbDraw->state.gfxCtx);
+void refreshColor_on_return_Player_PostLimbDrawGameplay(PlayState *play) {
+    OPEN_DISPS(play->state.gfxCtx);
     gEXPopEnvColor(POLY_OPA_DISP++);
-    CLOSE_DISPS(sPlayStatePostLimbDraw->state.gfxCtx);
+    CLOSE_DISPS(play->state.gfxCtx);
 }
 
 extern Color_RGB8 sPlayerBottleColors[];
 
-RECOMP_HOOK("func_80128640")
-void fixBottleEnv_func_80128640(PlayState *play, Player *player, Gfx *dList) {
+void fixBottleEnv_func_80128640(PlayState *play, Player *player) {
     if (player->leftHandType == PLAYER_MODELTYPE_LH_BOTTLE) {
         PlayerBottle bottle = Player_BottleFromIA(player, player->itemAction);
 

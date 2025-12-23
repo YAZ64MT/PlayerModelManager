@@ -859,8 +859,7 @@ void loadSavedModels() {
     _internal_onSavedModelsApplied();
 }
 
-RECOMP_HOOK_RETURN("ConsoleLogo_Destroy")
-void applySavedModelsAtStart() {
+void applySavedModels_on_return_ConsoleLogo_Destroy() {
     loadSavedModels();
 }
 

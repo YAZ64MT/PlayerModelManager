@@ -208,12 +208,10 @@ void initFormProxies() {
     gPlayer1Proxy = PlayerProxyManager_createPlayerProxy();
 }
 
-RECOMP_HOOK("Player_Draw")
-void updateAssets_on_Player_Draw(Actor *thisx, PlayState *play) {
-    FormProxy *fp = ProxyActorExt_getFormProxy(thisx);
+void updateAssets_on_Player_Draw(Player *player) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
     if (fp) {
-        Player *player = (Player *)thisx;
         FormProxy_repointPlayerFaceTexturePtrs(fp);
         repointSharedModelsToProxy(fp);
         repointFormPtrsToProxy(player, fp);
@@ -287,8 +285,7 @@ void handleInits() {
     _internal_postInitHashObjects();
 }
 
-RECOMP_CALLBACK("*", recomp_on_play_main)
-void skipInterpolationOnPlay(PlayState *play) {
+void skipInterpolation_on_Play_Draw(PlayState *play) {
     Player *player = GET_PLAYER(play);
 
     while (player) {

@@ -94,16 +94,12 @@ void handleFormProxyExtensionInits() {
     sActorExtIdFormProxyId = z64recomp_extend_actor_all(sizeof(FormProxyId));
 }
 
-RECOMP_HOOK("Actor_Init")
-void initFormProxyExtension_on_Actor_Init(Actor *actor, PlayState *play) {
+void initFormProxyExtension_on_Actor_Init(Actor *actor) {
     ProxyActorExt_setPlayerProxy(actor, NULL);
     ProxyActorExt_setFormProxyId(actor, PlayerModelConfig_getNumFormIds());
 }
 
-RECOMP_HOOK("Player_Init")
-void setupPlayerFormProxy_on_Player_Init(Actor *thisx, PlayState *play) {
-    Player *player = (Player *)thisx;
-
+void setupPlayerFormProxy_on_Player_Init(Player *player) {
     PlayerTransformation form;
     if (player->actor.shape.rot.x != 0) {
         form = player->actor.shape.rot.x - 1;
@@ -116,8 +112,8 @@ void setupPlayerFormProxy_on_Player_Init(Actor *thisx, PlayState *play) {
         FormProxyId id;
 
         if (PlayerProxy_getProxyIdFromForm(form, &id)) {
-            ProxyActorExt_setPlayerProxy(thisx, gPlayer1Proxy);
-            ProxyActorExt_setFormProxyId(thisx, id);
+            ProxyActorExt_setPlayerProxy(&player->actor, gPlayer1Proxy);
+            ProxyActorExt_setFormProxyId(&player->actor, id);
         }
     }
 }
