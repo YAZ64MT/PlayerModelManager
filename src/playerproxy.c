@@ -5,6 +5,8 @@
 #include "logger.h"
 #include "playermodelconfig.h"
 
+PlayerProxy *gPlayer1Proxy;
+
 ModelInfo gHumanModelInfoFallbackOverride;
 ModelInfo gDekuModelInfoFallbackOverride;
 ModelInfo gGoronModelInfoFallbackOverride;
@@ -119,7 +121,6 @@ void PlayerProxy_refresh(PlayerProxy *pp) {
         }
     }
 }
-
 
 void PlayerProxy_setOverrideDL(PlayerProxy *pp, Link_DisplayList dlId, Gfx *dl) {
     FormProxyId idMax = PlayerModelConfig_getNumFormIds();

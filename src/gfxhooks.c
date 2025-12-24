@@ -4,7 +4,7 @@
 #include "recomputils.h"
 #include "modelmatrixids.h"
 #include "logger.h"
-#include "externs_z_player_lib.h"
+#include "playerexterns.h"
 #include "maskdls.h"
 #include "playerproxy.h"
 #include "formproxy.h"

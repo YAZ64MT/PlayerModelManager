@@ -1,5 +1,5 @@
-#ifndef EXTERNS_Z_PLAYER_LIB_H
-#define EXTERNS_Z_PLAYER_LIB_H
+#ifndef PLAYEREXTERNS_H
+#define PLAYEREXTERNS_H
 
 extern Gfx *gPlayerRightHandOpenDLs[2 * PLAYER_FORM_MAX];
 extern Gfx *gPlayerRightHandClosedDLs[2 * PLAYER_FORM_MAX];

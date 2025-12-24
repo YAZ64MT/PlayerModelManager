@@ -1,25 +1,7 @@
-#include "modding.h"
 #include "global.h"
-#include "recomputils.h"
-#include "recompconfig.h"
-#include "utils.h"
-#include "modelreplacer_api.h"
-#include "modelreplacer_compat.h"
-#include "globalobjects_api.h"
-#include "externs_z_player_lib.h"
-#include "model_shared.h"
-#include "equipmentoverrides.h"
-#include "z64recomp_api.h"
-#include "playerproxy.h"
 #include "formproxy.h"
 #include "proxyactorext.h"
-#include "playerproxymanager.h"
-
-static bool sShouldSkipFormInterpolation[PLAYER_FORM_MAX];
-static bool sShouldSkipMirrorShieldInterpolation;
-static bool sShouldSkipHookshotInterpolation;
-
-PlayerProxy *gPlayer1Proxy;
+#include "playerexterns.h"
 
 static void tryReplaceCodeDL(FormProxy *fp, Link_DisplayList dlId, Gfx **dest) {
     Gfx *newDL = FormProxy_getDL(fp, dlId);
@@ -124,7 +106,7 @@ static Gfx **sPlayerMaskDLs = D_801C0B20;
 
 static EnBoomStruct *sPlayerBoomerangInfo = D_808A3078;
 
-void repointSharedModelsToProxy(FormProxy *formProxy) {
+static void repointSharedModelsToProxy(FormProxy *formProxy) {
     tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_KOKIRI, &sPlayerHandHoldingSwords[PLAYER_SWORD_KOKIRI * 2]);
     tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_RAZOR, &sPlayerHandHoldingSwords[PLAYER_SWORD_RAZOR * 2]);
     tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_GILDED, &sPlayerHandHoldingSwords[PLAYER_SWORD_GILDED * 2]);
@@ -199,15 +181,6 @@ void repointSharedModelsToProxy(FormProxy *formProxy) {
 #undef SET_MASK_DL
 }
 
-RECOMP_DECLARE_EVENT(_internal_setupVanillaModels());
-
-// initialize player models as blank display lists
-void initFormProxies() {
-    _internal_setupVanillaModels();
-
-    gPlayer1Proxy = PlayerProxyManager_createPlayerProxy();
-}
-
 void updateAssets_on_Player_Draw(Player *player) {
     FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
@@ -229,90 +202,5 @@ void updateAssets_on_Player_Draw(Player *player) {
                 player->unk_2C8.skeleton = shieldingSkel->sh.segment;
             }
         }
-    }
-}
-
-void doInitFormProxies() {
-    static bool isFormProxiesInitialized;
-
-    if (!isFormProxiesInitialized) {
-        isFormProxiesInitialized = true;
-        initFormProxies();
-        PlayerProxyManager_refreshAll();
-    }
-}
-
-RECOMP_CALLBACK(".", _internal_onReadyModelReplacerCompat)
-void initFormProxies_on_mrc() {
-    doInitFormProxies();
-}
-
-GLOBAL_OBJECTS_CALLBACK_ON_READY
-void initFormProxies_on_go() {
-    if (!MRC_isMRCEnabled()) {
-        doInitFormProxies();
-    }
-}
-
-RECOMP_CALLBACK(".", _internal_onFormModelApplied)
-void refreshSharedModelsOnFormModelApply(Link_CustomModelCategory form) {
-    sShouldSkipFormInterpolation[form] = true;
-}
-
-RECOMP_CALLBACK(".", _internal_onEquipmentModelApplied)
-void refreshEquipmentOnEquipmentModelApplied(Link_EquipmentReplacement eq) {
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        sShouldSkipFormInterpolation[i] = true;
-    }
-
-    if (eq == LINK_DL_REPLACE_SHIELD3) {
-        sShouldSkipMirrorShieldInterpolation = true;
-    }
-
-    if (eq == LINK_DL_REPLACE_HOOKSHOT) {
-        sShouldSkipHookshotInterpolation = true;
-    }
-}
-
-RECOMP_DECLARE_EVENT(_internal_preInitHashObjects());
-RECOMP_DECLARE_EVENT(_internal_initHashObjects());
-RECOMP_DECLARE_EVENT(_internal_postInitHashObjects());
-
-RECOMP_CALLBACK("*", recomp_on_init)
-void handleInits() {
-    _internal_preInitHashObjects();
-    _internal_initHashObjects();
-    _internal_postInitHashObjects();
-}
-
-void skipInterpolation_on_Play_Draw(PlayState *play) {
-    Player *player = GET_PLAYER(play);
-
-    while (player) {
-        if (sShouldSkipFormInterpolation[player->transformation] && player->actor.scale.y >= 0.0f) {
-            actor_set_interpolation_skipped(&player->actor);
-        }
-
-        player = (Player *)player->actor.next;
-    }
-
-    for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
-        sShouldSkipFormInterpolation[i] = false;
-    }
-
-    if (sShouldSkipMirrorShieldInterpolation || sShouldSkipHookshotInterpolation) {
-        Actor *actor = play->actorCtx.actorLists[ACTORCAT_ITEMACTION].first;
-
-        while (actor) {
-            if ((sShouldSkipMirrorShieldInterpolation && actor->id == ACTOR_MIR_RAY3) ||
-                (sShouldSkipHookshotInterpolation && actor->id == ACTOR_ARMS_HOOK)) {
-                actor_set_interpolation_skipped(actor);
-            }
-
-            actor = actor->next;
-        }
-
-        sShouldSkipMirrorShieldInterpolation = false;
-        sShouldSkipHookshotInterpolation = false;
     }
 }
