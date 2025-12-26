@@ -21,8 +21,8 @@ static void tryReplaceCodeLodDL(FormProxy *fp, Link_DisplayList dlId, Gfx *dest[
 void repointFormPtrsToProxy(Player *player, FormProxy *formProxy) {
     PlayerTransformation playerForm = player->transformation;
 
-    Link_DisplayList rightFistDLId = LINK_DL_RFIST;
-    Link_DisplayList leftFistDLId = LINK_DL_LFIST;
+    Link_DisplayList rightFistDLId = LINK_DL_OPT_RFIST;
+    Link_DisplayList leftFistDLId = LINK_DL_OPT_LFIST;
 
     if (player->itemAction == PLAYER_IA_DEKU_STICK) {
         rightFistDLId = LINK_DL_OPT_RFIST_DEKU_STICK;
@@ -62,7 +62,7 @@ void repointFormPtrsToProxy(Player *player, FormProxy *formProxy) {
 
     tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_KOKIRI, &gPlayerLeftHandOneHandSwordDLs[playerForm * 2]);
 
-    tryReplaceCodeLodDL(formProxy, LINK_DL_LHAND_BOTTLE, &gPlayerLeftHandBottleDLs[playerForm * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_OPT_LHAND_BOTTLE, &gPlayerLeftHandBottleDLs[playerForm * 2]);
 
     tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_BOW, &gPlayerRightHandBowDLs[playerForm * 2]);
 

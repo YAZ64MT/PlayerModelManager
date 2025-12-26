@@ -53,8 +53,8 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_TORSO,
 
     // Other hand DLs
-    PMM_DL_LFIST,
-    PMM_DL_LHAND_BOTTLE,
+    PMM_DL_OPT_LFIST,
+    PMM_DL_OPT_LHAND_BOTTLE,
     PMM_DL_OPT_LHAND_GUITAR,
     PMM_DL_OPT_LFIST_ITEM = 235,
     PMM_DL_OPT_LFIST_SWORD,
@@ -67,7 +67,7 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_OPT_LFIST_DEKU_STICK,
     PMM_DL_OPT_LFIST_HAMMER,
     PMM_DL_OPT_LFIST_BOOMERANG,
-    PMM_DL_RFIST = 21,
+    PMM_DL_OPT_RFIST = 21,
     PMM_DL_OPT_RHAND_OCARINA = 246,
     PMM_DL_OPT_RHAND_OCARINA_FAIRY,
     PMM_DL_OPT_RHAND_OCARINA_TIME,
@@ -396,6 +396,9 @@ typedef enum PlayerModelManagerDisplayListId {
 } PlayerModelManagerDisplayListId;
 
 // Keep these defines for backwards compatibility
+#define PMM_DL_RFIST PMM_DL_OPT_RFIST
+#define PMM_DL_LFIST PMM_DL_OPT_LFIST
+#define PMM_DL_LHAND_BOTTLE PMM_DL_OPT_LHAND_BOTTLE
 #define PMM_DL_LHAND_GUITAR PMM_DL_OPT_LHAND_GUITAR
 #define PMM_DL_FPS_HOOKSHOT PMM_DL_OPT_FPS_HOOKSHOT
 #define PMM_DL_FPS_BOW PMM_DL_OPT_FPS_BOW

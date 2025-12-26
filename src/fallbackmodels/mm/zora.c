@@ -62,12 +62,12 @@ static void setupZoraFallbackModel() {
 
     // hands
     SET_ENTRY_DL(LINK_DL_LHAND, getZoraDL(gLinkZoraLeftHandOpenDL));
-    SET_ENTRY_DL(LINK_DL_LFIST, getZoraDL(gLinkZoraLeftHandClosedDL));
-    SET_ENTRY_DL(LINK_DL_LHAND_BOTTLE, getZoraDL(gLinkZoraLeftHandHoldBottleDL));
-    SET_ENTRY_DL(LINK_DL_LHAND_GUITAR, getZoraDL(object_link_zora_DL_00E088));
+    SET_ENTRY_DL(LINK_DL_OPT_LFIST, getZoraDL(gLinkZoraLeftHandClosedDL));
+    SET_ENTRY_DL(LINK_DL_OPT_LHAND_BOTTLE, getZoraDL(gLinkZoraLeftHandHoldBottleDL));
+    SET_ENTRY_DL(LINK_DL_OPT_LHAND_GUITAR, getZoraDL(object_link_zora_DL_00E088));
 
     SET_ENTRY_DL(LINK_DL_RHAND, getZoraDL(gLinkZoraRightHandOpenDL));
-    SET_ENTRY_DL(LINK_DL_RFIST, getZoraDL(gLinkZoraRightHandClosedDL));
+    SET_ENTRY_DL(LINK_DL_OPT_RFIST, getZoraDL(gLinkZoraRightHandClosedDL));
 
     // First Person
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM, getZoraDL(gLinkZoraLeftForearmDL));

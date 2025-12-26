@@ -64,11 +64,11 @@ static void setupHumanFallbackModel() {
     SET_ENTRY_DL(LINK_DL_TORSO, getHumanDL(gLinkHumanTorsoDL));
 
     // hands
-    SET_ENTRY_DL(LINK_DL_LFIST, getHumanDL(gLinkHumanLeftHandClosedDL));
-    SET_ENTRY_DL(LINK_DL_LHAND_BOTTLE, getHumanDL(gLinkHumanLeftHandHoldBottleDL));
-    SET_ENTRY_DL(LINK_DL_LHAND_GUITAR, getHumanDL(gLinkHumanLeftHandOpenDL));
+    SET_ENTRY_DL(LINK_DL_OPT_LFIST, getHumanDL(gLinkHumanLeftHandClosedDL));
+    SET_ENTRY_DL(LINK_DL_OPT_LHAND_BOTTLE, getHumanDL(gLinkHumanLeftHandHoldBottleDL));
+    SET_ENTRY_DL(LINK_DL_OPT_LHAND_GUITAR, getHumanDL(gLinkHumanLeftHandOpenDL));
 
-    SET_ENTRY_DL(LINK_DL_RFIST, getHumanDL(gLinkHumanRightHandClosedDL));
+    SET_ENTRY_DL(LINK_DL_OPT_RFIST, getHumanDL(gLinkHumanRightHandClosedDL));
 
     SET_ENTRY_DL(LINK_DL_OPT_RHAND_OCARINA, gLinkHumanRightHandOcarinaDL);
 
