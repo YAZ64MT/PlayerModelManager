@@ -767,7 +767,7 @@ void CMEM_removeModel(Link_CustomModelCategory cat) {
     }
 }
 
-PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType type, char *internalName) {
+PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType type, const char *internalName) {
     Link_CustomModelCategory cat = getCategoryFromModelType(type);
 
     if (!isValidCategory(cat)) {

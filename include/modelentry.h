@@ -41,7 +41,7 @@ void ModelEntry_unsetAllFlags(ModelEntry *entry);
 bool ModelEntry_isAnyFlagEnabled(ModelEntry *entry, ModelEntryFlag flags);
 void ModelEntry_setCallback(ModelEntry *entry, PlayerModelManagerEventHandler *callback, void *data);
 
-ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
+ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName);
 ModelEntry *ModelEntryForm_getModelEntry(ModelEntryForm *entry);
 TexturePtr ModelEntryForm_getEyesTexture(ModelEntryForm *entry, PlayerEyeIndex i);
 TexturePtr ModelEntryForm_getMouthTexture(ModelEntryForm *entry, PlayerMouthIndex i);
@@ -54,12 +54,12 @@ FlexSkeletonHeader *ModelEntryForm_getSkeleton(ModelEntryForm *entry);
 void ModelEntryForm_setShieldingSkeleton(ModelEntryForm *entry, FlexSkeletonHeader *skel);
 FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry);
 
-ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName);
+ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName);
 ModelEntry *ModelEntryEquipment_getModelEntry(ModelEntryEquipment *entry);
 bool ModelEntryEquipment_setDisplayListForModelType(ModelEntryEquipment *entry, PlayerModelManagerModelType type, Link_DisplayList id, Gfx *dl);
 bool ModelEntryEquipment_setMatrixForModelType(ModelEntryEquipment *entry, PlayerModelManagerModelType type, Link_EquipmentMatrix id, Mtx *mtx);
 
-ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, char *internalName);
+ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, const char *internalName);
 ModelEntry *ModelEntryPack_getModelEntry(ModelEntryPack *entry);
 ModelEntry const *const *ModelEntryPack_getModelEntries(const ModelEntryPack *entry);
 size_t ModelEntryPack_getModelEntriesCount(const ModelEntryPack *entry);

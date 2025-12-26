@@ -154,7 +154,7 @@ static Mtx *ModelEntry_getMatrix_default(const ModelEntry *entry, Link_Equipment
     return NULL;
 }
 
-static bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+static bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName) {
 
     Link_CustomModelCategory cat = getCategoryFromModelType(type);
 
@@ -309,7 +309,7 @@ static Mtx *ModelEntryForm_getMatrix(const ModelEntry *thisx, Link_EquipmentMatr
     return ModelVisuals_getMtx(&this->modelVisuals, id);
 }
 
-static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName) {
     if (!ModelEntry_init(&entry->modelEntry, handle, type, internalName)) {
         return false;
     }
@@ -497,7 +497,7 @@ void ModelEntry_setCallback(ModelEntry *entry, PlayerModelManagerEventHandler *c
     entry->callbackData = data;
 }
 
-ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName) {
     ModelEntryForm *entry = recomp_alloc(sizeof(ModelEntryForm));
 
     if (!entry) {
@@ -865,7 +865,7 @@ static bool ModelEntryEquipment_removeFromFormProxy(const ModelEntry *thisx, For
     return false;
 }
 
-static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName) {
     if (!ModelEntry_init(&entry->modelEntry, handle, type, internalName)) {
         return false;
     }
@@ -895,7 +895,7 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
     return true;
 }
 
-ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, char *internalName) {
+ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName) {
     ModelEntryEquipment *entry = recomp_alloc(sizeof(ModelEntryEquipment));
 
     if (!entry) {
@@ -948,7 +948,7 @@ bool ModelEntryPack_removeFromFormProxy(const ModelEntry *this, FormProxy *fp) {
     return true;
 }
 
-bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle, char *internalName) {
+bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle, const char *internalName) {
     if (!ModelEntry_init(&entry->modelEntry, handle, PMM_MODEL_TYPE_MODEL_PACK, internalName)) {
         return false;
     }
@@ -967,7 +967,7 @@ bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle,
     return true;
 }
 
-ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, char *internalName) {
+ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, const char *internalName) {
     ModelEntryPack *entry = recomp_alloc(sizeof(ModelEntryPack));
 
     if (!entry) {
