@@ -6,7 +6,6 @@
 #include "yazmtcorelib_api.h"
 #include "modelreplacer_api.h"
 #include "globalobjects_api.h"
-#include "modelreplacer_compat.h"
 #include "apilocal.h"
 #include "logger.h"
 #include "playerproxy.h"

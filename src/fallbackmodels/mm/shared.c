@@ -12,7 +12,6 @@
 #include "assets/objects/gameplay_keep/gameplay_keep.h"
 #include "assets/objects/object_mir_ray/object_mir_ray.h"
 #include "maskdls.h"
-#include "modelreplacer_compat.h"
 #include "modelentrymanager.h"
 #include "modelentry.h"
 #include "customdls.h"

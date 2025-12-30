@@ -4,12 +4,10 @@
 #include "logger.h"
 #include "utils.h"
 #include "rt64_extended_gbi.h"
-#include "modelreplacer_compat.h"
 #include "modelmatrixids.h"
 #include "z64recomp_api.h"
 #include "model_shared.h"
 #include "modelentry.h"
-#include "modelreplacer_compat.h"
 #include "recompconfig.h"
 #include "playermodelconfig.h"
 

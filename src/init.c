@@ -1,7 +1,6 @@
 #include "global.h"
 #include "modding.h"
 #include "modelreplacer_api.h"
-#include "modelreplacer_compat.h"
 #include "globalobjects_api.h"
 #include "playerproxy.h"
 #include "formproxy.h"
