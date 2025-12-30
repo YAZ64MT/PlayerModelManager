@@ -25,10 +25,6 @@ void doInitFormProxies() {
     }
 }
 
-RECOMP_CALLBACK(".", _internal_onReadyModelReplacerCompat) void initFormProxiesOnModelReplacerCompat() {
-    doInitFormProxies();
-}
-
 GLOBAL_OBJECTS_CALLBACK_ON_READY void initFormProxiesOnGlobalObjects() {
     doInitFormProxies();
 }
