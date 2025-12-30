@@ -24,7 +24,7 @@ static void setupDekuFallbackModel() {
 
     ModelInfo_init(&gDekuModelInfo);
 
-    ModelEntryForm *entryForm = gDekuModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_DEKU, "__mm_object_link_nuts__"));
+    ModelEntryForm *entryForm = gDekuModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_DEKU, "__mm_object_link_nuts__"));
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
 
@@ -36,7 +36,7 @@ static void setupDekuFallbackModel() {
         ModelEntryForm_setMouthTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(deku, gDefaultMouthTextures[i]), i);
     }
 
-    CMEM_setEntryHidden(entry, true);
+    ModelEntryManager_setEntryHidden(entry, true);
     ModelInfo_setModelEntryForm(&gDekuModelInfo, entryForm);
 
 #define SET_ENTRY_DL(id, dl) ModelEntry_setDisplayList(entry, id, dl)

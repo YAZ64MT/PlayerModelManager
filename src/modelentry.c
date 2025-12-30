@@ -938,7 +938,7 @@ bool ModelEntryPack_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
     ModelEntry const *const *modelEntries = ModelEntryPack_getModelEntries(this);
 
     for (size_t i = 0; i < numEntries; ++i) {
-        CMEM_tryApplyEntry(modelEntries[i]->category, modelEntries[i]);
+        ModelEntryManager_tryApplyEntry(modelEntries[i]->category, modelEntries[i]);
     }
 
     return true;

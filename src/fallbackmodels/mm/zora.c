@@ -23,7 +23,7 @@ static void setupZoraFallbackModel() {
 
     ModelInfo_init(&gZoraModelInfo);
 
-    ModelEntryForm *entryForm = gZoraModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_ZORA, "__mm_object_link_zora__"));
+    ModelEntryForm *entryForm = gZoraModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_ZORA, "__mm_object_link_zora__"));
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
 
@@ -35,7 +35,7 @@ static void setupZoraFallbackModel() {
         ModelEntryForm_setMouthTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(zora, gDefaultMouthTextures[i]), i);
     }
 
-    CMEM_setEntryHidden(entry, true);
+    ModelEntryManager_setEntryHidden(entry, true);
     ModelInfo_setModelEntryForm(&gZoraModelInfo, entryForm);
 
 #define SET_ENTRY_DL(id, dl) ModelEntry_setDisplayList(entry, id, dl)

@@ -24,7 +24,7 @@ static void setupFierceDeityFallbackModel() {
 
     ModelInfo_init(&gFierceDeityModelInfo);
 
-    ModelEntryForm *entryForm = gFierceDeityModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_FIERCE_DEITY, "__mm_object_link_boy__"));
+    ModelEntryForm *entryForm = gFierceDeityModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_FIERCE_DEITY, "__mm_object_link_boy__"));
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
 
@@ -36,7 +36,7 @@ static void setupFierceDeityFallbackModel() {
         ModelEntryForm_setMouthTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(fd, gDefaultMouthTextures[i]), i);
     }
 
-    CMEM_setEntryHidden(entry, true);
+    ModelEntryManager_setEntryHidden(entry, true);
     ModelInfo_setModelEntryForm(&gFierceDeityModelInfo, entryForm);
 
 #define SET_ENTRY_DL(id, dl) ModelEntry_setDisplayList(entry, id, dl)

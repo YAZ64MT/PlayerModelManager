@@ -28,9 +28,9 @@ Gfx *getGameplayKeepDL(Gfx *dl) {
 }
 
 static void setupSharedFallbackModel() {
-    ModelEntry *modelEntry = CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_shared__"));
+    ModelEntry *modelEntry = ModelEntryManager_getEntry(ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_shared__"));
 
-    CMEM_setEntryHidden(modelEntry, true);
+    ModelEntryManager_setEntryHidden(modelEntry, true);
 
     gSharedModelEntry = (ModelEntryForm *)modelEntry;
 

@@ -587,7 +587,7 @@ static void applyByInternalName(Link_CustomModelCategory cat, const char *name) 
     u32 entryPtr;
 
     if (YAZMTCore_StringU32Dictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
-        CMEM_tryApplyEntry(cat, (ModelEntry *)entryPtr);
+        ModelEntryManager_tryApplyEntry(cat, (ModelEntry *)entryPtr);
     }
 }
 
@@ -607,7 +607,7 @@ bool isValidCategory(Link_CustomModelCategory cat) {
     return cat >= 0 && cat < LINK_CMC_MAX;
 }
 
-const ModelEntry *CMEM_getCurrentEntry(Link_CustomModelCategory cat) {
+const ModelEntry *ModelEntryManager_getCurrentEntry(Link_CustomModelCategory cat) {
     if (!isValidCategory(cat)) {
         return NULL;
     }
@@ -615,7 +615,7 @@ const ModelEntry *CMEM_getCurrentEntry(Link_CustomModelCategory cat) {
     return sCurrentModelEntries[cat];
 }
 
-void CMEM_setCurrentEntry(Link_CustomModelCategory cat, const ModelEntry *e) {
+void ModelEntryManager_setCurrentEntry(Link_CustomModelCategory cat, const ModelEntry *e) {
     // Packs are special in that they are made up of ModelEntries
     if (!isPackCategory(cat)) {
         sCurrentModelEntries[cat] = e;
@@ -660,8 +660,8 @@ static FormProxy *getLocalFormProxyFromCategory(Link_CustomModelCategory cat) {
     return PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
 }
 
-void CMEM_reapplyEntry(Link_CustomModelCategory cat) {
-    const ModelEntry *currEntry = CMEM_getCurrentEntry(cat);
+void ModelEntryManager_reapplyEntry(Link_CustomModelCategory cat) {
+    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(cat);
 
     if (currEntry) {
         ModelEntry_applyToFormProxy(currEntry, getLocalFormProxyFromCategory(cat));
@@ -671,18 +671,18 @@ void CMEM_reapplyEntry(Link_CustomModelCategory cat) {
 static void reapplyAllEquipmentEntries() {
     for (Link_CustomModelCategory i = 0; i < LINK_CMC_MAX; ++i) {
         if (isEquipmentCategory(i)) {
-            const ModelEntry *tmp = CMEM_getCurrentEntry(i);
-            CMEM_removeModel(i);
-            CMEM_tryApplyEntry(i, tmp);
+            const ModelEntry *tmp = ModelEntryManager_getCurrentEntry(i);
+            ModelEntryManager_removeModel(i);
+            ModelEntryManager_tryApplyEntry(i, tmp);
         }
     }
 }
 
-bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry) {
-    const ModelEntry *currEntry = CMEM_getCurrentEntry(cat);
+bool ModelEntryManager_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry) {
+    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(cat);
 
     if (newEntry == NULL) {
-        CMEM_removeModel(cat);
+        ModelEntryManager_removeModel(cat);
         return true;
     }
 
@@ -691,7 +691,7 @@ bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEnt
             ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_REMOVED);
         }
 
-        CMEM_setCurrentEntry(cat, newEntry);
+        ModelEntryManager_setCurrentEntry(cat, newEntry);
 
         if (newEntry) {
             ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_APPLIED);
@@ -707,11 +707,11 @@ bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEnt
     return false;
 }
 
-bool CMEM_isEntryHidden(const ModelEntry *ModelEntry) {
+bool ModelEntryManager_isEntryHidden(const ModelEntry *ModelEntry) {
     return recomputil_u32_hashset_contains(sHiddenModelEntries, (uintptr_t)ModelEntry);
 }
 
-void CMEM_setEntryHidden(const ModelEntry *modelEntry, bool isHidden) {
+void ModelEntryManager_setEntryHidden(const ModelEntry *modelEntry, bool isHidden) {
     if (isHidden) {
         recomputil_u32_hashset_insert(sHiddenModelEntries, (uintptr_t)modelEntry);
     } else {
@@ -719,16 +719,16 @@ void CMEM_setEntryHidden(const ModelEntry *modelEntry, bool isHidden) {
     }
 }
 
-bool CMEM_tryApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry) {
-    const ModelEntry *currEntry = CMEM_getCurrentEntry(cat);
+bool ModelEntryManager_tryApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry) {
+    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(cat);
     if (newEntry != currEntry) {
-        return CMEM_forceApplyEntry(cat, newEntry);
+        return ModelEntryManager_forceApplyEntry(cat, newEntry);
     }
 
     return false;
 }
 
-const ModelEntry **CMEM_getCategoryEntryData(Link_CustomModelCategory cat, size_t *count) {
+const ModelEntry **ModelEntryManager_getCategoryEntryData(Link_CustomModelCategory cat, size_t *count) {
     if (!isValidCategory(cat)) {
         return NULL;
     }
@@ -745,9 +745,9 @@ const ModelEntry **CMEM_getCategoryEntryData(Link_CustomModelCategory cat, size_
     return (const ModelEntry **)(YAZMTCore_DynamicU32Array_data(sModelEntries[cat]));
 }
 
-void CMEM_removeModel(Link_CustomModelCategory cat) {
+void ModelEntryManager_removeModel(Link_CustomModelCategory cat) {
     if (!isValidCategory(cat)) {
-        Logger_printError("Called CMEM_removeModel with invalid category %d\n", cat);
+        Logger_printError("Called ModelEntryManager_removeModel with invalid category %d\n", cat);
         Utils_tryCrashGame();
         return;
     }
@@ -757,7 +757,7 @@ void CMEM_removeModel(Link_CustomModelCategory cat) {
     if (entry) {
         ModelEntry_doCallback(entry, PMM_EVENT_MODEL_REMOVED);
 
-        CMEM_setCurrentEntry(cat, NULL);
+        ModelEntryManager_setCurrentEntry(cat, NULL);
 
         ModelEntry_removeFromFormProxy(entry, getLocalFormProxyFromCategory(cat));
 
@@ -767,7 +767,7 @@ void CMEM_removeModel(Link_CustomModelCategory cat) {
     }
 }
 
-PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType type, const char *internalName) {
+PlayerModelManagerHandle ModelEntryManager_createMemoryHandle(PlayerModelManagerModelType type, const char *internalName) {
     Link_CustomModelCategory cat = getCategoryFromModelType(type);
 
     if (!isValidCategory(cat)) {
@@ -794,7 +794,7 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType typ
     }
 
     if (!entry) {
-        Logger_printWarning("CMEM_createMemoryHandle failed to initialize an entry!");
+        Logger_printWarning("ModelEntryManager_createMemoryHandle failed to initialize an entry!");
         recomputil_u32_slotmap_erase(sEntryHandles, handle);
         return 0;
     }
@@ -806,7 +806,7 @@ PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType typ
     return handle;
 }
 
-ModelEntry *CMEM_getEntry(PlayerModelManagerHandle h) {
+ModelEntry *ModelEntryManager_getEntry(PlayerModelManagerHandle h) {
     uintptr_t entry = 0;
 
     if (recomputil_u32_slotmap_contains(sEntryHandles, h)) {
@@ -816,7 +816,7 @@ ModelEntry *CMEM_getEntry(PlayerModelManagerHandle h) {
     return (ModelEntry *)entry;
 }
 
-ModelEntry **CMEM_getEntries(Link_CustomModelCategory cat, size_t *count) {
+ModelEntry **ModelEntryManager_getEntries(Link_CustomModelCategory cat, size_t *count) {
     if (isValidCategory(cat)) {
         *count = YAZMTCore_DynamicU32Array_size(sModelEntries[cat]);
         return (ModelEntry **)(YAZMTCore_DynamicU32Array_data(sModelEntries[cat]));
@@ -825,7 +825,7 @@ ModelEntry **CMEM_getEntries(Link_CustomModelCategory cat, size_t *count) {
     return NULL;
 }
 
-void CMEM_saveCurrentEntry(Link_CustomModelCategory cat) {
+void ModelEntryManager_saveCurrentEntry(Link_CustomModelCategory cat) {
     if (!isValidCategory(cat)) {
         return;
     }
@@ -852,7 +852,7 @@ void loadSavedModels() {
         if (KV_Global_Get(sSavedModelNames[i].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
             applyByInternalName(i, retrievedName);
         } else {
-            CMEM_forceApplyEntry(i, NULL);
+            ModelEntryManager_forceApplyEntry(i, NULL);
         }
     }
 

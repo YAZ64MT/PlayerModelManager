@@ -27,7 +27,7 @@ static void setupGoronFallbackModel() {
 
     ModelInfo_init(&gGoronModelInfo);
 
-    ModelEntryForm *entryForm = gGoronModelEntry = (ModelEntryForm *)CMEM_getEntry(CMEM_createMemoryHandle(PMM_MODEL_TYPE_GORON, "__mm_object_link_goron__"));
+    ModelEntryForm *entryForm = gGoronModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_GORON, "__mm_object_link_goron__"));
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
     ModelEntryForm_setShieldingSkeleton(entryForm, shieldingSkel);
@@ -40,7 +40,7 @@ static void setupGoronFallbackModel() {
         ModelEntryForm_setMouthTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(goron, gDefaultMouthTextures[i]), i);
     }
 
-    CMEM_setEntryHidden(entry, true);
+    ModelEntryManager_setEntryHidden(entry, true);
     ModelInfo_setModelEntryForm(&gGoronModelInfo, entryForm);
 
 #define SET_ENTRY_DL(id, dl) ModelEntry_setDisplayList(entry, id, dl)

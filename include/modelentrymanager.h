@@ -8,18 +8,18 @@ typedef struct ModelEntry ModelEntry;
 
 typedef unsigned long PlayerModelManagerHandle;
 
-void CMEM_setCurrentEntry(Link_CustomModelCategory cat, const ModelEntry *entry);
-const ModelEntry *CMEM_getCurrentEntry(Link_CustomModelCategory cat);
-const ModelEntry **CMEM_getCategoryEntryData(Link_CustomModelCategory cat, size_t *count);
-bool CMEM_tryApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry);
-void CMEM_removeModel(Link_CustomModelCategory cat);
-PlayerModelManagerHandle CMEM_createMemoryHandle(PlayerModelManagerModelType type, const char *internalName);
-ModelEntry *CMEM_getEntry(PlayerModelManagerHandle h);
-void CMEM_saveCurrentEntry(Link_CustomModelCategory cat);
-void CMEM_reapplyEntry(Link_CustomModelCategory cat);
-bool CMEM_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry);
-bool CMEM_isEntryHidden(const ModelEntry *ModelEntry);
-void CMEM_setEntryHidden(const ModelEntry *modelEntry, bool isHidden);
+void ModelEntryManager_setCurrentEntry(Link_CustomModelCategory cat, const ModelEntry *entry);
+const ModelEntry *ModelEntryManager_getCurrentEntry(Link_CustomModelCategory cat);
+const ModelEntry **ModelEntryManager_getCategoryEntryData(Link_CustomModelCategory cat, size_t *count);
+bool ModelEntryManager_tryApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry);
+void ModelEntryManager_removeModel(Link_CustomModelCategory cat);
+PlayerModelManagerHandle ModelEntryManager_createMemoryHandle(PlayerModelManagerModelType type, const char *internalName);
+ModelEntry *ModelEntryManager_getEntry(PlayerModelManagerHandle h);
+void ModelEntryManager_saveCurrentEntry(Link_CustomModelCategory cat);
+void ModelEntryManager_reapplyEntry(Link_CustomModelCategory cat);
+bool ModelEntryManager_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry);
+bool ModelEntryManager_isEntryHidden(const ModelEntry *ModelEntry);
+void ModelEntryManager_setEntryHidden(const ModelEntry *modelEntry, bool isHidden);
 
 PlayerTransformation getFormFromModelType(PlayerModelManagerModelType t);
 Link_CustomModelCategory getCategoryFromModelType(PlayerModelManagerModelType t);

@@ -42,7 +42,7 @@ static Gfx sBelowV3FirstPersonBowDL[] = {
 
 static bool isEntryLoaded(ModelEntry *entry) {
     if (entry) {
-        return CMEM_getCurrentEntry(ModelEntry_getCategory(entry)) == entry;
+        return ModelEntryManager_getCurrentEntry(ModelEntry_getCategory(entry)) == entry;
     }
 
     return false;
@@ -52,7 +52,7 @@ static void refreshProxyIfEntryLoaded(ModelEntry *entry) {
     Link_CustomModelCategory cat = ModelEntry_getCategory(entry);
 
     if (isEntryLoaded(entry)) {
-        CMEM_reapplyEntry(cat);
+        ModelEntryManager_reapplyEntry(cat);
     }
 }
 
@@ -106,7 +106,7 @@ static bool isStrValid(const char *callerName, const char *strToVerify, size_t m
 static bool sIsAPILocked = true;
 
 static ModelEntry *getEntryOrPrintErr(PlayerModelManagerHandle h, const char *funcName) {
-    ModelEntry *entry = CMEM_getEntry(h);
+    ModelEntry *entry = ModelEntryManager_getEntry(h);
 
     if (!entry) {
         Logger_printError("Invalid handle passed in to %s.", funcName);
@@ -165,7 +165,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
         return 0;
     }
 
-    PlayerModelManagerHandle h = CMEM_createMemoryHandle(modelType, YAZMTCore_Utils_StrDup(internalName));
+    PlayerModelManagerHandle h = ModelEntryManager_createMemoryHandle(modelType, YAZMTCore_Utils_StrDup(internalName));
 
     ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
@@ -783,7 +783,7 @@ RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
         return false;
     }
 
-    return CMEM_getCurrentEntry(ModelEntry_getCategory(entry)) == entry;
+    return ModelEntryManager_getCurrentEntry(ModelEntry_getCategory(entry)) == entry;
 }
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {
@@ -830,7 +830,7 @@ RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation 
             break;
     }
 
-    return !!CMEM_getCurrentEntry(cat);
+    return !!ModelEntryManager_getCurrentEntry(cat);
 }
 
 #define DECLARE_BUILT_IN_DL(id, dl) [id] = dl

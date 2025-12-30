@@ -293,7 +293,7 @@ static void refreshModelButtonEntryColors() {
     CategoryInfo *catInf = getCurrentCategoryInfo();
 
     if (catInf) {
-        void *entry = (void *)CMEM_getCurrentEntry(catInf->category);
+        void *entry = (void *)ModelEntryManager_getCurrentEntry(catInf->category);
         size_t count = getCurrentModelButtonArraySize();
         const RecompuiResource *buttons = getCurrentModelButtonArray();
 
@@ -382,7 +382,7 @@ static void setAuthor(const char *author) {
 
 static void applyRealEntry(int entryIndex) {
     if (entryIndex >= 0 && entryIndex < ARRAY_COUNT(sCategoryInfos)) {
-        CMEM_tryApplyEntry(sCategoryInfos[entryIndex].category, sCategoryInfos[entryIndex].realEntry);
+        ModelEntryManager_tryApplyEntry(sCategoryInfos[entryIndex].category, sCategoryInfos[entryIndex].realEntry);
     } else {
         Logger_printWarning("applyRealEntry received invalid entryIndex %d\n", entryIndex);
     }
@@ -402,14 +402,14 @@ static void clearRealEntries() {
 
 static void fillRealEntries() {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
-        sCategoryInfos[i].realEntry = CMEM_getCurrentEntry(sCategoryInfos[i].category);
+        sCategoryInfos[i].realEntry = ModelEntryManager_getCurrentEntry(sCategoryInfos[i].category);
     }
 }
 
 static void removeAllModels() {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
-        CMEM_tryApplyEntry(catInf->category, NULL);
+        ModelEntryManager_tryApplyEntry(catInf->category, NULL);
     }
 }
 
@@ -417,7 +417,7 @@ static void removeEquipmentModels() {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         if (isEquipmentCategory(catInf->category)) {
-            CMEM_tryApplyEntry(catInf->category, NULL);
+            ModelEntryManager_tryApplyEntry(catInf->category, NULL);
         }
     }
 }
@@ -426,7 +426,7 @@ static void saveAllModels() {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         catInf->isNeedsDiskSave = true;
-        catInf->realEntry = CMEM_getCurrentEntry(catInf->category);
+        catInf->realEntry = ModelEntryManager_getCurrentEntry(catInf->category);
     }
 }
 
@@ -504,7 +504,7 @@ static void closeButtonPressed(RecompuiResource resource, const RecompuiEventDat
                 if (catInf->isNeedsDiskSave) {
                     catInf->isNeedsDiskSave = false;
                     wasModelChanged = true;
-                    CMEM_saveCurrentEntry(catInf->category);
+                    ModelEntryManager_saveCurrentEntry(catInf->category);
                 }
             }
 
@@ -772,7 +772,7 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
 
-                CMEM_tryApplyEntry(cat, entryOrNull);
+                ModelEntryManager_tryApplyEntry(cat, entryOrNull);
 
                 catInf->realEntry = entryOrNull;
 
@@ -788,7 +788,7 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
 
                 if (shouldLivePreview()) {
                     applyRealEntries();
-                    CMEM_tryApplyEntry(cat, entryOrNull);
+                    ModelEntryManager_tryApplyEntry(cat, entryOrNull);
                 }
             }
         }
@@ -806,7 +806,7 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
 
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
-                CMEM_tryApplyEntry(cat, entryOrNull);
+                ModelEntryManager_tryApplyEntry(cat, entryOrNull);
                 saveAllModels();
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
                 if (entryOrNull) {
@@ -817,7 +817,7 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
 
                 if (shouldLivePreview()) {
                     applyRealEntries();
-                    CMEM_tryApplyEntry(cat, entryOrNull);
+                    ModelEntryManager_tryApplyEntry(cat, entryOrNull);
                 }
             }
         }
@@ -898,10 +898,10 @@ static void createModelListButtons() {
     recompui_register_callback(removeModelButton, removedCallback, NULL);
 
     size_t count = 0;
-    const ModelEntry **modelEntries = CMEM_getCategoryEntryData(catInf->category, &count);
+    const ModelEntry **modelEntries = ModelEntryManager_getCategoryEntryData(catInf->category, &count);
 
     for (size_t i = 0; i < count; ++i) {
-        if (!CMEM_isEntryHidden(modelEntries[i])) {
+        if (!ModelEntryManager_isEntryHidden(modelEntries[i])) {
             const char *name = NULL;
 
             name = ModelEntry_getDisplayName(modelEntries[i]);
@@ -1045,7 +1045,7 @@ void populateFirstFileList() {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         size_t count = 0;
-        CMEM_getCategoryEntryData(catInf->category, &count);
+        ModelEntryManager_getCategoryEntryData(catInf->category, &count);
         catInf->isVisible = catInf->isVisible || (catInf->isUsedByCurrentGame && count > 0);
 
         if (catInf->isVisible) {
