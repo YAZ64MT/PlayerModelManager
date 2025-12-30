@@ -691,30 +691,6 @@ void FormProxy_refreshAllDLs(FormProxy *fp) {
     for (size_t i = 0; i < fp->numDLs; ++i) {
         FormProxy_refreshDL(fp, i);
     }
-
-    // first person hookshot workaround
-    Gfx *listenerHookDL = MRC_getListenerDL(fp->form, LINK_DL_HOOKSHOT);
-    if (listenerHookDL) {
-        gSPDisplayList(&wDLs[LINK_DL_FPS_HOOKSHOT].displayList[WRAPPED_DL_DRAW], listenerHookDL);
-    }
-
-    // first person bow workaround
-    Gfx *listenerBowDL = MRC_getListenerDL(fp->form, LINK_DL_BOW);
-    if (listenerBowDL) {
-        gSPDisplayList(&wDLs[LINK_DL_BOW].displayList[WRAPPED_DL_DRAW], listenerBowDL);
-    }
-
-    // disable hilt for Great Fairy Sword if replaced
-    Gfx *listenerGFSwordDL = MRC_getListenerDL(fp->form, LINK_DL_SWORD_GREAT_FAIRY_BLADE);
-    if (listenerGFSwordDL) {
-        gSPDisplayList(&wDLs[LINK_DL_SWORD_GREAT_FAIRY_HILT].displayList[WRAPPED_DL_DRAW], gEmptyDL);
-    }
-
-    // disable hilt for Fierce Deity's Sword if replaced
-    Gfx *listenerFDSwordDL = MRC_getListenerDL(fp->form, LINK_DL_SWORD_FIERCE_DEITY_BLADE);
-    if (listenerFDSwordDL) {
-        gSPDisplayList(&wDLs[LINK_DL_SWORD_GREAT_FAIRY_HILT].displayList[WRAPPED_DL_DRAW], gEmptyDL);
-    }
 }
 
 void FormProxy_refreshMtx(FormProxy *fp, Link_EquipmentMatrix id) {
@@ -1148,7 +1124,7 @@ Gfx *FormProxy_getNextRefreshDL(FormProxy *fp, Link_DisplayList id) {
         return NULL;
     }
 
-    Gfx *dl = MRC_getListenerDL(fp->form, id);
+    Gfx *dl = NULL;
 
     if (!dl) {
         FormProxy *fpAlt = NULL;
