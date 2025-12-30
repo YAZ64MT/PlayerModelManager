@@ -31,9 +31,7 @@ RECOMP_CALLBACK(".", _internal_onReadyModelReplacerCompat) void initFormProxiesO
 }
 
 GLOBAL_OBJECTS_CALLBACK_ON_READY void initFormProxiesOnGlobalObjects() {
-    if (!MRC_isMRCEnabled()) {
-        doInitFormProxies();
-    }
+    doInitFormProxies();
 }
 
 RECOMP_DECLARE_EVENT(_internal_preInitHashObjects());

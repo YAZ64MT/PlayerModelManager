@@ -940,7 +940,6 @@ RECOMP_DECLARE_EVENT(onRegisterModels());
 RECOMP_DECLARE_EVENT(onReady());
 
 static bool sIsCMEMReady = false;
-static bool sIsModelReplacerReady = false;
 static bool sIsGlobalObjectsReady = false;
 static bool sIsModelsRegistered = false;
 
@@ -951,7 +950,7 @@ void doRegisterModels() {
         return;
     }
 
-    if (!sIsCMEMReady || (!sIsModelReplacerReady && MRC_isMRCEnabled()) || !sIsGlobalObjectsReady) {
+    if (!sIsCMEMReady || !sIsGlobalObjectsReady) {
         return;
     }
 
@@ -976,7 +975,6 @@ void doRegisterModelsCMEMReady() {
 
 MODEL_REPLACER_CALLBACK_ON_REGISTER_REPLACERS
 void doRegisterModelsModelReplacerReady() {
-    sIsModelReplacerReady = true;
     Logger_printVerbose("ModelReplacer compatibility is ready.");
     doRegisterModels();
 }
