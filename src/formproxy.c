@@ -318,8 +318,6 @@ static void initProxyWrappers(FormProxy *fp) {
 
 static void initProxyDLs(FormProxy *fp) {
     for (size_t i = 0; i < fp->numDLs; ++i) {
-        MRC_addExcludedDL(&fp->displayLists[i]);
-        MRC_addExcludedDL(fp->wrappedDisplayLists[i].displayList);
         gSPBranchList(&fp->displayLists[i], fp->wrappedDisplayLists[i].displayList);
     }
 }
