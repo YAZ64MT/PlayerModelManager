@@ -9,6 +9,7 @@
 #include "playermodelmanager_api.h"
 #include "defaultfacetex.h"
 
+PlayerModelManagerHandle gFierceDeityModelHandle;
 ModelEntryForm *gFierceDeityModelEntry;
 ModelInfo gFierceDeityModelInfo;
 
@@ -24,7 +25,9 @@ static void setupFierceDeityFallbackModel() {
 
     ModelInfo_init(&gFierceDeityModelInfo);
 
-    ModelEntryForm *entryForm = gFierceDeityModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_FIERCE_DEITY, "__mm_object_link_boy__"));
+    gFierceDeityModelHandle = ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_FIERCE_DEITY, "__mm_object_link_boy__");
+
+    ModelEntryForm *entryForm = gFierceDeityModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(gFierceDeityModelHandle);
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
 

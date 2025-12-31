@@ -9,6 +9,7 @@
 #include "playermodelmanager_api.h"
 #include "defaultfacetex.h"
 
+PlayerModelManagerHandle gGoronModelHandle;
 ModelEntryForm *gGoronModelEntry;
 ModelInfo gGoronModelInfo;
 
@@ -27,7 +28,9 @@ static void setupGoronFallbackModel() {
 
     ModelInfo_init(&gGoronModelInfo);
 
-    ModelEntryForm *entryForm = gGoronModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_GORON, "__mm_object_link_goron__"));
+    gGoronModelHandle = ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_GORON, "__mm_object_link_goron__");
+
+    ModelEntryForm *entryForm = gGoronModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(gGoronModelHandle);
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
     ModelEntryForm_setShieldingSkeleton(entryForm, shieldingSkel);

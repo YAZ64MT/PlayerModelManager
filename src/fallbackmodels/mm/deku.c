@@ -9,6 +9,7 @@
 #include "playermodelmanager_api.h"
 #include "defaultfacetex.h"
 
+PlayerModelManagerHandle gDekuModelHandle;
 ModelEntryForm *gDekuModelEntry;
 ModelInfo gDekuModelInfo;
 
@@ -24,7 +25,9 @@ static void setupDekuFallbackModel() {
 
     ModelInfo_init(&gDekuModelInfo);
 
-    ModelEntryForm *entryForm = gDekuModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_DEKU, "__mm_object_link_nuts__"));
+    gDekuModelHandle = ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_DEKU, "__mm_object_link_nuts__");
+
+    ModelEntryForm *entryForm = gDekuModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(gDekuModelHandle);
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
 

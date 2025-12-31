@@ -11,6 +11,7 @@
 #include "defaultfacetex.h"
 #include "customdls.h"
 
+PlayerModelManagerHandle gHumanModelHandle;
 ModelEntryForm *gHumanModelEntry;
 ModelInfo gHumanModelInfo;
 
@@ -26,7 +27,9 @@ static void setupHumanFallbackModel() {
 
     ModelInfo_init(&gHumanModelInfo);
 
-    ModelEntryForm *entryForm = gHumanModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_child__"));
+    gHumanModelHandle = ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_child__");
+
+    ModelEntryForm *entryForm = gHumanModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(gHumanModelHandle);
     ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
     ModelEntryForm_setSkeleton(entryForm, skel);
 
