@@ -12,6 +12,11 @@ ModelInfo gDekuModelInfoFallbackOverride;
 ModelInfo gGoronModelInfoFallbackOverride;
 ModelInfo gZoraModelInfoFallbackOverride;
 ModelInfo gFierceDeityModelInfoFallbackOverride;
+ModelInfo gHumanModelInfo;
+ModelInfo gDekuModelInfo;
+ModelInfo gGoronModelInfo;
+ModelInfo gZoraModelInfo;
+ModelInfo gFierceDeityModelInfo;
 
 static U32HashsetHandle sValidPlayerProxies;
 
@@ -204,4 +209,9 @@ void initPlayerProxyFallbacks() {
     ModelInfo_init(&gGoronModelInfoFallbackOverride);
     ModelInfo_init(&gZoraModelInfoFallbackOverride);
     ModelInfo_init(&gFierceDeityModelInfoFallbackOverride);
+    ModelInfo_init(&gHumanModelInfo);
+    ModelInfo_init(&gDekuModelInfo);
+    ModelInfo_init(&gGoronModelInfo);
+    ModelInfo_init(&gZoraModelInfo);
+    ModelInfo_init(&gFierceDeityModelInfo);
 }

@@ -3,17 +3,13 @@
 #include "assets/objects/object_link_child/object_link_child.h"
 #include "utils.h"
 #include "globalobjects_api.h"
-#include "modelinfo.h"
-#include "modelentry.h"
-#include "modelentrymanager.h"
 #include "modelmatrixids.h"
 #include "playermodelmanager_api.h"
-#include "defaultfacetex.h"
 #include "customdls.h"
+#include "apilocal.h"
+#include "fallbackmodels.h"
 
 PlayerModelManagerHandle gHumanModelHandle;
-ModelEntryForm *gHumanModelEntry;
-ModelInfo gHumanModelInfo;
 
 Gfx *getHumanDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, dl);
@@ -23,48 +19,12 @@ static void setupHumanFallbackModel() {
     void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);
-    GlobalObjects_globalizeLodLimbSkeleton(human, &gLinkHumanSkel);
 
-    ModelInfo_init(&gHumanModelInfo);
+    gHumanModelHandle = PlayerModelManager_registerModel(PMM_API_VERSION, "__mm_object_link_child__", PMM_MODEL_TYPE_CHILD);
 
-    gHumanModelHandle = ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_CHILD, "__mm_object_link_child__");
+    FallbackModelsCommon_doCommonAssignments(gHumanModelHandle, skel, human, GlobalObjects_getGlobalObject(GAMEPLAY_KEEP));
 
-    ModelEntryForm *entryForm = gHumanModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(gHumanModelHandle);
-    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
-    ModelEntryForm_setSkeleton(entryForm, skel);
-
-    for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
-        ModelEntryForm_setEyesTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(human, gDefaultEyesTextures[i]), i);
-    }
-
-    for (PlayerMouthIndex i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        ModelEntryForm_setMouthTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(human, gDefaultMouthTextures[i]), i);
-    }
-
-    ModelEntryManager_setEntryHidden(entry, true);
-    ModelInfo_setModelEntryForm(&gHumanModelInfo, entryForm);
-
-#define SET_ENTRY_DL(id, dl) ModelEntry_setDisplayList(entry, id, dl)
-
-    // Body
-    SET_ENTRY_DL(LINK_DL_WAIST, getHumanDL(gLinkHumanWaistDL));
-    SET_ENTRY_DL(LINK_DL_RTHIGH, getHumanDL(gLinkHumanRightThighDL));
-    SET_ENTRY_DL(LINK_DL_RSHIN, getHumanDL(gLinkHumanRightShinDL));
-    SET_ENTRY_DL(LINK_DL_RFOOT, getHumanDL(gLinkHumanRightFootDL));
-    SET_ENTRY_DL(LINK_DL_LTHIGH, getHumanDL(gLinkHumanLeftThighDL));
-    SET_ENTRY_DL(LINK_DL_LSHIN, getHumanDL(gLinkHumanLeftShinDL));
-    SET_ENTRY_DL(LINK_DL_LFOOT, getHumanDL(gLinkHumanLeftFootDL));
-    SET_ENTRY_DL(LINK_DL_HEAD, getHumanDL(gLinkHumanHeadDL));
-    SET_ENTRY_DL(LINK_DL_HAT, getHumanDL(gLinkHumanHatDL));
-    SET_ENTRY_DL(LINK_DL_COLLAR, getHumanDL(gLinkHumanCollarDL));
-    SET_ENTRY_DL(LINK_DL_LSHOULDER, getHumanDL(gLinkHumanLeftShoulderDL));
-    SET_ENTRY_DL(LINK_DL_LFOREARM, getHumanDL(gLinkHumanLeftForearmDL));
-    SET_ENTRY_DL(LINK_DL_LHAND, getHumanDL(gLinkHumanLeftHandOpenDL));
-    SET_ENTRY_DL(LINK_DL_RSHOULDER, getHumanDL(gLinkHumanRightShoulderDL));
-    SET_ENTRY_DL(LINK_DL_RFOREARM, getHumanDL(gLinkHumanRightForearmDL));
-    SET_ENTRY_DL(LINK_DL_RHAND, getHumanDL(gLinkHumanRightHandOpenDL));
-    SET_ENTRY_DL(LINK_DL_SHEATH_NONE, getHumanDL(gLinkHumanSheathedKokiriSwordDL));
-    SET_ENTRY_DL(LINK_DL_TORSO, getHumanDL(gLinkHumanTorsoDL));
+#define SET_ENTRY_DL(id, dl) PlayerModelManager_setDisplayList(gHumanModelHandle, id, dl)
 
     // hands
     SET_ENTRY_DL(LINK_DL_OPT_LFIST, getHumanDL(gLinkHumanLeftHandClosedDL));
@@ -76,17 +36,11 @@ static void setupHumanFallbackModel() {
     SET_ENTRY_DL(LINK_DL_OPT_RHAND_OCARINA, gLinkHumanRightHandOcarinaDL);
 
     // First Person
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM, getHumanDL(gLinkHumanLeftForearmDL));
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND, getHumanDL(gLinkHumanLeftHandClosedDL));
     SET_ENTRY_DL(LINK_DL_OPT_FPS_RFOREARM, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);
-
     SET_ENTRY_DL(LINK_DL_OPT_FPS_RHAND, gLinkHumanFirstPersonArmDL);
-
-    // items
-    SET_ENTRY_DL(LINK_DL_OCARINA_TIME, gLinkHumanOcarinaDL);
 
 #undef SET_ENTRY_DL
 }

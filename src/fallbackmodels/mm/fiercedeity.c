@@ -3,15 +3,12 @@
 #include "assets/objects/object_link_boy/object_link_boy.h"
 #include "utils.h"
 #include "globalobjects_api.h"
-#include "modelentrymanager.h"
-#include "modelinfo.h"
-#include "modelentry.h"
 #include "playermodelmanager_api.h"
 #include "defaultfacetex.h"
+#include "apilocal.h"
+#include "fallbackmodels.h"
 
 PlayerModelManagerHandle gFierceDeityModelHandle;
-ModelEntryForm *gFierceDeityModelEntry;
-ModelInfo gFierceDeityModelInfo;
 
 Gfx *getFierceDeityDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_BOY, dl);
@@ -23,53 +20,11 @@ static void setupFierceDeityFallbackModel() {
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(fd, &gLinkFierceDeitySkel);
     GlobalObjects_globalizeLodLimbSkeleton(fd, &gLinkFierceDeitySkel);
 
-    ModelInfo_init(&gFierceDeityModelInfo);
+    gFierceDeityModelHandle = PlayerModelManager_registerModel(PMM_API_VERSION, "__mm_object_link_boy__", PMM_MODEL_TYPE_FIERCE_DEITY);
 
-    gFierceDeityModelHandle = ModelEntryManager_createMemoryHandle(PMM_MODEL_TYPE_FIERCE_DEITY, "__mm_object_link_boy__");
+    FallbackModelsCommon_doCommonAssignments(gFierceDeityModelHandle, skel, fd, GlobalObjects_getGlobalObject(GAMEPLAY_KEEP));
 
-    ModelEntryForm *entryForm = gFierceDeityModelEntry = (ModelEntryForm *)ModelEntryManager_getEntry(gFierceDeityModelHandle);
-    ModelEntry *entry = ModelEntryForm_getModelEntry(entryForm);
-    ModelEntryForm_setSkeleton(entryForm, skel);
-
-    for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
-        ModelEntryForm_setEyesTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(fd, gDefaultEyesTextures[i]), i);
-    }
-
-    for (PlayerMouthIndex i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        ModelEntryForm_setMouthTexture(entryForm, (TexturePtr)SEGMENTED_TO_GLOBAL_PTR(fd, gDefaultMouthTextures[i]), i);
-    }
-
-    ModelEntryManager_setEntryHidden(entry, true);
-    ModelInfo_setModelEntryForm(&gFierceDeityModelInfo, entryForm);
-
-#define SET_ENTRY_DL(id, dl) ModelEntry_setDisplayList(entry, id, dl)
-
-    // Body
-    SET_ENTRY_DL(LINK_DL_WAIST, getFierceDeityDL(gLinkFierceDeityWaistDL));
-    SET_ENTRY_DL(LINK_DL_RTHIGH, getFierceDeityDL(gLinkFierceDeityRightThighDL));
-    SET_ENTRY_DL(LINK_DL_RSHIN, getFierceDeityDL(gLinkFierceDeityRightShinDL));
-    SET_ENTRY_DL(LINK_DL_RFOOT, getFierceDeityDL(gLinkFierceDeityRightFootDL));
-    SET_ENTRY_DL(LINK_DL_LTHIGH, getFierceDeityDL(gLinkFierceDeityLeftThighDL));
-    SET_ENTRY_DL(LINK_DL_LSHIN, getFierceDeityDL(gLinkFierceDeityLeftShinDL));
-    SET_ENTRY_DL(LINK_DL_LFOOT, getFierceDeityDL(gLinkFierceDeityLeftFootDL));
-    SET_ENTRY_DL(LINK_DL_HEAD, getFierceDeityDL(gLinkFierceDeityHeadDL));
-    SET_ENTRY_DL(LINK_DL_HAT, getFierceDeityDL(gLinkFierceDeityHatDL));
-    SET_ENTRY_DL(LINK_DL_COLLAR, gEmptyDL);
-    SET_ENTRY_DL(LINK_DL_LSHOULDER, getFierceDeityDL(gLinkFierceDeityLeftShoulderDL));
-    SET_ENTRY_DL(LINK_DL_LFOREARM, getFierceDeityDL(gLinkFierceDeityLeftForearmDL));
-    SET_ENTRY_DL(LINK_DL_LHAND, getFierceDeityDL(gLinkFierceDeityLeftHandDL));
-    SET_ENTRY_DL(LINK_DL_RSHOULDER, getFierceDeityDL(gLinkFierceDeityRightShoulderDL));
-    SET_ENTRY_DL(LINK_DL_RFOREARM, getFierceDeityDL(gLinkFierceDeityRightForearmDL));
-    SET_ENTRY_DL(LINK_DL_RHAND, getFierceDeityDL(gLinkFierceDeityRightHandDL));
-    SET_ENTRY_DL(LINK_DL_SHEATH_NONE, gEmptyDL);
-    SET_ENTRY_DL(LINK_DL_TORSO, getFierceDeityDL(gLinkFierceDeityTorsoDL));
-
-    // First Person
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL);
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);
-
-#undef SET_ENTRY_DL
+    PlayerModelManager_setSkeleton(gFierceDeityModelHandle, skel);
 }
 
 RECOMP_CALLBACK(".", _internal_setupVanillaModels)
