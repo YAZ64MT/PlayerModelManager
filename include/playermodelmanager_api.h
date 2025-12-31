@@ -651,8 +651,8 @@ typedef enum PlayerModelManagerBuiltInDLId {
 // There is a maximum length of 64 characters.
 //
 // This function can only be used during the PlayerModelManager_onRegisterModels event. Otherwise, an invalid handle will be returned.
-#define PLAYERMODELMANAGER_REGISTER_MODEL(internalName, modelType) PlayerModelManager_registerModel(PMM_API_VERSION, internalName, modelType)
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType));
+#define PLAYERMODELMANAGER_REGISTER_MODEL(internalName, modelType) PlayerModelManager_registerModel(PMM_API_VERSION, internalName, modelType)
 
 // Sets the name that will appear in the menu for the passed in model handle.
 //
@@ -794,7 +794,8 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isCustomModelApplied(P
 
 // PlayerModelManager defines display lists internally for various purposes (e.g. adult equipment, ungluing models)
 // If you would like to manually specify these for some of your models, you can access them via the following function.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getBuiltInDL(PlayerModelManagerBuiltInDLId id));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getBuiltInDL(unsigned long apiVersion, PlayerModelManagerBuiltInDLId id));
+#define PLAYERMODELMANAGER_GET_BUILT_IN_DL(dlId) PlayerModelManager_getBuiltInDL(PMM_API_VERSION, dlId)
 
 // Helper define for register models event.
 #define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
