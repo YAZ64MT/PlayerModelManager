@@ -832,6 +832,14 @@ RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation 
     return !!ModelEntryManager_getCurrentEntry(cat);
 }
 
+void PlayerModelManager_lockAPI() {
+    sIsAPILocked = true;
+}
+
+void PlayerModelManager_unlockAPI() {
+    sIsAPILocked = false;
+}
+
 RECOMP_DECLARE_EVENT(onRegisterModels());
 RECOMP_DECLARE_EVENT(onReady());
 
