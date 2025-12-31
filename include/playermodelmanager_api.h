@@ -543,7 +543,7 @@ typedef enum PlayerModelManagerModelEvent {
 
 typedef void PlayerModelManagerEventHandler(PlayerModelManagerHandle handle, PlayerModelManagerModelEvent event, void *userdata);
 
-typedef enum PlayerModelManagerBuiltInDL {
+typedef enum PlayerModelManagerBuiltInDLId {
     PMM_BUILT_IN_DL_HUMAN_SWORD_KOKIRI_HILT,
     PMM_BUILT_IN_DL_HUMAN_SWORD_KOKIRI_HILT_AS_ADULT,
     PMM_BUILT_IN_DL_HUMAN_SWORD_KOKIRI_BLADE,
