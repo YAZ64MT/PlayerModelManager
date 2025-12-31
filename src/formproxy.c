@@ -6,7 +6,6 @@
 #include "rt64_extended_gbi.h"
 #include "modelmatrixids.h"
 #include "z64recomp_api.h"
-#include "model_shared.h"
 #include "modelentry.h"
 #include "recompconfig.h"
 #include "playermodelconfig.h"
@@ -706,10 +705,6 @@ void FormProxy_refreshMtx(FormProxy *fp, Link_EquipmentMatrix id) {
     }
 
     if (!matrix) {
-        matrix = ModelEntry_getMatrix(ModelEntryForm_getModelEntry(gSharedModelEntry), id);
-    }
-
-    if (!matrix) {
         matrix = &gIdentityMtx;
     }
 
@@ -1146,10 +1141,6 @@ Gfx *FormProxy_getNextRefreshDL(FormProxy *fp, Link_DisplayList id) {
 
     if (!dl) {
         dl = getDLOrAltFromModelInfo(fallback, id);
-    }
-
-    if (!dl) {
-        dl = getDLOrAltFromModelEntry(ModelEntryForm_getModelEntry(gSharedModelEntry), id);
     }
 
     return dl;
