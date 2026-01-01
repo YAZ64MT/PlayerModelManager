@@ -930,7 +930,7 @@ static Gfx *sBuiltInDLs[PMM_BUILT_IN_DL_MAX] = {
 };
 #undef DECLARE_BUILT_IN_DL
 
-RECOMP_EXPORT Gfx *PlayerModelManager_getBuiltInDL(unsigned long apiVersion, PlayerModelManagerBuiltInDLId id) {
+RECOMP_EXPORT Gfx *PlayerModelManager_getBuiltInDisplayList(unsigned long apiVersion, PlayerModelManagerBuiltInDLId id) {
     if (apiVersion > PMM_API_VERSION) {
         Logger_printError("PlayerModelManager is out of date! Expected API version <= %d but received version %d!", PMM_API_VERSION, apiVersion);
         return NULL;

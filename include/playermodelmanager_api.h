@@ -846,8 +846,8 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isCustomModelApplied(P
 
 // PlayerModelManager defines display lists internally for various purposes (e.g. adult equipment, ungluing models)
 // If you would like to manually specify these for some of your models, you can access them via the following function.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getBuiltInDL(unsigned long apiVersion, PlayerModelManagerBuiltInDLId id));
-#define PLAYERMODELMANAGER_GET_BUILT_IN_DL(dlId) PlayerModelManager_getBuiltInDL(PMM_API_VERSION, dlId)
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getBuiltInDisplayList(unsigned long apiVersion, PlayerModelManagerBuiltInDLId id));
+#define PLAYERMODELMANAGER_GET_BUILT_IN_DISPLAY_LIST(dlId) PlayerModelManager_getBuiltInDisplayList(PMM_API_VERSION, dlId)
 
 // PlayerModelManager defines matrixes internally for various purposes (e.g. adult equipment)
 // If you would like to manually specify these for some of your models, you can access them via the following function.
