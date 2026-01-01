@@ -851,8 +851,8 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getBuiltInDL(unsigned 
 
 // PlayerModelManager defines matrixes internally for various purposes (e.g. adult equipment)
 // If you would like to manually specify these for some of your models, you can access them via the following function.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getBuiltInDL(unsigned long apiVersion, PlayerModelManagerBuiltInDLId id));
-#define PLAYERMODELMANAGER_GET_BUILT_IN_DL(dlId) PlayerModelManager_getBuiltInDL(PMM_API_VERSION, dlId)
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Mtx *PlayerModelManager_getBuiltInMatrix(unsigned long apiVersion, PlayerModelManagerBuiltInMtxId id));
+#define PLAYERMODELMANAGER_GET_BUILT_IN_MATRIX(mtxId) PlayerModelManager_getBuiltInMatrix(PMM_API_VERSION, mtxId)
 
 // Helper define for register models event.
 #define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
