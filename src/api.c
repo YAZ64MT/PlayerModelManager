@@ -944,6 +944,62 @@ RECOMP_EXPORT Gfx *PlayerModelManager_getBuiltInDL(unsigned long apiVersion, Pla
     return sBuiltInDLs[id];
 }
 
+#define DECLARE_BUILT_IN_MTX(id, mtx) [id] = mtx
+static Mtx *sBuiltIMtxs[PMM_BUILT_IN_MTX_MAX] = {
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_KOKIRI_BACK, &gHumanKokiriSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_KOKIRI_BACK_AS_ADULT, &gHumanAdultKokiriSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_RAZOR_BACK, &gHumanRazorSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_RAZOR_BACK_AS_ADULT, &gHumanAdultRazorSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_GILDED_BACK, &gHumanGildedSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_GILDED_BACK_AS_ADULT, &gHumanAdultGildedSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SHIELD_HERO_BACK, &gHumanHeroShieldBackMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SHIELD_HERO_BACK_AS_ADULT, &gHumanAdultHeroShieldBackMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SHIELD_MIRROR_BACK, &gHumanMirrorShieldBackMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SHIELD_MIRROR_BACK_AS_ADULT, &gHumanAdultMirrorShieldBackMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_KOKIRI_HILT_AS_ADULT, &gHumanAdultKokiriSwordHiltResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_KOKIRI_BLADE_AS_ADULT, &gHumanAdultKokiriSwordBladeResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_KOKIRI_SHEATH_AS_ADULT, &gHumanAdultKokiriSwordSheathResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_RAZOR_HILT_AS_ADULT, &gHumanAdultRazorSwordHiltResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_RAZOR_BLADE_AS_ADULT, &gHumanAdultRazorSwordBladeResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_RAZOR_SHEATH_AS_ADULT, &gHumanAdultRazorSwordSheathResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_GILDED_HILT_AS_ADULT, &gHumanAdultGildedSwordHiltResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_GILDED_BLADE_AS_ADULT, &gHumanAdultGildedSwordBladeResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_GILDED_SHEATH_AS_ADULT, &gHumanAdultGildedSwordSheathResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SWORD_GREAT_FAIRY_AS_ADULT, &gHumanAdultGreatFairySwordResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_FIERCE_DEITY_SWORD_AS_CHILD, &gFierceDeityChildSwordResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SHIELD_HERO_AS_ADULT, &gHumanAdultHeroShieldResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SHIELD_MIRROR_AS_ADULT, &gHumanAdultMirrorShieldResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SHIELD_MIRROR_RAY_AS_ADULT, &gHumanAdultMirrorShieldRayResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_SHIELD_MIRROR_RAY_BEAM_AS_ADULT, &gHumanAdultMirrorShieldRayBeamResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_HOOKSHOT_AS_ADULT, &gHumanAdultHookshotResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_FPS_HOOKSHOT_AS_ADULT, &gHumanAdultHookshotFirstPersonResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_HOOKSHOT_HOOK_AS_ADULT, &gHumanAdultHookshotHookResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_HOOKSHOT_CHAIN_AS_ADULT, &gHumanAdultHookshotChainResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_BOW_AS_ADULT, &gHumanAdultBowResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_FPS_BOW_AS_ADULT, &gHumanAdultBowFirstPersonResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_BOW_STRING_AS_ADULT, &gHumanAdultBowStringResizerMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_OCARINA_TIME_AS_ADULT, &gHumanAdultOcarinaTimeResizerMtx),
+
+    // these two will need special handling when OoT recomp comes around
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_HOOKSHOT_CHAIN_AND_HOOK, &gIdentityMtx),
+    DECLARE_BUILT_IN_MTX(PMM_BUILT_IN_MTX_HUMAN_HOOKSHOT_CHAIN_AND_HOOK_AS_ADULT, &gHumanAdultHookshotHookAndChainMtx),
+};
+#undef DECLARE_BUILT_IN_MTX
+
+RECOMP_EXPORT Mtx *PlayerModelManager_getBuiltInMatrix(unsigned long apiVersion, PlayerModelManagerBuiltInMtxId id) {
+    if (apiVersion > PMM_API_VERSION) {
+        Logger_printError("PlayerModelManager is out of date! Expected API version <= %d but received version %d!", PMM_API_VERSION, apiVersion);
+        return NULL;
+    }
+
+    if (id < 0 || id >= ARRAY_COUNT(sBuiltIMtxs)) {
+        Logger_printError("Invalid id passed in.");
+        return NULL;
+    }
+
+    return sBuiltIMtxs[id];
+}
+
 RECOMP_DECLARE_EVENT(onRegisterModels());
 RECOMP_DECLARE_EVENT(onReady());
 
