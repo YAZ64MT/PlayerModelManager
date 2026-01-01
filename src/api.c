@@ -931,6 +931,11 @@ static Gfx *sBuiltInDLs[PMM_BUILT_IN_DL_MAX] = {
 #undef DECLARE_BUILT_IN_DL
 
 RECOMP_EXPORT Gfx *PlayerModelManager_getBuiltInDL(unsigned long apiVersion, PlayerModelManagerBuiltInDLId id) {
+    if (apiVersion > PMM_API_VERSION) {
+        Logger_printError("PlayerModelManager is out of date! Expected API version <= %d but received version %d!", PMM_API_VERSION, apiVersion);
+        return NULL;
+    }
+
     if (id < 0 || id >= ARRAY_COUNT(sBuiltInDLs)) {
         Logger_printError("Invalid id passed in.");
         return NULL;
@@ -969,8 +974,7 @@ void doRegisterModels() {
     Logger_printInfo("Ready!");
 }
 
-RECOMP_CALLBACK(".", _internal_postInitHashObjects)
-void doRegisterModelsCMEMReady() {
+RECOMP_CALLBACK(".", _internal_postInitHashObjects) void doRegisterModelsCMEMReady() {
     sIsCMEMReady = true;
     Logger_printVerbose("ModelEntryManager is ready.");
     doRegisterModels();
