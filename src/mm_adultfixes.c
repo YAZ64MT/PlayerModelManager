@@ -298,7 +298,7 @@ typedef struct SingleLegFloat {
     f32 tmp;
 } SingleLegFloat;
 
-SingleLegFloat sSingleLegFloatsTmp[] = {
+static SingleLegFloat sSingleLegFloatsTmp[] = {
     {.vanillaArr = D_801C08FC},
     {.vanillaArr = D_801C0910},
     {.vanillaArr = D_801C0924},
