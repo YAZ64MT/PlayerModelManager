@@ -643,6 +643,53 @@ typedef enum PlayerModelManagerBuiltInDLId {
     PMM_BUILT_IN_DL_MAX,
 } PlayerModelManagerBuiltInDLId;
 
+typedef enum PlayerModelManagerBuiltInMtxId {
+    PMM_BUILT_IN_MTX_NONE,
+
+    // Sheathed swords and shields
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_KOKIRI_BACK,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_KOKIRI_BACK_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_RAZOR_BACK,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_RAZOR_BACK_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_GILDED_BACK,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_GILDED_BACK_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SHIELD_HERO_BACK,
+    PMM_BUILT_IN_MTX_HUMAN_SHIELD_HERO_BACK_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SHIELD_MIRROR_BACK,
+    PMM_BUILT_IN_MTX_HUMAN_SHIELD_MIRROR_BACK_AS_ADULT,
+
+    // Resized + Repositioned MM Equipment
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_KOKIRI_HILT_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_KOKIRI_BLADE_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_KOKIRI_SHEATH_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_RAZOR_HILT_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_RAZOR_BLADE_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_RAZOR_SHEATH_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_GILDED_HILT_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_GILDED_BLADE_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_GILDED_SHEATH_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SWORD_GREAT_FAIRY_AS_ADULT,
+    PMM_BUILT_IN_MTX_FIERCE_DEITY_SWORD_AS_CHILD,
+    PMM_BUILT_IN_MTX_HUMAN_SHIELD_HERO_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SHIELD_MIRROR_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SHIELD_MIRROR_RAY_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_SHIELD_MIRROR_RAY_BEAM_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_HOOKSHOT_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_FPS_HOOKSHOT_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_HOOKSHOT_HOOK_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_HOOKSHOT_CHAIN_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_BOW_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_FPS_BOW_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_BOW_STRING_AS_ADULT,
+    PMM_BUILT_IN_MTX_HUMAN_OCARINA_TIME_AS_ADULT,
+
+    // Repositions the hookshot actor
+    PMM_BUILT_IN_MTX_HUMAN_HOOKSHOT_CHAIN_AND_HOOK,
+    PMM_BUILT_IN_MTX_HUMAN_HOOKSHOT_CHAIN_AND_HOOK_AS_ADULT,
+
+    PMM_BUILT_IN_MTX_MAX,
+} PlayerModelManagerBuiltInMtxId;
+
 #ifndef YAZMT_PMM_NO_API_IMPORTS
 
 #include "global.h"
@@ -798,6 +845,11 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_overrideVanillaMatrix(
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form));
 
 // PlayerModelManager defines display lists internally for various purposes (e.g. adult equipment, ungluing models)
+// If you would like to manually specify these for some of your models, you can access them via the following function.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getBuiltInDL(unsigned long apiVersion, PlayerModelManagerBuiltInDLId id));
+#define PLAYERMODELMANAGER_GET_BUILT_IN_DL(dlId) PlayerModelManager_getBuiltInDL(PMM_API_VERSION, dlId)
+
+// PlayerModelManager defines matrixes internally for various purposes (e.g. adult equipment)
 // If you would like to manually specify these for some of your models, you can access them via the following function.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getBuiltInDL(unsigned long apiVersion, PlayerModelManagerBuiltInDLId id));
 #define PLAYERMODELMANAGER_GET_BUILT_IN_DL(dlId) PlayerModelManager_getBuiltInDL(PMM_API_VERSION, dlId)
