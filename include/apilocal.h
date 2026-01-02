@@ -32,7 +32,5 @@ bool PlayerModelManager_isApplied(PlayerModelManagerHandle h);
 void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a);
 void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a);
 bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form);
-Gfx *PlayerModelManager_getBuiltInDisplayList(unsigned long apiVersion, PlayerModelManagerBuiltInDLId id);
-Mtx *PlayerModelManager_getBuiltInMatrix(unsigned long apiVersion, PlayerModelManagerBuiltInMtxId id);
 
 #endif
