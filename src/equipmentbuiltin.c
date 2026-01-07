@@ -77,6 +77,8 @@ DECLARE_MATRIX_WRAPPED_DL(gHumanAdultOcarinaTimeDL, gHumanAdultOcarinaTimeResize
 
 Mtx gHumanAdultHookshotHookAndChainMtx;
 
+Mtx gChildDekuShieldBackMtx;
+
 Mtx gHumanHeroShieldBackMtx;
 Mtx gHumanAdultHeroShieldBackMtx;
 
@@ -118,6 +120,8 @@ static void initCustomDLs() {
     const f32 ADULT_SWORD_SCALE_FACTOR = 1.3f;
 
     void *human = getMMObject(OBJECT_LINK_CHILD);
+
+    guPosition(&gChildDekuShieldBackMtx, 0.f, 0.f, 180.f, 1.f, 545.f, 0.f, 80.f);
 
     gHumanHeroShieldBackMtx = *getGlobalObjectMtx(human, &gLinkHumanHerosShieldMtx);
     guPosition(&gHumanAdultHeroShieldBackMtx, 0.f, 0.f, 180.f, 1.f, 935.f, 94.f, 29.f);

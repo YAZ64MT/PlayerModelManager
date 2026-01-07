@@ -78,53 +78,9 @@ extern Gfx gHumanAdultBowStringDL[];
 extern Mtx gHumanAdultOcarinaTimeResizerMtx;
 extern Gfx gHumanAdultOcarinaTimeDL[];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 extern Mtx gHumanAdultHookshotHookAndChainMtx;
+
+extern Mtx gChildDekuShieldBackMtx;
 
 extern Mtx gHumanHeroShieldBackMtx;
 extern Mtx gHumanAdultHeroShieldBackMtx;
