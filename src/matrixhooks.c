@@ -37,7 +37,7 @@ void handleMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex
     }
 }
 
-void handleMaskMtx_on_return_Player_PostLimbDrawGameplay() {
+void handleMaskMtx_on_return_Player_PostLimbDrawGameplay(void) {
     if (sIsMaskMatrixPushed) {
         Matrix_Pop();
     }
@@ -65,7 +65,7 @@ void fixAdultBremen_on_Player_Draw(Player *player, PlayState *play) {
     }
 }
 
-void fixAdultBremen_on_return_Player_Draw() {
+void fixAdultBremen_on_return_Player_Draw(void) {
     if (sPushedMatrixBremen) {
         Matrix_Pop();
     }

@@ -116,7 +116,7 @@ static Mtx *getGlobalObjectMtx(void *globalObject, Mtx *segmentedPtr) {
     return SEGMENTED_TO_GLOBAL_PTR(globalObject, segmentedPtr);
 }
 
-static void initCustomDLs() {
+static void initCustomDLs(void) {
     const f32 ADULT_SWORD_SCALE_FACTOR = 1.3f;
 
     void *human = getMMObject(OBJECT_LINK_CHILD);
@@ -228,7 +228,7 @@ static void setChildModelTypeMtx(PlayerModelManagerHandle h, Link_EquipmentMatri
 }
 
 RECOMP_CALLBACK(".", onRegisterModels)
-void registerMMEquipment() {
+void registerMMEquipment(void) {
     initCustomDLs();
 
     void *human = getMMObject(OBJECT_LINK_CHILD);

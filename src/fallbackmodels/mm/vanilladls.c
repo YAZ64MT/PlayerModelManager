@@ -25,7 +25,7 @@ static Gfx *getRepointedDL(ObjectId id, Gfx *segmentedDL) {
     return GlobalObjects_getGlobalGfxPtr(id, segmentedDL);
 }
 
-void initVanillaMMDLs() {
+void initVanillaMMDLs(void) {
     for (int i = 0; i < ARRAY_COUNT(sVanillaMMDLInits); ++i) {
         VanillaInitDLInfo *curr = &sVanillaMMDLInits[i];
 

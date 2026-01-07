@@ -19,6 +19,6 @@ PlayerModelConfigDLHandle PLayerModelConfig_addDLWithMtx(PlayerModelConfigMtxHan
 
 bool PlayerModelConfig_getEntries(PlayerModelConfigDLHandle **handlesOut, size_t *numOut);
 
-FormProxyId PlayerModelConfig_getNumFormIds();
+FormProxyId PlayerModelConfig_getNumFormIds(void);
 
 #endif

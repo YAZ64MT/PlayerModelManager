@@ -49,7 +49,7 @@ static Gfx sEndBowstringDL[] = {
 };
 
 RECOMP_CALLBACK(".", _internal_preInitHashObjects)
-void initFormProxyExDLs() {
+void initFormProxyExDLs(void) {
     gEXPushEnvColor(&sStartDLWrapper[0]);
     gEXPopEnvColor(&sEndDLWrapper[0]);
     gEXMatrixGroupSimple(&sStartBowStringDL[0], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
@@ -1239,7 +1239,7 @@ void FormProxy_requestRefresh(FormProxy *fp) {
     YAZMTCore_IterableU32Set_insert(sQueuedRefreshes, (uintptr_t)fp);
 }
 
-static void setupAltLists() {
+static void setupAltLists(void) {
     sDLToAltLists = recomputil_create_u32_value_hashmap();
 
     for (int i = 0; i < ARRAY_COUNT(sDisplayListAlts); ++i) {
@@ -1252,13 +1252,13 @@ static void setupAltLists() {
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initFormProxyObjects() {
+void initFormProxyObjects(void) {
     sValidFormProxyPtrs = recomputil_create_u32_hashset();
     setupAltLists();
     sQueuedRefreshes = YAZMTCore_IterableU32Set_new();
 }
 
-void processFormProxyRefreshRequests_on_Play_Draw() {
+void processFormProxyRefreshRequests_on_Play_Draw(void) {
     size_t numRequests = YAZMTCore_IterableU32Set_size(sQueuedRefreshes);
 
     if (numRequests > 0) {

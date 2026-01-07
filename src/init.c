@@ -51,7 +51,7 @@ void initFormProxies(void) {
 void initVanillaMMDLs(void);
 void initCustomDLs(void);
 
-GLOBAL_OBJECTS_CALLBACK_ON_READY void initFormProxiesOnGlobalObjects() {
+GLOBAL_OBJECTS_CALLBACK_ON_READY void initFormProxiesOnGlobalObjects(void) {
     initCustomDLs();
     initVanillaMMDLs();
     sIsGlobalObjectsReady = true;
@@ -62,7 +62,7 @@ RECOMP_DECLARE_EVENT(_internal_preInitHashObjects(void));
 RECOMP_DECLARE_EVENT(_internal_initHashObjects(void));
 RECOMP_DECLARE_EVENT(_internal_postInitHashObjects(void));
 
-RECOMP_CALLBACK("*", recomp_on_init) void handleInits() {
+RECOMP_CALLBACK("*", recomp_on_init) void handleInits(void) {
     _internal_preInitHashObjects();
     _internal_initHashObjects();
     _internal_postInitHashObjects();

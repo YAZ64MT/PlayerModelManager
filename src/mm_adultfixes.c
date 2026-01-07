@@ -56,7 +56,7 @@ PlayerAgeProperties gAdultLinkAgeProps;
 
 extern PlayerAgeProperties sPlayerAgeProperties[];
 
-void initAdultLinkAgeProperties() {
+void initAdultLinkAgeProperties(void) {
     PlayerAgeProperties *fdProps = &sPlayerAgeProperties[PLAYER_FORM_FIERCE_DEITY];
     gAdultLinkAgeProps = sPlayerAgeProperties[PLAYER_FORM_ZORA];
 
@@ -84,7 +84,7 @@ void changePlayerMass_on_Player_UpdateCommon(Player *player) {
     }
 }
 
-void changePlayerMass_on_return_Player_UpdateCommon() {
+void changePlayerMass_on_return_Player_UpdateCommon(void) {
     sPlayerMass[PLAYER_FORM_HUMAN] = sHumanMass;
 }
 
@@ -110,7 +110,7 @@ void setAdultBootData_on_func_80123140(PlayState *play, Player *player) {
     }
 }
 
-void setAdultBootData_on_return_func_80123140() {
+void setAdultBootData_on_return_func_80123140(void) {
     if (sIsBootsOverwritten) {
         copyBootProperties(PLAYER_BOOTS_ARR[PLAYER_BOOTS_HYLIAN], sBootsPropsTemp);
     }
@@ -135,7 +135,7 @@ void replaceDoorAnim_on_Player_Door_Knob(Player *player) {
     }
 }
 
-void replaceDoorAnim_on_return_Player_Door_Knob() {
+void replaceDoorAnim_on_return_Player_Door_Knob(void) {
     if (sWasDoorAnimChanged) {
         sWasDoorAnimChanged = false;
         for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
@@ -145,7 +145,7 @@ void replaceDoorAnim_on_return_Player_Door_Knob() {
     }
 }
 
-void initVanillaProps_on_Player_Init() {
+void initVanillaProps_on_Player_Init(void) {
     static bool isFirstTimeInitDone;
     if (!isFirstTimeInitDone) {
         isFirstTimeInitDone = true;
@@ -212,7 +212,7 @@ void fixEnemyHeight_on_EnRd_Grab(PlayState *play) {
     }
 }
 
-void fixEnemyHeight_on_return_EnRd_Grab() {
+void fixEnemyHeight_on_return_EnRd_Grab(void) {
     sPlayerEnRdGrab->transformation = sRealPlayerFormEnRdGrab;
 }
 
@@ -227,7 +227,7 @@ void fixEnemyHeight_on_EnRailgibud_MoveToIdealGrabPositionAndRotation(PlayState 
     }
 }
 
-void fixEnemyHeight_on_return_EnRailgibud_MoveToIdealGrabPositionAndRotation() {
+void fixEnemyHeight_on_return_EnRailgibud_MoveToIdealGrabPositionAndRotation(void) {
     gSaveContext.save.playerForm = sRealPlayerFormIdealPosMusicBox;
 }
 
@@ -242,7 +242,7 @@ void fixEnemyHeight_on_EnTalkgibud_MoveToIdealGrabPositionAndRotation(PlayState 
     }
 }
 
-void fixEnemyHeight_on_return_EnTalkgibud_MoveToIdealGrabPositionAndRotation() {
+void fixEnemyHeight_on_return_EnTalkgibud_MoveToIdealGrabPositionAndRotation(void) {
     gSaveContext.save.playerForm = sRealPlayerFormIdealPosTalk;
 }
 
@@ -277,7 +277,7 @@ void fixBowProperties_on_Player_Draw(Player *player, PlayState *play) {
     }
 }
 
-void fixBowProperties_on_return_Player_Draw() {
+void fixBowProperties_on_return_Player_Draw(void) {
     if (sIsAdultBowData) {
         D_801C0D6C = sChildArrowOffset;
         D_801C0D98 = sChildBowStringData;
@@ -322,7 +322,7 @@ void adjustAdultLeg_on_Player_AdjustSingleLeg(Player *player) {
     }
 }
 
-void adjustAdultLeg_on_return_Player_AdjustSingleLeg() {
+void adjustAdultLeg_on_return_Player_AdjustSingleLeg(void) {
     if (sIsSingleLegAdjusted) {
         D_801C08C0[PLAYER_FORM_HUMAN] = sTmpAdjustSingleLegVec;
 

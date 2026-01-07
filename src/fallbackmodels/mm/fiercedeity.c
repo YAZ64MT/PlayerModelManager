@@ -14,7 +14,7 @@ Gfx *getFierceDeityDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_BOY, dl);
 }
 
-void registerFierceDeity() {
+void registerFierceDeity(void) {
     void *fd = GlobalObjects_getGlobalObject(OBJECT_LINK_BOY);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(fd, &gLinkFierceDeitySkel);

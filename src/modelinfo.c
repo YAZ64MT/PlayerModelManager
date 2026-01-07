@@ -224,6 +224,6 @@ bool ModelInfo_isAnyFlagEnabled(ModelInfo *modelInfo, u64 flags) {
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initModelInfoObjects() {
+void initModelInfoObjects(void) {
     sValidModelInfoPtrs = recomputil_create_u32_hashset();
 }

@@ -9,7 +9,7 @@
 ActorExtensionId gPlayerExtIdMirrorShieldBackMf;
 
 RECOMP_CALLBACK(".", _internal_preInitHashObjects)
-void initMirrorShieldActorExtensions() {
+void initMirrorShieldActorExtensions(void) {
     gPlayerExtIdMirrorShieldBackMf = z64recomp_extend_actor(ACTOR_PLAYER, sizeof(MtxF));
 }
 
@@ -53,6 +53,6 @@ void overwriteShieldMtx_on_MirRay3_Draw(MirRay3 *mirRay3, PlayState *play) {
     }
 }
 
-void overwriteShieldMtx_on_return_MirRay3_Draw() {
+void overwriteShieldMtx_on_return_MirRay3_Draw(void) {
     sMirRay3Player->shieldMf = sRealShieldMf;
 }

@@ -198,12 +198,12 @@ void PlayerProxy_requestTunicColorOverride(PlayerProxy *pp, Color_RGBA8 color) {
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initPlayerProxyHash() {
+void initPlayerProxyHash(void) {
     sValidPlayerProxies = recomputil_create_u32_hashset();
 }
 
 RECOMP_CALLBACK(".", _internal_postInitHashObjects)
-void initPlayerProxyFallbacks() {
+void initPlayerProxyFallbacks(void) {
     ModelInfo_init(&gHumanModelInfoFallbackOverride);
     ModelInfo_init(&gDekuModelInfoFallbackOverride);
     ModelInfo_init(&gGoronModelInfoFallbackOverride);

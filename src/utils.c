@@ -87,7 +87,7 @@ void Utils_setCrashEnabled(bool isEnabled) {
     sIsCrashDisabled = isEnabled;
 }
 
-void Utils_tryCrashGame() {
+void Utils_tryCrashGame(void) {
     if (!sIsCrashDisabled) {
         Logger_printError("Forcing game crash...");
         int *ptr = NULL;

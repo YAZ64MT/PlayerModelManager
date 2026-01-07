@@ -145,7 +145,7 @@ void GfxHookLookup_init(GfxHookLookup *ghl) {
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initGfxHookReplacmentMaps() {
+void initGfxHookReplacmentMaps(void) {
     GfxHookLookup_init(&sGameplayKeepDLMap);
     GfxHookLookup_init(&sLinkHumanDLMap);
     GfxHookLookup_init(&sLinkDekuDLMap);
@@ -289,7 +289,7 @@ void hookGfx_on_Player_Draw(Player *player, PlayState *play) {
     fillGfxHookData(&sPlayerDrawGfxHook, play, ProxyActorExt_getFormProxy(&player->actor), &sGameplayKeepDLMap, getFormGfxLookup(player->transformation), NULL);
 }
 
-void hookGfx_on_return_Player_Draw() {
+void hookGfx_on_return_Player_Draw(void) {
     replaceHookedOpaGfxCommands(&sPlayerDrawGfxHook);
     replaceHookedXluGfxCommands(&sPlayerDrawGfxHook);
 }
@@ -300,7 +300,7 @@ void hookGfx_on_Player_DrawBlastMask(PlayState *play, Player *player) {
     fillGfxHookData(&sPlayerDrawBlastMaskGfxHook, play, ProxyActorExt_getFormProxy(&player->actor), &sGameplayKeepDLMap, NULL, &sBlastMaskDLMap);
 }
 
-void hookGfx_on_return_Player_DrawBlastMask() {
+void hookGfx_on_return_Player_DrawBlastMask(void) {
     replaceHookedOpaGfxCommands(&sPlayerDrawBlastMaskGfxHook);
     replaceHookedXluGfxCommands(&sPlayerDrawBlastMaskGfxHook);
 }
@@ -329,7 +329,7 @@ void hookGfx_on_ArmsHook_Draw(ArmsHook *armsHook, PlayState *play) {
     fillGfxHookData(&sHookshotGfxHook, play, getFormProxyOrFallback(&armsHook->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, &sLinkHumanDLMap, NULL);
 }
 
-void hookGfx_on_return_ArmsHook_Draw() {
+void hookGfx_on_return_ArmsHook_Draw(void) {
     replaceHookedOpaGfxCommands(&sHookshotGfxHook);
     replaceHookedXluGfxCommands(&sHookshotGfxHook);
 }
@@ -348,7 +348,7 @@ void hookGfx_on_EnArrow_Draw(EnArrow *enArrow, PlayState *play) {
     fillGfxHookData(&sArrowGfxHook, play, getFormProxyOrFallback(&enArrow->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
 }
 
-void hookGfx_on_return_EnArrow_Draw() {
+void hookGfx_on_return_EnArrow_Draw(void) {
     replaceHookedOpaGfxCommands(&sArrowGfxHook);
     replaceHookedXluGfxCommands(&sArrowGfxHook);
 }
@@ -367,7 +367,7 @@ void hookGfx_on_MirRay3_Draw(MirRay3 *mirRay3, PlayState *play) {
     fillGfxHookData(&sMirrorRayGfxHook, play, getFormProxyOrFallback(&mirRay3->actor, formId, play), &sGameplayKeepDLMap, &sShieldMirrorDLMap, NULL);
 }
 
-void hookGfx_on_return_MirRay3_Draw() {
+void hookGfx_on_return_MirRay3_Draw(void) {
     replaceHookedOpaGfxCommands(&sMirrorRayGfxHook);
     replaceHookedXluGfxCommands(&sMirrorRayGfxHook);
 }
@@ -409,7 +409,7 @@ void hookGfx_on_EnBom_Draw(EnBom *enBom, PlayState *play) {
     fillGfxHookData(&sBombGfxHook, play, getFormProxyOrFallback(&enBom->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
 }
 
-void hookGfx_on_return_EnBom_Draw() {
+void hookGfx_on_return_EnBom_Draw(void) {
     replaceHookedOpaGfxCommands(&sBombGfxHook);
 }
 
@@ -419,6 +419,6 @@ void hookGfx_on_EnBomChu_Draw(EnBomChu *enBomChu, PlayState *play) {
     fillGfxHookData(&sBombchuGfxHook, play, getFormProxyOrFallback(&enBomChu->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
 }
 
-void hookGfx_on_return_EnBomChu_Draw() {
+void hookGfx_on_return_EnBomChu_Draw(void) {
     replaceHookedOpaGfxCommands(&sBombchuGfxHook);
 }

@@ -16,7 +16,7 @@ Gfx *getHumanDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, dl);
 }
 
-void registerHuman() {
+void registerHuman(void) {
     void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);

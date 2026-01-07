@@ -14,7 +14,7 @@ Gfx *getDekuDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_NUTS, dl);
 }
 
-void registerDeku() {
+void registerDeku(void) {
     void *deku = GlobalObjects_getGlobalObject(OBJECT_LINK_NUTS);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(deku, &gLinkDekuSkel);

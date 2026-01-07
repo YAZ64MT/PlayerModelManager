@@ -58,7 +58,7 @@ static Gfx *getDLCopy(Gfx dl[], size_t n) {
     return copy;
 }
 
-static void unglueOcarinaFromHand() {
+static void unglueOcarinaFromHand(void) {
     const size_t RIGHT_HAND_HOLDING_OCARINA_DL_LEN = 74;
 
     Gfx *humanRightHandHoldingOcarinaDL = getDLCopy(GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, gLinkHumanRightHandHoldingOcarinaDL), RIGHT_HAND_HOLDING_OCARINA_DL_LEN);
@@ -72,7 +72,7 @@ static void unglueOcarinaFromHand() {
     gSPBranchList(ARRAY_LAST_ELEMENT_PTR(gLinkHumanOcarinaDL), &humanRightHandHoldingOcarinaDL[OCARINA_START_DRAW_INDEX + 1]);
 }
 
-static void unglueFirstPersonHandFromHookshot() {
+static void unglueFirstPersonHandFromHookshot(void) {
     const size_t RIGHT_HAND_HOLDING_HOOKSHOT_FIRST_PERSON_DL_LEN = 209;
 
     Gfx *humanRightHandHoldingHookshotFirstPersonDL = getDLCopy(GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, object_link_child_DL_017B40), RIGHT_HAND_HOLDING_HOOKSHOT_FIRST_PERSON_DL_LEN);
@@ -86,7 +86,7 @@ static void unglueFirstPersonHandFromHookshot() {
     gSPBranchList(ARRAY_LAST_ELEMENT_PTR(gLinkHumanFirstPersonArmDL), &humanRightHandHoldingHookshotFirstPersonDL[FPS_RIGHT_HAND_START_DRAW_INDEX + 1]);
 }
 
-static void unglueFirstPersonBowFromHand() {
+static void unglueFirstPersonBowFromHand(void) {
     const size_t FPS_BOW_DL_LEN = 86;
 
     Gfx *firstPersonBow = getDLCopy(GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, object_link_child_DL_018490), FPS_BOW_DL_LEN);
@@ -96,7 +96,7 @@ static void unglueFirstPersonBowFromHand() {
     gSPBranchList(gLinkHumanFirstPersonBowDL, firstPersonBow);
 }
 
-void initCustomDLs() {
+void initCustomDLs(void) {
     unglueOcarinaFromHand();
     unglueFirstPersonHandFromHookshot();
     unglueFirstPersonBowFromHand();

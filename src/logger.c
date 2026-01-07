@@ -15,11 +15,11 @@ void Logger_setLoggerLevel(LoggerLevel level) {
 }
 
 RECOMP_CALLBACK(".", _internal_preInitHashObjects)
-void setupLoggerFirstTime() {
+void setupLoggerFirstTime(void) {
     Logger_setLoggerLevel(recomp_get_config_u32("logging_level"));
 }
 
-void updateLoggerLevel_on_Play_Main() {
+void updateLoggerLevel_on_Play_Main(void) {
     LoggerLevel level = recomp_get_config_u32("logging_level");
 
     if (level != gLoggerLevel) {

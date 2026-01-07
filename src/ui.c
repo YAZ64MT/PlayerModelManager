@@ -104,15 +104,15 @@ static bool isValidCategoryInfoIndex(int i) {
     return i >= 0 && i < ARRAY_COUNT(sCategoryInfos);
 }
 
-static bool isSelectingCategory() {
+static bool isSelectingCategory(void) {
     return false;
 }
 
-static bool isSelectingModel() {
+static bool isSelectingModel(void) {
     return isValidCategoryInfoIndex(sCurrentCategoryInfo);
 }
 
-static CategoryInfo *getCurrentCategoryInfo() {
+static CategoryInfo *getCurrentCategoryInfo(void) {
     if (isSelectingModel()) {
         return &sCategoryInfos[sCurrentCategoryInfo];
     } else {
@@ -235,21 +235,21 @@ static void connectListBoxButtons(const RecompuiResource buttons[], size_t n) {
 
 YAZMTCore_IterableU32Set *sModelListButtons;
 
-static const RecompuiResource *getCurrentModelButtonArray() {
+static const RecompuiResource *getCurrentModelButtonArray(void) {
     return YAZMTCore_IterableU32Set_values(sModelListButtons);
 }
 
-static size_t getCurrentModelButtonArraySize() {
+static size_t getCurrentModelButtonArraySize(void) {
     return YAZMTCore_IterableU32Set_size(sModelListButtons);
 }
 
 YAZMTCore_IterableU32Set *sCategoryListButtons;
 
-static const RecompuiResource *getCategoryButtonArray() {
+static const RecompuiResource *getCategoryButtonArray(void) {
     return YAZMTCore_IterableU32Set_values(sCategoryListButtons);
 }
 
-static size_t getCategoryButtonArraySize() {
+static size_t getCategoryButtonArraySize(void) {
     return YAZMTCore_IterableU32Set_size(sCategoryListButtons);
 }
 
@@ -289,7 +289,7 @@ static void setButtonColor(RecompuiResource button, const ButtonColor *color) {
     recompui_set_border_color(button, &color->borderColor);
 }
 
-static void refreshModelButtonEntryColors() {
+static void refreshModelButtonEntryColors(void) {
     CategoryInfo *catInf = getCurrentCategoryInfo();
 
     if (catInf) {
@@ -310,7 +310,7 @@ static void refreshModelButtonEntryColors() {
     }
 }
 
-static void refreshCategoryButtonEntryColors() {
+static void refreshCategoryButtonEntryColors(void) {
     CategoryInfo *catInf = getCurrentCategoryInfo();
 
     if (catInf) {
@@ -357,11 +357,11 @@ RecompuiResource sLabelAuthor;
 
 static bool sIsLivePreviewEnabled = false;
 
-static bool shouldLivePreview() {
+static bool shouldLivePreview(void) {
     return sIsLivePreviewEnabled;
 }
 
-static void destroyAuthor() {
+static void destroyAuthor(void) {
     if (sLabelAuthor) {
         recompui_destroy_element(sRowAuthor, sLabelAuthor);
         recompui_destroy_element(sRowAuthor, sLabelAuthorPrefix);
@@ -388,32 +388,32 @@ static void applyRealEntry(int entryIndex) {
     }
 }
 
-static void applyRealEntries() {
+static void applyRealEntries(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         applyRealEntry(i);
     }
 }
 
-static void clearRealEntries() {
+static void clearRealEntries(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         sCategoryInfos[i].realEntry = NULL;
     }
 }
 
-static void fillRealEntries() {
+static void fillRealEntries(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         sCategoryInfos[i].realEntry = ModelEntryManager_getCurrentEntry(sCategoryInfos[i].category);
     }
 }
 
-static void removeAllModels() {
+static void removeAllModels(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         ModelEntryManager_tryApplyEntry(catInf->category, NULL);
     }
 }
 
-static void removeEquipmentModels() {
+static void removeEquipmentModels(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         if (isEquipmentCategory(catInf->category)) {
@@ -422,7 +422,7 @@ static void removeEquipmentModels() {
     }
 }
 
-static void saveAllModels() {
+static void saveAllModels(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         catInf->isNeedsDiskSave = true;
@@ -529,7 +529,7 @@ static void closeButtonPressed(RecompuiResource resource, const RecompuiEventDat
 
 static void destroyModelButtons();
 
-void refreshCategoryName() {
+void refreshCategoryName(void) {
     if (sLabelCategory) {
         recompui_destroy_element(sRowCategory, sLabelCategory);
         sLabelCategory = 0;
@@ -547,7 +547,7 @@ void refreshCategoryName() {
     }
 }
 
-static void incrementCurrentCategory() {
+static void incrementCurrentCategory(void) {
     CategoryInfo *currInf;
 
     do {
@@ -557,7 +557,7 @@ static void incrementCurrentCategory() {
     } while (!(currInf->isVisible || sIsForceAllCategoriesVisible));
 }
 
-static void decrementCurrentCategory() {
+static void decrementCurrentCategory(void) {
     CategoryInfo *currInf;
 
     do {
@@ -593,7 +593,7 @@ static void changeCategoryButtonPressed(RecompuiResource resource, const Recompu
     }
 }
 
-static void createNextPrevCategoryButtons() {
+static void createNextPrevCategoryButtons(void) {
     sButtonCategoryPrev = recompui_create_button(sUIContext, sRowCategory, "◀", BUTTONSTYLE_SECONDARY);
     sButtonCategoryNext = recompui_create_button(sUIContext, sRowCategory, "▶", BUTTONSTYLE_SECONDARY);
 
@@ -644,7 +644,7 @@ static void setupRow(RecompuiResource row) {
 }
 
 RECOMP_CALLBACK(".", _internal_preInitHashObjects)
-void initUIOnRecompInit() {
+void initUIOnRecompInit(void) {
     RecompuiColor backgroundColor;
     backgroundColor.r = 255;
     backgroundColor.g = 255;
@@ -868,7 +868,7 @@ static void onUpOneLevelButtonPressed(RecompuiResource resource, const RecompuiE
     }
 }
 
-static void destroyModelButtons() {
+static void destroyModelButtons(void) {
     size_t count = getCurrentModelButtonArraySize();
     const RecompuiResource *buttons = getCurrentModelButtonArray();
 
@@ -880,7 +880,7 @@ static void destroyModelButtons() {
     YAZMTCore_IterableU32Set_clear(sModelListButtons);
 }
 
-static void createModelListButtons() {
+static void createModelListButtons(void) {
     CategoryInfo *catInf = getCurrentCategoryInfo();
     RecompuiEventHandler *pressedCallback = onModelButtonPressed;
     RecompuiEventHandler *removedCallback = onModelButtonPressed;
@@ -926,7 +926,7 @@ static void createModelListButtons() {
     connectListBoxButtons(getCurrentModelButtonArray(), getCurrentModelButtonArraySize());
 }
 
-static void refreshFileList() {
+static void refreshFileList(void) {
     // MUST CALL INSIDE UI CONTEXT
 
     destroyModelButtons();
@@ -1009,7 +1009,7 @@ static bool isOpenMenuComboPressed(PlayState *play) {
     return false;
 }
 
-static void openModelMenu() {
+static void openModelMenu(void) {
     if (!sIsUIContextShown) {
         sIsLivePreviewEnabled = recomp_get_config_u32("is_live_preview_enabled");
         fillRealEntries();
@@ -1021,7 +1021,7 @@ static void openModelMenu() {
 static bool sIsModelManagerReady;
 
 RECOMP_CALLBACK(".", onReady)
-void allowUIOnReady() {
+void allowUIOnReady(void) {
     sIsModelManagerReady = true;
 }
 
@@ -1039,7 +1039,7 @@ void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play) {
 }
 
 RECOMP_CALLBACK(".", _internal_onFinishedRegisterModels)
-void populateFirstFileList() {
+void populateFirstFileList(void) {
     recompui_open_context(sUIContext);
 
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
@@ -1078,7 +1078,7 @@ void populateFirstFileList() {
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initUiObjects() {
+void initUiObjects(void) {
     sModelButtonsToData = recomputil_create_u32_value_hashmap();
     sCategoryButtonsToData = recomputil_create_u32_value_hashmap();
     sModelListButtons = YAZMTCore_IterableU32Set_new();
@@ -1086,7 +1086,7 @@ void initUiObjects() {
 }
 
 RECOMP_CALLBACK(".", _internal_preInitHashObjects)
-void preInitUiObjects() {
+void preInitUiObjects(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         sCategoryInfos[i].index = i;
     }

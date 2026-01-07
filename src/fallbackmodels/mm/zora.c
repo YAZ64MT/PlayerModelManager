@@ -13,7 +13,7 @@ Gfx *getZoraDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_ZORA, dl);
 }
 
-void registerZora() {
+void registerZora(void) {
     void *zora = GlobalObjects_getGlobalObject(OBJECT_LINK_ZORA);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(zora, &gLinkZoraSkel);

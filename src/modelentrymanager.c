@@ -668,7 +668,7 @@ void ModelEntryManager_reapplyEntry(Link_CustomModelCategory cat) {
     }
 }
 
-static void reapplyAllEquipmentEntries() {
+static void reapplyAllEquipmentEntries(void) {
     for (Link_CustomModelCategory i = 0; i < LINK_CMC_MAX; ++i) {
         if (isEquipmentCategory(i)) {
             const ModelEntry *tmp = ModelEntryManager_getCurrentEntry(i);
@@ -845,7 +845,7 @@ void ModelEntryManager_saveCurrentEntry(Link_CustomModelCategory cat) {
 
 RECOMP_DECLARE_EVENT(_internal_onSavedModelsApplied());
 
-void loadSavedModels() {
+void loadSavedModels(void) {
     static char retrievedName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
 
     for (int i = 0; i < LINK_CMC_MAX; ++i) {
@@ -859,12 +859,12 @@ void loadSavedModels() {
     _internal_onSavedModelsApplied();
 }
 
-void applySavedModels_on_return_ConsoleLogo_Destroy() {
+void applySavedModels_on_return_ConsoleLogo_Destroy(void) {
     loadSavedModels();
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initCMEMHash() {
+void initCMEMHash(void) {
     sEntryHandles = recomputil_create_u32_slotmap();
     sInternalNamesToEntries = YAZMTCore_StringU32Dictionary_new();
     sHiddenModelEntries = recomputil_create_u32_hashset();

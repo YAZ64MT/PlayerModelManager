@@ -14,7 +14,7 @@ Gfx *getGoronDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_GORON, dl);
 }
 
-void registerGoron() {
+void registerGoron(void) {
     void *goron = GlobalObjects_getGlobalObject(OBJECT_LINK_GORON);
     void *gk = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
 

@@ -11,11 +11,11 @@
 static YAZMTCore_IterableU32Set *sPlayerProxies;
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initPPMHash() {
+void initPPMHash(void) {
     sPlayerProxies = YAZMTCore_IterableU32Set_new();
 }
 
-PlayerProxy *PlayerProxyManager_createPlayerProxy() {
+PlayerProxy *PlayerProxyManager_createPlayerProxy(void) {
     PlayerProxy *pp = recomp_alloc(sizeof(PlayerProxy));
 
     PlayerProxy_init(pp);
@@ -33,7 +33,7 @@ static bool isModelEntryInModelInfo(ModelInfo *mi, ModelEntry *entry) {
     return (void *)ModelInfo_getModelEntryForm(mi) == entry;
 }
 
-void PlayerProxyManager_refreshAll() {
+void PlayerProxyManager_refreshAll(void) {
     PlayerProxy *const *proxies = (PlayerProxy *const *)YAZMTCore_IterableU32Set_values(sPlayerProxies);
     size_t numProxies = YAZMTCore_IterableU32Set_size(sPlayerProxies);
 

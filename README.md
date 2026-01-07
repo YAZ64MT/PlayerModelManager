@@ -25,7 +25,7 @@ For a functional example of replacing a model using this API, see the [PlayasKaf
 Models can only be registered during the onRegisterModels event. Helper macros have been defined for you, seen below.
 
 ```c
-PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS void registerModels() {
+PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS void registerModels(void) {
     PlayerModelManagerHandle humanModel = PLAYERMODELMANAGER_REGISTER_MODEL("example_model_internal_name", PMM_MODEL_TYPE_CHILD);
     // ... do stuff
 }
