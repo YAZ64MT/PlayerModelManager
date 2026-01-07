@@ -14,7 +14,7 @@ Gfx *getDekuDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_NUTS, dl);
 }
 
-static void setupDekuFallbackModel() {
+void registerDeku() {
     void *deku = GlobalObjects_getGlobalObject(OBJECT_LINK_NUTS);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(deku, &gLinkDekuSkel);
@@ -23,10 +23,5 @@ static void setupDekuFallbackModel() {
 
     FallbackModelsCommon_doCommonAssignments(gDekuModelHandle, skel, deku, GlobalObjects_getGlobalObject(GAMEPLAY_KEEP));
 
-    PlayerModelManager_setSkeleton(gDekuModelHandle, skel);
-}
-
-RECOMP_CALLBACK(".", _internal_setupVanillaModels)
-void setupVanillaDeku() {
-    setupDekuFallbackModel();
+    FallbackModelsCommon_addEquipmentChildMM(gDekuModelHandle);
 }

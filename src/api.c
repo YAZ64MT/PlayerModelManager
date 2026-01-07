@@ -849,6 +849,8 @@ static bool sIsModelsRegistered = false;
 
 RECOMP_DECLARE_EVENT(_internal_onFinishedRegisterModels());
 
+void doInitFormProxies();
+
 void doRegisterModels() {
     if (sIsModelsRegistered) {
         return;
@@ -861,7 +863,9 @@ void doRegisterModels() {
     sIsModelsRegistered = true;
 
     sIsAPILocked = false;
-    Logger_printInfo("Registering models...");
+    Logger_printInfo("Registering vanilla models...");
+    doInitFormProxies();
+    Logger_printInfo("Registering custom models...");
     onRegisterModels();
     sIsAPILocked = true;
     _internal_onFinishedRegisterModels();

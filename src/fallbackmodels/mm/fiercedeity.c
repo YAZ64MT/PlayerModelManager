@@ -14,7 +14,7 @@ Gfx *getFierceDeityDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_BOY, dl);
 }
 
-static void setupFierceDeityFallbackModel() {
+void registerFierceDeity() {
     void *fd = GlobalObjects_getGlobalObject(OBJECT_LINK_BOY);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(fd, &gLinkFierceDeitySkel);
@@ -24,10 +24,5 @@ static void setupFierceDeityFallbackModel() {
 
     FallbackModelsCommon_doCommonAssignments(gFierceDeityModelHandle, skel, fd, GlobalObjects_getGlobalObject(GAMEPLAY_KEEP));
 
-    PlayerModelManager_setSkeleton(gFierceDeityModelHandle, skel);
-}
-
-RECOMP_CALLBACK(".", _internal_setupVanillaModels)
-void setupVanillaFierceDeity() {
-    setupFierceDeityFallbackModel();
+    FallbackModelsCommon_addEquipmentAdultMM(gFierceDeityModelHandle);
 }

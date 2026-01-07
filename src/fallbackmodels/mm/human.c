@@ -8,6 +8,7 @@
 #include "customdls.h"
 #include "apilocal.h"
 #include "fallbackmodels.h"
+#include "logger.h"
 
 PlayerModelManagerHandle gHumanModelHandle;
 
@@ -15,7 +16,7 @@ Gfx *getHumanDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_CHILD, dl);
 }
 
-static void setupHumanFallbackModel() {
+void registerHuman() {
     void *human = GlobalObjects_getGlobalObject(OBJECT_LINK_CHILD);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(human, &gLinkHumanSkel);
@@ -37,15 +38,9 @@ static void setupHumanFallbackModel() {
 
     // First Person
     SET_ENTRY_DL(LINK_DL_OPT_FPS_RFOREARM, gEmptyDL);
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL);
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);
     SET_ENTRY_DL(LINK_DL_OPT_FPS_RHAND, gLinkHumanFirstPersonArmDL);
 
 #undef SET_ENTRY_DL
-}
 
-RECOMP_CALLBACK(".", _internal_setupVanillaModels)
-void setupVanillaHuman() {
-    setupHumanFallbackModel();
+    FallbackModelsCommon_addEquipmentChildMM(gHumanModelHandle);
 }

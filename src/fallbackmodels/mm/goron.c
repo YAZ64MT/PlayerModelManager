@@ -14,7 +14,7 @@ Gfx *getGoronDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_GORON, dl);
 }
 
-static void setupGoronFallbackModel() {
+void registerGoron() {
     void *goron = GlobalObjects_getGlobalObject(OBJECT_LINK_GORON);
     void *gk = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
 
@@ -40,7 +40,6 @@ static void setupGoronFallbackModel() {
 
     FallbackModelsCommon_doCommonAssignments(gGoronModelHandle, skel, goron, gk);
 
-    PlayerModelManager_setSkeleton(gGoronModelHandle, skel);
     PlayerModelManager_setShieldingSkeleton(gGoronModelHandle, shieldingSkel);
 
 #define SET_ENTRY_DL(id, dl) PlayerModelManager_setDisplayList(gGoronModelHandle, id, dl)
@@ -51,15 +50,7 @@ static void setupGoronFallbackModel() {
 
     SET_ENTRY_DL(LINK_DL_OPT_RFIST, getGoronDL(gLinkGoronRightHandClosedDL));
 
-    // First Person
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL);
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);
-
 #undef SET_ENTRY_DL
-}
 
-RECOMP_CALLBACK(".", _internal_setupVanillaModels)
-void setupVanillaGoron() {
-    setupGoronFallbackModel();
+    FallbackModelsCommon_addEquipmentAdultMM(gGoronModelHandle);
 }

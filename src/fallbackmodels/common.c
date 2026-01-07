@@ -13,11 +13,13 @@ typedef struct DLIdToBuiltInDL {
     Link_DisplayList dlId;
     Gfx *builtInDL;
 } DLIdToBuiltInDL;
+#define DECLARE_BUILT_IN_DL(tgt, src) {.dlId = tgt, .builtInDL = src}
 
 typedef struct MtxIdToBuiltInMtx {
     Link_EquipmentMatrix mtxId;
     Mtx *builtInMtx;
 } MtxIdToBuiltInMtx;
+#define DECLARE_BUILT_IN_MTX(tgt, src) {.mtxId = tgt, .builtInMtx = src}
 
 void FallbackModelsCommon_doCommonAssignments(PlayerModelManagerHandle h, FlexSkeletonHeader *skel, void *seg06, void *seg04) {
     ModelEntry *entry = ModelEntryManager_getEntry(h);
@@ -31,7 +33,7 @@ void FallbackModelsCommon_doCommonAssignments(PlayerModelManagerHandle h, FlexSk
     segments[0x04] = seg04;
     segments[0x06] = seg06;
 
-    GlobalObjects_globalizeLodLimbSkeleton(skel, seg06);
+    GlobalObjects_globalizeLodLimbSkeleton(seg06, skel);
 
     for (int i = 0; i < skel->sh.limbCount; ++i) {
         LodLimb *curr = skel->sh.segment[i];
@@ -44,6 +46,8 @@ void FallbackModelsCommon_doCommonAssignments(PlayerModelManagerHandle h, FlexSk
             GlobalObjects_rebaseDL(curr->dLists[1], segments);
         }
     }
+
+    PlayerModelManager_setSkeleton(h, skel);
 
     TexturePtr eyesTex[PLAYER_EYES_MAX];
     for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
@@ -67,7 +71,13 @@ static void addAllBuiltInDLs(PlayerModelManagerHandle h, DLIdToBuiltInDL builtIn
     }
 }
 
-#define DECLARE_BUILT_IN_DL(tgt, src) {.dlId = tgt, .builtInDL = src}
+static void addAllBuiltInMtxs(PlayerModelManagerHandle h, MtxIdToBuiltInMtx builtIns[], size_t n) {
+    for (size_t i = 0; i < n; ++i) {
+        MtxIdToBuiltInMtx *curr = &builtIns[i];
+        PlayerModelManager_setMatrix(h, curr->mtxId, curr->builtInMtx);
+    }
+}
+
 static DLIdToBuiltInDL sBuiltInDLCommonZ64[] = {
     DECLARE_BUILT_IN_DL(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL),
     DECLARE_BUILT_IN_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL),
@@ -170,6 +180,15 @@ void FallbackModelsCommon_addEquipmentCommonMM(PlayerModelManagerHandle h) {
     addAllBuiltInDLs(h, sBuiltInDLCommonMM, ARRAY_COUNT(sBuiltInDLCommonMM));
 }
 
+static MtxIdToBuiltInMtx sBuiltInMtxChildMM[] = {
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK, &gHumanKokiriSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK, &gHumanRazorSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SWORD_GILDED_BACK, &gHumanGildedSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SHIELD1_BACK, &gChildDekuShieldBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SHIELD_HERO_BACK, &gHumanHeroShieldBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, &gHumanMirrorShieldBackMtx),
+};
+
 static DLIdToBuiltInDL sBuiltInDLChildMM[] = {
     DECLARE_BUILT_IN_DL(LINK_DL_SWORD_KOKIRI_HILT, gCallHumanKokiriSwordHiltDL),
     DECLARE_BUILT_IN_DL(LINK_DL_SWORD_KOKIRI_BLADE, gCallHumanKokiriSwordBladeDL),
@@ -194,13 +213,24 @@ static DLIdToBuiltInDL sBuiltInDLChildMM[] = {
     DECLARE_BUILT_IN_DL(LINK_DL_BOW, gCallHumanBowDL),
     DECLARE_BUILT_IN_DL(LINK_DL_FPS_BOW, gLinkHumanFirstPersonBowDL),
     DECLARE_BUILT_IN_DL(LINK_DL_BOW_STRING, gCallHumanBowStringDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_OCARINA_TIME, gLinkHumanOcarinaDL),
 };
 
 void FallbackModelsCommon_addEquipmentChildMM(PlayerModelManagerHandle h) {
     FallbackModelsCommon_addEquipmentCommonZ64(h);
 
     addAllBuiltInDLs(h, sBuiltInDLChildMM, ARRAY_COUNT(sBuiltInDLChildMM));
+    addAllBuiltInMtxs(h, sBuiltInMtxChildMM, ARRAY_COUNT(sBuiltInMtxChildMM));
 }
+
+static MtxIdToBuiltInMtx sBuiltInMtxAdultMM[] = {
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SWORD_KOKIRI_BACK, &gHumanAdultKokiriSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SWORD_RAZOR_BACK, &gHumanAdultRazorSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SWORD_GILDED_BACK, &gHumanAdultGildedSwordHiltBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SHIELD1_BACK, &gHumanAdultHeroShieldBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SHIELD_HERO_BACK, &gHumanAdultHeroShieldBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, &gHumanAdultMirrorShieldBackMtx),
+};
 
 static DLIdToBuiltInDL sBuiltInDLAdultMM[] = {
     DECLARE_BUILT_IN_DL(LINK_DL_SWORD_KOKIRI_HILT, gHumanAdultKokiriSwordHiltDL),
@@ -226,10 +256,12 @@ static DLIdToBuiltInDL sBuiltInDLAdultMM[] = {
     DECLARE_BUILT_IN_DL(LINK_DL_BOW, gHumanAdultBowDL),
     DECLARE_BUILT_IN_DL(LINK_DL_FPS_BOW, gHumanAdultBowFirstPersonDL),
     DECLARE_BUILT_IN_DL(LINK_DL_BOW_STRING, gHumanAdultBowStringDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOW_STRING, gHumanAdultOcarinaTimeDL),
 };
 
 void FallbackModelsCommon_addEquipmentAdultMM(PlayerModelManagerHandle h) {
     FallbackModelsCommon_addEquipmentCommonZ64(h);
 
     addAllBuiltInDLs(h, sBuiltInDLAdultMM, ARRAY_COUNT(sBuiltInDLAdultMM));
+    addAllBuiltInMtxs(h, sBuiltInMtxAdultMM, ARRAY_COUNT(sBuiltInMtxAdultMM));
 }

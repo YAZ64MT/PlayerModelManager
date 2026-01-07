@@ -13,7 +13,7 @@ Gfx *getZoraDL(Gfx *dl) {
     return GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_ZORA, dl);
 }
 
-static void setupZoraFallbackModel() {
+void registerZora() {
     void *zora = GlobalObjects_getGlobalObject(OBJECT_LINK_ZORA);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(zora, &gLinkZoraSkel);
@@ -21,8 +21,6 @@ static void setupZoraFallbackModel() {
     gZoraModelHandle = PlayerModelManager_registerModel(PMM_API_VERSION, "__mm_object_link_zora__", PMM_MODEL_TYPE_ZORA);
 
     FallbackModelsCommon_doCommonAssignments(gZoraModelHandle, skel, zora, GlobalObjects_getGlobalObject(GAMEPLAY_KEEP));
-
-    PlayerModelManager_setSkeleton(gZoraModelHandle, skel);
 
 #define SET_ENTRY_DL(id, dl) PlayerModelManager_setDisplayList(gZoraModelHandle, id, dl)
 
@@ -36,9 +34,6 @@ static void setupZoraFallbackModel() {
     SET_ENTRY_DL(LINK_DL_OPT_RFIST, getZoraDL(gLinkZoraRightHandClosedDL));;
 
 #undef SET_ENTRY_DL
-}
 
-RECOMP_CALLBACK(".", _internal_setupVanillaModels)
-void setupVanillaZora() {
-    setupZoraFallbackModel();
+    FallbackModelsCommon_addEquipmentAdultMM(gZoraModelHandle);
 }

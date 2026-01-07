@@ -5,13 +5,30 @@
 #include "playerproxy.h"
 #include "formproxy.h"
 #include "playerproxymanager.h"
+#include "apilocal.h"
+#include "logger.h"
+#include "modelinfo.h"
+#include "modelentrymanager.h"
+#include "fallbackmodels.h"
 
-RECOMP_DECLARE_EVENT(_internal_setupVanillaModels());
+void registerHuman();
+void registerDeku();
+void registerGoron();
+void registerZora();
+void registerFierceDeity();
 
 // initialize player models as blank display lists
 void initFormProxies() {
-    _internal_setupVanillaModels();
-
+    registerHuman();
+    ModelInfo_setModelEntryForm(&gHumanModelInfo, (ModelEntryForm *)ModelEntryManager_getEntry(gHumanModelHandle));
+    registerDeku();
+    ModelInfo_setModelEntryForm(&gDekuModelInfo, (ModelEntryForm *)ModelEntryManager_getEntry(gDekuModelHandle));
+    registerGoron();
+    ModelInfo_setModelEntryForm(&gGoronModelInfo, (ModelEntryForm *)ModelEntryManager_getEntry(gGoronModelHandle));
+    registerZora();
+    ModelInfo_setModelEntryForm(&gZoraModelInfo, (ModelEntryForm *)ModelEntryManager_getEntry(gZoraModelHandle));
+    registerFierceDeity();
+    ModelInfo_setModelEntryForm(&gFierceDeityModelInfo, (ModelEntryForm *)ModelEntryManager_getEntry(gFierceDeityModelHandle));
     gPlayer1Proxy = PlayerProxyManager_createPlayerProxy();
 }
 
@@ -29,7 +46,6 @@ void initVanillaMMDLs();
 
 GLOBAL_OBJECTS_CALLBACK_ON_READY void initFormProxiesOnGlobalObjects() {
     initVanillaMMDLs();
-    doInitFormProxies();
 }
 
 RECOMP_DECLARE_EVENT(_internal_preInitHashObjects());
