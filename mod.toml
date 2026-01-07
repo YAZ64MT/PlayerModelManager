@@ -45,7 +45,7 @@ dependencies = [
 # list aren't present. You can query the presence of a given dependency by using `recomp_is_dependency_met` in recomputils.h.
 # Calling a function imported from an optional dependency that isn't present will trigger an error.
 optional_dependencies = [
-    "yazmt_mm_modelreplacer",
+
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.
