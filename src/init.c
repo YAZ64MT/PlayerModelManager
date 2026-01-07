@@ -10,14 +10,21 @@
 #include "modelentrymanager.h"
 #include "fallbackmodels.h"
 
-void registerHuman();
-void registerDeku();
-void registerGoron();
-void registerZora();
-void registerFierceDeity();
+static bool sIsModelEntryManagerReady;
+static bool sIsGlobalObjectsReady;
+static bool sIsModelsRegistered;
+static bool sIsAllHashObjectsInitialized;
+
+static void doRegisterModels(void);
+
+void registerHuman(void);
+void registerDeku(void);
+void registerGoron(void);
+void registerZora(void);
+void registerFierceDeity(void);
 
 // initialize player models as blank display lists
-void initFormProxies() {
+static void forceInitFormProxies(void) {
     registerHuman();
     ModelInfo_setModelEntryForm(&gHumanModelInfo, (ModelEntryForm *)ModelEntryManager_getEntry(gHumanModelHandle));
     registerDeku();
@@ -31,30 +38,66 @@ void initFormProxies() {
     gPlayer1Proxy = PlayerProxyManager_createPlayerProxy();
 }
 
-void doInitFormProxies() {
+void initFormProxies(void) {
     static bool isFormProxiesInitialized;
 
     if (!isFormProxiesInitialized) {
         isFormProxiesInitialized = true;
-        initFormProxies();
+        forceInitFormProxies();
         PlayerProxyManager_refreshAll();
     }
 }
 
-void initVanillaMMDLs();
-void initCustomDLs();
+void initVanillaMMDLs(void);
+void initCustomDLs(void);
 
 GLOBAL_OBJECTS_CALLBACK_ON_READY void initFormProxiesOnGlobalObjects() {
     initCustomDLs();
     initVanillaMMDLs();
+    sIsGlobalObjectsReady = true;
+
 }
 
-RECOMP_DECLARE_EVENT(_internal_preInitHashObjects());
-RECOMP_DECLARE_EVENT(_internal_initHashObjects());
-RECOMP_DECLARE_EVENT(_internal_postInitHashObjects());
+RECOMP_DECLARE_EVENT(_internal_preInitHashObjects(void));
+RECOMP_DECLARE_EVENT(_internal_initHashObjects(void));
+RECOMP_DECLARE_EVENT(_internal_postInitHashObjects(void));
 
 RECOMP_CALLBACK("*", recomp_on_init) void handleInits() {
     _internal_preInitHashObjects();
     _internal_initHashObjects();
     _internal_postInitHashObjects();
+
+    doRegisterModels();
+    sIsAllHashObjectsInitialized = true;
+}
+
+RECOMP_DECLARE_EVENT(onRegisterModels(void));
+RECOMP_DECLARE_EVENT(onReady(void));
+RECOMP_DECLARE_EVENT(_internal_onFinishedRegisterModels(void));
+
+static void doRegisterModels(void) {
+    if (sIsModelsRegistered) {
+        return;
+    }
+
+    if (!sIsModelEntryManagerReady || !sIsGlobalObjectsReady) {
+        return;
+    }
+
+    sIsModelsRegistered = true;
+
+    PlayerModelManager_unlockAPI();
+
+    Logger_printInfo("Setting up vanilla models...");
+    initFormProxies();
+
+    Logger_printInfo("Registering custom models...");
+    onRegisterModels();
+
+    PlayerModelManager_lockAPI();
+
+    _internal_onFinishedRegisterModels();
+    Logger_printInfo("Finished registering models.");
+    onReady();
+    Logger_printInfo("Ready!");
 }

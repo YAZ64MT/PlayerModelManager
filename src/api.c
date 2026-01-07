@@ -831,63 +831,10 @@ RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation 
     return !!ModelEntryManager_getCurrentEntry(cat);
 }
 
-void PlayerModelManager_lockAPI() {
+void PlayerModelManager_lockAPI(void) {
     sIsAPILocked = true;
 }
 
-void PlayerModelManager_unlockAPI() {
+void PlayerModelManager_unlockAPI(void) {
     sIsAPILocked = false;
-}
-
-RECOMP_DECLARE_EVENT(onRegisterModels());
-RECOMP_DECLARE_EVENT(onReady());
-
-static bool sIsCMEMReady = false;
-static bool sIsGlobalObjectsReady = false;
-static bool sIsModelsRegistered = false;
-
-RECOMP_DECLARE_EVENT(_internal_onFinishedRegisterModels());
-
-void doInitFormProxies();
-
-void doRegisterModels() {
-    if (sIsModelsRegistered) {
-        return;
-    }
-
-    if (!sIsCMEMReady || !sIsGlobalObjectsReady) {
-        return;
-    }
-
-    sIsModelsRegistered = true;
-
-    sIsAPILocked = false;
-    Logger_printInfo("Registering vanilla models...");
-    doInitFormProxies();
-    Logger_printInfo("Registering custom models...");
-    onRegisterModels();
-    sIsAPILocked = true;
-    _internal_onFinishedRegisterModels();
-    Logger_printInfo("Finished registering models.");
-    onReady();
-    Logger_printInfo("Ready!");
-}
-
-RECOMP_CALLBACK(".", _internal_postInitHashObjects) void doRegisterModelsCMEMReady() {
-    sIsCMEMReady = true;
-    Logger_printVerbose("ModelEntryManager is ready.");
-    doRegisterModels();
-}
-
-MODEL_REPLACER_CALLBACK_ON_REGISTER_REPLACERS
-void doRegisterModelsModelReplacerReady() {
-    Logger_printVerbose("ModelReplacer compatibility is ready.");
-    doRegisterModels();
-}
-
-GLOBAL_OBJECTS_CALLBACK_ON_READY
-void doRegisterModelsGlobalObjectsReady() {
-    sIsGlobalObjectsReady = true;
-    Logger_printVerbose("GlobalObjects is ready.");
-    doRegisterModels();
 }
