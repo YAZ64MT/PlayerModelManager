@@ -5,6 +5,19 @@
 #include "modelentrymanager.h"
 #include "defaultfacetex.h"
 #include "logger.h"
+#include "customdls.h"
+#include "mm/vanillawrapperdls.h"
+#include "equipmentbuiltin.h"
+
+typedef struct DLIdToBuiltInDL {
+    Link_DisplayList dlId;
+    Gfx *builtInDL;
+} DLIdToBuiltInDL;
+
+typedef struct MtxIdToBuiltInMtx {
+    Link_EquipmentMatrix mtxId;
+    Mtx *builtInMtx;
+} MtxIdToBuiltInMtx;
 
 void FallbackModelsCommon_doCommonAssignments(PlayerModelManagerHandle h, FlexSkeletonHeader *skel, void *seg06, void *seg04) {
     ModelEntry *entry = ModelEntryManager_getEntry(h);
@@ -45,9 +58,178 @@ void FallbackModelsCommon_doCommonAssignments(PlayerModelManagerHandle h, FlexSk
     PlayerModelManager_setMouthTextures(h, mouthTex);
 
     ModelEntryManager_setEntryHidden(entry, true);
+}
 
-    // First Person
-    PlayerModelManager_setDisplayList(h, LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL);
-    PlayerModelManager_setDisplayList(h, LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL);
-    PlayerModelManager_setDisplayList(h, LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL);
+static void addAllBuiltInDLs(PlayerModelManagerHandle h, DLIdToBuiltInDL builtIns[], size_t n) {
+    for (size_t i = 0; i < n; ++i) {
+        DLIdToBuiltInDL *curr = &builtIns[i];
+        PlayerModelManager_setDisplayList(h, curr->dlId, curr->builtInDL);
+    }
+}
+
+#define DECLARE_BUILT_IN_DL(tgt, src) {.dlId = tgt, .builtInDL = src}
+static DLIdToBuiltInDL sBuiltInDLCommonZ64[] = {
+    DECLARE_BUILT_IN_DL(LINK_DL_OPT_FPS_LSHOULDER_SLINGSHOT, gEmptyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_OPT_FPS_LFOREARM_SLINGSHOT, gEmptyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_OPT_FPS_LHAND_SLINGSHOT, gEmptyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_PIPE_MOUTH, gCallDekuPipeMouthDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_PIPE_RIGHT, gCallDekuPipeRightDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_PIPE_UP, gCallDekuPipeUpDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_PIPE_DOWN, gCallDekuPipeDownDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_PIPE_LEFT, gCallDekuPipeLeftDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_PIPE_A, gCallDekuPipeADL),
+    DECLARE_BUILT_IN_DL(LINK_DL_DRUM_STRAP, gCallGoronDrumStrapDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_DRUM_RIGHT, gCallGoronDrumRightDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_DRUM_UP, gCallGoronDrumUpDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_DRUM_DOWN, gCallGoronDrumDownDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_DRUM_LEFT, gCallGoronDrumLeftDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_DRUM_A, gCallGoronDrumADL),
+    DECLARE_BUILT_IN_DL(LINK_DL_GUITAR, gCallZoraGuitarDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_KAFEIS_MASK, gCallHumanMaskKafeiDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_ALL_NIGHT, gCallHumanMaskAllNightDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_GARO, gCallHumanMaskGaroDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_ROMANI, gCallHumanMaskRomaniDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_CIRCUS_LEADER, gCallHumanMaskCircusLeaderDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_COUPLE, gCallHumanMaskCoupleDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_POSTMAN, gCallHumanMaskPostmanDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_GREAT_FAIRY, gCallHumanMaskGreatFairyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_GIBDO, gCallHumanMaskGibdoDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_DON_GERO, gCallHumanMaskDonGeroDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_KAMARO, gCallHumanMaskKamaroDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_CAPTAIN, gCallHumanMaskCaptainDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_STONE, gCallHumanMaskStoneDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_BREMEN, gCallHumanMaskBremenDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_BLAST, gCallHumanMaskBlastDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_BLAST_COOLING_DOWN, gCallHumanMaskBlastCooldownDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_SCENTS, gCallHumanMaskScentsDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_GIANT, gCallHumanMaskGiantDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_DEKU, gCallHumanMaskDekuDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_FIERCE_DEITY, gCallHumanMaskFierceDeityDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_DEKU_SCREAM, gCallHumanMaskDekuScreamDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_GORON_SCREAM, gCallHumanMaskGoronScreamDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_ZORA_SCREAM, gCallHumanMaskZoraScreamDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_FIERCE_DEITY_SCREAM, gCallHumanMaskFierceDeityScreamDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN, gCallHumanElegyShellDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU, gCallDekuElegyShellDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON, gCallGoronElegyShellDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA, gCallZoraElegyShellDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY, gCallHumanElegyShellDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_LFIN, gCallZoraFinLeftDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_RFIN, gCallZoraFinRightDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_LFIN_BOOMERANG, gCallZoraBoomerangLeftDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_RFIN_BOOMERANG, gCallZoraBoomerangRightDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_LFIN_SWIM, gCallZoraFinSwimLeftDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_RFIN_SWIM, gCallZoraFinSwimRightDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MAGIC_BARRIER, gCallZoraMagicBarrierDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_STEM_RIGHT, gCallDekuStemRightDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_STEM_LEFT, gCallDekuStemLeftDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FLOWER_CENTER_CLOSED, gCallDekuFlowerCenterClosedDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FLOWER_CENTER_OPEN, gCallDekuFlowerCenterOpenDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FLOWER_PROPELLER_CLOSED, gCallDekuFlowerPropellerClosedDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FLOWER_PROPELLER_OPEN, gCallDekuFlowerPropellerOpenDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_PETAL_PARTICLE, gCallDekuFlowerParticleDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_PAD_WOOD, gCallDekuPadWoodDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_PAD_GRASS, gCallDekuPadGrassDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_PAD_OPENING, gCallDekuPadOpeningDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_DEKU_GUARD, gCallDekuGuardDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_CURLED, gCallGoronCurledDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SPIKES, gCallGoronSpikesDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FIRE_INIT, gCallGoronFireInitDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FIRE_ROLL, gCallGoronFireRollDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FIRE_PUNCH, gCallGoronFirePunchDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BODY_SHIELD_BODY, gCallGoronShieldBodyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BODY_SHIELD_HEAD, gCallGoronShieldHeadDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BODY_SHIELD_ARMS_AND_LEGS, gCallGoronShieldArmsAndLegsDL),
+};
+
+void FallbackModelsCommon_addEquipmentCommonZ64(PlayerModelManagerHandle h) {
+    for (Link_EquipmentMatrix i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
+        PlayerModelManager_setMatrix(h, i, &gIdentityMtx);
+    }
+
+    addAllBuiltInDLs(h, sBuiltInDLCommonZ64, ARRAY_COUNT(sBuiltInDLCommonZ64));
+}
+
+static DLIdToBuiltInDL sBuiltInDLCommonMM[] = {
+    DECLARE_BUILT_IN_DL(LINK_DL_HOOKSHOT_RETICLE, gCallHumanHookshotReticleDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_HOOKSHOT_CHAIN, gCallHumanHookshotDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOW_ARROW, gCallHumanArrowDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOTTLE_GLASS, gCallHumanBottleGlassDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOTTLE_CONTENTS, gCallHumanBottleContentsDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_DEKU_STICK, gCallHumanDekuStickDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_TRUTH, gCallHumanMaskTruthDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_BUNNY, gCallHumanMaskBunnyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_KEATON, gCallHumanMaskKeatonDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_GORON, gCallHumanMaskGoronDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_MASK_ZORA, gCallHumanMaskZoraDL),
+};
+
+void FallbackModelsCommon_addEquipmentCommonMM(PlayerModelManagerHandle h) {
+    FallbackModelsCommon_addEquipmentCommonZ64(h);
+
+    addAllBuiltInDLs(h, sBuiltInDLCommonMM, ARRAY_COUNT(sBuiltInDLCommonMM));
+}
+
+static DLIdToBuiltInDL sBuiltInDLChildMM[] = {
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_KOKIRI_HILT, gCallHumanKokiriSwordHiltDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_KOKIRI_BLADE, gCallHumanKokiriSwordBladeDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_KOKIRI_SHEATH, gCallHumanKokiriSwordSheathDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_RAZOR_HILT, gCallHumanRazorSwordHiltDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_RAZOR_BLADE, gCallHumanRazorSwordBladeDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_RAZOR_SHEATH, gCallHumanRazorSwordSheathDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_GILDED_HILT, gCallHumanGildedSwordHiltDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_GILDED_BLADE, gCallHumanGildedSwordBladeDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_GILDED_SHEATH, gCallHumanGildedSwordSheathDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_FIERCE_DEITY_HILT, gEmptyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_FIERCE_DEITY_BLADE, gFierceDeityChildSwordDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_GREAT_FAIRY_HILT, gEmptyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_GREAT_FAIRY_BLADE, gCallHumanGreatFairySwordDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SHIELD_HERO, gCallHumanHeroShieldDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SHIELD_MIRROR, gCallHumanMirrorShieldDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SHIELD_MIRROR_RAY, gCallHumanMirrorShieldRayDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SHIELD_MIRROR_RAY_BEAM, gCallHumanMirrorShieldRayBeamDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_HOOKSHOT, gCallHumanHookshotDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FPS_HOOKSHOT, gLinkHumanFirstPersonHookshotDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_HOOKSHOT_HOOK, gCallHumanHookshotHookDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOW, gCallHumanBowDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FPS_BOW, gLinkHumanFirstPersonBowDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOW_STRING, gCallHumanBowStringDL),
+};
+
+void FallbackModelsCommon_addEquipmentChildMM(PlayerModelManagerHandle h) {
+    FallbackModelsCommon_addEquipmentCommonZ64(h);
+
+    addAllBuiltInDLs(h, sBuiltInDLChildMM, ARRAY_COUNT(sBuiltInDLChildMM));
+}
+
+static DLIdToBuiltInDL sBuiltInDLAdultMM[] = {
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_KOKIRI_HILT, gHumanAdultKokiriSwordHiltDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_KOKIRI_BLADE, gHumanAdultKokiriSwordBladeDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_KOKIRI_SHEATH, gHumanAdultKokiriSwordSheathDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_RAZOR_HILT, gHumanAdultRazorSwordHiltDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_RAZOR_BLADE, gHumanAdultRazorSwordBladeDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_RAZOR_SHEATH, gHumanAdultRazorSwordSheathDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_GILDED_HILT, gHumanAdultGildedSwordHiltDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_GILDED_BLADE, gHumanAdultGildedSwordBladeDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_GILDED_SHEATH, gHumanAdultGildedSwordSheathDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_FIERCE_DEITY_HILT, gEmptyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_FIERCE_DEITY_BLADE, gCallFierceDeitySwordDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_GREAT_FAIRY_HILT, gEmptyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SWORD_GREAT_FAIRY_BLADE, gHumanAdultGreatFairySwordDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SHIELD_HERO, gHumanAdultHeroShieldDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SHIELD_MIRROR, gHumanAdultMirrorShieldDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SHIELD_MIRROR_RAY, gHumanAdultMirrorShieldRayDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_SHIELD_MIRROR_RAY_BEAM, gHumanAdultMirrorShieldRayBeamDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_HOOKSHOT, gHumanAdultHookshotDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FPS_HOOKSHOT, gHumanAdultHookshotFirstPersonDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_HOOKSHOT_HOOK, gHumanAdultHookshotHookDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOW, gHumanAdultBowDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_FPS_BOW, gHumanAdultBowFirstPersonDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOW_STRING, gHumanAdultBowStringDL),
+};
+
+void FallbackModelsCommon_addEquipmentAdultMM(PlayerModelManagerHandle h) {
+    FallbackModelsCommon_addEquipmentCommonZ64(h);
+
+    addAllBuiltInDLs(h, sBuiltInDLAdultMM, ARRAY_COUNT(sBuiltInDLAdultMM));
 }
