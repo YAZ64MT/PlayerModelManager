@@ -25,7 +25,10 @@ void doInitFormProxies() {
     }
 }
 
+void initVanillaMMDLs();
+
 GLOBAL_OBJECTS_CALLBACK_ON_READY void initFormProxiesOnGlobalObjects() {
+    initVanillaMMDLs();
     doInitFormProxies();
 }
 

@@ -12,6 +12,7 @@
 #include "apilocal.h"
 #include "recomputils.h"
 #include "equipmentbuiltin.h"
+#include "mm/vanillawrapperdls.h"
 
 extern Gfx gLinkHumanFirstPersonHookshotDL[];
 extern Gfx gLinkHumanFirstPersonBowDL[];
@@ -26,343 +27,51 @@ extern Gfx gLinkHumanOcarinaDL[];
         gsSPEndDisplayList(),                                           \
     }
 
-Gfx gCallHumanHeroShieldDL[] = {
-    gsSPEndDisplayList(),
-};
-
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultHeroShieldDL, gHumanAdultHeroShieldResizerMtx, gCallHumanHeroShieldDL);
-
-Gfx gCallHumanMirrorShieldDL[] = {
-    gsSPEndDisplayList(),
-};
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultMirrorShieldDL, gHumanAdultMirrorShieldResizerMtx, gCallHumanMirrorShieldDL);
 
-Gfx gCallHumanMirrorShieldRayDL[] = {
-    gsSPEndDisplayList(),
-};
-
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultMirrorShieldRayDL, gHumanAdultMirrorShieldRayResizerMtx, gCallHumanMirrorShieldRayDL);
-
-Gfx gCallHumanMirrorShieldRayBeamDL[] = {
-    gsSPEndDisplayList(),
-};
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultMirrorShieldRayBeamDL, gHumanAdultMirrorShieldRayBeamResizerMtx, gCallHumanMirrorShieldRayBeamDL);
 
-Gfx gCallHumanKokiriSwordHiltDL[] = {
-    gsSPEndDisplayList(),
-};
-
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultKokiriSwordHiltDL, gHumanAdultKokiriSwordHiltResizerMtx, gCallHumanKokiriSwordHiltDL);
-
-Gfx gCallHumanKokiriSwordBladeDL[] = {
-    gsSPEndDisplayList(),
-};
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultKokiriSwordBladeDL, gHumanAdultKokiriSwordBladeResizerMtx, gCallHumanKokiriSwordBladeDL);
 
-Gfx gCallHumanKokiriSwordSheathDL[] = {
-    gsSPEndDisplayList(),
-};
-
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultKokiriSwordSheathDL, gHumanAdultKokiriSwordSheathResizerMtx, gCallHumanKokiriSwordSheathDL);
-
-Gfx gCallHumanRazorSwordHiltDL[] = {
-    gsSPEndDisplayList(),
-};
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultRazorSwordHiltDL, gHumanAdultRazorSwordHiltResizerMtx, gCallHumanRazorSwordHiltDL);
 
-Gfx gCallHumanRazorSwordBladeDL[] = {
-    gsSPEndDisplayList(),
-};
-
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultRazorSwordBladeDL, gHumanAdultRazorSwordBladeResizerMtx, gCallHumanRazorSwordBladeDL);
-
-Gfx gCallHumanRazorSwordSheathDL[] = {
-    gsSPEndDisplayList(),
-};
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultRazorSwordSheathDL, gHumanAdultRazorSwordSheathResizerMtx, gCallHumanRazorSwordSheathDL);
 
-Gfx gCallHumanGildedSwordHiltDL[] = {
-    gsSPEndDisplayList(),
-};
-
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultGildedSwordHiltDL, gHumanAdultGildedSwordHiltResizerMtx, gCallHumanGildedSwordHiltDL);
-
-Gfx gCallHumanGildedSwordBladeDL[] = {
-    gsSPEndDisplayList(),
-};
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultGildedSwordBladeDL, gHumanAdultGildedSwordBladeResizerMtx, gCallHumanGildedSwordBladeDL);
 
-Gfx gCallHumanGildedSwordSheathDL[] = {
-    gsSPEndDisplayList(),
-};
-
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultGildedSwordSheathDL, gHumanAdultGildedSwordSheathResizerMtx, gCallHumanGildedSwordSheathDL);
-
-Gfx gCallHumanGreatFairySwordDL[] = {
-    gsSPEndDisplayList(),
-};
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultGreatFairySwordDL, gHumanAdultGreatFairySwordResizerMtx, gCallHumanGreatFairySwordDL);
 
-Gfx gCallFierceDeitySwordDL[] = {
-    gsSPEndDisplayList(),
-};
-
 DECLARE_MATRIX_WRAPPED_DL(gFierceDeityChildSwordDL, gFierceDeityChildSwordResizerMtx, gCallFierceDeitySwordDL);
-
-Gfx gCallHumanHookshotDL[] = {
-    gsSPEndDisplayList(),
-};
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultHookshotDL, gHumanAdultHookshotResizerMtx, gCallHumanHookshotDL);
 
-Gfx gCallHumanHookshotFirstPersonDL[] = {
-    gsSPBranchList(gLinkHumanFirstPersonHookshotDL),
-};
-
-DECLARE_MATRIX_WRAPPED_DL(gHumanAdultHookshotFirstPersonDL, gHumanAdultHookshotFirstPersonResizerMtx, gCallHumanHookshotFirstPersonDL);
-
-Gfx gCallHumanHookshotHookDL[] = {
-    gsSPEndDisplayList(),
-};
+DECLARE_MATRIX_WRAPPED_DL(gHumanAdultHookshotFirstPersonDL, gHumanAdultHookshotFirstPersonResizerMtx, gLinkHumanFirstPersonHookshotDL);
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultHookshotHookDL, gHumanAdultHookshotHookResizerMtx, gCallHumanHookshotHookDL);
 
-Gfx gCallHumanHookshotChainDL[] = {
-    gsSPEndDisplayList(),
-};
-
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultHookshotChainDL, gHumanAdultHookshotChainResizerMtx, gCallHumanHookshotChainDL);
-
-Gfx gCallHumanHookshotReticleDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanBowDL[] = {
-    gsSPEndDisplayList(),
-};
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultBowDL, gHumanAdultBowResizerMtx, gCallHumanBowDL);
 
-Gfx gCallHumanBowFirstPersonDL[] = {
-    gsSPBranchList(gLinkHumanFirstPersonBowDL),
-};
-
-DECLARE_MATRIX_WRAPPED_DL(gHumanAdultBowFirstPersonDL, gHumanAdultBowFirstPersonResizerMtx, gCallHumanBowFirstPersonDL);
-
-Gfx gCallHumanBowStringDL[] = {
-    gsSPEndDisplayList(),
-};
+DECLARE_MATRIX_WRAPPED_DL(gHumanAdultBowFirstPersonDL, gHumanAdultBowFirstPersonResizerMtx, gLinkHumanFirstPersonBowDL);
 
 DECLARE_MATRIX_WRAPPED_DL(gHumanAdultBowStringDL, gHumanAdultBowStringResizerMtx, gCallHumanBowStringDL);
 
-Gfx gCallHumanArrowDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallMMBottleGlassDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallMMBottleContentsDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanOcarinaTimeDL[] = {
-    gsSPBranchList(gLinkHumanOcarinaDL),
-};
-
-DECLARE_MATRIX_WRAPPED_DL(gHumanAdultOcarinaTimeDL, gHumanAdultOcarinaTimeResizerMtx, gCallHumanOcarinaTimeDL);
-
-Gfx gCallHumanDekuStickDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallDekuPipesMouthDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallDekuPipesADL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallDekuPipesUpDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallDekuPipesDownDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallDekuPipesLeftDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallDekuPipesRightDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallGoronDrumStrapDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallGoronDrumUpDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallGoronDrumDownDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallGoronDrumLeftDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallGoronDrumRightDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallGoronDrumADL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallZoraGuitarDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskTruthDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskKafeiDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskAllNightDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskBunnyHoodDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskKeatonDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskGaroDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskRomaniDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskCircusLeaderDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskPostmanDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskCoupleDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskGreatFairyDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskGibdoDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskDonGeroDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskKamaroDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskCaptainDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskStoneDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskBremenDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskBlastDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskBlastCooldownDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskScentsDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskGiantDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskFierceDeityDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskFierceDeityScreamDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskGoronDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskGoronScreamDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskZoraDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskZoraScreamDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskDekuDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanMaskDekuScreamDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanBombBodyDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanBombCapDL[] = {
-    gsSPEndDisplayList(),
-};
-
-Gfx gCallHumanBombchuDL[] = {
-    gsSPEndDisplayList(),
-};
+DECLARE_MATRIX_WRAPPED_DL(gHumanAdultOcarinaTimeDL, gHumanAdultOcarinaTimeResizerMtx, gLinkHumanOcarinaDL);
 
 #undef DECLARE_STATIC_MATRIX_WRAPPED_DL
 
@@ -416,22 +125,15 @@ static void initCustomDLs() {
     gHumanMirrorShieldBackMtx = *getGlobalObjectMtx(human, &gLinkHumanMirrorShieldMtx);
     gHumanAdultMirrorShieldBackMtx = gHumanAdultHeroShieldBackMtx;
 
-    gSPBranchList(gCallHumanHeroShieldDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanHerosShieldDL));
     guPosition(&gHumanAdultHeroShieldResizerMtx, 0.f, 0.f, 0.f, 1.3f, 0.f, 0.f, 0.f);
 
-    gSPBranchList(gCallHumanMirrorShieldDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanMirrorShieldDL));
     guPosition(&gHumanAdultMirrorShieldResizerMtx, 0.f, 0.f, 0.f, 1.3f, 0.f, 0.f, 0.f);
 
-    gSPBranchList(gCallHumanMirrorShieldRayDL, getRepointedMMDL(OBJECT_MIR_RAY, object_mir_ray_DL_0004B0));
     guPosition(&gHumanAdultMirrorShieldRayResizerMtx, 0.f, 0.f, 0.f, 1.3f, 0.f, 0.f, 0.f);
 
-    gSPBranchList(gCallHumanMirrorShieldRayBeamDL, getRepointedMMDL(OBJECT_MIR_RAY, object_mir_ray_DL_000168));
     guPosition(&gHumanAdultMirrorShieldRayBeamResizerMtx, 0.f, 0.f, 0.f, 1.3f, 0.f, 0.f, 0.f);
 
     gHumanKokiriSwordHiltBackMtx = *getGlobalObjectMtx(human, &gLinkHumanSheathedKokiriSwordMtx);
-    gSPBranchList(gCallHumanKokiriSwordHiltDL, getRepointedMMDL(GAMEPLAY_KEEP, gKokiriSwordHandleDL));
-    gSPBranchList(gCallHumanKokiriSwordBladeDL, getRepointedMMDL(GAMEPLAY_KEEP, gKokiriSwordBladeDL));
-    gSPBranchList(gCallHumanKokiriSwordSheathDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanKokiriSwordSheathDL));
     static Vec3f kokiriSwordTranslation = {75.f, 25.f, -115.f};
     static Vec3f kokiriSwordBackBaseTranslation = {-578.f, -221.f, -32.f};
     setupResizedSwordMatrixes(&gHumanAdultKokiriSwordHiltResizerMtx, &gHumanAdultKokiriSwordBladeResizerMtx, &gHumanAdultKokiriSwordSheathResizerMtx,
@@ -439,9 +141,6 @@ static void initCustomDLs() {
                               &kokiriSwordTranslation, &kokiriSwordBackBaseTranslation);
 
     gHumanRazorSwordHiltBackMtx = *getGlobalObjectMtx(human, &gLinkHumanSheathedRazorSwordMtx);
-    gSPBranchList(gCallHumanRazorSwordHiltDL, getRepointedMMDL(GAMEPLAY_KEEP, gRazorSwordHandleDL));
-    gSPBranchList(gCallHumanRazorSwordBladeDL, getRepointedMMDL(GAMEPLAY_KEEP, gRazorSwordBladeDL));
-    gSPBranchList(gCallHumanRazorSwordSheathDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanRazorSwordSheathDL));
     static Vec3f razorSwordTranslation = {75.f, 25.f, -115.f};
     static Vec3f razorSwordBackBaseTranslation = {-480.f, -240.f, -14.f};
     setupResizedSwordMatrixes(&gHumanAdultRazorSwordHiltResizerMtx, &gHumanAdultRazorSwordBladeResizerMtx, &gHumanAdultRazorSwordSheathResizerMtx,
@@ -449,9 +148,6 @@ static void initCustomDLs() {
                               &razorSwordBackBaseTranslation);
 
     gHumanGildedSwordHiltBackMtx = *getGlobalObjectMtx(human, &gLinkHumanSheathedKokiriSwordMtx);
-    gSPBranchList(gCallHumanGildedSwordHiltDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordHandleDL));
-    gSPBranchList(gCallHumanGildedSwordBladeDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordBladeDL));
-    gSPBranchList(gCallHumanGildedSwordSheathDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGildedSwordSheathDL));
     static Vec3f gildedSwordTranslation = {-25.f, 25.f, -100.f};
     static Vec3f gildedSwordBackBaseTranslation = {-578.f, -221.f, -32.f};
     setupResizedSwordMatrixes(&gHumanAdultGildedSwordHiltResizerMtx, &gHumanAdultGildedSwordBladeResizerMtx, &gHumanAdultGildedSwordSheathResizerMtx,
@@ -487,62 +183,7 @@ static void initCustomDLs() {
     guPosition(&gHumanAdultBowFirstPersonResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, BOW_Y_OFFSET, 0.f);
     guScale(&gHumanAdultBowStringResizerMtx, BOW_SCALE_FACTOR, BOW_SCALE_FACTOR, 0.7f);
 
-    gSPBranchList(gCallMMBottleGlassDL, getRepointedMMDL(GAMEPLAY_KEEP, gBottleGlassDL));
-    gSPBranchList(gCallMMBottleContentsDL, getRepointedMMDL(GAMEPLAY_KEEP, gBottleContentsDL));
-
     guPosition(&gHumanAdultOcarinaTimeResizerMtx, 7.f, -8.f, -4.f, 1.f, 72.f, 238.f, -3.f);
-
-    gSPBranchList(gCallHumanDekuStickDL, getRepointedMMDL(GAMEPLAY_KEEP, gDekuStickDL));
-
-    gSPBranchList(gCallDekuPipesMouthDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007390));
-    gSPBranchList(gCallDekuPipesRightDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007548));
-    gSPBranchList(gCallDekuPipesUpDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_0076A0));
-    gSPBranchList(gCallDekuPipesDownDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_0077D0));
-    gSPBranchList(gCallDekuPipesLeftDL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007900));
-    gSPBranchList(gCallDekuPipesADL, getRepointedMMDL(OBJECT_LINK_NUTS, object_link_nuts_DL_007A28));
-
-    gSPBranchList(gCallGoronDrumStrapDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_00FC18));
-    gSPBranchList(gCallGoronDrumUpDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_00FCF0));
-    gSPBranchList(gCallGoronDrumDownDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_010368));
-    gSPBranchList(gCallGoronDrumLeftDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_00FF18));
-    gSPBranchList(gCallGoronDrumRightDL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_010140));
-    gSPBranchList(gCallGoronDrumADL, getRepointedMMDL(OBJECT_LINK_GORON, object_link_goron_DL_010590));
-
-    gSPBranchList(gCallZoraGuitarDL, getRepointedMMDL(OBJECT_LINK_ZORA, object_link_zora_DL_00E2A0));
-
-    gSPBranchList(gCallHumanMaskTruthDL, getRepointedMMDL(OBJECT_MASK_TRUTH, object_mask_truth_DL_0001A0));
-    gSPBranchList(gCallHumanMaskKafeiDL, getRepointedMMDL(OBJECT_MASK_KERFAY, gKafeisMaskDL));
-    gSPBranchList(gCallHumanMaskAllNightDL, getRepointedMMDL(OBJECT_MASK_YOFUKASI, object_mask_yofukasi_DL_000490));
-    gSPBranchList(gCallHumanMaskBunnyHoodDL, getRepointedMMDL(OBJECT_MASK_RABIT, object_mask_rabit_DL_000610));
-    gSPBranchList(gCallHumanMaskKeatonDL, getRepointedMMDL(OBJECT_MASK_KI_TAN, object_mask_ki_tan_DL_0004A0));
-    gSPBranchList(gCallHumanMaskGaroDL, getRepointedMMDL(OBJECT_MASK_JSON, object_mask_json_DL_0004C0));
-    gSPBranchList(gCallHumanMaskRomaniDL, getRepointedMMDL(OBJECT_MASK_ROMERNY, object_mask_romerny_DL_0007A0));
-    gSPBranchList(gCallHumanMaskCircusLeaderDL, getRepointedMMDL(OBJECT_MASK_ZACHO, object_mask_zacho_DL_000700));
-    gSPBranchList(gCallHumanMaskPostmanDL, getRepointedMMDL(OBJECT_MASK_POSTHAT, object_mask_posthat_DL_000290));
-    gSPBranchList(gCallHumanMaskCoupleDL, getRepointedMMDL(OBJECT_MASK_MEOTO, object_mask_meoto_DL_0005A0));
-    gSPBranchList(gCallHumanMaskGreatFairyDL, getRepointedMMDL(OBJECT_MASK_BIGELF, object_mask_bigelf_DL_0016F0));
-    gSPBranchList(gCallHumanMaskGibdoDL, getRepointedMMDL(OBJECT_MASK_GIBUDO, object_mask_gibudo_DL_000250));
-    gSPBranchList(gCallHumanMaskDonGeroDL, getRepointedMMDL(OBJECT_MASK_GERO, gDonGeroMaskDL));
-    gSPBranchList(gCallHumanMaskKamaroDL, getRepointedMMDL(OBJECT_MASK_DANCER, object_mask_dancer_DL_000EF0));
-    gSPBranchList(gCallHumanMaskCaptainDL, getRepointedMMDL(OBJECT_MASK_SKJ, object_mask_skj_DL_0009F0));
-    gSPBranchList(gCallHumanMaskStoneDL, getRepointedMMDL(OBJECT_MASK_STONE, object_mask_stone_DL_000820));
-    gSPBranchList(gCallHumanMaskBremenDL, getRepointedMMDL(OBJECT_MASK_BREE, object_mask_bree_DL_0003C0));
-    gSPBranchList(gCallHumanMaskBlastDL, getRepointedMMDL(OBJECT_MASK_BAKURETU, object_mask_bakuretu_DL_0005C0));
-    gSPBranchList(gCallHumanMaskBlastCooldownDL, getRepointedMMDL(OBJECT_MASK_BAKURETU, object_mask_bakuretu_DL_000440));
-    gSPBranchList(gCallHumanMaskScentsDL, getRepointedMMDL(OBJECT_MASK_BU_SAN, object_mask_bu_san_DL_000710));
-    gSPBranchList(gCallHumanMaskGiantDL, getRepointedMMDL(OBJECT_MASK_KYOJIN, object_mask_kyojin_DL_000380));
-    gSPBranchList(gCallHumanMaskFierceDeityDL, getRepointedMMDL(GAMEPLAY_KEEP, gFierceDeityMaskDL));
-    gSPBranchList(gCallHumanMaskFierceDeityScreamDL, getRepointedMMDL(OBJECT_MASK_BOY, object_mask_boy_DL_000900));
-    gSPBranchList(gCallHumanMaskGoronDL, getRepointedMMDL(GAMEPLAY_KEEP, gGoronMaskDL));
-    gSPBranchList(gCallHumanMaskGoronScreamDL, getRepointedMMDL(OBJECT_MASK_GORON, object_mask_goron_DL_0014A0));
-    gSPBranchList(gCallHumanMaskZoraDL, getRepointedMMDL(GAMEPLAY_KEEP, gZoraMaskDL));
-    gSPBranchList(gCallHumanMaskZoraScreamDL, getRepointedMMDL(OBJECT_MASK_ZORA, object_mask_zora_DL_000DB0));
-    gSPBranchList(gCallHumanMaskDekuDL, getRepointedMMDL(GAMEPLAY_KEEP, gDekuMaskDL));
-    gSPBranchList(gCallHumanMaskDekuScreamDL, getRepointedMMDL(OBJECT_MASK_NUTS, object_mask_nuts_DL_001D90));
-
-    gSPBranchList(gCallHumanBombBodyDL, getRepointedMMDL(GAMEPLAY_KEEP, gBombBodyDL));
-    gSPBranchList(gCallHumanBombCapDL, getRepointedMMDL(GAMEPLAY_KEEP, gBombCapDL));
-    gSPBranchList(gCallHumanBombchuDL, getRepointedMMDL(GAMEPLAY_KEEP, gBombchuDL));
 }
 
 static void registerMaskDL(PlayerModelManagerHandle pack, const char *internalName, const char *displayName, PlayerModelManagerModelType modelType, Link_DisplayList dlId, Gfx *dl) {
@@ -745,7 +386,7 @@ void registerMMEquipment() {
 
         PlayerModelManager_setMatrix(h, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK, &gIdentityMtx);
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT, gCallHumanHookshotDL);
-        PlayerModelManager_setDisplayList(h, LINK_DL_FPS_HOOKSHOT, gCallHumanHookshotFirstPersonDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_FPS_HOOKSHOT, gLinkHumanFirstPersonHookshotDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_CHAIN, gCallHumanHookshotChainDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_HOOK, gCallHumanHookshotHookDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_HOOKSHOT_RETICLE, gCallHumanHookshotReticleDL);
@@ -765,7 +406,7 @@ void registerMMEquipment() {
         PlayerModelManager_setAuthor(h, "Nintendo");
 
         PlayerModelManager_setDisplayList(h, LINK_DL_BOW, gCallHumanBowDL);
-        PlayerModelManager_setDisplayList(h, LINK_DL_FPS_BOW, gCallHumanBowFirstPersonDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_FPS_BOW, gLinkHumanFirstPersonBowDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_BOW_STRING, gCallHumanBowStringDL);
         PlayerModelManager_setDisplayList(h, LINK_DL_BOW_ARROW, gCallHumanArrowDL);
 
@@ -782,8 +423,8 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayName(h, "Bottle (MM)");
         PlayerModelManager_setAuthor(h, "Nintendo");
 
-        PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_GLASS, gCallMMBottleGlassDL);
-        PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_CONTENTS, gCallMMBottleContentsDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_GLASS, gCallHumanBottleGlassDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_BOTTLE_CONTENTS, gCallHumanBottleContentsDL);
 
         PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
@@ -793,7 +434,7 @@ void registerMMEquipment() {
         PlayerModelManagerHandle h = PlayerModelManager_registerModel(PMM_API_VERSION, "__mm_ocarina2_time__", PMM_MODEL_TYPE_OCARINA_TIME);
         PlayerModelManager_setDisplayName(h, "Ocarina of Time");
         PlayerModelManager_setAuthor(h, "Nintendo");
-        PlayerModelManager_setDisplayList(h, LINK_DL_OCARINA_TIME, gCallHumanOcarinaTimeDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_OCARINA_TIME, gLinkHumanOcarinaDL);
 
         setAdultModelTypeDL(h, LINK_DL_OCARINA_TIME, gHumanAdultOcarinaTimeDL);
 
@@ -817,12 +458,12 @@ void registerMMEquipment() {
         PlayerModelManager_setDisplayName(h, "Deku Pipes");
         PlayerModelManager_setAuthor(h, "Nintendo");
 
-        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_MOUTH, gCallDekuPipesMouthDL);
-        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_UP, gCallDekuPipesUpDL);
-        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_DOWN, gCallDekuPipesDownDL);
-        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_LEFT, gCallDekuPipesLeftDL);
-        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_RIGHT, gCallDekuPipesRightDL);
-        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_A, gCallDekuPipesADL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_MOUTH, gCallDekuPipeMouthDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_UP, gCallDekuPipeUpDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_DOWN, gCallDekuPipeDownDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_LEFT, gCallDekuPipeLeftDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_RIGHT, gCallDekuPipeRightDL);
+        PlayerModelManager_setDisplayList(h, LINK_DL_PIPE_A, gCallDekuPipeADL);
 
         PlayerModelManager_addHandleToPack(vanillaPack, h);
     }
@@ -858,7 +499,7 @@ void registerMMEquipment() {
     registerMaskDL(vanillaPack, "__mm_mask_truth__", "Mask of Truth", PMM_MODEL_TYPE_MASK_TRUTH, LINK_DL_MASK_TRUTH, gCallHumanMaskTruthDL);
     registerMaskDL(vanillaPack, "__mm_mask_kafei__", "Kafei's Mask", PMM_MODEL_TYPE_MASK_KAFEIS_MASK, LINK_DL_MASK_KAFEIS_MASK, gCallHumanMaskKafeiDL);
     registerMaskDL(vanillaPack, "__mm_mask_all_night__", "All Night Mask", PMM_MODEL_TYPE_MASK_ALL_NIGHT, LINK_DL_MASK_ALL_NIGHT, gCallHumanMaskAllNightDL);
-    registerMaskDL(vanillaPack, "__mm_mask_bunny_hood__", "Bunny Hood", PMM_MODEL_TYPE_MASK_BUNNY, LINK_DL_MASK_BUNNY, gCallHumanMaskBunnyHoodDL);
+    registerMaskDL(vanillaPack, "__mm_mask_bunny_hood__", "Bunny Hood", PMM_MODEL_TYPE_MASK_BUNNY, LINK_DL_MASK_BUNNY, gCallHumanMaskBunnyDL);
     registerMaskDL(vanillaPack, "__mm_mask_keaton__", "Keaton Mask", PMM_MODEL_TYPE_MASK_KEATON, LINK_DL_MASK_KEATON, gCallHumanMaskKeatonDL);
     registerMaskDL(vanillaPack, "__mm_mask_garo__", "Garo's Mask", PMM_MODEL_TYPE_MASK_GARO, LINK_DL_MASK_GARO, gCallHumanMaskGaroDL);
     registerMaskDL(vanillaPack, "__mm_mask_romani__", "Romani's Mask", PMM_MODEL_TYPE_MASK_ROMANI, LINK_DL_MASK_ROMANI, gCallHumanMaskRomaniDL);
