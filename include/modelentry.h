@@ -38,7 +38,7 @@ void ModelEntry_doCallback(const ModelEntry *entry, PlayerModelManagerModelEvent
 void ModelEntry_setFlags(ModelEntry *entry, u64 flags);
 void ModelEntry_unsetFlags(ModelEntry *entry, u64 flags);
 void ModelEntry_unsetAllFlags(ModelEntry *entry);
-bool ModelEntry_isAnyFlagEnabled(ModelEntry *entry, ModelEntryFlag flags);
+bool ModelEntry_isAnyFlagEnabled(const ModelEntry *entry, ModelEntryFlag flags);
 void ModelEntry_setCallback(ModelEntry *entry, PlayerModelManagerEventHandler *callback, void *data);
 
 ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName);

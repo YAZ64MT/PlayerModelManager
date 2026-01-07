@@ -478,7 +478,7 @@ void ModelEntry_unsetAllFlags(ModelEntry *entry) {
     entry->flags = 0;
 }
 
-bool ModelEntry_isAnyFlagEnabled(ModelEntry *entry, ModelEntryFlag flags) {
+bool ModelEntry_isAnyFlagEnabled(const ModelEntry *entry, ModelEntryFlag flags) {
     if (!isValidModelEntry(entry)) {
         PRINT_INVALID_PTR_ERR();
         return false;
