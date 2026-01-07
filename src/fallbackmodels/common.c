@@ -218,6 +218,7 @@ static DLIdToBuiltInDL sBuiltInDLChildMM[] = {
 
 void FallbackModelsCommon_addEquipmentChildMM(PlayerModelManagerHandle h) {
     FallbackModelsCommon_addEquipmentCommonZ64(h);
+    FallbackModelsCommon_addEquipmentCommonMM(h);
 
     addAllBuiltInDLs(h, sBuiltInDLChildMM, ARRAY_COUNT(sBuiltInDLChildMM));
     addAllBuiltInMtxs(h, sBuiltInMtxChildMM, ARRAY_COUNT(sBuiltInMtxChildMM));
@@ -256,11 +257,12 @@ static DLIdToBuiltInDL sBuiltInDLAdultMM[] = {
     DECLARE_BUILT_IN_DL(LINK_DL_BOW, gHumanAdultBowDL),
     DECLARE_BUILT_IN_DL(LINK_DL_FPS_BOW, gHumanAdultBowFirstPersonDL),
     DECLARE_BUILT_IN_DL(LINK_DL_BOW_STRING, gHumanAdultBowStringDL),
-    DECLARE_BUILT_IN_DL(LINK_DL_BOW_STRING, gHumanAdultOcarinaTimeDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_OCARINA_TIME, gHumanAdultOcarinaTimeDL),
 };
 
 void FallbackModelsCommon_addEquipmentAdultMM(PlayerModelManagerHandle h) {
     FallbackModelsCommon_addEquipmentCommonZ64(h);
+    FallbackModelsCommon_addEquipmentCommonMM(h);
 
     addAllBuiltInDLs(h, sBuiltInDLAdultMM, ARRAY_COUNT(sBuiltInDLAdultMM));
     addAllBuiltInMtxs(h, sBuiltInMtxAdultMM, ARRAY_COUNT(sBuiltInMtxAdultMM));
