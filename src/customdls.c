@@ -96,8 +96,7 @@ static void unglueFirstPersonBowFromHand() {
     gSPBranchList(gLinkHumanFirstPersonBowDL, firstPersonBow);
 }
 
-GLOBAL_OBJECTS_CALLBACK_ON_READY
-void setupCustomDLs() {
+void initCustomDLs() {
     unglueOcarinaFromHand();
     unglueFirstPersonHandFromHookshot();
     unglueFirstPersonBowFromHand();
