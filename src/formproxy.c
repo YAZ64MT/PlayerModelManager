@@ -1128,8 +1128,16 @@ Gfx *FormProxy_getNextRefreshDL(FormProxy *fp, Link_DisplayList id) {
     }
 
     ModelInfo *current = &fp->currentModelInfo;
-    ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
     ModelInfo *fallback = fp->fallbackModelInfo;
+    ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
+
+    if (ModelInfo_hasModelEntry(current)) {
+        ModelEntry *currEntry = ModelEntryForm_getModelEntry(ModelInfo_getModelEntryForm(current));
+
+        if (ModelEntry_isAnyFlagEnabled(currEntry, MODELENTRY_FLAG_FORCE_HUMAN_CHILD_EQUIPMENT)) {
+            fallback = &gHumanModelInfo;
+        }
+    }
 
     if (!dl) {
         dl = getDLOrAltFromModelInfo(current, id);
