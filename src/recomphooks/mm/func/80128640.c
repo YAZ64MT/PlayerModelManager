@@ -15,6 +15,6 @@ RECOMP_HOOK("func_80128640") void on_func_80128640(PlayState *play, Player *play
     fixBottleEnv_func_80128640(sPlay, sPlayer);
 }
 
-RECOMP_HOOK_RETURN("func_80128640") void on_return_func_80128640() {
+RECOMP_HOOK_RETURN("func_80128640") void on_return_func_80128640(void) {
 
 }

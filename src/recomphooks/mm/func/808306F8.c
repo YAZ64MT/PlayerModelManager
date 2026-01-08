@@ -11,6 +11,6 @@ RECOMP_HOOK("func_808306F8") void on_func_808306F8(Player *this, PlayState *play
 
 void setupArrowProxy_on_return_func_808306F8(Player *player);
 
-RECOMP_HOOK_RETURN("func_808306F8") void on_return_func_808306F8() {
+RECOMP_HOOK_RETURN("func_808306F8") void on_return_func_808306F8(void) {
     setupArrowProxy_on_return_func_808306F8(sPlayer);
 }

@@ -11,6 +11,6 @@ RECOMP_HOOK("Player_InitExplosiveIA") void on_Player_InitExplosiveIA(PlayState *
 
 void setupBombProxy_on_return_Player_InitExplosiveIA(Player *player);
 
-RECOMP_HOOK_RETURN("Player_InitExplosiveIA") void on_return_Player_InitExplosiveIA() {
+RECOMP_HOOK_RETURN("Player_InitExplosiveIA") void on_return_Player_InitExplosiveIA(void) {
     setupBombProxy_on_return_Player_InitExplosiveIA(sPlayer);
 }

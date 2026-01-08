@@ -11,6 +11,6 @@ RECOMP_HOOK("Player_InitHookshotIA") void on_Player_InitHookshotIA(PlayState *pl
 
 void assignHookshotProxy_on_return_Player_InitHookshotIA(Player *player);
 
-RECOMP_HOOK_RETURN("Player_InitHookshotIA") void on_return_Player_InitHookshotIA() {
+RECOMP_HOOK_RETURN("Player_InitHookshotIA") void on_return_Player_InitHookshotIA(void) {
     assignHookshotProxy_on_return_Player_InitHookshotIA(sPlayer);
 }

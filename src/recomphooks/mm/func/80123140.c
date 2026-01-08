@@ -13,8 +13,8 @@ RECOMP_HOOK("func_80123140") void on_func_80123140(PlayState *play, Player *play
     setAdultBootData_on_func_80123140(sPlay, sPlayer);
 }
 
-void setAdultBootData_on_return_func_80123140();
+void setAdultBootData_on_return_func_80123140(void);
 
-RECOMP_HOOK_RETURN("func_80123140") void on_return_func_80123140() {
+RECOMP_HOOK_RETURN("func_80123140") void on_return_func_80123140(void) {
     setAdultBootData_on_return_func_80123140();
 }

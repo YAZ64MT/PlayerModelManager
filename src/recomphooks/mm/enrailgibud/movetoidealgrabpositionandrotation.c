@@ -15,8 +15,8 @@ RECOMP_HOOK("EnRailgibud_MoveToIdealGrabPositionAndRotation") void on_EnRailgibu
     fixEnemyHeight_on_EnRailgibud_MoveToIdealGrabPositionAndRotation(sPlay);
 }
 
-void fixEnemyHeight_on_return_EnRailgibud_MoveToIdealGrabPositionAndRotation();
+void fixEnemyHeight_on_return_EnRailgibud_MoveToIdealGrabPositionAndRotation(void);
 
-RECOMP_HOOK_RETURN("EnRailgibud_MoveToIdealGrabPositionAndRotation") void on_return_EnRailgibud_MoveToIdealGrabPositionAndRotation() {
+RECOMP_HOOK_RETURN("EnRailgibud_MoveToIdealGrabPositionAndRotation") void on_return_EnRailgibud_MoveToIdealGrabPositionAndRotation(void) {
     fixEnemyHeight_on_return_EnRailgibud_MoveToIdealGrabPositionAndRotation();
 }

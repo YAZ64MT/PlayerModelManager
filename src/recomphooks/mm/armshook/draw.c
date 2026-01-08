@@ -15,8 +15,8 @@ RECOMP_HOOK("ArmsHook_Draw") void on_ArmsHook_Draw(Actor *thisx, PlayState *play
     hookGfx_on_ArmsHook_Draw(sArmsHook, sPlay);
 }
 
-void hookGfx_on_return_ArmsHook_Draw();
+void hookGfx_on_return_ArmsHook_Draw(void);
 
-RECOMP_HOOK_RETURN("ArmsHook_Draw") void on_return_ArmsHook_Draw() {
+RECOMP_HOOK_RETURN("ArmsHook_Draw") void on_return_ArmsHook_Draw(void) {
     hookGfx_on_return_ArmsHook_Draw();
 }

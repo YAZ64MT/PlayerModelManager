@@ -15,8 +15,8 @@ RECOMP_HOOK("EnBomChu_Draw") void on_EnBomChu_Draw(Actor *thisx, PlayState *play
     hookGfx_on_EnBomChu_Draw(sEnBomChu, sPlay);
 }
 
-void hookGfx_on_return_EnBomChu_Draw();
+void hookGfx_on_return_EnBomChu_Draw(void);
 
-RECOMP_HOOK_RETURN("EnBomChu_Draw") void on_return_EnBomChu_Draw() {
+RECOMP_HOOK_RETURN("EnBomChu_Draw") void on_return_EnBomChu_Draw(void) {
     hookGfx_on_return_EnBomChu_Draw();
 }

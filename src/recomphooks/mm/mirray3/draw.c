@@ -17,10 +17,10 @@ RECOMP_HOOK("MirRay3_Draw") void on_MirRay3_Draw(Actor *thisx, PlayState *play) 
     hookGfx_on_MirRay3_Draw(sMirRay3, sPlay);
 }
 
-void overwriteShieldMtx_on_return_MirRay3_Draw();
-void hookGfx_on_return_MirRay3_Draw();
+void overwriteShieldMtx_on_return_MirRay3_Draw(void);
+void hookGfx_on_return_MirRay3_Draw(void);
 
-RECOMP_HOOK_RETURN("MirRay3_Draw") void on_return_MirRay3_Draw() {
+RECOMP_HOOK_RETURN("MirRay3_Draw") void on_return_MirRay3_Draw(void) {
     hookGfx_on_return_MirRay3_Draw();
     overwriteShieldMtx_on_return_MirRay3_Draw();
 }

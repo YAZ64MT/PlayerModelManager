@@ -13,6 +13,6 @@ RECOMP_HOOK("Player_GetHeight") void on_Player_GetHeight(Player *player) {
 
 void adjustHeight_on_return_Player_GetHeight(Player *player);
 
-RECOMP_HOOK_RETURN("Player_GetHeight") void on_return_Player_GetHeight() {
+RECOMP_HOOK_RETURN("Player_GetHeight") void on_return_Player_GetHeight(void) {
     adjustHeight_on_return_Player_GetHeight(sPlayer);
 }

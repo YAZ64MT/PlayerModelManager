@@ -21,11 +21,11 @@ RECOMP_HOOK("Player_Draw") void on_Player_Draw(Actor *thisx, PlayState *play) {
     fixBowProperties_on_Player_Draw(sPlayer, sPlay);
 }
 
-void hookGfx_on_return_Player_Draw();
-void fixAdultBremen_on_return_Player_Draw();
-void fixBowProperties_on_return_Player_Draw();
+void hookGfx_on_return_Player_Draw(void);
+void fixAdultBremen_on_return_Player_Draw(void);
+void fixBowProperties_on_return_Player_Draw(void);
 
-RECOMP_HOOK_RETURN("Player_Draw") void on_return_Player_Draw() {
+RECOMP_HOOK_RETURN("Player_Draw") void on_return_Player_Draw(void) {
     fixBowProperties_on_return_Player_Draw();
     fixAdultBremen_on_return_Player_Draw();
     hookGfx_on_return_Player_Draw();

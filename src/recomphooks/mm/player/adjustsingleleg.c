@@ -25,8 +25,8 @@ RECOMP_HOOK("Player_AdjustSingleLeg") void on_Player_AdjustSingleLeg(PlayState *
     adjustAdultLeg_on_Player_AdjustSingleLeg(sPlayer);
 }
 
-void adjustAdultLeg_on_return_Player_AdjustSingleLeg();
+void adjustAdultLeg_on_return_Player_AdjustSingleLeg(void);
 
-RECOMP_HOOK_RETURN("Player_AdjustSingleLeg") void on_return_Player_AdjustSingleLeg() {
+RECOMP_HOOK_RETURN("Player_AdjustSingleLeg") void on_return_Player_AdjustSingleLeg(void) {
     adjustAdultLeg_on_return_Player_AdjustSingleLeg();
 }

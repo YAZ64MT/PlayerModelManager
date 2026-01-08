@@ -3,7 +3,7 @@
 
 static PlayState *sPlay;
 
-void processFormProxyRefreshRequests_on_Play_Draw();
+void processFormProxyRefreshRequests_on_Play_Draw(void);
 void skipInterpolation_on_Play_Draw(PlayState *play);
 
 RECOMP_HOOK("Play_Draw") void on_Play_Draw(PlayState *this) {
@@ -13,6 +13,6 @@ RECOMP_HOOK("Play_Draw") void on_Play_Draw(PlayState *this) {
     skipInterpolation_on_Play_Draw(sPlay);
 }
 
-RECOMP_HOOK_RETURN("Play_Draw") void on_return_Play_Draw() {
+RECOMP_HOOK_RETURN("Play_Draw") void on_return_Play_Draw(void) {
 
 }

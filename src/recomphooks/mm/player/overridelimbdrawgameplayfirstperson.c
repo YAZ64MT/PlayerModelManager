@@ -23,6 +23,6 @@ RECOMP_HOOK("Player_OverrideLimbDrawGameplayFirstPerson") void on_Player_Overrid
 
 void addCustomFirstPersonDLs_on_return_Player_OverrideLimbDrawFirstPerson(Gfx **dList);
 
-RECOMP_HOOK_RETURN("Player_OverrideLimbDrawGameplayFirstPerson") void on_return_Player_OverrideLimbDrawGameplayFirstPerson() {
+RECOMP_HOOK_RETURN("Player_OverrideLimbDrawGameplayFirstPerson") void on_return_Player_OverrideLimbDrawGameplayFirstPerson(void) {
     addCustomFirstPersonDLs_on_return_Player_OverrideLimbDrawFirstPerson(sDList);
 }

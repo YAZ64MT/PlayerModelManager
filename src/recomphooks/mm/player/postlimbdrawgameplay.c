@@ -28,9 +28,9 @@ RECOMP_HOOK("Player_PostLimbDrawGameplay") void on_Player_PostLimbDrawGameplay(P
 }
 
 void refreshColor_on_return_Player_PostLimbDrawGameplay(PlayState *play);
-void handleMaskMtx_on_return_Player_PostLimbDrawGameplay();
+void handleMaskMtx_on_return_Player_PostLimbDrawGameplay(void);
 
-RECOMP_HOOK_RETURN("Player_PostLimbDrawGameplay") void on_return_Player_PostLimbDrawGameplay() {
+RECOMP_HOOK_RETURN("Player_PostLimbDrawGameplay") void on_return_Player_PostLimbDrawGameplay(void) {
     handleMaskMtx_on_return_Player_PostLimbDrawGameplay();
     refreshColor_on_return_Player_PostLimbDrawGameplay(sPlay);
 }

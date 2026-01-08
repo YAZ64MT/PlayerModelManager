@@ -13,6 +13,6 @@ RECOMP_HOOK("Play_UpdateMain") void on_Play_UpdateMain(PlayState *this) {
     checkToOpenModelMenu_on_Play_UpdateMain(sPlay);
 }
 
-RECOMP_HOOK_RETURN("Play_UpdateMain") void on_return_Play_UpdateMain() {
+RECOMP_HOOK_RETURN("Play_UpdateMain") void on_return_Play_UpdateMain(void) {
 
 }

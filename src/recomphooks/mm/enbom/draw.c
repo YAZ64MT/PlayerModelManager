@@ -17,8 +17,8 @@ RECOMP_HOOK("EnBom_Draw") void on_EnBom_Draw(Actor *thisx, PlayState *play) {
     draw3DBombBody_on_EnBom_Draw(sEnBom, sPlay);
 }
 
-void hookGfx_on_return_EnBom_Draw();
+void hookGfx_on_return_EnBom_Draw(void);
 
-RECOMP_HOOK_RETURN("EnBom_Draw") void on_return_EnBom_Draw() {
+RECOMP_HOOK_RETURN("EnBom_Draw") void on_return_EnBom_Draw(void) {
     hookGfx_on_return_EnBom_Draw();
 }

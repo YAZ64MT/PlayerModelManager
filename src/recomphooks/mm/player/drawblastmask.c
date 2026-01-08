@@ -13,8 +13,8 @@ RECOMP_HOOK("Player_DrawBlastMask") void on_Player_DrawBlastMask(PlayState *play
     hookGfx_on_Player_DrawBlastMask(sPlay, sPlayer);
 }
 
-void hookGfx_on_return_Player_DrawBlastMask();
+void hookGfx_on_return_Player_DrawBlastMask(void);
 
-RECOMP_HOOK_RETURN("Player_DrawBlastMask") void on_return_Player_DrawBlastMask() {
+RECOMP_HOOK_RETURN("Player_DrawBlastMask") void on_return_Player_DrawBlastMask(void) {
     hookGfx_on_return_Player_DrawBlastMask();
 }
