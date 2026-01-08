@@ -150,6 +150,7 @@ static DLIdToBuiltInDL sBuiltInDLCommonZ64[] = {
     DECLARE_BUILT_IN_DL(LINK_DL_BODY_SHIELD_BODY, gCallGoronShieldBodyDL),
     DECLARE_BUILT_IN_DL(LINK_DL_BODY_SHIELD_HEAD, gCallGoronShieldHeadDL),
     DECLARE_BUILT_IN_DL(LINK_DL_BODY_SHIELD_ARMS_AND_LEGS, gCallGoronShieldArmsAndLegsDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOMB_BODY_3D, gEmptyDL),
 };
 
 void FallbackModelsCommon_addEquipmentCommonZ64(PlayerModelManagerHandle h) {
@@ -172,6 +173,9 @@ static DLIdToBuiltInDL sBuiltInDLCommonMM[] = {
     DECLARE_BUILT_IN_DL(LINK_DL_MASK_KEATON, gCallHumanMaskKeatonDL),
     DECLARE_BUILT_IN_DL(LINK_DL_MASK_GORON, gCallHumanMaskGoronDL),
     DECLARE_BUILT_IN_DL(LINK_DL_MASK_ZORA, gCallHumanMaskZoraDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOMB_CAP, gCallHumanBombCapDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOMB_BODY_2D, gCallHumanBombBodyDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_BOMBCHU, gCallHumanBombchuDL),
 };
 
 void FallbackModelsCommon_addEquipmentCommonMM(PlayerModelManagerHandle h) {
