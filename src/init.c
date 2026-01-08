@@ -10,7 +10,6 @@
 #include "modelentrymanager.h"
 #include "fallbackmodels.h"
 
-static bool sIsModelEntryManagerReady;
 static bool sIsGlobalObjectsReady;
 static bool sIsModelsRegistered;
 static bool sIsAllHashObjectsInitialized;
@@ -55,7 +54,7 @@ GLOBAL_OBJECTS_CALLBACK_ON_READY void initFormProxiesOnGlobalObjects(void) {
     initCustomDLs();
     initVanillaMMDLs();
     sIsGlobalObjectsReady = true;
-
+    doRegisterModels();
 }
 
 RECOMP_DECLARE_EVENT(_internal_preInitHashObjects(void));
@@ -67,8 +66,8 @@ RECOMP_CALLBACK("*", recomp_on_init) void handleInits(void) {
     _internal_initHashObjects();
     _internal_postInitHashObjects();
 
-    doRegisterModels();
     sIsAllHashObjectsInitialized = true;
+    doRegisterModels();
 }
 
 RECOMP_DECLARE_EVENT(onRegisterModels(void));
@@ -80,7 +79,7 @@ static void doRegisterModels(void) {
         return;
     }
 
-    if (!sIsModelEntryManagerReady || !sIsGlobalObjectsReady) {
+    if (!sIsAllHashObjectsInitialized || !sIsGlobalObjectsReady) {
         return;
     }
 
