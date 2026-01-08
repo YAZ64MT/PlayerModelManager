@@ -333,3 +333,29 @@ void adjustAdultLeg_on_return_Player_AdjustSingleLeg(void) {
         }
     }
 }
+
+typedef struct AnimSfxEntry {
+    /* 0x0 */ u16 sfxId;
+    /* 0x2 */ s16 flags; // negative marks the end
+} AnimSfxEntry;          // size = 0x4
+
+void adjustTransformationVoice_on_func_80855218(Player *player) {
+    extern AnimSfxEntry D_8085D8F0[];
+
+    D_8085D8F0[3].sfxId = shouldUseAdultFixes(player) ? NA_SE_NONE : NA_SE_PL_TRANSFORM_VOICE;
+}
+
+void adjustTransformationVoice_on_return_func_80855218(Player *player) {
+    if ((R_PLAY_FILL_SCREEN_ON == 0) && (player->skelAnime.animation == &gPlayerAnim_cl_setmask) && shouldUseAdultFixes(player)) {
+        static f32 adultTransformationMaskFreq = 0.94167805f;
+        static s8 adultTransformationMaskReverbAdd = 0x40;
+
+        if (PlayerAnimation_OnFrame(&player->skelAnime, 30)) {
+            AudioSfx_PlaySfx(NA_SE_VO_LI_DEMO_DAMAGE, &player->actor.projectedPos, 4, &adultTransformationMaskFreq, &gSfxDefaultFreqAndVolScale,
+                             &adultTransformationMaskReverbAdd);
+        } else if (PlayerAnimation_OnFrame(&player->skelAnime, 50)) {
+            AudioSfx_PlaySfx(NA_SE_VO_LI_TAKEN_AWAY, &player->actor.projectedPos, 4, &adultTransformationMaskFreq, &gSfxDefaultFreqAndVolScale,
+                             &adultTransformationMaskReverbAdd);
+        }
+    }
+}
