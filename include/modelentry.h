@@ -11,6 +11,7 @@ typedef struct FormProxy FormProxy;
 
 typedef enum ModelEntryFlag {
     MODELENTRY_FLAG_IS_ADULT = 0x01ULL,
+    MODELENTRY_FLAG_FORCE_HUMAN_CHILD_EQUIPMENT = 0x01ULL << 1,
 } ModelEntryFlag;
 
 // This is the max file name length for most Linux distros and MacOS

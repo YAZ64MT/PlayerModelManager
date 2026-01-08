@@ -184,6 +184,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
         ModelEntry_setDisplayList(entry, LINK_DL_OPT_FPS_RHAND, sBelowV3FirstPersonRightHandDL);
         ModelEntry_setDisplayList(entry, LINK_DL_FPS_HOOKSHOT, sBelowV3FirstPersonHookshotDL);
         ModelEntry_setDisplayList(entry, LINK_DL_FPS_BOW, sBelowV3FirstPersonBowDL);
+        ModelEntry_setFlags(entry, MODELENTRY_FLAG_FORCE_HUMAN_CHILD_EQUIPMENT);
     }
 
     return h;
