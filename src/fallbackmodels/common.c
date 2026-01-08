@@ -162,7 +162,7 @@ void FallbackModelsCommon_addEquipmentCommonZ64(PlayerModelManagerHandle h) {
 
 static DLIdToBuiltInDL sBuiltInDLCommonMM[] = {
     DECLARE_BUILT_IN_DL(LINK_DL_HOOKSHOT_RETICLE, gCallHumanHookshotReticleDL),
-    DECLARE_BUILT_IN_DL(LINK_DL_HOOKSHOT_CHAIN, gCallHumanHookshotDL),
+    DECLARE_BUILT_IN_DL(LINK_DL_HOOKSHOT_CHAIN, gCallHumanHookshotChainDL),
     DECLARE_BUILT_IN_DL(LINK_DL_BOW_ARROW, gCallHumanArrowDL),
     DECLARE_BUILT_IN_DL(LINK_DL_BOTTLE_GLASS, gCallHumanBottleGlassDL),
     DECLARE_BUILT_IN_DL(LINK_DL_BOTTLE_CONTENTS, gCallHumanBottleContentsDL),
