@@ -217,48 +217,6 @@ RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerHandle h, cons
     return true;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_setFlags(PlayerModelManagerHandle h, u64 flags) {
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
-
-    if (!entry) {
-        return false;
-    }
-
-    ModelEntry_setFlags(entry, flags);
-
-    Logger_printVerbose("Setting flags 0x%llX of handle with internal name '%s'", flags, ModelEntry_getInternalName(entry));
-
-    return true;
-}
-
-RECOMP_EXPORT bool PlayerModelManager_clearFlags(PlayerModelManagerHandle h, u64 flags) {
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
-
-    if (!entry) {
-        return false;
-    }
-
-    ModelEntry_unsetFlags(entry, flags);
-
-    Logger_printVerbose("Clearing flags 0x%llX of handle with internal name '%s'", flags, ModelEntry_getInternalName(entry));
-
-    return true;
-}
-
-RECOMP_EXPORT bool PlayerModelManager_clearAllFlags(PlayerModelManagerHandle h, u64 flags) {
-    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
-
-    if (!entry) {
-        return false;
-    }
-
-    ModelEntry_unsetAllFlags(entry);
-
-    Logger_printVerbose("Clearing all flags of handle with internal name '%s'", ModelEntry_getInternalName(entry));
-
-    return true;
-}
-
 RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, Link_DisplayList dlId, Gfx *dl) {
     if (dlId >= LINK_DL_MAX || dlId < 0) {
         Logger_printError("Invalid display list ID passed in.");
