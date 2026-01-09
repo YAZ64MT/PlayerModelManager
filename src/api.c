@@ -14,14 +14,6 @@
 #include "customdls.h"
 #include "equipmentbuiltin.h"
 
-static Gfx sBelowV3OcarinaHandDL[] = {
-    gsSPBranchList(gLinkHumanRightHandOcarinaDL),
-};
-
-static Gfx sBelowV3OcarinaDL[] = {
-    gsSPBranchList(gLinkHumanOcarinaDL),
-};
-
 static Gfx sBelowV3FirstPersonRightForearmDL[] = {
     gsSPEndDisplayList(),
 };
