@@ -9,7 +9,9 @@
 #include "recompdata.h"
 #include "modelentry.h"
 
-static void refreshFileList();
+static bool sIsFileListRefreshRequested;
+
+static void requestRefreshFileList(void);
 static void onUpOneLevelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata);
 
 typedef struct CategoryInfo {
@@ -371,6 +373,9 @@ static void destroyAuthor(void) {
 }
 
 static void setAuthor(const char *author) {
+    // TODO: Restore author preview
+    return;
+
     if (!author) {
         author = "N/A";
     }
@@ -582,7 +587,7 @@ static void changeCategoryButtonPressed(RecompuiResource resource, const Recompu
                 decrementCurrentCategory();
             }
 
-            refreshFileList();
+            requestRefreshFileList();
         } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
             destroyAuthor();
 
@@ -641,6 +646,18 @@ static void setupRow(RecompuiResource row) {
     recompui_set_justify_content(row, JUSTIFY_CONTENT_FLEX_START);
     recompui_set_align_items(row, ALIGN_ITEMS_FLEX_END);
     recompui_set_gap(row, 16.0f, UNIT_DP);
+}
+
+static void setupAuthorRow(void) {
+    sRowAuthor = recompui_create_element(sUIContext, sContainerMain);
+    recompui_set_flex_basis(sRowAuthor, 100.0f, UNIT_DP);
+    recompui_set_flex_grow(sRowAuthor, 0.0f);
+    recompui_set_flex_shrink(sRowAuthor, 0.0f);
+    recompui_set_display(sRowAuthor, DISPLAY_FLEX);
+    recompui_set_flex_direction(sRowAuthor, FLEX_DIRECTION_ROW);
+    recompui_set_justify_content(sRowAuthor, JUSTIFY_CONTENT_FLEX_START);
+    recompui_set_align_items(sRowAuthor, ALIGN_ITEMS_FLEX_END);
+    recompui_set_gap(sRowAuthor, 0.0f, UNIT_DP);
 }
 
 RECOMP_CALLBACK(".", _internal_preInitHashObjects)
@@ -712,15 +729,8 @@ void initUIOnRecompInit(void) {
     sModelListElement = recompui_create_element(sUIContext, sContainerMain);
     setupScrollingList(sModelListElement);
 
-    sRowAuthor = recompui_create_element(sUIContext, sContainerMain);
-    recompui_set_flex_basis(sRowAuthor, 100.0f, UNIT_DP);
-    recompui_set_flex_grow(sRowAuthor, 0.0f);
-    recompui_set_flex_shrink(sRowAuthor, 0.0f);
-    recompui_set_display(sRowAuthor, DISPLAY_FLEX);
-    recompui_set_flex_direction(sRowAuthor, FLEX_DIRECTION_ROW);
-    recompui_set_justify_content(sRowAuthor, JUSTIFY_CONTENT_FLEX_START);
-    recompui_set_align_items(sRowAuthor, ALIGN_ITEMS_FLEX_END);
-    recompui_set_gap(sRowAuthor, 0.0f, UNIT_DP);
+    // TODO: Restore author preview after UI crashes are mitigated in Recomp
+    //setupAuthorRow();
 
     // Setup category container
     sContainerCategories = recompui_create_element(sUIContext, sUIRoot);
@@ -832,7 +842,7 @@ static void onCategoryButtonPressed(RecompuiResource resource, const RecompuiEve
             if (catInf && isValidCategoryInfoIndex(catInf->index)) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
                 sCurrentCategoryInfo = catInf->index;
-                refreshFileList();
+                requestRefreshFileList();
             } else {
                 Audio_PlaySfx(NA_SE_SY_ERROR);
             }
@@ -924,6 +934,10 @@ static void createModelListButtons(void) {
     }
 
     connectListBoxButtons(getCurrentModelButtonArray(), getCurrentModelButtonArraySize());
+}
+
+static void requestRefreshFileList(void) {
+    sIsFileListRefreshRequested = true;
 }
 
 static void refreshFileList(void) {
@@ -1027,6 +1041,13 @@ void allowUIOnReady(void) {
 
 // Hook Play_UpdateMain to check if the L button is pressed and show this mod's UI if so.
 void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play) {
+    if (sIsFileListRefreshRequested) {
+        sIsFileListRefreshRequested = false;
+        recompui_open_context(sUIContext);
+        refreshFileList();
+        recompui_close_context(sUIContext);
+    }
+
     if (isOpenMenuComboPressed(play) && sIsModelManagerReady) {
         openModelMenu();
     }
@@ -1073,7 +1094,7 @@ void populateFirstFileList(void) {
 
     recompui_set_nav(catButtons[catButtonsNum - 1], NAVDIRECTION_DOWN, sButtonCategoriesHide);
 
-    refreshFileList();
+    requestRefreshFileList();
     recompui_close_context(sUIContext);
 }
 
