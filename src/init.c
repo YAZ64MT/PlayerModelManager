@@ -93,9 +93,14 @@ static void doRegisterModels(void) {
     initUIFileList();
     Logger_printInfo("Finished registering models.");
 
-    ModelEntryManager_applyModelsFromDisk();
     PlayerProxyManager_refreshAll();
 
     Logger_printInfo("Ready!");
     onReady();
+}
+
+// Need to do this in ConsoleLogo_Destroy for Rando compatibility
+// TODO: Remove when filesystem API fo Recomp exists
+void applyDiskModels_on_return_ConsoleLogo_Destroy(void) {
+    ModelEntryManager_applyModelsFromDisk();
 }

@@ -9,6 +9,8 @@ RECOMP_HOOK("ConsoleLogo_Destroy") void on_ConsoleLogo_Destroy(GameState *thisx)
     sConsoleLogo = (ConsoleLogoState *)thisx;
 }
 
-RECOMP_HOOK_RETURN("ConsoleLogo_Destroy") void on_return_ConsoleLogo_Destroy(void) {
+void applyDiskModels_on_return_ConsoleLogo_Destroy(void);
 
+RECOMP_HOOK_RETURN("ConsoleLogo_Destroy") void on_return_ConsoleLogo_Destroy(void) {
+    applyDiskModels_on_return_ConsoleLogo_Destroy();
 }
