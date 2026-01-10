@@ -235,6 +235,7 @@ static MtxIdToBuiltInMtx sBuiltInMtxAdultMM[] = {
     DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SHIELD1_BACK, &gHumanAdultHeroShieldBackMtx),
     DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SHIELD_HERO_BACK, &gHumanAdultHeroShieldBackMtx),
     DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_SHIELD_MIRROR_BACK, &gHumanAdultMirrorShieldBackMtx),
+    DECLARE_BUILT_IN_MTX(LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK, &gHumanAdultHookshotHookAndChainMtx),
 };
 
 static DLIdToBuiltInDL sBuiltInDLAdultMM[] = {
