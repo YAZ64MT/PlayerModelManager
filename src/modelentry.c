@@ -487,6 +487,15 @@ bool ModelEntry_isAnyFlagEnabled(const ModelEntry *entry, ModelEntryFlag flags) 
     return entry->flags & flags;
 }
 
+bool ModelEntry_isAllFlagsEnabled(const ModelEntry *entry, ModelEntryFlag flags) {
+    if (!isValidModelEntry(entry)) {
+        PRINT_INVALID_PTR_ERR();
+        return false;
+    }
+
+    return (entry->flags & flags) == flags;
+}
+
 void ModelEntry_setCallback(ModelEntry *entry, PlayerModelManagerEventHandler *callback, void *data) {
     if (!isValidModelEntry(entry)) {
         PRINT_INVALID_PTR_ERR();

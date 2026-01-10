@@ -851,11 +851,25 @@ void FormProxy_setCurrentModelFormEntry(FormProxy *fp, ModelEntryForm *modelEntr
     ModelInfo_setModelEntryForm(&fp->currentModelInfo, modelEntry);
 }
 
+static void switchFallbackToFierceDeityIfNeeded(FormProxy *fp) {
+    if (fp->fallbackModelInfo == &gHumanModelInfo) {
+        if (ModelInfo_hasModelEntry(&fp->currentModelInfo)) {
+            ModelEntry *entry = ModelEntryForm_getModelEntry(ModelInfo_getModelEntryForm(&fp->currentModelInfo));
+            if (ModelEntry_isAnyFlagEnabled(entry, MODELENTRY_FLAG_IS_ADULT) && !ModelEntry_isAnyFlagEnabled(entry, MODELENTRY_FLAG_USE_OLD_EQUIP_BEHAVIOR)) {
+                fp->fallbackModelInfo = &gFierceDeityModelInfo;
+            }
+        }
+    }
+}
+
 void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp) {
     if (!isValidFormProxy(fp)) {
         PRINT_INVALID_PTR_ERR();
         return;
     }
+
+    ModelInfo *tempFallback = fp->fallbackModelInfo;
+    switchFallbackToFierceDeityIfNeeded(fp);
 
     extern TexturePtr sPlayerEyesTextures[];
     extern TexturePtr sPlayerMouthTextures[];
@@ -891,6 +905,8 @@ void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp) {
 
         sPlayerMouthTextures[i] = mouthTex;
     }
+
+    fp->fallbackModelInfo = tempFallback;
 }
 
 static void FormProxy_refresh(FormProxy *fp) {
@@ -899,9 +915,14 @@ static void FormProxy_refresh(FormProxy *fp) {
         return;
     }
 
+    ModelInfo *tempFallback = fp->fallbackModelInfo;
+    switchFallbackToFierceDeityIfNeeded(fp);
+
     FormProxy_refreshSkeletons(fp);
     FormProxy_refreshAllDLs(fp);
     FormProxy_refreshAllMtxs(fp);
+
+    fp->fallbackModelInfo = tempFallback;
 }
 
 Mtx *FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id) {
@@ -1130,14 +1151,6 @@ Gfx *FormProxy_getNextRefreshDL(FormProxy *fp, Link_DisplayList id) {
     ModelInfo *current = &fp->currentModelInfo;
     ModelInfo *fallback = fp->fallbackModelInfo;
     ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
-
-    if (ModelInfo_hasModelEntry(current)) {
-        ModelEntry *currEntry = ModelEntryForm_getModelEntry(ModelInfo_getModelEntryForm(current));
-
-        if (ModelEntry_isAnyFlagEnabled(currEntry, MODELENTRY_FLAG_FORCE_HUMAN_CHILD_EQUIPMENT)) {
-            fallback = &gHumanModelInfo;
-        }
-    }
 
     if (!dl) {
         dl = getDLOrAltFromModelInfo(current, id);

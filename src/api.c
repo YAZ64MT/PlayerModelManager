@@ -166,7 +166,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
     if (apiVersion < 3UL && (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT)) {
         ModelEntry_setDisplayList(entry, LINK_DL_OPT_FPS_RFOREARM, sBelowV3FirstPersonRightForearmDL);
         ModelEntry_setDisplayList(entry, LINK_DL_OPT_FPS_RHAND, sBelowV3FirstPersonRightHandDL);
-        ModelEntry_setFlags(entry, MODELENTRY_FLAG_FORCE_HUMAN_CHILD_EQUIPMENT);
+        ModelEntry_setFlags(entry, MODELENTRY_FLAG_USE_OLD_EQUIP_BEHAVIOR);
     }
 
     return h;

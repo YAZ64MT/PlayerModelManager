@@ -11,7 +11,7 @@ typedef struct FormProxy FormProxy;
 
 typedef enum ModelEntryFlag {
     MODELENTRY_FLAG_IS_ADULT = 0x01ULL,
-    MODELENTRY_FLAG_FORCE_HUMAN_CHILD_EQUIPMENT = 0x01ULL << 1,
+    MODELENTRY_FLAG_USE_OLD_EQUIP_BEHAVIOR = 0x01ULL << 1,
 } ModelEntryFlag;
 
 // This is the max file name length for most Linux distros and MacOS
@@ -40,6 +40,7 @@ void ModelEntry_setFlags(ModelEntry *entry, u64 flags);
 void ModelEntry_unsetFlags(ModelEntry *entry, u64 flags);
 void ModelEntry_unsetAllFlags(ModelEntry *entry);
 bool ModelEntry_isAnyFlagEnabled(const ModelEntry *entry, ModelEntryFlag flags);
+bool ModelEntry_isAllFlagsEnabled(const ModelEntry *entry, ModelEntryFlag flags);
 void ModelEntry_setCallback(ModelEntry *entry, PlayerModelManagerEventHandler *callback, void *data);
 
 ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName);
