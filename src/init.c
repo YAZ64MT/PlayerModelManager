@@ -43,14 +43,13 @@ void initFormProxies(void) {
     if (!isFormProxiesInitialized) {
         isFormProxiesInitialized = true;
         forceInitFormProxies();
-        PlayerProxyManager_refreshAll();
     }
 }
 
 void initVanillaMMDLs(void);
 void initCustomDLs(void);
 
-GLOBAL_OBJECTS_CALLBACK_ON_READY void initFormProxiesOnGlobalObjects(void) {
+GLOBAL_OBJECTS_CALLBACK_ON_READY void initCustomDLsOnGlobalObjects(void) {
     initCustomDLs();
     initVanillaMMDLs();
     sIsGlobalObjectsReady = true;
@@ -65,21 +64,17 @@ RECOMP_CALLBACK("*", recomp_on_init) void handleInits(void) {
     _internal_preInitHashObjects();
     _internal_initHashObjects();
     _internal_postInitHashObjects();
-
     sIsAllHashObjectsInitialized = true;
     doRegisterModels();
 }
 
 RECOMP_DECLARE_EVENT(onRegisterModels(void));
 RECOMP_DECLARE_EVENT(onReady(void));
-RECOMP_DECLARE_EVENT(_internal_onFinishedRegisterModels(void));
+
+void initUIFileList(void);
 
 static void doRegisterModels(void) {
-    if (sIsModelsRegistered) {
-        return;
-    }
-
-    if (!sIsAllHashObjectsInitialized || !sIsGlobalObjectsReady) {
+    if (sIsModelsRegistered || !sIsAllHashObjectsInitialized || !sIsGlobalObjectsReady) {
         return;
     }
 
@@ -95,8 +90,12 @@ static void doRegisterModels(void) {
 
     PlayerModelManager_lockAPI();
 
-    _internal_onFinishedRegisterModels();
+    initUIFileList();
     Logger_printInfo("Finished registering models.");
-    onReady();
+
+    ModelEntryManager_applyModelsFromDisk();
+    PlayerProxyManager_refreshAll();
+
     Logger_printInfo("Ready!");
+    onReady();
 }

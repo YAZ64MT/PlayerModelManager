@@ -747,12 +747,12 @@ const ModelEntry **ModelEntryManager_getCategoryEntryData(Link_CustomModelCatego
 
 void ModelEntryManager_removeModel(Link_CustomModelCategory cat) {
     if (!isValidCategory(cat)) {
-        Logger_printError("Called ModelEntryManager_removeModel with invalid category %d\n", cat);
+        Logger_printError("Called with invalid category %d\n", cat);
         Utils_tryCrashGame();
         return;
     }
 
-    const ModelEntry *entry = sCurrentModelEntries[cat];
+    const ModelEntry *entry = ModelEntryManager_getCurrentEntry(cat);
 
     if (entry) {
         ModelEntry_doCallback(entry, PMM_EVENT_MODEL_REMOVED);
@@ -834,33 +834,26 @@ void ModelEntryManager_saveCurrentEntry(Link_CustomModelCategory cat) {
 
     KV_Global_Remove(key);
 
-    if (sCurrentModelEntries[cat]) {
+    const ModelEntry *curr = ModelEntryManager_getCurrentEntry(cat);
+    if (curr) {
         // No need to initialize this since there will be a null terminator
         char tmpNameBuf[SAVED_INTERNAL_NAME_BUFFER_SIZE];
 
-        strcpy(tmpNameBuf, ModelEntry_getInternalName(sCurrentModelEntries[cat]));
+        strcpy(tmpNameBuf, ModelEntry_getInternalName(curr));
         KV_Global_Set(key, tmpNameBuf, INTERNAL_NAME_MAX_LENGTH);
     }
 }
 
-RECOMP_DECLARE_EVENT(_internal_onSavedModelsApplied());
-
-void loadSavedModels(void) {
+void ModelEntryManager_applyModelsFromDisk(void) {
     static char retrievedName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
 
-    for (int i = 0; i < LINK_CMC_MAX; ++i) {
+    for (Link_CustomModelCategory i = 0; i < LINK_CMC_MAX; ++i) {
         if (KV_Global_Get(sSavedModelNames[i].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
             applyByInternalName(i, retrievedName);
         } else {
             ModelEntryManager_forceApplyEntry(i, NULL);
         }
     }
-
-    _internal_onSavedModelsApplied();
-}
-
-void applySavedModels_on_return_ConsoleLogo_Destroy(void) {
-    loadSavedModels();
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects)

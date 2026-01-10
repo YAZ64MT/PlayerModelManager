@@ -20,6 +20,7 @@ void ModelEntryManager_reapplyEntry(Link_CustomModelCategory cat);
 bool ModelEntryManager_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry);
 bool ModelEntryManager_isEntryHidden(const ModelEntry *ModelEntry);
 void ModelEntryManager_setEntryHidden(const ModelEntry *modelEntry, bool isHidden);
+void ModelEntryManager_applyModelsFromDisk(void);
 
 PlayerTransformation getFormFromModelType(PlayerModelManagerModelType t);
 Link_CustomModelCategory getCategoryFromModelType(PlayerModelManagerModelType t);

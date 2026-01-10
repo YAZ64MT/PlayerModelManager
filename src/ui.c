@@ -1041,15 +1041,15 @@ void allowUIOnReady(void) {
 
 // Hook Play_UpdateMain to check if the L button is pressed and show this mod's UI if so.
 void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play) {
-    if (sIsFileListRefreshRequested) {
+    if (isOpenMenuComboPressed(play) && sIsModelManagerReady) {
+        openModelMenu();
+    }
+
+    if (sIsFileListRefreshRequested && sIsUIContextShown) {
         sIsFileListRefreshRequested = false;
         recompui_open_context(sUIContext);
         refreshFileList();
         recompui_close_context(sUIContext);
-    }
-
-    if (isOpenMenuComboPressed(play) && sIsModelManagerReady) {
-        openModelMenu();
     }
 
     if (sShouldClearAllButtonsNextFrame) {
@@ -1059,8 +1059,7 @@ void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play) {
     sShouldClearAllButtonsNextFrame = false;
 }
 
-RECOMP_CALLBACK(".", _internal_onFinishedRegisterModels)
-void populateFirstFileList(void) {
+void initUIFileList(void) {
     recompui_open_context(sUIContext);
 
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
