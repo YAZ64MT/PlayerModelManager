@@ -48,8 +48,7 @@ static Gfx sEndBowstringDL[] = {
     gsSPBranchList(sEndDLWrapper),
 };
 
-RECOMP_CALLBACK(".", _internal_preInitHashObjects)
-void initFormProxyExDLs(void) {
+RECOMP_CALLBACK(".", _internal_preInitHashObjects) void initFormProxyExDLs(void) {
     gEXPushEnvColor(&sStartDLWrapper[0]);
     gEXPopEnvColor(&sEndDLWrapper[0]);
     gEXMatrixGroupSimple(&sStartBowStringDL[0], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
@@ -169,8 +168,10 @@ static void initProxyShims(FormProxy *fp) {
         gSPBranchList(shims[i], gEmptyDL);
     }
 
-#define SHIM_ITEM_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item] = Utils_createShimDisplayList(2, &dls[LINK_DL_##item], &dls[LINK_DL_##hand])
-#define SHIM_ITEM_OPT_HAND(hand, item) shims[LINK_SHIMDL_##hand##_##item] = Utils_createShimDisplayList(2, &dls[LINK_DL_##item], &dls[LINK_DL_OPT_##hand##_##item])
+    // TODO: clean up this preprocessor mess
+    // clang-format off
+#define SHIM_ITEM_HAND(hand, item) {shims[LINK_SHIMDL_##hand##_##item] = Utils_createShimDisplayListVa(&dls[LINK_DL_##item], &dls[LINK_DL_##hand]);} (void)0
+#define SHIM_ITEM_OPT_HAND(hand, item) {shims[LINK_SHIMDL_##hand##_##item] = Utils_createShimDisplayListVa(&dls[LINK_DL_##item], &dls[LINK_DL_OPT_##hand##_##item]);} (void)0
 #define SHIM_ITEM_LFIST(item) SHIM_ITEM_HAND(LFIST, item)
 #define SHIM_ITEM_OPT_LFIST(item) SHIM_ITEM_OPT_HAND(LFIST, item)
 #define SHIM_ITEM_RFIST(item) SHIM_ITEM_HAND(RFIST, item)
@@ -179,22 +180,23 @@ static void initProxyShims(FormProxy *fp) {
 #define SHIM_ITEM_OPT_LHAND(item) SHIM_ITEM_OPT_HAND(LHAND, item)
 #define SHIM_ITEM_RHAND(item) SHIM_ITEM_HAND(RHAND, item)
 #define SHIM_ITEM_OPT_RHAND(item) SHIM_ITEM_OPT_HAND(RHAND, item)
-#define SHIM_ITEM_RHAND_OCARINA(item) shims[LINK_SHIMDL_RHAND_##item] = Utils_createShimDisplayList(2, &dls[LINK_DL_##item], &dls[LINK_DL_OPT_RHAND_##item])
-#define SHIM_HILT_BACK(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_HILT_BACK] = Utils_createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SWORD##swordNum##_BACK], &dls[LINK_DL_SWORD##swordNum##_HILT], sPopModelViewMtx)
-#define SHIM_SWORD_SHEATHED(swordNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHEATHED] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_SHEATH], &dls[LINK_DL_SWORD##swordNum##_HILT_BACK])
-#define SHIM_SHIELD_BACK(shieldNum) shims[LINK_SHIMDL_SHIELD##shieldNum##_BACK] = Utils_createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD##shieldNum##_BACK], &dls[LINK_DL_SHIELD##shieldNum], sPopModelViewMtx)
-#define SHIM_SWORD_SHIELD_UNSHEATHED(swordNum, shieldNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_UNSHEATHED] = Utils_createShimDisplayList(1, &dls[LINK_DL_SWORD##swordNum##_SHEATH])
-#define SHIM_SWORD_SHIELD_SHEATH(swordNum, shieldNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_SHEATH] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_SHEATH], &dls[LINK_DL_SHIELD##shieldNum##_BACK])
-#define SHIM_SWORD_SHIELD_SHEATHED(swordNum, shieldNum) shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_SHEATHED] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_SHEATHED], &dls[LINK_DL_SHIELD##shieldNum##_BACK])
-#define SHIM_SWORD(swordNum) shims[LINK_SHIMDL_SWORD##swordNum] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD##swordNum##_HILT], &dls[LINK_DL_SWORD##swordNum##_BLADE])
+#define SHIM_ITEM_RHAND_OCARINA(item) {shims[LINK_SHIMDL_RHAND_##item] = Utils_createShimDisplayListVa(&dls[LINK_DL_##item], &dls[LINK_DL_OPT_RHAND_##item]);} (void)0
+#define SHIM_HILT_BACK(swordNum) {shims[LINK_SHIMDL_SWORD##swordNum##_HILT_BACK] = Utils_createShimDisplayListVa(mtxDls[LINK_EQUIP_MATRIX_SWORD##swordNum##_BACK], &dls[LINK_DL_SWORD##swordNum##_HILT], sPopModelViewMtx);} (void)0
+#define SHIM_SWORD_SHEATHED(swordNum) {shims[LINK_SHIMDL_SWORD##swordNum##_SHEATHED] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD##swordNum##_SHEATH], &dls[LINK_DL_SWORD##swordNum##_HILT_BACK]);} (void)0
+#define SHIM_SHIELD_BACK(shieldNum) {shims[LINK_SHIMDL_SHIELD##shieldNum##_BACK] = Utils_createShimDisplayListVa(mtxDls[LINK_EQUIP_MATRIX_SHIELD##shieldNum##_BACK], &dls[LINK_DL_SHIELD##shieldNum], sPopModelViewMtx);} (void)0
+#define SHIM_SWORD_SHIELD_UNSHEATHED(swordNum, shieldNum) {shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_UNSHEATHED] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD##swordNum##_SHEATH]);} (void)0
+#define SHIM_SWORD_SHIELD_SHEATH(swordNum, shieldNum) {shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_SHEATH] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD##swordNum##_SHEATH], &dls[LINK_DL_SHIELD##shieldNum##_BACK]);} (void)0
+#define SHIM_SWORD_SHIELD_SHEATHED(swordNum, shieldNum) {shims[LINK_SHIMDL_SWORD##swordNum##_SHIELD##shieldNum##_SHEATHED] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD##swordNum##_SHEATHED], &dls[LINK_DL_SHIELD##shieldNum##_BACK]);} (void)0
+#define SHIM_SWORD(swordNum) {shims[LINK_SHIMDL_SWORD##swordNum] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD##swordNum##_HILT], &dls[LINK_DL_SWORD##swordNum##_BLADE]);} (void)0
 #define SHIM_SWORD_LFIST(swordNum) SHIM_ITEM_LFIST(SWORD##swordNum)
 #define SHIM_SHIELD_RFIST(shieldNum) SHIM_ITEM_RFIST(SHIELD##shieldNum)
+    // clang-format on
 
     SHIM_SWORD(1);
     SHIM_SWORD(2);
     SHIM_SWORD(3);
     SHIM_SWORD(4);
-    shims[LINK_SHIMDL_SWORD4_BROKEN] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD4_HILT], &dls[LINK_DL_SWORD4_BLADE_BROKEN]);
+    shims[LINK_SHIMDL_SWORD4_BROKEN] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD4_HILT], &dls[LINK_DL_SWORD4_BLADE_BROKEN]);
     SHIM_SWORD(5);
 
     SHIM_HILT_BACK(1);
@@ -245,17 +247,17 @@ static void initProxyShims(FormProxy *fp) {
     SHIM_SWORD_SHIELD_SHEATHED(5, 2);
     SHIM_SWORD_SHIELD_SHEATHED(5, 3);
 
-    shims[LINK_SHIMDL_LFIST_SWORD1] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD1], &dls[LINK_DL_OPT_LFIST_SWORD1]);
-    shims[LINK_SHIMDL_LFIST_SWORD2] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD2], &dls[LINK_DL_OPT_LFIST_SWORD2]);
-    shims[LINK_SHIMDL_LFIST_SWORD3] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD3], &dls[LINK_DL_OPT_LFIST_SWORD3]);
-    shims[LINK_SHIMDL_LFIST_SWORD3_PEDESTAL_GRABBED] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD3_PEDESTAL_GRABBED], &dls[LINK_DL_OPT_LFIST_SWORD3]);
-    shims[LINK_SHIMDL_LFIST_SWORD4] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD4], &dls[LINK_DL_OPT_LFIST_SWORD4]);
-    shims[LINK_SHIMDL_LFIST_SWORD4_BROKEN] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD4_BROKEN], &dls[LINK_DL_OPT_LFIST_SWORD4]);
-    shims[LINK_SHIMDL_LFIST_SWORD5] = Utils_createShimDisplayList(2, &dls[LINK_DL_SWORD5], &dls[LINK_DL_OPT_LFIST_SWORD5]);
+    shims[LINK_SHIMDL_LFIST_SWORD1] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD1], &dls[LINK_DL_OPT_LFIST_SWORD1]);
+    shims[LINK_SHIMDL_LFIST_SWORD2] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD2], &dls[LINK_DL_OPT_LFIST_SWORD2]);
+    shims[LINK_SHIMDL_LFIST_SWORD3] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD3], &dls[LINK_DL_OPT_LFIST_SWORD3]);
+    shims[LINK_SHIMDL_LFIST_SWORD3_PEDESTAL_GRABBED] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD3_PEDESTAL_GRABBED], &dls[LINK_DL_OPT_LFIST_SWORD3]);
+    shims[LINK_SHIMDL_LFIST_SWORD4] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD4], &dls[LINK_DL_OPT_LFIST_SWORD4]);
+    shims[LINK_SHIMDL_LFIST_SWORD4_BROKEN] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD4_BROKEN], &dls[LINK_DL_OPT_LFIST_SWORD4]);
+    shims[LINK_SHIMDL_LFIST_SWORD5] = Utils_createShimDisplayListVa(&dls[LINK_DL_SWORD5], &dls[LINK_DL_OPT_LFIST_SWORD5]);
 
-    shims[LINK_SHIMDL_RFIST_SHIELD1] = Utils_createShimDisplayList(2, &dls[LINK_DL_SHIELD1], &dls[LINK_DL_OPT_RFIST_SHIELD1]);
-    shims[LINK_SHIMDL_RFIST_SHIELD2] = Utils_createShimDisplayList(2, &dls[LINK_DL_SHIELD2], &dls[LINK_DL_OPT_RFIST_SHIELD2]);
-    shims[LINK_SHIMDL_RFIST_SHIELD3] = Utils_createShimDisplayList(2, &dls[LINK_DL_SHIELD3], &dls[LINK_DL_OPT_RFIST_SHIELD3]);
+    shims[LINK_SHIMDL_RFIST_SHIELD1] = Utils_createShimDisplayListVa(&dls[LINK_DL_SHIELD1], &dls[LINK_DL_OPT_RFIST_SHIELD1]);
+    shims[LINK_SHIMDL_RFIST_SHIELD2] = Utils_createShimDisplayListVa(&dls[LINK_DL_SHIELD2], &dls[LINK_DL_OPT_RFIST_SHIELD2]);
+    shims[LINK_SHIMDL_RFIST_SHIELD3] = Utils_createShimDisplayListVa(&dls[LINK_DL_SHIELD3], &dls[LINK_DL_OPT_RFIST_SHIELD3]);
 
     SHIM_ITEM_OPT_LFIST(HAMMER);
     SHIM_ITEM_OPT_RFIST(BOW);
@@ -265,17 +267,17 @@ static void initProxyShims(FormProxy *fp) {
     SHIM_ITEM_RHAND_OCARINA(OCARINA_TIME);
     SHIM_ITEM_OPT_LFIST(BOOMERANG);
 
-    shims[LINK_SHIMDL_FPS_RHAND_SLINGSHOT] = Utils_createShimDisplayList(2, &dls[LINK_DL_SLINGSHOT], &dls[LINK_DL_OPT_FPS_RHAND_SLINGSHOT]);
-    shims[LINK_SHIMDL_FPS_RHAND_BOW] = Utils_createShimDisplayList(2, &dls[LINK_DL_FPS_BOW], &dls[LINK_DL_OPT_FPS_RHAND_BOW]);
-    shims[LINK_SHIMDL_FPS_RHAND_HOOKSHOT] = Utils_createShimDisplayList(2, &dls[LINK_DL_FPS_HOOKSHOT], &dls[LINK_DL_OPT_FPS_RHAND_HOOKSHOT]);
-    shims[LINK_SHIMDL_FPS_RHAND_LONGSHOT] = Utils_createShimDisplayList(2, &dls[LINK_DL_OPT_FPS_LONGSHOT], &dls[LINK_DL_OPT_FPS_RHAND_LONGSHOT]);
+    shims[LINK_SHIMDL_FPS_RHAND_SLINGSHOT] = Utils_createShimDisplayListVa(&dls[LINK_DL_SLINGSHOT], &dls[LINK_DL_OPT_FPS_RHAND_SLINGSHOT]);
+    shims[LINK_SHIMDL_FPS_RHAND_BOW] = Utils_createShimDisplayListVa(&dls[LINK_DL_FPS_BOW], &dls[LINK_DL_OPT_FPS_RHAND_BOW]);
+    shims[LINK_SHIMDL_FPS_RHAND_HOOKSHOT] = Utils_createShimDisplayListVa(&dls[LINK_DL_FPS_HOOKSHOT], &dls[LINK_DL_OPT_FPS_RHAND_HOOKSHOT]);
+    shims[LINK_SHIMDL_FPS_RHAND_LONGSHOT] = Utils_createShimDisplayListVa(&dls[LINK_DL_OPT_FPS_LONGSHOT], &dls[LINK_DL_OPT_FPS_RHAND_LONGSHOT]);
 
-    shims[LINK_SHIMDL_SHIELD1_ITEM] = Utils_createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SHIELD1_ITEM], &dls[LINK_DL_SHIELD1], sPopModelViewMtx);
-    shims[LINK_SHIMDL_SWORD3_PEDESTAL] = Utils_createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL], &dls[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL], sPopModelViewMtx);
-    shims[LINK_SHIMDL_SWORD3_PEDESTAL_GRABBED] = Utils_createShimDisplayList(3, mtxDls[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL_GRABBED], &dls[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL_GRABBED], sPopModelViewMtx);
+    shims[LINK_SHIMDL_SHIELD1_ITEM] = Utils_createShimDisplayListVa(mtxDls[LINK_EQUIP_MATRIX_SHIELD1_ITEM], &dls[LINK_DL_SHIELD1], sPopModelViewMtx);
+    shims[LINK_SHIMDL_SWORD3_PEDESTAL] = Utils_createShimDisplayListVa(mtxDls[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL], &dls[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL], sPopModelViewMtx);
+    shims[LINK_SHIMDL_SWORD3_PEDESTAL_GRABBED] = Utils_createShimDisplayListVa(mtxDls[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL_GRABBED], &dls[LINK_EQUIP_MATRIX_SWORD3_PEDESTAL_GRABBED], sPopModelViewMtx);
 
-    shims[LINK_SHIMDL_CENTER_FLOWER_PROPELLER_CLOSED] = Utils_createShimDisplayList(2, &dls[LINK_DL_FLOWER_PROPELLER_CLOSED], &dls[LINK_DL_FLOWER_CENTER_CLOSED]);
-    shims[LINK_SHIMDL_CENTER_FLOWER_PROPELLER_OPEN] = Utils_createShimDisplayList(2, &dls[LINK_DL_FLOWER_PROPELLER_OPEN], &dls[LINK_DL_FLOWER_CENTER_OPEN]);
+    shims[LINK_SHIMDL_CENTER_FLOWER_PROPELLER_CLOSED] = Utils_createShimDisplayListVa(&dls[LINK_DL_FLOWER_PROPELLER_CLOSED], &dls[LINK_DL_FLOWER_CENTER_CLOSED]);
+    shims[LINK_SHIMDL_CENTER_FLOWER_PROPELLER_OPEN] = Utils_createShimDisplayListVa(&dls[LINK_DL_FLOWER_PROPELLER_OPEN], &dls[LINK_DL_FLOWER_CENTER_OPEN]);
 
 #undef SHIM_ITEM_HAND
 #undef SHIM_ITEM_LFIST
@@ -1272,8 +1274,7 @@ static void setupAltLists(void) {
     }
 }
 
-RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initFormProxyObjects(void) {
+RECOMP_CALLBACK(".", _internal_initHashObjects) void initFormProxyObjects(void) {
     sValidFormProxyPtrs = recomputil_create_u32_hashset();
     setupAltLists();
     sQueuedRefreshes = YAZMTCore_IterableU32Set_new();

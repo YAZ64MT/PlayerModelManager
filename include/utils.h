@@ -7,8 +7,13 @@
 #include "stdbool.h"
 #include "globalobjects_api.h"
 
-Gfx *Utils_createShimWithMatrix(Mtx *matrix, int displayListCount, ...);
-Gfx *Utils_createShimDisplayList(int displayListCount, ...);
+Gfx *Utils_createShimWithMatrix(Mtx *matrix, Gfx *dls[], int n);
+Gfx *Utils_createShimDisplayList(Gfx *dls[], int n);
+
+#define GFX_PTR_ARR(...) ((Gfx *[]){__VA_ARGS__})
+#define CREATE_SHIM_DL_ARGS(...) GFX_PTR_ARR(__VA_ARGS__), ARRAY_COUNT(GFX_PTR_ARR(__VA_ARGS__))
+#define Utils_createShimWithMatrixVa(matrix, ...) Utils_createShimWithMatrix(matrix, CREATE_SHIM_DL_ARGS(__VA_ARGS__))
+#define Utils_createShimDisplayListVa(...) Utils_createShimDisplayList(CREATE_SHIM_DL_ARGS(__VA_ARGS__))
 
 u32 Utils_readU32(const u8 array[], u32 offset);
 void Utils_writeU32(u8 array[], u32 offset, u32 value);

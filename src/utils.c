@@ -2,65 +2,48 @@
 #include "global.h"
 #include "recomputils.h"
 #include "recompconfig.h"
-#include "libc/stdarg.h"
 #include "modelmatrixids.h"
 #include "utils.h"
 #include "logger.h"
 #include "globalobjects_api.h"
 
-Gfx *Utils_createShimDisplayList(int displayListCount, ...) {
-    if (displayListCount < 1) {
+Gfx *Utils_createShimDisplayList(Gfx *dls[], int n) {
+    if (n < 1) {
         return NULL;
     }
 
-    Gfx *shimDl = recomp_alloc(sizeof(Gfx) * displayListCount);
+    Gfx *shimDL = recomp_alloc(n * sizeof(*shimDL));
 
-    va_list args;
-    va_start(args, displayListCount);
-
-    for (int i = 0; i < displayListCount - 1; ++i) {
-        Gfx *dlToCall = va_arg(args, Gfx *);
-
-        gSPDisplayList(&shimDl[i], dlToCall);
+    for (int i = 0; i < n - 1; ++i) {
+        gSPDisplayList(&shimDL[i], dls[i]);
     }
 
-    Gfx *lastDl = va_arg(args, Gfx *);
+    gSPBranchList(&shimDL[n - 1], dls[n - 1]);
 
-    gSPBranchList(&shimDl[displayListCount - 1], lastDl);
-
-    va_end(args);
-
-    return shimDl;
+    return shimDL;
 }
 
-Gfx *Utils_createShimWithMatrix(Mtx *matrix, int displayListCount, ...) {
-    if (displayListCount < 1) {
+Gfx *Utils_createShimWithMatrix(Mtx *matrix, Gfx *dls[], int n) {
+    if (n < 1) {
         return NULL;
     }
 
-    u32 shimSize = displayListCount + 3;
+    int shimSize = n + 3;
 
-    Gfx *shimDl = recomp_alloc(sizeof(Gfx) * (shimSize));
+    Gfx *shimDL = recomp_alloc((shimSize) * sizeof(*shimDL));
 
-    gSPMatrix(shimDl, matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+    gSPMatrix(shimDL, matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
 
-    va_list args;
-    va_start(args, displayListCount);
-
-    Gfx *calledLists = shimDl + 1;
-    for (int i = 0; i < displayListCount; ++i) {
-        Gfx *dlToCall = va_arg(args, Gfx *);
-
-        gSPDisplayList(&calledLists[i], dlToCall);
+    Gfx *calledLists = shimDL + 1;
+    for (int i = 0; i < n; ++i) {
+        gSPDisplayList(&calledLists[i], dls[i]);
     }
 
-    va_end(args);
+    gSPPopMatrix(&shimDL[shimSize - 2], G_MTX_MODELVIEW);
 
-    gSPPopMatrix(&shimDl[shimSize - 2], G_MTX_MODELVIEW);
+    gSPEndDisplayList(&shimDL[shimSize - 1]);
 
-    gSPEndDisplayList(&shimDl[shimSize - 1]);
-
-    return shimDl;
+    return shimDL;
 }
 
 u32 Utils_readU32(const u8 array[], u32 offset) {
