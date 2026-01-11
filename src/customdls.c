@@ -51,7 +51,7 @@ Gfx gLinkHumanFirstPersonBowDL[] = {
 
 static Gfx *getDLCopy(Gfx dl[], size_t n) {
     size_t copySize = sizeof(Gfx) * n;
-    Gfx *copy = recomp_alloc(sizeof(*copy) * n);
+    Gfx *copy = recomp_alloc(copySize);
 
     Lib_MemCpy(copy, dl, copySize);
 

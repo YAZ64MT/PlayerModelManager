@@ -7,6 +7,7 @@
 #include "playermodelconfig.h"
 #include "yazmtcorelib_api.h"
 #include "logger.h"
+#include "utils.h"
 
 static YAZMTCore_IterableU32Set *sPlayerProxies;
 
@@ -15,7 +16,7 @@ RECOMP_CALLBACK(".", _internal_initHashObjects) void initPPMHash(void) {
 }
 
 PlayerProxy *PlayerProxyManager_createPlayerProxy(void) {
-    PlayerProxy *pp = recomp_alloc(sizeof(PlayerProxy));
+    PlayerProxy *pp = Utils_recompCalloc(sizeof(PlayerProxy));
 
     PlayerProxy_init(pp);
 

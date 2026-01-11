@@ -145,13 +145,19 @@ static void initShieldingSkeleton(FormProxy *fp) {
 }
 
 static void initMatrixes(FormProxy *fp) {
-    Gfx *mtxDLs = recomp_alloc(sizeof(Gfx) * 2 * LINK_EQUIP_MATRIX_MAX);
+    typedef struct MatrixPushDL {
+        Gfx dl[2];
+    } MatrixPushDL;
+
+    MatrixPushDL *mtxDLs = recomp_alloc(sizeof(*mtxDLs) * LINK_EQUIP_MATRIX_MAX);
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
-        fp->mtxDisplayLists[i] = &mtxDLs[i * 2];
+        MatrixPushDL *curr = &mtxDLs[i];
 
-        gSPMatrix(&fp->mtxDisplayLists[i][0], &gIdentityMtx, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
-        gSPEndDisplayList(&fp->mtxDisplayLists[i][1]);
+        gSPMatrix(&curr->dl[0], &gIdentityMtx, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+        gSPEndDisplayList(&curr->dl[1]);
+
+        fp->mtxDisplayLists[i] = curr->dl;
     }
 }
 

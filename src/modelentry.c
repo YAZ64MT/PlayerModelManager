@@ -507,7 +507,7 @@ void ModelEntry_setCallback(ModelEntry *entry, PlayerModelManagerEventHandler *c
 }
 
 ModelEntryForm *ModelEntryForm_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName) {
-    ModelEntryForm *entry = recomp_alloc(sizeof(ModelEntryForm));
+    ModelEntryForm *entry = Utils_recompCalloc(sizeof(ModelEntryForm));
 
     if (!entry) {
         Logger_printError("Failed to allocate memory for ModelEntryForm!");
@@ -905,7 +905,7 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
 }
 
 ModelEntryEquipment *ModelEntryEquipment_new(PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName) {
-    ModelEntryEquipment *entry = recomp_alloc(sizeof(ModelEntryEquipment));
+    ModelEntryEquipment *entry = Utils_recompCalloc(sizeof(ModelEntryEquipment));
 
     if (!entry) {
         Logger_printError("Failed to allocate memory for ModelEntryEquipment!");
@@ -977,7 +977,7 @@ bool ModelEntryPack_init(ModelEntryPack *entry, PlayerModelManagerHandle handle,
 }
 
 ModelEntryPack *ModelEntryPack_new(PlayerModelManagerHandle handle, const char *internalName) {
-    ModelEntryPack *entry = recomp_alloc(sizeof(ModelEntryPack));
+    ModelEntryPack *entry = Utils_recompCalloc(sizeof(ModelEntryPack));
 
     if (!entry) {
         Logger_printError("Failed to allocate memory for ModelEntryPack!");

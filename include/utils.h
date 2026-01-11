@@ -22,4 +22,6 @@ bool Utils_isSegmentedPtr(void *p);
 void Utils_setCrashEnabled(bool isEnabled);
 void Utils_tryCrashGame();
 
+void *Utils_recompCalloc(size_t size);
+
 #endif

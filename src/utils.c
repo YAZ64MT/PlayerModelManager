@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "logger.h"
 #include "globalobjects_api.h"
+#include "string.h"
 
 Gfx *Utils_createShimDisplayList(Gfx *dls[], int n) {
     if (n < 1) {
@@ -76,4 +77,14 @@ void Utils_tryCrashGame(void) {
         int *ptr = NULL;
         *ptr = 0xDEADBEEF;
     }
+}
+
+void *Utils_recompCalloc(size_t size) {
+    void *alloc = recomp_alloc(size);
+
+    if (alloc) {
+        memset(alloc, 0, size);
+    }
+
+    return alloc;
 }
