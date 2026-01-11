@@ -28,8 +28,13 @@ void repointFormPtrsToProxy(Player *player, FormProxy *formProxy) {
         rightFistDLId = LINK_DL_OPT_RFIST_DEKU_STICK;
         leftFistDLId = LINK_DL_OPT_LFIST_DEKU_STICK;
     } else if (player->itemAction == PLAYER_IA_SWORD_TWO_HANDED) {
-        rightFistDLId = LINK_DL_OPT_RFIST_SWORD_TWO_HANDED;
-        leftFistDLId = LINK_DL_OPT_LFIST_SWORD_TWO_HANDED;
+        if (playerForm == PLAYER_FORM_FIERCE_DEITY) {
+            rightFistDLId = LINK_DL_OPT_RFIST_SWORD4;
+            leftFistDLId = LINK_DL_OPT_LFIST_SWORD4;
+        } else {
+            rightFistDLId = LINK_DL_OPT_RFIST_SWORD5;
+            leftFistDLId = LINK_DL_OPT_LFIST_SWORD5;
+        }
     }
 
     tryReplaceCodeLodDL(formProxy, LINK_DL_RHAND, &gPlayerRightHandOpenDLs[playerForm * 2]);
