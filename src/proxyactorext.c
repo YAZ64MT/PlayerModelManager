@@ -88,8 +88,7 @@ bool ProxyActorExt_copyProxyInformation(Actor *dest, Actor *src) {
     return false;
 }
 
-RECOMP_CALLBACK(".", _internal_preInitHashObjects)
-void handleFormProxyExtensionInits(void) {
+RECOMP_CALLBACK(".", _internal_preInitHashObjects) void handleFormProxyExtensionInits(void) {
     sActorExtIdPlayerProxy = z64recomp_extend_actor_all(sizeof(PlayerProxy *));
     sActorExtIdFormProxyId = z64recomp_extend_actor_all(sizeof(FormProxyId));
 }

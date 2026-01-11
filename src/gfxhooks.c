@@ -144,8 +144,7 @@ void GfxHookLookup_init(GfxHookLookup *ghl) {
     }
 }
 
-RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initGfxHookReplacmentMaps(void) {
+RECOMP_CALLBACK(".", _internal_initHashObjects) void initGfxHookReplacmentMaps(void) {
     GfxHookLookup_init(&sGameplayKeepDLMap);
     GfxHookLookup_init(&sLinkHumanDLMap);
     GfxHookLookup_init(&sLinkDekuDLMap);

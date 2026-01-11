@@ -1075,8 +1075,7 @@ bool ModelEntryPack_addEntryToPack(ModelEntryPack *entry, ModelEntry *entryToAdd
     return false;
 }
 
-RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initModelEntryObjects(void) {
+RECOMP_CALLBACK(".", _internal_initHashObjects) void initModelEntryObjects(void) {
     sQueuedPacks = YAZMTCore_DynamicU32Array_new();
 
     sValidModelEntryPtrs = recomputil_create_u32_hashset();

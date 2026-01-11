@@ -856,8 +856,7 @@ void ModelEntryManager_applyModelsFromDisk(void) {
     }
 }
 
-RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initCMEMHash(void) {
+RECOMP_CALLBACK(".", _internal_initHashObjects) void initCMEMHash(void) {
     sEntryHandles = recomputil_create_u32_slotmap();
     sInternalNamesToEntries = YAZMTCore_StringU32Dictionary_new();
     sHiddenModelEntries = recomputil_create_u32_hashset();

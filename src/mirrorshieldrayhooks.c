@@ -8,8 +8,7 @@
 
 ActorExtensionId gPlayerExtIdMirrorShieldBackMf;
 
-RECOMP_CALLBACK(".", _internal_preInitHashObjects)
-void initMirrorShieldActorExtensions(void) {
+RECOMP_CALLBACK(".", _internal_preInitHashObjects) void initMirrorShieldActorExtensions(void) {
     gPlayerExtIdMirrorShieldBackMf = z64recomp_extend_actor(ACTOR_PLAYER, sizeof(MtxF));
 }
 

@@ -18,9 +18,9 @@ extern Gfx gLinkHumanFirstPersonHookshotDL[];
 extern Gfx gLinkHumanFirstPersonBowDL[];
 extern Gfx gLinkHumanOcarinaDL[];
 
-#define DECLARE_MATRIX_WRAPPED_DL(dlName, mtxName, dl)           \
-    Mtx mtxName;                                                 \
-    Gfx dlName[] = {                                             \
+#define DECLARE_MATRIX_WRAPPED_DL(dlName, mtxName, dl)                  \
+    Mtx mtxName;                                                        \
+    Gfx dlName[] = {                                                    \
         gsSPMatrix(&mtxName, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW), \
         gsSPDisplayList(dl),                                            \
         gsSPPopMatrix(G_MTX_MODELVIEW),                                 \
@@ -227,8 +227,7 @@ static void setChildModelTypeMtx(PlayerModelManagerHandle h, Link_EquipmentMatri
     PlayerModelManager_setMatrixForModelTypeArray(h, sModelTypesChild, ARRAY_COUNT(sModelTypesChild), id, mtx);
 }
 
-RECOMP_CALLBACK(".", onRegisterModels)
-void registerMMEquipment(void) {
+RECOMP_CALLBACK(".", onRegisterModels) void registerMMEquipment(void) {
     initCustomDLs();
 
     void *human = getMMObject(OBJECT_LINK_CHILD);

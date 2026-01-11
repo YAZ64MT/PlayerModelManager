@@ -223,7 +223,6 @@ bool ModelInfo_isAnyFlagEnabled(ModelInfo *modelInfo, u64 flags) {
     return modelInfo->modelEntryForm ? (ModelEntry_isAnyFlagEnabled(ModelEntryForm_getModelEntry(modelInfo->modelEntryForm), flags)) : false;
 }
 
-RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initModelInfoObjects(void) {
+RECOMP_CALLBACK(".", _internal_initHashObjects) void initModelInfoObjects(void) {
     sValidModelInfoPtrs = recomputil_create_u32_hashset();
 }

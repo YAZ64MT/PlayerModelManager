@@ -660,8 +660,7 @@ static void setupAuthorRow(void) {
     recompui_set_gap(sRowAuthor, 0.0f, UNIT_DP);
 }
 
-RECOMP_CALLBACK(".", _internal_preInitHashObjects)
-void initUIOnRecompInit(void) {
+RECOMP_CALLBACK(".", _internal_preInitHashObjects) void initUIOnRecompInit(void) {
     RecompuiColor backgroundColor;
     backgroundColor.r = 255;
     backgroundColor.g = 255;
@@ -1034,8 +1033,7 @@ static void openModelMenu(void) {
 
 static bool sIsModelManagerReady;
 
-RECOMP_CALLBACK(".", onReady)
-void allowUIOnReady(void) {
+RECOMP_CALLBACK(".", onReady) void allowUIOnReady(void) {
     sIsModelManagerReady = true;
 }
 
@@ -1097,16 +1095,14 @@ void initUIFileList(void) {
     recompui_close_context(sUIContext);
 }
 
-RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initUiObjects(void) {
+RECOMP_CALLBACK(".", _internal_initHashObjects) void initUiObjects(void) {
     sModelButtonsToData = recomputil_create_u32_value_hashmap();
     sCategoryButtonsToData = recomputil_create_u32_value_hashmap();
     sModelListButtons = YAZMTCore_IterableU32Set_new();
     sCategoryListButtons = YAZMTCore_IterableU32Set_new();
 }
 
-RECOMP_CALLBACK(".", _internal_preInitHashObjects)
-void preInitUiObjects(void) {
+RECOMP_CALLBACK(".", _internal_preInitHashObjects) void preInitUiObjects(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         sCategoryInfos[i].index = i;
     }

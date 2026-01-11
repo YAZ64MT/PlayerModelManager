@@ -10,8 +10,7 @@
 
 static YAZMTCore_IterableU32Set *sPlayerProxies;
 
-RECOMP_CALLBACK(".", _internal_initHashObjects)
-void initPPMHash(void) {
+RECOMP_CALLBACK(".", _internal_initHashObjects) void initPPMHash(void) {
     sPlayerProxies = YAZMTCore_IterableU32Set_new();
 }
 
