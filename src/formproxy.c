@@ -35,6 +35,7 @@ static Gfx sEndDLWrapper[] = {
 };
 
 static Gfx sStartBowStringDL[] = {
+    gsSPDisplayList(sStartDLWrapper),
     // Two commands worth of space for the gEXMatrixGroup.
     gsSPNoOp(),
     gsSPNoOp(),
@@ -51,7 +52,7 @@ static Gfx sEndBowstringDL[] = {
 RECOMP_CALLBACK(".", _internal_preInitHashObjects) void initFormProxyExDLs(void) {
     gEXPushEnvColor(&sStartDLWrapper[0]);
     gEXPopEnvColor(&sEndDLWrapper[0]);
-    gEXMatrixGroupSimple(&sStartBowStringDL[0], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
+    gEXMatrixGroupSimple(&sStartBowStringDL[1], z64recomp_get_bowstring_transform_id(), G_EX_PUSH, G_MTX_MODELVIEW,
                          G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE, G_EX_ORDER_LINEAR, G_EX_EDIT_NONE);
     gEXPopMatrixGroup(&sEndBowstringDL[0], G_MTX_MODELVIEW);
 }
