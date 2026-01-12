@@ -18,7 +18,6 @@ void registerFierceDeity(void) {
     void *fd = GlobalObjects_getGlobalObject(OBJECT_LINK_BOY);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(fd, &gLinkFierceDeitySkel);
-    GlobalObjects_globalizeLodLimbSkeleton(fd, &gLinkFierceDeitySkel);
 
     gFierceDeityModelHandle = PlayerModelManager_registerModel(PMM_API_VERSION, "__mm_object_link_boy__", PMM_MODEL_TYPE_FIERCE_DEITY);
 

@@ -19,7 +19,6 @@ void registerGoron(void) {
     void *gk = GlobalObjects_getGlobalObject(GAMEPLAY_KEEP);
 
     FlexSkeletonHeader *skel = SEGMENTED_TO_GLOBAL_PTR(goron, &gLinkGoronSkel);
-    GlobalObjects_globalizeLodLimbSkeleton(goron, &gLinkGoronSkel);
 
     FlexSkeletonHeader *shieldingSkel = SEGMENTED_TO_GLOBAL_PTR(goron, &gLinkGoronShieldingSkel);
     GlobalObjects_globalizeStandardLimbSkeleton(goron, &gLinkGoronShieldingSkel);

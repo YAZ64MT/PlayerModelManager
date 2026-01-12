@@ -25,6 +25,7 @@ void registerZora(void) {
 #define SET_ENTRY_DL(id, dl) PlayerModelManager_setDisplayList(gZoraModelHandle, id, dl)
 
     // hands
+    // gLinkZoraSkel has fists on skeleton limbs, so we manually specify the open hands here
     SET_ENTRY_DL(LINK_DL_LHAND, getZoraDL(gLinkZoraLeftHandOpenDL));
     SET_ENTRY_DL(LINK_DL_OPT_LFIST, getZoraDL(gLinkZoraLeftHandClosedDL));
     SET_ENTRY_DL(LINK_DL_OPT_LHAND_BOTTLE, getZoraDL(gLinkZoraLeftHandHoldBottleDL));
