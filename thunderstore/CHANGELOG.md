@@ -1,3 +1,19 @@
+### 0.5.0
+* Add support for replacing individual pieces of equipment
+  * Can be specified on a per-form-model-type basis
+* Added built-in equipment model entries
+* Add support for model packs
+  * Allows mod creators to have multiple model types equipped as a set
+* Adult models built for this version or later fall back to adult-sized equipment
+* Update UI to allow model categories to be directly selected
+* Removed ModelReplacer optional dependency
+* Concept of "optional models" formalized
+  * These models are prefixed with PMM_DL_OPT
+  * If an optional model isn't specified, it will fall back to another model before falling back to the vanilla models
+  * e.g. if PMM_DL_OPT_FPS_BOW isn't specified, it will fall back to PMM_DL_BOW before falling back to the vanilla model
+* Fix Blast Mask cooldown corrupting tunic color
+* Rewrote much of the mod under the hood for better extensibility in the future
+
 ### 0.4.0
 * Add support for custom Fierce Deity Elegy of Emptiness statues
 * Add API call for changing the tunic color on a per form basis
