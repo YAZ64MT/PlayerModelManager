@@ -617,7 +617,7 @@ const ModelEntry *ModelEntryManager_getCurrentEntry(Link_CustomModelCategory cat
 
 void ModelEntryManager_setCurrentEntry(Link_CustomModelCategory cat, const ModelEntry *e) {
     // Packs are special in that they are made up of ModelEntries
-    if (!isPackCategory(cat)) {
+    if (isValidCategory(cat) && !isPackCategory(cat)) {
         sCurrentModelEntries[cat] = e;
     }
 }
