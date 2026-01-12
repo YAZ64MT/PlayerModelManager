@@ -94,10 +94,6 @@ Mtx gHumanAdultRazorSwordHiltBackMtx;
 Mtx gHumanGildedSwordHiltBackMtx;
 Mtx gHumanAdultGildedSwordHiltBackMtx;
 
-static Gfx *getRepointedMMDL(ObjectId id, Gfx *g) {
-    return GlobalObjects_getGlobalGfxPtr(id, g);
-}
-
 static void *getMMObject(ObjectId id) {
     return GlobalObjects_getGlobalObject(id);
 }
@@ -117,6 +113,14 @@ static Mtx *getGlobalObjectMtx(void *globalObject, Mtx *segmentedPtr) {
 }
 
 static void initCustomDLs(void) {
+    static bool isCustomDLsInit;
+
+    if (isCustomDLsInit) {
+        return;
+    }
+
+    isCustomDLsInit = true;
+
     const f32 ADULT_SWORD_SCALE_FACTOR = 1.3f;
 
     void *human = getMMObject(OBJECT_LINK_CHILD);
@@ -158,31 +162,21 @@ static void initCustomDLs(void) {
                               &gHumanAdultGildedSwordHiltBackMtx, ADULT_SWORD_SCALE_FACTOR, &gildedSwordTranslation,
                               &gildedSwordBackBaseTranslation);
 
-    gSPBranchList(gCallHumanGreatFairySwordDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanGreatFairysSwordDL));
     guPosition(&gHumanAdultGreatFairySwordResizerMtx, 0.f, 0.f, 0.f, 1.1f, -30.f, 125.f, -100.f);
 
-    gSPBranchList(gCallFierceDeitySwordDL, getRepointedMMDL(OBJECT_LINK_BOY, gLinkFierceDeitySwordDL));
     guPosition(&gFierceDeityChildSwordResizerMtx, 0.f, 0.f, 0.f, 0.9f, 0.f, -200.f, 25.f);
 
-    gSPBranchList(gCallHumanHookshotDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanHookshotDL));
     guPosition(&gHumanAdultHookshotResizerMtx, 0.f, 0.f, 0.f, 1.4f, 50.f, 105.f, 0.f);
     gHumanAdultHookshotFirstPersonResizerMtx = gHumanAdultHookshotResizerMtx;
 
-    gSPBranchList(gCallHumanHookshotChainDL, getRepointedMMDL(GAMEPLAY_KEEP, gHookshotChainDL));
     guPosition(&gHumanAdultHookshotChainResizerMtx, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f);
 
-    gSPBranchList(gCallHumanHookshotHookDL, getRepointedMMDL(OBJECT_LINK_CHILD, object_link_child_DL_01D960));
     guPosition(&gHumanAdultHookshotHookResizerMtx, 0.f, 0.f, 0.f, 1.4f, 0.f, 0.f, 0.f);
-
-    gSPBranchList(gCallHumanHookshotReticleDL, getRepointedMMDL(GAMEPLAY_KEEP, gHookshotReticleDL));
 
     guPosition(&gHumanAdultHookshotHookAndChainMtx, 0.f, 0.f, 0.f, 1.f, 50.f, 420.f, 0.f);
 
     const f32 BOW_SCALE_FACTOR = 1.3f;
     const f32 BOW_Y_OFFSET = 40.f;
-    gSPBranchList(gCallHumanBowDL, getRepointedMMDL(OBJECT_LINK_CHILD, gLinkHumanBowDL));
-    gSPBranchList(gCallHumanBowStringDL, getRepointedMMDL(OBJECT_LINK_CHILD, object_link_child_DL_017818));
-    gSPBranchList(gCallHumanArrowDL, getRepointedMMDL(GAMEPLAY_KEEP, gameplay_keep_DL_013FF0));
     guPosition(&gHumanAdultBowResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, BOW_Y_OFFSET, 0.f);
     guPosition(&gHumanAdultBowFirstPersonResizerMtx, 0.f, 0.f, 0.f, BOW_SCALE_FACTOR, 0.f, BOW_Y_OFFSET, 0.f);
     guScale(&gHumanAdultBowStringResizerMtx, BOW_SCALE_FACTOR, BOW_SCALE_FACTOR, 0.7f);
@@ -229,12 +223,6 @@ static void setChildModelTypeMtx(PlayerModelManagerHandle h, Link_EquipmentMatri
 
 RECOMP_CALLBACK(".", onRegisterModels) void registerMMEquipment(void) {
     initCustomDLs();
-
-    void *human = getMMObject(OBJECT_LINK_CHILD);
-    void *deku = getMMObject(OBJECT_LINK_NUTS);
-    void *goron = getMMObject(OBJECT_LINK_GORON);
-    void *zora = getMMObject(OBJECT_LINK_ZORA);
-    void *deity = getMMObject(OBJECT_LINK_BOY);
 
     PlayerModelManagerHandle vanillaPack = PlayerModelManager_registerModel(PMM_API_VERSION, "__mm_vanilla_equipment__", PMM_MODEL_TYPE_MODEL_PACK);
     PlayerModelManager_setAuthor(vanillaPack, "Nintendo");
