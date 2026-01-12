@@ -22,38 +22,6 @@ static Gfx sBelowV3FirstPersonRightHandDL[] = {
     gsSPBranchList(gLinkHumanFirstPersonArmDL),
 };
 
-static bool isEntryLoaded(ModelEntry *entry) {
-    if (entry) {
-        return ModelEntryManager_getCurrentEntry(ModelEntry_getCategory(entry)) == entry;
-    }
-
-    return false;
-}
-
-static void refreshProxyIfEntryLoaded(ModelEntry *entry) {
-    Link_CustomModelCategory cat = ModelEntry_getCategory(entry);
-
-    if (isEntryLoaded(entry)) {
-        ModelEntryManager_reapplyEntry(cat);
-    }
-}
-
-static void refreshProxyDLIfEntryLoaded(ModelEntry *entry, Link_DisplayList dlId) {
-    refreshProxyIfEntryLoaded(entry);
-}
-
-static void refreshProxyMtxIfEntryLoaded(ModelEntry *entry, Link_EquipmentMatrix mtxId) {
-    refreshProxyIfEntryLoaded(entry);
-}
-
-static void refreshProxyEyesTexturesIfEntryLoaded(ModelEntry *entry) {
-    refreshProxyIfEntryLoaded(entry);
-}
-
-static void refreshProxyMouthTexturesIfEntryLoaded(ModelEntry *entry) {
-    refreshProxyIfEntryLoaded(entry);
-}
-
 static bool isStrTooLong(const char *s, size_t maxLen) {
     size_t length = 0;
 
@@ -213,7 +181,6 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
     }
 
     if (ModelEntry_setDisplayList(entry, dlId, dl)) {
-        refreshProxyDLIfEntryLoaded(entry, dlId);
         Logger_printVerbose("Setting DL id %d on handle with internal name '%s' to 0x%X", dlId, ModelEntry_getInternalName(entry), dl);
         return true;
     }
@@ -246,7 +213,6 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelType(PlayerModelMana
     ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
 
     if (ModelEntryEquipment_setDisplayListForModelType(entry, type, dlId, dl)) {
-        refreshProxyDLIfEntryLoaded(entryx, dlId);
         Logger_printVerbose("Setting DL id %d for type %d on handle with internal name '%s' to 0x%X", dlId, type, ModelEntry_getInternalName(entryx), dl);
         return true;
     }
@@ -289,7 +255,6 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelTypeArray(PlayerMode
     for (size_t i = 0; i < n; ++i) {
         PlayerModelManagerModelType type = types[i];
         if (ModelEntryEquipment_setDisplayListForModelType(entry, type, dlId, dl)) {
-            refreshProxyDLIfEntryLoaded(entryx, dlId);
             Logger_printVerbose("Setting DL id %d for type %d on handle with internal name '%s' to 0x%X", dlId, type, ModelEntry_getInternalName(entryx), dl);
         }
     }
@@ -310,7 +275,6 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
     }
 
     if (ModelEntry_setMatrix(entry, mtxId, matrix)) {
-        refreshProxyMtxIfEntryLoaded(entry, mtxId);
         Logger_printVerbose("Setting matrix with id %d at 0x%X into handle with internal name '%s'", mtxId, matrix, ModelEntry_getInternalName(entry));
         return true;
     }
@@ -342,7 +306,6 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrixForModelType(PlayerModelManagerHa
     ModelEntryEquipment *entry = (ModelEntryEquipment *)entryx;
 
     if (ModelEntryEquipment_setMatrixForModelType(entry, type, mtxId, matrix)) {
-        refreshProxyMtxIfEntryLoaded(entryx, mtxId);
         Logger_printVerbose("Setting matrix with id %d for type %d at 0x%X into handle with internal name '%s'", mtxId, type, matrix, ModelEntry_getInternalName(entryx));
         return true;
     }
@@ -384,7 +347,6 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrixForModelTypeArray(PlayerModelMana
     for (size_t i = 0; i < n; ++i) {
         PlayerModelManagerModelType type = types[i];
         if (ModelEntryEquipment_setMatrixForModelType(entry, type, mtxId, matrix)) {
-            refreshProxyMtxIfEntryLoaded(entryx, mtxId);
             Logger_printVerbose("Setting matrix with id %d for type %d at 0x%X into handle with internal name '%s'", mtxId, type, matrix, ModelEntry_getInternalName(entryx));
         }
     }
@@ -455,7 +417,6 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, Fl
     {                                                                                                                    \
         if (!ModelEntry_getDisplayList(entry, entryDL))                                                                  \
             ModelEntry_setDisplayList(entry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                     \
     }                                                                                                                    \
     (void)0
 
@@ -480,8 +441,6 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, Fl
     }
 
 #undef SET_LIMB_DL
-
-    refreshProxyIfEntryLoaded(entry);
 
     Logger_printVerbose("Setting skeleton of handle with internal name '%s' to 0x%X", ModelEntry_getInternalName(entry), skel);
 
@@ -510,7 +469,6 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
     {                                                                                                                    \
         if (!ModelEntry_getDisplayList(entry, entryDL))                                                                  \
             ModelEntry_setDisplayList(entry, entryDL, (limbs[pLimb - 1]->dList) ? (limbs[pLimb - 1]->dList) : gEmptyDL); \
-        refreshProxyDLIfEntryLoaded(entry, entryDL);                                                                     \
     }                                                                                                                    \
     (void)0
 
@@ -520,8 +478,6 @@ RECOMP_EXPORT bool PlayerModelManager_setShieldingSkeleton(PlayerModelManagerHan
     }
 
 #undef SET_SHIELDING_LIMB_DL
-
-    refreshProxyIfEntryLoaded(entry);
 
     Logger_printVerbose("Setting shielding skeleton of handle with internal name '%s' to 0x%X", ModelEntry_getInternalName(entry), skel);
 
@@ -541,8 +497,6 @@ RECOMP_EXPORT bool PlayerModelManager_setEyesTextures(PlayerModelManagerHandle h
         ModelEntryForm_setEyesTexture(entryForm, eyesTextures[i], i);
     }
 
-    refreshProxyEyesTexturesIfEntryLoaded(entry);
-
     Logger_printVerbose("Setting eyes flipbook textures of handle with internal name '%s'", ModelEntry_getInternalName(entry));
 
     return true;
@@ -560,8 +514,6 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle 
     for (int i = 0; i < PLAYER_MOUTH_MAX; ++i) {
         ModelEntryForm_setMouthTexture(entryForm, mouthTextures[i], i);
     }
-
-    refreshProxyMouthTexturesIfEntryLoaded(entry);
 
     Logger_printVerbose("Setting mouth flipbook textures of handle with internal name '%s'", ModelEntry_getInternalName(entry));
 
