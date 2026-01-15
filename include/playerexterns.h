@@ -55,6 +55,4 @@ typedef struct {
 
 extern EnBoomStruct D_808A3078[]; // Zora Boomerang struct
 
-extern Gfx *sShellDLists[]; // Elegy of emptiness statues
-
 #endif

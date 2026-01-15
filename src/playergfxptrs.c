@@ -146,12 +146,6 @@ static void repointSharedModelsToProxy(FormProxy *formProxy) {
     tryReplaceCodeDL(formProxy, LINK_DL_LFIN_BOOMERANG, &sPlayerBoomerangInfo[0].unk_00);
     tryReplaceCodeDL(formProxy, LINK_DL_RFIN_BOOMERANG, &sPlayerBoomerangInfo[1].unk_00);
 
-    tryReplaceCodeDL(formProxy, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN, &sShellDLists[PLAYER_FORM_HUMAN]);
-    tryReplaceCodeDL(formProxy, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU, &sShellDLists[PLAYER_FORM_DEKU]);
-    tryReplaceCodeDL(formProxy, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON, &sShellDLists[PLAYER_FORM_GORON]);
-    tryReplaceCodeDL(formProxy, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA, &sShellDLists[PLAYER_FORM_ZORA]);
-    tryReplaceCodeDL(formProxy, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY, &sShellDLists[PLAYER_FORM_FIERCE_DEITY]);
-
 #define SET_MASK_DL(playerMaskIndex, linkDLIndex) tryReplaceCodeDL(formProxy, linkDLIndex, &sPlayerMaskDLs[playerMaskIndex - 1])
 
     SET_MASK_DL(PLAYER_MASK_TRUTH, LINK_DL_MASK_TRUTH);
