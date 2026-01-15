@@ -109,8 +109,6 @@ static Gfx **sPlayerPads = D_8085D574;
 
 static Gfx **sPlayerMaskDLs = D_801C0B20;
 
-static EnBoomStruct *sPlayerBoomerangInfo = D_808A3078;
-
 static void repointSharedModelsToProxy(FormProxy *formProxy) {
     tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_KOKIRI, &sPlayerHandHoldingSwords[PLAYER_SWORD_KOKIRI * 2]);
     tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_RAZOR, &sPlayerHandHoldingSwords[PLAYER_SWORD_RAZOR * 2]);
@@ -142,9 +140,6 @@ static void repointSharedModelsToProxy(FormProxy *formProxy) {
     tryReplaceCodeDL(formProxy, LINK_DL_PAD_GRASS, &sPlayerPads[0]);
     tryReplaceCodeDL(formProxy, LINK_DL_PAD_WOOD, &sPlayerPads[1]);
     tryReplaceCodeDL(formProxy, LINK_DL_PAD_OPENING, &sPlayerPads[2]);
-
-    tryReplaceCodeDL(formProxy, LINK_DL_LFIN_BOOMERANG, &sPlayerBoomerangInfo[0].unk_00);
-    tryReplaceCodeDL(formProxy, LINK_DL_RFIN_BOOMERANG, &sPlayerBoomerangInfo[1].unk_00);
 
 #define SET_MASK_DL(playerMaskIndex, linkDLIndex) tryReplaceCodeDL(formProxy, linkDLIndex, &sPlayerMaskDLs[playerMaskIndex - 1])
 
