@@ -365,8 +365,9 @@ void Player_PlaySfx(Player *player, u16 sfxId);
 void playAdultLinkVoice_on_return_Player_AnimSfx_PlayVoice(Player *player, u16 sfxId) {
     if (player->actor.id == ACTOR_PLAYER && shouldUseAdultFixes(player)) {
         if (player->currentMask == PLAYER_MASK_GIANT) {
-            // TODO: Play Adult Link Giant's mask sound?
-            // AudioSfx_PlaySfx((sfxId & 0x681F) + 0x20, pos, 4, &sGiantsMaskFreq, &gSfxDefaultFreqAndVolScale, &sGiantsMaskReverbAdd);
+            extern f32 sGiantsMaskFreq;
+            extern s8 sGiantsMaskReverbAdd;
+            AudioSfx_PlaySfx((sfxId & 0x681F) + player->ageProperties->voiceSfxIdOffset, &player->actor.projectedPos, 4, &sGiantsMaskFreq, &gSfxDefaultFreqAndVolScale, &sGiantsMaskReverbAdd);
         }
         else if (player->currentMask != PLAYER_MASK_SCENTS) {
             if (sfxId == NA_SE_VO_LI_LASH) {
