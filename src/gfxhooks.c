@@ -308,24 +308,10 @@ void assignHookshotProxy_on_return_Player_InitHookshotIA(Player *player) {
     ProxyActorExt_copyProxyInformation(player->heldActor, &player->actor);
 }
 
-static FormProxy *getFormProxyOrFallback(Actor *actor, FormProxyId fallbackId, PlayState *play) {
-    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
-
-    if (!fp) {
-        fp = ProxyActorExt_getFormProxy(&(GET_PLAYER(play)->actor));
-    }
-
-    if (!fp) {
-        fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fallbackId);
-    }
-
-    return fp;
-}
-
 static GfxHookData sHookshotGfxHook;
 
 void hookGfx_on_ArmsHook_Draw(ArmsHook *armsHook, PlayState *play) {
-    fillGfxHookData(&sHookshotGfxHook, play, getFormProxyOrFallback(&armsHook->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, &sLinkHumanDLMap, NULL);
+    fillGfxHookData(&sHookshotGfxHook, play, ProxyActorExt_getFormProxyOrFallback(&armsHook->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, &sLinkHumanDLMap, NULL);
 }
 
 void hookGfx_on_return_ArmsHook_Draw(void) {
@@ -344,7 +330,7 @@ void setupArrowProxy_on_return_func_808306F8(Player *player) {
 static GfxHookData sArrowGfxHook;
 
 void hookGfx_on_EnArrow_Draw(EnArrow *enArrow, PlayState *play) {
-    fillGfxHookData(&sArrowGfxHook, play, getFormProxyOrFallback(&enArrow->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
+    fillGfxHookData(&sArrowGfxHook, play, ProxyActorExt_getFormProxyOrFallback(&enArrow->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
 }
 
 void hookGfx_on_return_EnArrow_Draw(void) {
@@ -363,7 +349,7 @@ void hookGfx_on_MirRay3_Draw(MirRay3 *mirRay3, PlayState *play) {
         formId = FORM_PROXY_ID_HUMAN;
     }
 
-    fillGfxHookData(&sMirrorRayGfxHook, play, getFormProxyOrFallback(&mirRay3->actor, formId, play), &sGameplayKeepDLMap, &sShieldMirrorDLMap, NULL);
+    fillGfxHookData(&sMirrorRayGfxHook, play, ProxyActorExt_getFormProxyOrFallback(&mirRay3->actor, formId, play), &sGameplayKeepDLMap, &sShieldMirrorDLMap, NULL);
 }
 
 void hookGfx_on_return_MirRay3_Draw(void) {
@@ -381,7 +367,7 @@ void setupBombProxy_on_return_Player_InitExplosiveIA(Player *player) {
 
 void draw3DBombBody_on_EnBom_Draw(EnBom *enBom, PlayState *play) {
     if (enBom->actor.params == BOMB_TYPE_BODY && !enBom->isPowderKeg) {
-        FormProxy *fp = getFormProxyOrFallback(&enBom->actor, FORM_PROXY_ID_HUMAN, play);
+        FormProxy *fp = ProxyActorExt_getFormProxyOrFallback(&enBom->actor, FORM_PROXY_ID_HUMAN, play);
 
         if (fp) {
             Gfx *bombBody3DDL = FormProxy_getDL(fp, LINK_DL_BOMB_BODY_3D);
@@ -405,7 +391,7 @@ void draw3DBombBody_on_EnBom_Draw(EnBom *enBom, PlayState *play) {
 static GfxHookData sBombGfxHook;
 
 void hookGfx_on_EnBom_Draw(EnBom *enBom, PlayState *play) {
-    fillGfxHookData(&sBombGfxHook, play, getFormProxyOrFallback(&enBom->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
+    fillGfxHookData(&sBombGfxHook, play, ProxyActorExt_getFormProxyOrFallback(&enBom->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
 }
 
 void hookGfx_on_return_EnBom_Draw(void) {
@@ -415,7 +401,7 @@ void hookGfx_on_return_EnBom_Draw(void) {
 static GfxHookData sBombchuGfxHook;
 
 void hookGfx_on_EnBomChu_Draw(EnBomChu *enBomChu, PlayState *play) {
-    fillGfxHookData(&sBombchuGfxHook, play, getFormProxyOrFallback(&enBomChu->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
+    fillGfxHookData(&sBombchuGfxHook, play, ProxyActorExt_getFormProxyOrFallback(&enBomChu->actor, FORM_PROXY_ID_HUMAN, play), &sGameplayKeepDLMap, NULL, NULL);
 }
 
 void hookGfx_on_return_EnBomChu_Draw(void) {

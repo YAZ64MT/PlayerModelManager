@@ -88,6 +88,20 @@ bool ProxyActorExt_copyProxyInformation(Actor *dest, Actor *src) {
     return false;
 }
 
+FormProxy *ProxyActorExt_getFormProxyOrFallback(Actor *actor, FormProxyId fallbackId, PlayState *play) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (!fp) {
+        fp = ProxyActorExt_getFormProxy(&(GET_PLAYER(play)->actor));
+    }
+
+    if (!fp) {
+        fp = PlayerProxy_getFormProxy(gPlayer1Proxy, fallbackId);
+    }
+
+    return fp;
+}
+
 RECOMP_CALLBACK(".", _internal_preInitHashObjects) void handleFormProxyExtensionInits(void) {
     sActorExtIdPlayerProxy = z64recomp_extend_actor_all(sizeof(PlayerProxy *));
     sActorExtIdFormProxyId = z64recomp_extend_actor_all(sizeof(FormProxyId));
