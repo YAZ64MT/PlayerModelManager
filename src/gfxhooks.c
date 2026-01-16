@@ -52,16 +52,6 @@ typedef struct {
     Gfx *startXlu;
 } GfxHookData;
 
-U32ValueHashmapHandle initReplacementList(GfxHookDisplayList replacements[], int numReplacements) {
-    U32ValueHashmapHandle h = recomputil_create_u32_value_hashmap();
-
-    for (int i = 0; i < numReplacements; ++i) {
-        recomputil_u32_value_hashmap_insert(h, (uintptr_t)(replacements->target), replacements->replacementId);
-    }
-
-    return h;
-}
-
 static GfxHookDisplayList sLinkHumanDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_link_child_DL_017818, LINK_DL_BOW_STRING),
     DECLARE_GFX_HOOK_DL(object_link_child_DL_01D960, LINK_DL_HOOKSHOT_HOOK),
@@ -139,7 +129,7 @@ void GfxHookLookup_init(GfxHookLookup *ghl) {
     for (size_t i = 0; i < ghl->numHookDLEntries; ++i) {
         GfxHookDisplayList *currHookDL = &ghl->rawHookDLEntries[i];
         if (!recomputil_u32_value_hashmap_insert(ghl->gfxPtrsToDLs, (uintptr_t)(currHookDL->target), currHookDL->replacementId)) {
-            Logger_printWarning("GfxHookLookup_init: Passed in GfxHookLookup contains duplicate keys!\n");
+            Logger_printWarning("GfxHookLookup_init: Passed in GfxHookLookup contains duplicate key 0x%X!\n", currHookDL->target);
         }
     }
 }
@@ -155,7 +145,7 @@ RECOMP_CALLBACK(".", _internal_initHashObjects) void initGfxHookReplacmentMaps(v
 }
 
 // assumed hookdat has valid playstate ptr
-void fillGfxHookData(GfxHookData *hookDat, PlayState *play, FormProxy *formProxy, const GfxHookLookup *seg04, const GfxHookLookup *seg06, const GfxHookLookup *seg0A) {
+static void fillGfxHookData(GfxHookData *hookDat, PlayState *play, FormProxy *formProxy, const GfxHookLookup *seg04, const GfxHookLookup *seg06, const GfxHookLookup *seg0A) {
     hookDat->play = play;
     hookDat->formProxy = formProxy;
 
@@ -242,13 +232,13 @@ static void replaceHookedGfxCommands(GfxHookData *hookDat, Gfx *startDL, Gfx *en
     }
 }
 
-void replaceHookedOpaGfxCommands(GfxHookData *hookDat) {
+static void replaceHookedOpaGfxCommands(GfxHookData *hookDat) {
     OPEN_DISPS(hookDat->play->state.gfxCtx);
     replaceHookedGfxCommands(hookDat, hookDat->startOpa, POLY_OPA_DISP);
     CLOSE_DISPS(hookDat->play.state.gfxCtx);
 }
 
-void replaceHookedXluGfxCommands(GfxHookData *hookDat) {
+static void replaceHookedXluGfxCommands(GfxHookData *hookDat) {
     OPEN_DISPS(hookDat->play->state.gfxCtx);
     replaceHookedGfxCommands(hookDat, hookDat->startXlu, POLY_XLU_DISP);
     CLOSE_DISPS(hookDat->play.state.gfxCtx);
