@@ -31,6 +31,8 @@ void skipInterpolation_on_Play_Draw(PlayState *play) {
     while (player) {
         if (sShouldSkipFormInterpolation[player->transformation] && player->actor.scale.y >= 0.0f) {
             actor_set_interpolation_skipped(&player->actor);
+            sShouldSkipMirrorShieldInterpolation = true;
+            sShouldSkipHookshotInterpolation = true;
         }
 
         player = (Player *)player->actor.next;
