@@ -48,7 +48,9 @@ void overwriteShieldMtx_on_MirRay3_Draw(MirRay3 *mirRay3, PlayState *play) {
         (player->rightHandType != PLAYER_MODELTYPE_RH_FF)) {
         MtxF *shieldMtx = z64recomp_get_extended_actor_data(&player->actor, gPlayerExtIdMirrorShieldBackMf);
 
-        player->shieldMf = *shieldMtx;
+        if (shieldMtx) {
+            player->shieldMf = *shieldMtx;
+        }
     }
 }
 
