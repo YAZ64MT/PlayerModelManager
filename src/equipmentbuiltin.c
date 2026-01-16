@@ -384,6 +384,7 @@ RECOMP_CALLBACK(".", onRegisterModels) void registerMMEquipment(void) {
 
         setAdultModelTypeMtx(h, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK, &gHumanAdultHookshotHookAndChainMtx);
         setAdultModelTypeDL(h, LINK_DL_HOOKSHOT, gHumanAdultHookshotDL);
+        setAdultModelTypeDL(h, LINK_DL_HOOKSHOT_HOOK, gHumanAdultHookshotHookDL);
         setAdultModelTypeDL(h, LINK_DL_HOOKSHOT_CHAIN, gHumanAdultHookshotChainDL);
         setAdultModelTypeDL(h, LINK_DL_FPS_HOOKSHOT, gHumanAdultHookshotFirstPersonDL);
 
