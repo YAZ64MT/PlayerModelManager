@@ -98,7 +98,7 @@ static void copyBootProperties(s16 *dest, s16 *src) {
     }
 }
 
-s16 sBootsPropsTemp[NUM_BOOT_PROPERTIES];
+static s16 sBootsPropsTemp[NUM_BOOT_PROPERTIES];
 static bool sIsBootsOverwritten;
 
 void setAdultBootData_on_func_80123140(PlayState *play, Player *player) {
