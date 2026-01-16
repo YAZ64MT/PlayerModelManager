@@ -73,34 +73,36 @@ void fixAdultBremen_on_return_Player_Draw(void) {
 
 void repositionHeldActors_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Player *player) {
     if (player->actor.scale.y >= 0.f) {
-        Actor *heldActor = player->heldActor;
-
         FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
-        if (heldActor) {
-            if (limbIndex == PLAYER_LIMB_LEFT_HAND && player->rightHandType == PLAYER_MODELTYPE_RH_BOW) {
-                if (!Player_IsHoldingHookshot(player)) {
-                    if ((player->stateFlags3 & PLAYER_STATE3_40) && (player->transformation != PLAYER_FORM_DEKU)) {
-                        Mtx *arrowMtx = FormProxy_getMatrix(fp, LINK_EQUIP_MATRIX_ARROW_DRAWN);
+        if (fp) {
+            Actor *heldActor = player->heldActor;
 
-                        if (arrowMtx) {
-                            OPEN_DISPS(play->state.gfxCtx);
-                            MtxF arrowMtxF;
-                            Matrix_MtxToMtxF(arrowMtx, &arrowMtxF);
-                            Matrix_Mult(&arrowMtxF, MTXMODE_APPLY);
-                            CLOSE_DISPS(play->state.gfxCtx);
+            if (fp && heldActor) {
+                if (limbIndex == PLAYER_LIMB_LEFT_HAND && player->rightHandType == PLAYER_MODELTYPE_RH_BOW) {
+                    if (!Player_IsHoldingHookshot(player)) {
+                        if ((player->stateFlags3 & PLAYER_STATE3_40) && (player->transformation != PLAYER_FORM_DEKU)) {
+                            Mtx *arrowMtx = FormProxy_getMatrix(fp, LINK_EQUIP_MATRIX_ARROW_DRAWN);
+
+                            if (arrowMtx) {
+                                OPEN_DISPS(play->state.gfxCtx);
+                                MtxF arrowMtxF;
+                                Matrix_MtxToMtxF(arrowMtx, &arrowMtxF);
+                                Matrix_Mult(&arrowMtxF, MTXMODE_APPLY);
+                                CLOSE_DISPS(play->state.gfxCtx);
+                            }
                         }
                     }
-                }
-            } else if (limbIndex == PLAYER_LIMB_RIGHT_HAND && Player_IsHoldingHookshot(player)) {
-                Mtx *hookMtx = FormProxy_getMatrix(fp, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK);
+                } else if (limbIndex == PLAYER_LIMB_RIGHT_HAND && Player_IsHoldingHookshot(player)) {
+                    Mtx *hookMtx = FormProxy_getMatrix(fp, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK);
 
-                if (hookMtx) {
-                    OPEN_DISPS(play->state.gfxCtx);
-                    MtxF hookMtxF;
-                    Matrix_MtxToMtxF(hookMtx, &hookMtxF);
-                    Matrix_Mult(&hookMtxF, MTXMODE_APPLY);
-                    CLOSE_DISPS(play->state.gfxCtx);
+                    if (hookMtx) {
+                        OPEN_DISPS(play->state.gfxCtx);
+                        MtxF hookMtxF;
+                        Matrix_MtxToMtxF(hookMtx, &hookMtxF);
+                        Matrix_Mult(&hookMtxF, MTXMODE_APPLY);
+                        CLOSE_DISPS(play->state.gfxCtx);
+                    }
                 }
             }
         }
