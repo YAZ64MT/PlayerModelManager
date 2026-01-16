@@ -45,7 +45,7 @@ static Gfx sStartBowStringDL[] = {
 };
 
 static Gfx sEndBowstringDL[] = {
-    gsSPNoOp(),
+    gsSPNoOp(), // gEXPopMatrixGroup
     gsSPBranchList(sEndDLWrapper),
 };
 
