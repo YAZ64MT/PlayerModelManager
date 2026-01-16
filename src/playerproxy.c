@@ -64,7 +64,7 @@ void PlayerProxy_createFormProxy(PlayerProxy *pp, FormProxyId proxyId, PlayerTra
     }
 
     if (recomputil_u32_memory_hashmap_create(pp->formProxies, proxyId)) {
-        FormProxy *fp = PlayerProxy_getFormProxy(pp, form);
+        FormProxy *fp = PlayerProxy_getFormProxy(pp, proxyId);
         FormProxy_init(fp, pp, form, proxyId, fallback, fallbackOverride);
     } else {
         Logger_printWarning("Tried to create a FormProxy, but key %d already existed!", proxyId);
