@@ -265,7 +265,7 @@ static Vec3f sAdultBowStringData = {0.0f, -360.4f, 0.0f}; // From OoT
 
 static bool sIsAdultBowData = false;
 
-void fixBowProperties_on_Player_Draw(Player *player, PlayState *play) {
+void applyAdultBowProperties_on_Player_Draw(Player *player, PlayState *play) {
     sIsAdultBowData = shouldUseAdultFixes(player);
 
     if (sIsAdultBowData) {
@@ -277,7 +277,7 @@ void fixBowProperties_on_Player_Draw(Player *player, PlayState *play) {
     }
 }
 
-void fixBowProperties_on_return_Player_Draw(void) {
+void applyAdultBowProperties_on_return_Player_Draw(void) {
     if (sIsAdultBowData) {
         D_801C0D6C = sChildArrowOffset;
         D_801C0D98 = sChildBowStringData;
