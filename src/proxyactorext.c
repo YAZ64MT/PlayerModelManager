@@ -6,7 +6,6 @@
 #include "proxyactorext.h"
 #include "playermodelconfig.h"
 #include "logger.h"
-#include "assets/objects/object_link_goron/object_link_goron.h"
 
 static ActorExtensionId sActorExtIdPlayerProxy;
 static ActorExtensionId sActorExtIdFormProxyId;
