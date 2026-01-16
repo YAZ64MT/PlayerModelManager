@@ -49,11 +49,12 @@ void PlayerProxyManager_refreshAll(void) {
 void PlayerProxyManager_refreshFullAllWithModelEntry(ModelEntry *modelEntry) {
     PlayerProxy *const *proxies = (PlayerProxy *const *)YAZMTCore_IterableU32Set_values(sPlayerProxies);
     size_t numProxies = YAZMTCore_IterableU32Set_size(sPlayerProxies);
+    FormProxyId idMax = PlayerModelConfig_getNumFormIds();
 
     for (size_t i = 0; i < numProxies; ++i) {
         PlayerProxy *currPp = proxies[i];
 
-        for (FormProxyId j = 0, numFormIds = PlayerModelConfig_getNumFormIds(); j < numFormIds; ++j) {
+        for (FormProxyId j = 0; j < idMax; ++j) {
             FormProxy *currFp = PlayerProxy_getFormProxy(currPp, j);
 
             if (currFp) {

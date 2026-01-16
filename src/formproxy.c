@@ -380,7 +380,7 @@ void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, F
 FormProxyId FormProxy_getFormProxyId(const FormProxy *fp) {
     if (!isValidFormProxy(fp)) {
         PRINT_INVALID_PTR_ERR();
-        return PlayerModelConfig_getNumFormIds();
+        return FORM_PROXY_ID_NONE;
     }
 
     return fp->fpId;

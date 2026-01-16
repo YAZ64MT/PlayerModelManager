@@ -46,13 +46,11 @@ FormProxy *ProxyActorExt_getFormProxy(Actor *actor) {
 }
 
 bool ProxyActorExt_setFormProxyId(Actor *actor, FormProxyId id) {
-    if (id < PlayerModelConfig_getNumFormIds()) {
-        FormProxyId *fpIdPtr = z64recomp_get_extended_actor_data(actor, sActorExtIdFormProxyId);
+    FormProxyId *fpIdPtr = z64recomp_get_extended_actor_data(actor, sActorExtIdFormProxyId);
 
-        if (fpIdPtr) {
-            *fpIdPtr = id;
-            return true;
-        }
+    if (fpIdPtr) {
+        *fpIdPtr = id;
+        return true;
     }
 
     return false;
@@ -108,7 +106,7 @@ RECOMP_CALLBACK(".", _internal_preInitHashObjects) void handleFormProxyExtension
 
 void initFormProxyExtension_on_Actor_Init(Actor *actor) {
     ProxyActorExt_setPlayerProxy(actor, NULL);
-    ProxyActorExt_setFormProxyId(actor, PlayerModelConfig_getNumFormIds());
+    ProxyActorExt_setFormProxyId(actor, FORM_PROXY_ID_NONE);
 }
 
 void setupPlayerFormProxy_on_Player_Init(Player *player) {

@@ -736,10 +736,14 @@ typedef enum Link_CustomModelCategory {
 
 typedef unsigned long FormProxyId;
 
-#define FORM_PROXY_ID_FIERCE_DEITY ((FormProxyId)0)
-#define FORM_PROXY_ID_GORON ((FormProxyId)1)
-#define FORM_PROXY_ID_ZORA ((FormProxyId)2)
-#define FORM_PROXY_ID_DEKU ((FormProxyId)3)
-#define FORM_PROXY_ID_HUMAN ((FormProxyId)4)
+#define FORM_PROXY_ID_NONE ((FormProxyId)0)
+#define FORM_PROXY_ID_FIERCE_DEITY ((FormProxyId)1)
+#define FORM_PROXY_ID_GORON ((FormProxyId)2)
+#define FORM_PROXY_ID_ZORA ((FormProxyId)3)
+#define FORM_PROXY_ID_DEKU ((FormProxyId)4)
+#define FORM_PROXY_ID_HUMAN ((FormProxyId)5)
+
+// Use PlayerModelConfig_getNumFormIds instead
+#define FORM_PROXY_ID_MAX_DO_NOT_DIRECTLY_USE ((FormProxyId)6)
 
 #endif
