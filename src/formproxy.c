@@ -329,6 +329,11 @@ static void initProxyDLs(FormProxy *fp) {
 }
 
 void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, FormProxyId fpId, ModelInfo *fallback, ModelInfo *fallbackOverride) {
+    if (!fp) {
+        Logger_printError("Received NULL FormProxy argument!");
+        Utils_tryCrashGame();
+    }
+
     if (!pp) {
         Logger_printError("Received NULL PlayerProxy argument!");
         Utils_tryCrashGame();
