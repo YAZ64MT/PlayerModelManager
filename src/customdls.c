@@ -99,28 +99,44 @@ static void unglueFirstPersonBowFromHand(void) {
 
 #define ZORA_SHIELD_DL_LEN 95
 #define NUM_ZORA_SHIELD_VTX 80
-u8 sZoraShieldBytes[NUM_ZORA_SHIELD_VTX];
 
-Vtx sZoraShieldVtxs[NUM_ZORA_SHIELD_VTX];
+static Vtx sZoraShieldVtxs[NUM_ZORA_SHIELD_VTX];
+
+static u8 *sZoraShieldPhi;
 
 Gfx gZoraMagicBarrierDL[95];
 
-void initZoraShieldDL(void) {
+void initZoraMagicBarrierDL(void) {
     void *zora = GlobalObjects_getGlobalObject(OBJECT_LINK_ZORA);
 
     Lib_MemCpy(gZoraMagicBarrierDL, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_ZORA, object_link_zora_DL_011760), sizeof(gZoraMagicBarrierDL));
     Lib_MemCpy(sZoraShieldVtxs, SEGMENTED_TO_GLOBAL_PTR(zora, object_link_zora_Vtx_011210), sizeof(sZoraShieldVtxs));
-    Lib_MemCpy(sZoraShieldBytes, SEGMENTED_TO_GLOBAL_PTR(zora, object_link_zora_U8_011710), sizeof(sZoraShieldBytes));
 
     gSPVertex(&gZoraMagicBarrierDL[90], &sZoraShieldVtxs[72], 8, 0);
     gSPVertex(&gZoraMagicBarrierDL[68], &sZoraShieldVtxs[40], 32, 0);
     gSPVertex(&gZoraMagicBarrierDL[45], &sZoraShieldVtxs[32], 8, 0);
     gSPVertex(&gZoraMagicBarrierDL[23], &sZoraShieldVtxs[0], 32, 0);
+
+    sZoraShieldPhi = SEGMENTED_TO_GLOBAL_PTR(GlobalObjects_getGlobalObject(OBJECT_LINK_ZORA), object_link_zora_U8_011710);
+}
+
+// Mostly copied from Player_DrawZoraShield
+void updateZoraMagicBarrier_on_Player_DrawZoraShield(Player *player) {
+    Vtx *vtx = sZoraShieldVtxs;
+    u8 *phi_a0 = sZoraShieldPhi;
+
+    // ARRAY_COUNT(object_link_zora_Vtx_011210)
+    for (int i = 0; i < NUM_ZORA_SHIELD_VTX; i++) {
+        // Editing the Vtxs in object itself
+        vtx->v.cn[3] = (*phi_a0 * player->unk_B62) >> 8;
+        vtx++;
+        phi_a0++;
+    }
 }
 
 void initCustomDLs(void) {
     unglueOcarinaFromHand();
     unglueFirstPersonHandFromHookshot();
     unglueFirstPersonBowFromHand();
-    initZoraShieldDL();
+    initZoraMagicBarrierDL();
 }
