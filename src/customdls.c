@@ -4,6 +4,7 @@
 #include "globalobjects_api.h"
 #include "logger.h"
 #include "assets/objects/object_link_child/object_link_child.h"
+#include "assets/objects/object_link_zora/object_link_zora.h"
 
 #define ARRAY_LAST_ELEMENT_PTR(arr) (arr + (ARRAY_COUNT(arr) - 1))
 
@@ -96,8 +97,30 @@ static void unglueFirstPersonBowFromHand(void) {
     gSPBranchList(gLinkHumanFirstPersonBowDL, firstPersonBow);
 }
 
+#define ZORA_SHIELD_DL_LEN 95
+#define NUM_ZORA_SHIELD_VTX 80
+u8 sZoraShieldBytes[NUM_ZORA_SHIELD_VTX];
+
+Vtx sZoraShieldVtxs[NUM_ZORA_SHIELD_VTX];
+
+Gfx gZoraMagicBarrierDL[95];
+
+void initZoraShieldDL(void) {
+    void *zora = GlobalObjects_getGlobalObject(OBJECT_LINK_ZORA);
+
+    Lib_MemCpy(gZoraMagicBarrierDL, GlobalObjects_getGlobalGfxPtr(OBJECT_LINK_ZORA, object_link_zora_DL_011760), sizeof(gZoraMagicBarrierDL));
+    Lib_MemCpy(sZoraShieldVtxs, SEGMENTED_TO_GLOBAL_PTR(zora, object_link_zora_Vtx_011210), sizeof(sZoraShieldVtxs));
+    Lib_MemCpy(sZoraShieldBytes, SEGMENTED_TO_GLOBAL_PTR(zora, object_link_zora_U8_011710), sizeof(sZoraShieldBytes));
+
+    gSPVertex(&gZoraMagicBarrierDL[90], &sZoraShieldVtxs[72], 8, 0);
+    gSPVertex(&gZoraMagicBarrierDL[68], &sZoraShieldVtxs[40], 32, 0);
+    gSPVertex(&gZoraMagicBarrierDL[45], &sZoraShieldVtxs[32], 8, 0);
+    gSPVertex(&gZoraMagicBarrierDL[23], &sZoraShieldVtxs[0], 32, 0);
+}
+
 void initCustomDLs(void) {
     unglueOcarinaFromHand();
     unglueFirstPersonHandFromHookshot();
     unglueFirstPersonBowFromHand();
+    initZoraShieldDL();
 }

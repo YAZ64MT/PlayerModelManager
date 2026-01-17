@@ -9,5 +9,6 @@ extern Gfx gLinkHumanRightHandOcarinaDL[];
 extern Gfx gLinkHumanFirstPersonArmDL[];
 extern Gfx gLinkHumanFirstPersonHookshotDL[];
 extern Gfx gLinkHumanFirstPersonBowDL[];
+extern Gfx gZoraMagicBarrierDL[];
 
 #endif
