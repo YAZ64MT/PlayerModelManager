@@ -96,6 +96,7 @@ static GfxHookDisplayList sLinkZoraDLReplacements[] = {
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_00E088, LINK_DL_OPT_LHAND_GUITAR),
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_00E2A0, LINK_DL_GUITAR),
     DECLARE_GFX_HOOK_DL(object_link_zora_DL_0110A8, LINK_DL_FIN_SHIELD),
+    DECLARE_GFX_HOOK_DL(object_link_zora_DL_011760, LINK_DL_MAGIC_BARRIER),
 };
 static GfxHookLookup sLinkZoraDLMap = DECLARE_GFX_HOOK_LUT(sLinkZoraDLReplacements);
 
@@ -396,4 +397,14 @@ void hookGfx_on_EnBomChu_Draw(EnBomChu *enBomChu, PlayState *play) {
 
 void hookGfx_on_return_EnBomChu_Draw(void) {
     replaceHookedOpaGfxCommands(&sBombchuGfxHook);
+}
+
+static GfxHookData sZoraMagicBarrierGfxHook;
+
+void hookGfx_on_Player_DrawZoraShield(PlayState *play, Player *player) {
+    fillGfxHookData(&sZoraMagicBarrierGfxHook, play, ProxyActorExt_getFormProxy(&player->actor), &sGameplayKeepDLMap, &sLinkZoraDLMap, NULL);
+}
+
+void hookGfx_on_return_Player_DrawZoraShield(void) {
+    replaceHookedXluGfxCommands(&sZoraMagicBarrierGfxHook);
 }
