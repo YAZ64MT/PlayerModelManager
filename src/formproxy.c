@@ -963,7 +963,7 @@ static Link_DisplayList sLongshotAlts[] = {LINK_DL_HOOKSHOT};
 static Link_DisplayList sLongshotChainAlts[] = {LINK_DL_HOOKSHOT_CHAIN};
 static Link_DisplayList sLongshotHookAlts[] = {LINK_DL_HOOKSHOT_HOOK};
 static Link_DisplayList sLongshotReticleAlts[] = {LINK_DL_HOOKSHOT_RETICLE};
-static Link_DisplayList sFpsLongshotAlts[] = {LINK_DL_FPS_HOOKSHOT, LINK_DL_OPT_LONGSHOT}; // TODO: Give FPS hookshot priority over 3rd person hookshot
+static Link_DisplayList sFpsLongshotAlts[] = {LINK_DL_FPS_HOOKSHOT, LINK_DL_OPT_LONGSHOT};
 static Link_DisplayList sFpsBowAlts[] = {LINK_DL_BOW};
 static Link_DisplayList sFpsSlingshotAlts[] = {LINK_DL_SLINGSHOT};
 static Link_DisplayList sLeftHandBottleAlts[] = {LINK_DL_LHAND};
@@ -1112,6 +1112,11 @@ static Gfx *getDLOrAltFromModelEntry(ModelEntry *me, Link_DisplayList dlId) {
     Gfx *result = ModelEntry_getDisplayList(me, dlId);
 
     if (!result) {
+        if (dlId == LINK_DL_OPT_FPS_LONGSHOT) {
+            // Without this check, the 3rd person hookshot would take priority over 3rd person longshot
+            result = ModelEntry_getDisplayList(me, LINK_DL_OPT_LONGSHOT);
+        }
+
         DisplayListAltList *alts = getAltList(dlId);
 
         if (alts) {
