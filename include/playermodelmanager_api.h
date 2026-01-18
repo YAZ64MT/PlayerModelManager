@@ -138,6 +138,10 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_BOOMERANG = 58,   // Boomerang model while held in hand
     PMM_DL_BOOMERANG_FLYING, // Boomerang model after being thrown
     PMM_DL_HAMMER,
+    PMM_DL_BOMB_BODY_2D = 291,
+    PMM_DL_BOMB_BODY_3D,
+    PMM_DL_BOMB_CAP,
+    PMM_DL_BOMBCHU = 297,
 
     // First Person
     PMM_DL_OPT_FPS_LSHOULDER = 263,
