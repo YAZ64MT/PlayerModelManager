@@ -6,6 +6,11 @@
 * Added support for model packs
   * Allows mod creators to have multiple model types equipped as a set
 * Adult models built for this version or later fall back to adult-sized equipment
+* Adult models now use adult Link voice clips in more situations
+  * When firing hookshot
+  * When whipping Epona
+  * When equipping a transformation mask
+  * When transformed into a giant
 * Update UI to allow model categories to be directly selected
 * Removed ModelReplacer optional dependency
 * Concept of "optional models" formalized
