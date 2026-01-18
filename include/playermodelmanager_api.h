@@ -21,13 +21,13 @@ typedef unsigned long PlayerModelManagerHandle;
 // Swords:
 //      1: Kokiri Sword
 //      2: Razor Sword
-//      3: Master Sword / Gilded Sword
-//      4: Giant's Knife / Biggoron Sword / Fierce Deity's Sword
+//      3: Gilded Sword
+//      4: Fierce Deity's Sword
 //      5: Great Fairy Sword
 
 // Shields:
 //      1: Deku Shield
-//      2: Hylian Shield / Hero's Shield
+//      2: Hero's Shield
 //      3: Mirror Shield
 
 typedef enum PlayerModelManagerDisplayListId {
@@ -252,7 +252,7 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_FLOWER_PROPELLER_OPEN,
     PMM_DL_FLOWER_CENTER_OPEN,
 
-    // Deku Pad DLs
+    // Burrowed into a Deku Flower models
     PMM_DL_PAD_WOOD,
     PMM_DL_PAD_GRASS,
     PMM_DL_PAD_OPENING,
