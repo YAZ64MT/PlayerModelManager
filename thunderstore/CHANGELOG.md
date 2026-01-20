@@ -3,6 +3,7 @@
   * Can be specified on a per-form-model-type basis
 * Added built-in equipment model entries
 * Added ability to replace the ray emitted by the Mirror Shield
+* Added ability to replace bomb and bombchu models
 * Added support for model packs
   * Allows mod creators to have multiple model types equipped as a set
 * Adult models built for this version or later fall back to adult-sized equipment
@@ -11,15 +12,17 @@
   * When whipping Epona
   * When equipping a transformation mask
   * When transformed into a giant
-* Update UI to allow model categories to be directly selected
+* Updated UI to allow model categories to be directly selected
 * Removed ModelReplacer optional dependency
 * Concept of "optional models" formalized
   * These models are prefixed with PMM_DL_OPT
   * If an optional model isn't specified, it will fall back to another model before falling back to the vanilla models
   * e.g. if PMM_DL_OPT_FPS_BOW isn't specified, it will fall back to PMM_DL_BOW before falling back to the vanilla model
-* Fix Blast Mask cooldown corrupting tunic color
+* Fixed Blast Mask cooldown corrupting tunic color
+* Fixed PMM_DL_MIRROR_SHIELD_RAY and PMM_DL_MAGIC_BARRIER not being replaced
 * Mod will no longer attempt to write values to En_Torch2 or En_Boom variables while their overlays are not loaded
 * Rewrote much of the mod under the hood for better extensibility
+* Bumped API version
 
 ### 0.4.0
 * Add support for custom Fierce Deity Elegy of Emptiness statues
