@@ -328,6 +328,16 @@ RECOMP_EXPORT bool PlayerModelManager_setSkeleton(PlayerModelManagerHandle h, Fl
     ModelEntryForm_setSkeleton(entryForm, skel);
 
     if (skel) {
+#define LINK_SKEL_LIMB_COUNT 21
+        if (skel->sh.limbCount != LINK_SKEL_LIMB_COUNT) {
+            Logger_printWarning("For model %s, skeleton has %d limbs (expected %d)", ModelEntry_getInternalName(entry), skel->sh.limbCount, LINK_SKEL_LIMB_COUNT);
+        }
+
+#define LINK_SKEL_DLIST_COUNT 18
+        if (skel->dListCount != LINK_SKEL_DLIST_COUNT) {
+            Logger_printWarning("For model %s, skeleton has %d display lists (expected %d)", ModelEntry_getInternalName(entry), skel->dListCount, LINK_SKEL_DLIST_COUNT);
+        }
+
         StandardLimb **limbs = (StandardLimb **)skel->sh.segment;
 
 #define SET_LIMB_DL(pLimb, entryDL)                                                                                      \
