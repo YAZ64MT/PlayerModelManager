@@ -533,14 +533,18 @@ void FormProxy_refreshSkeletons(FormProxy *fp) {
             fp->skeleton.limbs[i].sibling = limb->sibling;
             fp->skeleton.limbs[i].jointPos = limb->jointPos;
 
-            if (!limb->dList) {
-                fp->skeleton.limbs[i].dLists[0] = NULL;
-                fp->skeleton.limbs[i].dLists[1] = NULL;
-            } else {
+            fp->skeleton.limbs[i].dLists[0] = NULL;
+            fp->skeleton.limbs[i].dLists[1] = NULL;
+
+            if (limb->dList) {
                 Link_DisplayList id = limbToDLEntry[i];
                 if (id != NO_DISPLAY_LIST) {
                     fp->skeleton.limbs[i].dLists[0] = &fp->displayLists[id];
                     fp->skeleton.limbs[i].dLists[1] = &fp->displayLists[id];
+                } else {
+                    // backwards compatibility measure for malformed skeletons
+                    fp->skeleton.limbs[i].dLists[0] = gEmptyDL;
+                    fp->skeleton.limbs[i].dLists[1] = gEmptyDL;
                 }
             }
         }
