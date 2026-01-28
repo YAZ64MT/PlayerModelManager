@@ -768,6 +768,11 @@ void ModelEntryManager_removeModel(Link_CustomModelCategory cat) {
 }
 
 PlayerModelManagerHandle ModelEntryManager_createMemoryHandle(PlayerModelManagerModelType type, const char *internalName) {
+    if (YAZMTCore_StringU32Dictionary_contains(sInternalNamesToEntries, internalName)) {
+        Logger_printError("Entry with internal name %s already exists!", internalName);
+        return 0;
+    }
+
     Link_CustomModelCategory cat = getCategoryFromModelType(type);
 
     if (!isValidCategory(cat)) {
