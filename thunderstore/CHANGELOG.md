@@ -21,7 +21,7 @@
 * Fixed Blast Mask cooldown corrupting tunic color
 * Fixed PMM_DL_MIRROR_SHIELD_RAY and PMM_DL_MAGIC_BARRIER not being replaced
 * Mod will no longer attempt to write values to En_Torch2 or En_Boom variables while their overlays are not loaded
-  * Should fix many instances of corrupted graphics, code, and crashing
+  * Should fix many instances of corrupted graphics/code and crashing
 * Rewrote much of the mod under the hood for better extensibility
 * Bumped API version
 
