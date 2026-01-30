@@ -1,7 +1,5 @@
 # PlayerModelManager for Majora's Mask: Recompiled
 
-**This mod is not considered stable. In particular, there is currently a memory corruption bug. Use at your own risk.**
-
 This is an API mod for Majora's Mask: Recompiled that simplifies Link model 
 replacement and adds a menu that lets the user swap  between models for each 
 form as well as equipment.
