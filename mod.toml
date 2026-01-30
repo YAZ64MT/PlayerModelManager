@@ -36,9 +36,9 @@ minimum_recomp_version = "1.2.2"
 dependencies = [
 # Example dependency:
 #    "modname:1.0.0"
-    "yazmt_mm_global_objects",
+    "yazmt_mm_global_objects:0.1.1",
     "ProxyMM_KV:0.0.5",
-    "yazmt_mm_corelib",
+    "yazmt_mm_corelib:0.1.1",
 ]
 
 # Optional dependency mods. This has the same format as `dependencies`, but the game will still start if dependencies in this
