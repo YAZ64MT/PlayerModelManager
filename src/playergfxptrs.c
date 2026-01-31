@@ -1,7 +1,6 @@
 #include "global.h"
 #include "formproxy.h"
 #include "proxyactorext.h"
-#include "playerexterns.h"
 
 static void tryReplaceCodeDL(FormProxy *fp, Link_DisplayList dlId, Gfx **dest) {
     Gfx *newDL = FormProxy_getDL(fp, dlId);
@@ -37,8 +36,10 @@ void repointFormPtrsToProxy(Player *player, FormProxy *formProxy) {
         }
     }
 
+    extern Gfx *gPlayerRightHandOpenDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, LINK_DL_RHAND, &gPlayerRightHandOpenDLs[playerForm * 2]);
 
+    extern Gfx *gPlayerRightHandClosedDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, rightFistDLId, &gPlayerRightHandClosedDLs[playerForm * 2]);
 
     Link_DisplayList rightHandHoldingInstrumentDLId;
@@ -48,12 +49,16 @@ void repointFormPtrsToProxy(Player *player, FormProxy *formProxy) {
         rightHandHoldingInstrumentDLId = LINK_DL_OPT_RHAND_OCARINA;
     }
 
+    extern Gfx *gPlayerRightHandInstrumentDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, rightHandHoldingInstrumentDLId, &gPlayerRightHandInstrumentDLs[playerForm * 2]);
 
+    extern Gfx *gPlayerRightHandHookshotDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_HOOKSHOT, &gPlayerRightHandHookshotDLs[playerForm * 2]);
 
+    extern Gfx *gPlayerLeftHandOpenDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, LINK_DL_LHAND, &gPlayerLeftHandOpenDLs[playerForm * 2]);
 
+    extern Gfx *gPlayerLeftHandClosedDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, leftFistDLId, &gPlayerLeftHandClosedDLs[playerForm * 2]);
 
     Link_DisplayList leftHandHoldingTwoHandedSwordDLId;
@@ -63,12 +68,16 @@ void repointFormPtrsToProxy(Player *player, FormProxy *formProxy) {
         leftHandHoldingTwoHandedSwordDLId = LINK_DL_LFIST_SWORD_GREAT_FAIRY;
     }
 
+    extern Gfx *gPlayerLeftHandTwoHandSwordDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, leftHandHoldingTwoHandedSwordDLId, &gPlayerLeftHandTwoHandSwordDLs[playerForm * 2]);
 
+    extern Gfx *gPlayerLeftHandOneHandSwordDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_KOKIRI, &gPlayerLeftHandOneHandSwordDLs[playerForm * 2]);
 
+    extern Gfx *gPlayerLeftHandBottleDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, LINK_DL_OPT_LHAND_BOTTLE, &gPlayerLeftHandBottleDLs[playerForm * 2]);
 
+    extern Gfx *gPlayerRightHandBowDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_BOW, &gPlayerRightHandBowDLs[playerForm * 2]);
 
     Link_DisplayList firstPersonLeftForearmDlId;
@@ -84,64 +93,68 @@ void repointFormPtrsToProxy(Player *player, FormProxy *formProxy) {
         firstPersonRightShoulderDlId = LINK_DL_OPT_FPS_RSHOULDER_BOW;
     }
 
+    extern Gfx *sPlayerFirstPersonLeftForearmDLs[PLAYER_FORM_MAX];
     tryReplaceCodeDL(formProxy, firstPersonLeftForearmDlId, &sPlayerFirstPersonLeftForearmDLs[playerForm]);
 
+    extern Gfx *sPlayerFirstPersonLeftHandDLs[PLAYER_FORM_MAX];
     tryReplaceCodeDL(formProxy, firstPersonLeftHandDlId, &sPlayerFirstPersonLeftHandDLs[playerForm]);
 
+    extern Gfx *sPlayerFirstPersonRightShoulderDLs[PLAYER_FORM_MAX];
     tryReplaceCodeDL(formProxy, firstPersonRightShoulderDlId, &sPlayerFirstPersonRightShoulderDLs[playerForm]);
 
+    extern Gfx *sPlayerFirstPersonRightHandDLs[PLAYER_FORM_MAX];
     tryReplaceCodeDL(formProxy, LINK_DL_FPS_RHAND_BOW, &sPlayerFirstPersonRightHandDLs[playerForm]);
 
+    extern Gfx *sPlayerFirstPersonRightHandHookshotDLs[PLAYER_FORM_MAX];
     tryReplaceCodeDL(formProxy, LINK_DL_FPS_RHAND_HOOKSHOT, &sPlayerFirstPersonRightHandHookshotDLs[playerForm]);
 
+    extern Gfx *gPlayerWaistDLs[2 * PLAYER_FORM_MAX];
     tryReplaceCodeLodDL(formProxy, LINK_DL_WAIST, &gPlayerWaistDLs[playerForm * 2]);
 }
 
-static Gfx **sPlayerHandHoldingSwords = D_801C018C;
-
-static Gfx **sPlayerMasks = D_801C0B20;
-
-static Gfx **sPlayerFins = D_801C0AB4;
-
-static Gfx **sPlayerSwimFins = D_801C0ABC;
-
-static Gfx **sPlayerPads = D_8085D574;
-
-static Gfx **sPlayerMaskDLs = D_801C0B20;
-
 static void repointSharedModelsToProxy(FormProxy *formProxy) {
-    tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_KOKIRI, &sPlayerHandHoldingSwords[PLAYER_SWORD_KOKIRI * 2]);
-    tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_RAZOR, &sPlayerHandHoldingSwords[PLAYER_SWORD_RAZOR * 2]);
-    tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_GILDED, &sPlayerHandHoldingSwords[PLAYER_SWORD_GILDED * 2]);
+    extern Gfx *D_801C018C[]; // Left hand holding 1-handed sword DLs
+    tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_KOKIRI, &D_801C018C[PLAYER_SWORD_KOKIRI * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_RAZOR, &D_801C018C[PLAYER_SWORD_RAZOR * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_LFIST_SWORD_GILDED, &D_801C018C[PLAYER_SWORD_GILDED * 2]);
 
-    int shieldHeroIndex = PLAYER_SHIELD_HEROS_SHIELD - 1;
-    int shieldMirrorIndex = PLAYER_SHIELD_MIRROR_SHIELD - 1;
+    const int SHIELD_HERO_INDEX = PLAYER_SHIELD_HEROS_SHIELD - 1;
+    const int SHIELD_MIRROR_INDEX = PLAYER_SHIELD_MIRROR_SHIELD - 1;
 
-    tryReplaceCodeLodDL(formProxy, LINK_DL_SHIELD_HERO_BACK, &gPlayerShields[shieldHeroIndex * 2]);
-    tryReplaceCodeLodDL(formProxy, LINK_DL_SHIELD_MIRROR_BACK, &gPlayerShields[shieldMirrorIndex * 2]);
+    extern Gfx *gPlayerShields[];
+    tryReplaceCodeLodDL(formProxy, LINK_DL_SHIELD_HERO_BACK, &gPlayerShields[SHIELD_HERO_INDEX * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_SHIELD_MIRROR_BACK, &gPlayerShields[SHIELD_MIRROR_INDEX * 2]);
 
-    tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_SHIELD_HERO, &gPlayerHandHoldingShields[shieldHeroIndex * 2]);
-    tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_SHIELD_MIRROR, &gPlayerHandHoldingShields[shieldMirrorIndex * 2]);
+    extern Gfx *gPlayerHandHoldingShields[];
+    tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_SHIELD_HERO, &gPlayerHandHoldingShields[SHIELD_HERO_INDEX * 2]);
+    tryReplaceCodeLodDL(formProxy, LINK_DL_RFIST_SHIELD_MIRROR, &gPlayerHandHoldingShields[SHIELD_MIRROR_INDEX * 2]);
 
+    extern Gfx *gPlayerSheathedSwords[];
     tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_KOKIRI_SHEATHED, &gPlayerSheathedSwords[PLAYER_SWORD_KOKIRI * 2]);
     tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_RAZOR_SHEATHED, &gPlayerSheathedSwords[PLAYER_SWORD_RAZOR * 2]);
     tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_GILDED_SHEATHED, &gPlayerSheathedSwords[PLAYER_SWORD_GILDED * 2]);
 
+    extern Gfx *gPlayerSwordSheaths[];
     tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_KOKIRI_SHEATH, &gPlayerSwordSheaths[PLAYER_SWORD_KOKIRI * 2]);
     tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_RAZOR_SHEATH, &gPlayerSwordSheaths[PLAYER_SWORD_RAZOR * 2]);
     tryReplaceCodeLodDL(formProxy, LINK_DL_SWORD_GILDED_SHEATH, &gPlayerSwordSheaths[PLAYER_SWORD_GILDED * 2]);
 
-    tryReplaceCodeDL(formProxy, LINK_DL_LFIN, &sPlayerFins[0]);
-    tryReplaceCodeDL(formProxy, LINK_DL_RFIN, &sPlayerFins[1]);
+    extern Gfx *D_801C0AB4[]; // Zora fin DLs
+    tryReplaceCodeDL(formProxy, LINK_DL_LFIN, &D_801C0AB4[0]);
+    tryReplaceCodeDL(formProxy, LINK_DL_RFIN, &D_801C0AB4[1]);
 
-    tryReplaceCodeDL(formProxy, LINK_DL_LFIN_SWIM, &sPlayerSwimFins[0]);
-    tryReplaceCodeDL(formProxy, LINK_DL_RFIN_SWIM, &sPlayerSwimFins[1]);
+    extern Gfx *D_801C0ABC[]; // Zora fin (swim) DLs
+    tryReplaceCodeDL(formProxy, LINK_DL_LFIN_SWIM, &D_801C0ABC[0]);
+    tryReplaceCodeDL(formProxy, LINK_DL_RFIN_SWIM, &D_801C0ABC[1]);
 
-    tryReplaceCodeDL(formProxy, LINK_DL_PAD_GRASS, &sPlayerPads[0]);
-    tryReplaceCodeDL(formProxy, LINK_DL_PAD_WOOD, &sPlayerPads[1]);
-    tryReplaceCodeDL(formProxy, LINK_DL_PAD_OPENING, &sPlayerPads[2]);
+    extern Gfx *D_8085D574[]; // Deku flower burrowing DLs
+    tryReplaceCodeDL(formProxy, LINK_DL_PAD_GRASS, &D_8085D574[0]);
+    tryReplaceCodeDL(formProxy, LINK_DL_PAD_WOOD, &D_8085D574[1]);
+    tryReplaceCodeDL(formProxy, LINK_DL_PAD_OPENING, &D_8085D574[2]);
 
-#define SET_MASK_DL(playerMaskIndex, linkDLIndex) tryReplaceCodeDL(formProxy, linkDLIndex, &sPlayerMaskDLs[playerMaskIndex - 1])
+    extern Gfx *D_801C0B20[]; // Masks
+
+#define SET_MASK_DL(playerMaskIndex, linkDLIndex) tryReplaceCodeDL(formProxy, linkDLIndex, &D_801C0B20[playerMaskIndex - 1])
 
     SET_MASK_DL(PLAYER_MASK_TRUTH, LINK_DL_MASK_TRUTH);
     SET_MASK_DL(PLAYER_MASK_KAFEIS_MASK, LINK_DL_MASK_KAFEIS_MASK);

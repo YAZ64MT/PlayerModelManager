@@ -2,7 +2,6 @@
 #include "mm/vanillawrapperdls.h"
 #include "globalobjects_api.h"
 #include "maskdls.h"
-#include "playerexterns.h"
 #include "mm/vanillasegmenteddlexterns.h"
 
 #define DECLARE_MM_DL_CFG(objectId, segmentedDL, wrapperDLName) Gfx wrapperDLName[] = {gsSPEndDisplayList()};
