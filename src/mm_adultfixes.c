@@ -399,13 +399,11 @@ void playAdultLinkVoice_on_return_Player_AnimSfx_PlayVoice(Player *player, u16 s
 }
 
 void fixAdultLinkSfx_on_Player_Action_65(Player *player) {
-    const static AnimSfxEntry DEFAULT_ENTRY = ANIMSFX(ANIMSFX_TYPE_FLOOR_JUMP, 87, NA_SE_NONE, CONTINUE);
-
     extern AnimSfxEntry D_8085D73C[];
-
-    D_8085D73C[0] = DEFAULT_ENTRY;
 
     if (shouldUseAdultFixes(player)) {
         D_8085D73C[0].flags = -1;
+    } else {
+        D_8085D73C[0].flags = ANIMSFX_FLAGS(ANIMSFX_TYPE_FLOOR_JUMP, 87, CONTINUE);
     }
 }
