@@ -15,5 +15,6 @@ RECOMP_HOOK("Player_InitCommon") void on_Player_InitCommon(Player *player, PlayS
     fixAdultAgeProps_on_Player_InitCommon(sPlayer);
 }
 
-RECOMP_HOOK_RETURN("Player_InitCommon") void on_return_Player_InitCommon() {
+RECOMP_HOOK_RETURN("Player_InitCommon") void on_return_Player_InitCommon(void) {
+
 }

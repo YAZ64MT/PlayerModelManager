@@ -13,6 +13,6 @@ RECOMP_HOOK("Player_Action_65") void on_Player_Action_65(Player *player, PlaySta
     fixAdultLinkSfx_on_Player_Action_65(sPlayer);
 }
 
-RECOMP_HOOK_RETURN("Player_Action_65") void on_return_Player_Action_65() {
+RECOMP_HOOK_RETURN("Player_Action_65") void on_return_Player_Action_65(void) {
 
 }
