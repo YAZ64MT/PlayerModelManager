@@ -339,6 +339,30 @@ typedef struct AnimSfxEntry {
     /* 0x2 */ s16 flags; // negative marks the end
 } AnimSfxEntry;          // size = 0x4
 
+typedef enum AnimSfxType {
+    /*  1 */ ANIMSFX_TYPE_GENERAL = 1,
+    /*  2 */ ANIMSFX_TYPE_FLOOR,
+    /*  3 */ ANIMSFX_TYPE_FLOOR_BY_AGE,
+    /*  4 */ ANIMSFX_TYPE_VOICE,
+    /*  5 */ ANIMSFX_TYPE_FLOOR_LAND, // does not use sfxId
+    /*  6 */ ANIMSFX_TYPE_6,          // FLOOR_WALK_Something // does not use sfxId
+    /*  7 */ ANIMSFX_TYPE_FLOOR_JUMP, // does not use sfxId
+    /*  8 */ ANIMSFX_TYPE_8,          // FLOOR_WALK_Something2 // does not use sfxId
+    /*  9 */ ANIMSFX_TYPE_9,          // Uses NA_SE_PL_WALK_LADDER // does not use sfxId, unused
+    /* 10 */ ANIMSFX_TYPE_SURFACE
+} AnimSfxType;
+
+#define ANIMSFX_SHIFT_TYPE(type) ((type) << 11)
+
+#define ANIMSFX_CONTINUE (1)
+#define ANIMSFX_STOP (0)
+
+#define ANIMSFX_FLAGS(type, frame, cont) \
+    (((ANIMSFX_##cont) == ANIMSFX_STOP ? -1 : 1) * (ANIMSFX_SHIFT_TYPE(type) | ((frame) & 0x7FF)))
+
+#define ANIMSFX(type, frame, sfxId, cont) \
+    {(sfxId), ANIMSFX_FLAGS(type, frame, cont)}
+
 void adjustTransformationVoice_on_func_80855218(Player *player) {
     extern AnimSfxEntry D_8085D8F0[];
 
@@ -374,5 +398,17 @@ void playAdultLinkVoice_on_return_Player_AnimSfx_PlayVoice(Player *player, u16 s
                 Player_PlaySfx(player, NA_SE_VO_LI_SWORD_N + player->ageProperties->voiceSfxIdOffset);
             }
         }
+    }
+}
+
+void fixAdultLinkSfx_on_Player_Action_65(Player *player) {
+    const static AnimSfxEntry DEFAULT_ENTRY = ANIMSFX(ANIMSFX_TYPE_FLOOR_JUMP, 87, NA_SE_NONE, CONTINUE);
+
+    extern AnimSfxEntry D_8085D73C[];
+
+    D_8085D73C[0] = DEFAULT_ENTRY;
+
+    if (shouldUseAdultFixes(player)) {
+        D_8085D73C[0].flags = -1;
     }
 }
