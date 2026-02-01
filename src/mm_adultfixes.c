@@ -153,19 +153,22 @@ void initVanillaProps_on_Player_Init(void) {
     }
 }
 
+static void updateAgeProps(Player *player) {
+    if (player->transformation == PLAYER_FORM_HUMAN) {
+        if (shouldUseAdultFixes(player)) {
+            player->ageProperties = &gAdultLinkAgeProps;
+        } else {
+            player->ageProperties = &sPlayerAgeProperties[PLAYER_FORM_HUMAN];
+        }
+    }
+}
+
 // Need to do this every frame or adult Link clips into the floor on unpause
 void updateAdultProperties_on_Play_UpdateMain(PlayState *play) {
     Player *player = GET_PLAYER(play);
 
     while (player) {
-        if (player->transformation == PLAYER_FORM_HUMAN) {
-            if (shouldUseAdultFixes(player)) {
-                player->ageProperties = &gAdultLinkAgeProps;
-            } else {
-                player->ageProperties = &sPlayerAgeProperties[PLAYER_FORM_HUMAN];
-            }
-        }
-
+        updateAgeProps(player);
         player = (Player *)player->actor.next;
     }
 }
@@ -331,6 +334,15 @@ void adjustAdultLeg_on_return_Player_AdjustSingleLeg(void) {
 
             curr->vanillaArr[PLAYER_FORM_HUMAN] = curr->tmp;
         }
+    }
+}
+
+void fixAdultAgeProps_on_Player_InitCommon(Player *player) {
+    // Earliest point age props can be updated without a RECOMP_PATCH
+    // Makes adult Link use right voice during certain transitions
+    // (e.g. getting thrown out of the Pirate's Fortress)
+    if (player->actor.id == ACTOR_PLAYER) { // obligatory Kafei check
+        updateAgeProps(player);
     }
 }
 
