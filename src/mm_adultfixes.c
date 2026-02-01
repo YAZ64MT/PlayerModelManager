@@ -116,33 +116,18 @@ void setAdultBootData_on_return_func_80123140(void) {
     }
 }
 
-extern PlayerAnimationHeader *D_8085BE84[PLAYER_ANIMGROUP_MAX][PLAYER_ANIMTYPE_MAX];
-#define PLAYER_ANIM_GROUPS D_8085BE84
-
-static PlayerAnimationHeader *sDoorAAnimsTmp[PLAYER_ANIMTYPE_MAX];
-static PlayerAnimationHeader *sDoorBAnimsTmp[PLAYER_ANIMTYPE_MAX];
-bool sWasDoorAnimChanged;
+PlayerTransformation sRealPlayerFormPlayerDoorKnob;
 
 void replaceDoorAnim_on_Player_Door_Knob(Player *player) {
+    sRealPlayerFormPlayerDoorKnob = player->transformation;
+
     if (shouldUseAdultFixes(player)) {
-        sWasDoorAnimChanged = true;
-        for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
-            sDoorAAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i];
-            sDoorBAnimsTmp[i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i];
-            PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA_free][i];
-            PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i] = PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB_free][i];
-        }
+        player->transformation = PLAYER_FORM_FIERCE_DEITY;
     }
 }
 
-void replaceDoorAnim_on_return_Player_Door_Knob(void) {
-    if (sWasDoorAnimChanged) {
-        sWasDoorAnimChanged = false;
-        for (int i = 0; i < PLAYER_ANIMTYPE_MAX; i++) {
-            PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorA][i] = sDoorAAnimsTmp[i];
-            PLAYER_ANIM_GROUPS[PLAYER_ANIMGROUP_doorB][i] = sDoorBAnimsTmp[i];
-        }
-    }
+void replaceDoorAnim_on_return_Player_Door_Knob(Player *player) {
+    player->transformation = sRealPlayerFormPlayerDoorKnob;
 }
 
 void initVanillaProps_on_Player_Init(void) {

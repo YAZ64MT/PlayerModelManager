@@ -17,8 +17,8 @@ RECOMP_HOOK("Player_Door_Knob") void on_Player_Door_Knob(PlayState *play, Player
     replaceDoorAnim_on_Player_Door_Knob(sPlayer);
 }
 
-void replaceDoorAnim_on_return_Player_Door_Knob(void);
+void replaceDoorAnim_on_return_Player_Door_Knob(Player *player);
 
 RECOMP_HOOK_RETURN("Player_Door_Knob") void on_return_Player_Door_Knob(void) {
-    replaceDoorAnim_on_return_Player_Door_Knob();
+    replaceDoorAnim_on_return_Player_Door_Knob(sPlayer);
 }
