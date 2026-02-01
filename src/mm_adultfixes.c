@@ -331,6 +331,31 @@ void fixAdultAgeProps_on_Player_InitCommon(Player *player) {
     }
 }
 
+typedef struct struct_8085D224 {
+    /* 0x0 */ PlayerAnimationHeader *anim;
+    /* 0x4 */ f32 unk_4;
+    /* 0x8 */ f32 unk_8;
+} struct_8085D224; // size = 0xC
+
+extern struct_8085D224 D_8085D224[][2];
+
+struct_8085D224 sTempHorseAnimInfo[2];
+
+void fixAdultHorseMount_on_Player_ActionHandler_3(Player *player) {
+    sTempHorseAnimInfo[0] = D_8085D224[0][0];
+    sTempHorseAnimInfo[1] = D_8085D224[0][1];
+
+    if (shouldUseAdultFixes(player)) {
+        D_8085D224[0][0] = D_8085D224[1][0];
+        D_8085D224[0][1] = D_8085D224[1][1];
+    }
+}
+
+void fixAdultHorseMount_on_return_Player_ActionHandler_3(void) {
+    D_8085D224[0][0] = sTempHorseAnimInfo[0];
+    D_8085D224[0][1] = sTempHorseAnimInfo[1];
+}
+
 typedef struct AnimSfxEntry {
     /* 0x0 */ u16 sfxId;
     /* 0x2 */ s16 flags; // negative marks the end
