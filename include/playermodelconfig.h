@@ -6,19 +6,24 @@
 #include "PR/gbi.h"
 #include "stdbool.h"
 
-typedef unsigned long PlayerModelConfigDLHandle;
-typedef unsigned long PlayerModelConfigMtxHandle;
+// typedef unsigned long PlayerModelConfigDLHandle;
+// typedef unsigned long PlayerModelConfigMtxHandle;
+//
+// PlayerModelConfigDLHandle PlayerModelConfig_addSingleDL(Gfx *defaultDL);
+//
+// PlayerModelConfigMtxHandle PlayerModelConfig_addSingleMtx(Mtx *defaultMtx);
+//
+// PlayerModelConfigDLHandle PlayerModelConfig_addShimDL(PlayerModelConfigDLHandle dls[], size_t n);
+//
+// PlayerModelConfigDLHandle PlayerModelConfig_addDLWithMtx(PlayerModelConfigMtxHandle mtx, PlayerModelConfigDLHandle dl[], size_t n);
+//
+// bool PlayerModelConfig_getEntries(PlayerModelConfigDLHandle **handlesOut, size_t *numOut);
 
-PlayerModelConfigDLHandle PlayerModelConfig_addSingleDL(Gfx *defaultDL);
+typedef struct FormProxyIdsArray {
+    size_t size;
+    const FormProxyId *ids;
+} FormProxyIdsArray;
 
-PlayerModelConfigMtxHandle PlayerModelConfig_addSingleMtx(Mtx *defaultMtx);
-
-PlayerModelConfigDLHandle PlayerModelConfig_addShimDL(PlayerModelConfigDLHandle dls[], size_t n);
-
-PlayerModelConfigDLHandle PLayerModelConfig_addDLWithMtx(PlayerModelConfigMtxHandle mtx, PlayerModelConfigDLHandle dl[], size_t n);
-
-bool PlayerModelConfig_getEntries(PlayerModelConfigDLHandle **handlesOut, size_t *numOut);
-
-FormProxyId PlayerModelConfig_getNumFormIds(void);
+extern FormProxyIdsArray const *const gFormProxyIds;
 
 #endif

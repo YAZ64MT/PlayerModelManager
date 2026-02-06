@@ -797,15 +797,13 @@ static bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormPr
     PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
 
     if (pp) {
-        FormProxyId maxFormIds = PlayerModelConfig_getNumFormIds();
-
         ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
         const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
 
         if (override) {
-            for (FormProxyId i = 0; i < maxFormIds; i++) {
-                FormProxy *currFp = PlayerProxy_getFormProxy(pp, i);
+            for (size_t i = 0; i < gFormProxyIds->size; i++) {
+                FormProxy *currFp = PlayerProxy_getFormProxy(pp, gFormProxyIds->ids[i]);
                 if (currFp) {
                     PlayerModelManagerModelType type = FormProxy_getModelType(currFp);
 

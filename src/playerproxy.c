@@ -35,28 +35,6 @@ FormProxy *PlayerProxy_getFormProxy(PlayerProxy *pp, FormProxyId formId) {
     return recomputil_u32_memory_hashmap_get(pp->formProxies, formId);
 }
 
-typedef struct FormAlternateDL {
-    FormProxyId formProxyId;
-    Link_DisplayList dlId;
-} FormAlternateDL;
-
-#define DECLARE_FORM_ALT_DL(proxyId, linkDlId) {.formProxyId = proxyId, .dlId = linkDlId}
-
-static const FormAlternateDL sFormAlternates[] = {
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_DEKU, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_DEKU, LINK_DL_MASK_DEKU),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_DEKU, LINK_DL_MASK_DEKU_SCREAM),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_GORON, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_GORON, LINK_DL_MASK_GORON),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_GORON, LINK_DL_MASK_GORON_SCREAM),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_ZORA, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_ZORA, LINK_DL_MASK_ZORA),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_ZORA, LINK_DL_MASK_ZORA_SCREAM),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_FIERCE_DEITY, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY),
-    DECLARE_FORM_ALT_DL(FORM_PROXY_ID_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY_SCREAM),
-};
-
 void PlayerProxy_createFormProxy(PlayerProxy *pp, FormProxyId proxyId, PlayerTransformation form, ModelInfo *fallback, ModelInfo *fallbackOverride) {
     if (!isValidPlayerProxy(pp)) {
         PRINT_INVALID_PTR_ERR();
@@ -100,12 +78,37 @@ void PlayerProxy_init(PlayerProxy *pp) {
 
     FormProxy *formProxies[] = {human, deku, goron, zora, fd};
 
+    typedef struct FormAlternateDL {
+        FormProxyId formProxyId;
+        Link_DisplayList dlId;
+    } FormAlternateDL;
+
+#define DECLARE_FORM_ALT_DL(proxyId, linkDlId)   \
+    {                                            \
+        .formProxyId = proxyId, .dlId = linkDlId \
+    }
+
+    const FormAlternateDL formAlternates[] = {
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_DEKU, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_DEKU, LINK_DL_MASK_DEKU),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_DEKU, LINK_DL_MASK_DEKU_SCREAM),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_GORON, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_GORON, LINK_DL_MASK_GORON),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_GORON, LINK_DL_MASK_GORON_SCREAM),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_ZORA, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_ZORA, LINK_DL_MASK_ZORA),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_ZORA, LINK_DL_MASK_ZORA_SCREAM),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_FIERCE_DEITY, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY),
+        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY_SCREAM),
+    };
+
     for (int i = 0; i < ARRAY_COUNT(formProxies); ++i) {
         FormProxy *currFp = formProxies[i];
 
         if (currFp) {
-            for (int j = 0; j < ARRAY_COUNT(sFormAlternates); ++j) {
-                const FormAlternateDL *currAlt = &sFormAlternates[j];
+            for (int j = 0; j < ARRAY_COUNT(formAlternates); ++j) {
+                const FormAlternateDL *currAlt = &formAlternates[j];
 
                 if (FormProxy_getFormProxyId(currFp) != currAlt->formProxyId) {
                     FormProxy_setAlternateFormProxyDL(currFp, currAlt->dlId, PlayerProxy_getFormProxy(pp, currAlt->formProxyId));
@@ -116,10 +119,8 @@ void PlayerProxy_init(PlayerProxy *pp) {
 }
 
 void PlayerProxy_refresh(PlayerProxy *pp) {
-    FormProxyId idMax = PlayerModelConfig_getNumFormIds();
-
-    for (FormProxyId i = 0; i < idMax; ++i) {
-        FormProxy *currFp = PlayerProxy_getFormProxy(pp, i);
+    for (size_t i = 0; i < gFormProxyIds->size; ++i) {
+        FormProxy *currFp = PlayerProxy_getFormProxy(pp, gFormProxyIds->ids[i]);
 
         if (currFp) {
             FormProxy_requestRefresh(currFp);
@@ -128,10 +129,8 @@ void PlayerProxy_refresh(PlayerProxy *pp) {
 }
 
 void PlayerProxy_setOverrideDL(PlayerProxy *pp, Link_DisplayList dlId, Gfx *dl) {
-    FormProxyId idMax = PlayerModelConfig_getNumFormIds();
-
-    for (FormProxyId i = 0; i < idMax; ++i) {
-        FormProxy *currFp = PlayerProxy_getFormProxy(pp, i);
+    for (size_t i = 0; i < gFormProxyIds->size; ++i) {
+        FormProxy *currFp = PlayerProxy_getFormProxy(pp, gFormProxyIds->ids[i]);
 
         if (currFp) {
             FormProxy_setCurrentOverrideDL(currFp, dlId, dl);
@@ -140,10 +139,8 @@ void PlayerProxy_setOverrideDL(PlayerProxy *pp, Link_DisplayList dlId, Gfx *dl) 
 }
 
 void PlayerProxy_setOverrideMtx(PlayerProxy *pp, Link_EquipmentMatrix mtxId, Mtx *mtx) {
-    FormProxyId idMax = PlayerModelConfig_getNumFormIds();
-
-    for (FormProxyId i = 0; i < idMax; ++i) {
-        FormProxy *currFp = PlayerProxy_getFormProxy(pp, i);
+    for (size_t i = 0; i < gFormProxyIds->size; ++i) {
+        FormProxy *currFp = PlayerProxy_getFormProxy(pp, gFormProxyIds->ids[i]);
 
         if (currFp) {
             FormProxy_setCurrentOverrideMtx(currFp, mtxId, mtx);
@@ -186,10 +183,8 @@ bool PlayerProxy_getProxyIdFromForm(PlayerTransformation form, FormProxyId *out)
 }
 
 void PlayerProxy_requestTunicColorOverride(PlayerProxy *pp, Color_RGBA8 color) {
-    FormProxyId idMax = PlayerModelConfig_getNumFormIds();
-
-    for (FormProxyId i = 0; i < idMax; ++i) {
-        FormProxy *currFp = PlayerProxy_getFormProxy(pp, i);
+    for (size_t i = 0; i < gFormProxyIds->size; ++i) {
+        FormProxy *currFp = PlayerProxy_getFormProxy(pp, gFormProxyIds->ids[i]);
 
         if (currFp) {
             FormProxy_requestTunicColorOverride(currFp, color);
