@@ -104,7 +104,7 @@ static Vtx sZoraShieldVtxs[NUM_ZORA_SHIELD_VTX];
 
 static u8 *sZoraShieldPhi;
 
-Gfx gZoraMagicBarrierDL[95];
+Gfx gZoraMagicBarrierDL[ZORA_SHIELD_DL_LEN];
 
 void initZoraMagicBarrierDL(void) {
     void *zora = GlobalObjects_getGlobalObject(OBJECT_LINK_ZORA);
