@@ -1139,6 +1139,11 @@ static Gfx *getDLOrAltFromModelInfo(ModelInfo *mi, Link_DisplayList dlId) {
     Gfx *result = ModelInfo_getDL(mi, dlId);
 
     if (!result) {
+        if (dlId == LINK_DL_OPT_FPS_LONGSHOT) {
+            // Without this check, the 3rd person hookshot would take priority over 3rd person longshot
+            result = ModelInfo_getDL(mi, LINK_DL_OPT_LONGSHOT);
+        }
+
         DisplayListAltList *alts = getAltList(dlId);
 
         if (alts) {
