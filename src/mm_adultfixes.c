@@ -116,7 +116,7 @@ void setAdultBootData_on_return_func_80123140(void) {
     }
 }
 
-PlayerTransformation sRealPlayerFormPlayerDoorKnob;
+static PlayerTransformation sRealPlayerFormPlayerDoorKnob;
 
 void replaceDoorAnim_on_Player_Door_Knob(Player *player) {
     sRealPlayerFormPlayerDoorKnob = player->transformation;
