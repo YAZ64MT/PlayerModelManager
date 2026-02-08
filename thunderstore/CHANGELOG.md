@@ -1,3 +1,7 @@
+### 0.5.1
+* Fix child voice being used for adult models during certain scene transitions
+* Adult models no longer use child sound cues during the big chest opening cutscene
+
 ### 0.5.0
 * Add support for replacing individual pieces of equipment
   * Can be specified on a per-form-model-type basis
