@@ -109,21 +109,23 @@ void initFormProxyExtension_on_Actor_Init(Actor *actor) {
     ProxyActorExt_setFormProxyId(actor, FORM_PROXY_ID_NONE);
 }
 
-void setupPlayerFormProxy_on_Player_Init(Player *player) {
-    PlayerTransformation form;
-    if (player->actor.shape.rot.x != 0) {
-        form = player->actor.shape.rot.x - 1;
-    } else {
-        form = GET_PLAYER_FORM;
-    }
-
-    if (form < PLAYER_FORM_MAX) {
+void setupPlayerFormProxy_on_Player_InitCommon(Player *player) {
+    if (player->transformation < PLAYER_FORM_MAX) {
         // TODO: CREATE AN EXPORT FOR OVERRIDING PLAYER PROXY
         FormProxyId id;
 
-        if (PlayerProxy_getProxyIdFromForm(form, &id)) {
-            ProxyActorExt_setPlayerProxy(&player->actor, gPlayer1Proxy);
-            ProxyActorExt_setFormProxyId(&player->actor, id);
+        if (PlayerProxy_getProxyIdFromForm(player->transformation, &id)) {
+            PlayerProxy *proxy = NULL;
+            if (player->actor.id == ACTOR_PLAYER) {
+                proxy = gPlayer1Proxy;
+            } else if (player->actor.id == ACTOR_EN_TEST3) {
+                proxy = gPlayer2Proxy;
+            }
+
+            if (proxy) {
+                ProxyActorExt_setPlayerProxy(&player->actor, proxy);
+                ProxyActorExt_setFormProxyId(&player->actor, id);
+            }
         }
     }
 }
