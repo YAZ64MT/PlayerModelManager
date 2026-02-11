@@ -23,5 +23,6 @@ bool PlayerProxy_getProxyIdFromForm(PlayerTransformation form, FormProxyId *out)
 void PlayerProxy_requestTunicColorOverride(PlayerProxy *pp, Color_RGBA8 color);
 
 extern PlayerProxy *gPlayer1Proxy;
+extern PlayerProxy *gPlayer2Proxy;
 
 #endif

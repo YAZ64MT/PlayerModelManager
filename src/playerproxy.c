@@ -6,6 +6,7 @@
 #include "playermodelconfig.h"
 
 PlayerProxy *gPlayer1Proxy;
+PlayerProxy *gPlayer2Proxy;
 
 ModelInfo gHumanModelInfoFallbackOverride;
 ModelInfo gDekuModelInfoFallbackOverride;

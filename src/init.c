@@ -35,6 +35,7 @@ static void forceInitFormProxies(void) {
     registerFierceDeity();
     ModelInfo_setModelEntryForm(&gFierceDeityModelInfo, (ModelEntryForm *)ModelEntryManager_getEntry(gFierceDeityModelHandle));
     gPlayer1Proxy = PlayerProxyManager_createPlayerProxy();
+    gPlayer2Proxy = PlayerProxyManager_createPlayerProxy();
 }
 
 void initFormProxies(void) {
