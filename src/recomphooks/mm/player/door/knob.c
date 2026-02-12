@@ -3,9 +3,9 @@
 
 typedef struct KnobDoorActor KnobDoorActor;
 
-PlayState *sPlay;
-Player *sPlayer;
-KnobDoorActor *sKnobDoorActor;
+static PlayState *sPlay;
+static Player *sPlayer;
+static KnobDoorActor *sKnobDoorActor;
 
 void replaceDoorAnim_on_Player_Door_Knob(Player *player);
 
