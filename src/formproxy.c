@@ -880,7 +880,7 @@ static void switchFallbackToFierceDeityIfNeeded(FormProxy *fp) {
     }
 }
 
-void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp) {
+void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp, TexturePtr eyesTextures[], TexturePtr mouthTextures[]) {
     if (!isValidFormProxy(fp)) {
         PRINT_INVALID_PTR_ERR();
         return;
@@ -888,9 +888,6 @@ void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp) {
 
     ModelInfo *tempFallback = fp->fallbackModelInfo;
     switchFallbackToFierceDeityIfNeeded(fp);
-
-    extern TexturePtr sPlayerEyesTextures[];
-    extern TexturePtr sPlayerMouthTextures[];
 
     ModelInfo *current = &fp->currentModelInfo;
     ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
@@ -907,7 +904,7 @@ void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp) {
             eyesTex = ModelInfo_getEyesTexture(fallback, i);
         }
 
-        sPlayerEyesTextures[i] = eyesTex;
+        eyesTextures[i] = eyesTex;
     }
 
     for (PlayerMouthIndex i = 0; i < PLAYER_MOUTH_MAX; ++i) {
@@ -921,7 +918,7 @@ void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp) {
             mouthTex = ModelInfo_getMouthTexture(fallback, i);
         }
 
-        sPlayerMouthTextures[i] = mouthTex;
+        mouthTextures[i] = mouthTex;
     }
 
     fp->fallbackModelInfo = tempFallback;
