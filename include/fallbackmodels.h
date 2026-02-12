@@ -7,6 +7,7 @@
 typedef struct ModelEntryForm ModelEntryForm;
 
 extern PlayerModelManagerHandle gHumanModelHandle;
+extern PlayerModelManagerHandle gKafeiModelHandle;
 extern PlayerModelManagerHandle gDekuModelHandle;
 extern PlayerModelManagerHandle gGoronModelHandle;
 extern PlayerModelManagerHandle gZoraModelHandle;
