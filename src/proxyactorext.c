@@ -7,24 +7,36 @@
 #include "playermodelconfig.h"
 #include "logger.h"
 
-static ActorExtensionId sActorExtIdPlayerProxy;
-static ActorExtensionId sActorExtIdFormProxyId;
+typedef struct PlayerProxyInfo {
+    PlayerProxy *pp;
+    FormProxyId id;
+} PlayerProxyInfo;
+
+static ActorExtensionId sActorExtIdPlayerProxyInfo;
+
+static PlayerProxyInfo *getPlayerProxyInfo(Actor *actor) {
+    if (!actor) {
+        return NULL;
+    }
+
+    return z64recomp_get_extended_actor_data(actor, sActorExtIdPlayerProxyInfo);
+}
 
 PlayerProxy *ProxyActorExt_getPlayerProxy(Actor *actor) {
-    PlayerProxy **actorPp = z64recomp_get_extended_actor_data(actor, sActorExtIdPlayerProxy);
+    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
 
-    if (actorPp) {
-        return *actorPp;
+    if (proxyInfo) {
+        return proxyInfo->pp;
     }
 
     return NULL;
 }
 
 bool ProxyActorExt_getFormProxyId(Actor *actor, FormProxyId *out) {
-    FormProxyId *fpIdPtr = z64recomp_get_extended_actor_data(actor, sActorExtIdFormProxyId);
+    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
 
-    if (fpIdPtr) {
-        *out = *fpIdPtr;
+    if (proxyInfo) {
+        *out = proxyInfo->id;
         return true;
     }
 
@@ -46,10 +58,10 @@ FormProxy *ProxyActorExt_getFormProxy(Actor *actor) {
 }
 
 bool ProxyActorExt_setFormProxyId(Actor *actor, FormProxyId id) {
-    FormProxyId *fpIdPtr = z64recomp_get_extended_actor_data(actor, sActorExtIdFormProxyId);
+    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
 
-    if (fpIdPtr) {
-        *fpIdPtr = id;
+    if (proxyInfo) {
+        proxyInfo->id = id;
         return true;
     }
 
@@ -57,10 +69,10 @@ bool ProxyActorExt_setFormProxyId(Actor *actor, FormProxyId id) {
 }
 
 bool ProxyActorExt_setPlayerProxy(Actor *actor, PlayerProxy *pp) {
-    PlayerProxy **actorPp = z64recomp_get_extended_actor_data(actor, sActorExtIdPlayerProxy);
+    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
 
-    if (actorPp) {
-        *actorPp = pp;
+    if (proxyInfo) {
+        proxyInfo->pp = pp;
         return true;
     }
 
@@ -100,8 +112,7 @@ FormProxy *ProxyActorExt_getFormProxyOrFallback(Actor *actor, FormProxyId fallba
 }
 
 RECOMP_CALLBACK(".", _internal_preInitHashObjects) void handleFormProxyExtensionInits(void) {
-    sActorExtIdPlayerProxy = z64recomp_extend_actor_all(sizeof(PlayerProxy *));
-    sActorExtIdFormProxyId = z64recomp_extend_actor_all(sizeof(FormProxyId));
+    sActorExtIdPlayerProxyInfo = z64recomp_extend_actor_all(sizeof(PlayerProxyInfo));
 }
 
 void initFormProxyExtension_on_Actor_Init(Actor *actor) {
