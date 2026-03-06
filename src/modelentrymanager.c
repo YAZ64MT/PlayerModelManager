@@ -340,7 +340,8 @@ PlayerModelManagerHandle ModelEntryManager_createMemoryHandle(PlayerModelManager
 
     pushEntry(sModelEntries[type], entry);
 
-    // TODO: REMOVE THIS AFTER ADULTS ARE DISTINCT FORM
+    // In MM, adult models are classified as "child" models
+    // This won't be done in OoT
     if (type == PMM_MODEL_TYPE_ADULT) {
         YAZMTCore_DynamicU32Array_push(sModelEntries[PMM_MODEL_TYPE_CHILD], (uintptr_t)entry);
     }
