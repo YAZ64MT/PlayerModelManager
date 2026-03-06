@@ -2,6 +2,7 @@
 #include "modding.h"
 #include "modelmatrixids.h"
 #include "z64recomp_api.h"
+#include "playermodelmanager_api.h"
 
 static bool sShouldSkipFormInterpolation[PLAYER_FORM_MAX];
 static bool sShouldSkipMirrorShieldInterpolation;
@@ -11,16 +12,16 @@ RECOMP_CALLBACK(".", _internal_onFormModelApplied) void refreshSharedModelsOnFor
     sShouldSkipFormInterpolation[form] = true;
 }
 
-RECOMP_CALLBACK(".", _internal_onEquipmentModelApplied) void refreshEquipmentOnEquipmentModelApplied(Link_EquipmentReplacement eq) {
+RECOMP_CALLBACK(".", _internal_onEquipmentModelApplied) void refreshEquipmentOnEquipmentModelApplied(PlayerModelManagerModelType type) {
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
         sShouldSkipFormInterpolation[i] = true;
     }
 
-    if (eq == LINK_DL_REPLACE_SHIELD3) {
+    if (type == PMM_MODEL_TYPE_SHIELD3) {
         sShouldSkipMirrorShieldInterpolation = true;
     }
 
-    if (eq == LINK_DL_REPLACE_HOOKSHOT) {
+    if (type == PMM_MODEL_TYPE_HOOKSHOT) {
         sShouldSkipHookshotInterpolation = true;
     }
 }

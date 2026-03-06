@@ -16,9 +16,9 @@ static U32SlotmapHandle sEntryHandles;
 
 static YAZMTCore_StringU32Dictionary *sInternalNamesToEntries;
 
-static YAZMTCore_DynamicU32Array *sModelEntries[LINK_CMC_MAX];
+static YAZMTCore_DynamicU32Array *sModelEntries[PMM_MODEL_TYPE_MAX];
 
-static const ModelEntry *sCurrentModelEntries[LINK_CMC_MAX];
+static const ModelEntry *sCurrentModelEntries[PMM_MODEL_TYPE_MAX];
 
 static U32HashsetHandle sHiddenModelEntries;
 
@@ -28,10 +28,10 @@ typedef struct {
     const char *key;
 } SavedModelName;
 
-static SavedModelName sSavedModelNames[LINK_CMC_MAX] = {
+static SavedModelName sSavedModelNames[PMM_MODEL_TYPE_MAX] = {
+    {.key = "pmm_saved_none_name"}, // FAKE!
     {.key = "pmm_saved_child_name"},
     {.key = "pmm_saved_adult_name"},
-    {.key = "pmm_saved_human_name"},
     {.key = "pmm_saved_deku_name"},
     {.key = "pmm_saved_goron_name"},
     {.key = "pmm_saved_zora_name"},
@@ -119,506 +119,42 @@ PlayerTransformation getFormFromModelType(PlayerModelManagerModelType t) {
     return PLAYER_FORM_MAX;
 }
 
-Link_CustomModelCategory getCategoryFromModelType(PlayerModelManagerModelType t) {
-    switch (t) {
-        case PMM_MODEL_TYPE_CHILD:
-        case PMM_MODEL_TYPE_ADULT:
-            return LINK_CMC_HUMAN;
-            break;
-
-        case PMM_MODEL_TYPE_DEKU:
-            return LINK_CMC_DEKU;
-            break;
-
-        case PMM_MODEL_TYPE_GORON:
-            return LINK_CMC_GORON;
-            break;
-
-        case PMM_MODEL_TYPE_ZORA:
-            return LINK_CMC_ZORA;
-            break;
-
-        case PMM_MODEL_TYPE_FIERCE_DEITY:
-            return LINK_CMC_FIERCE_DEITY;
-            break;
-
-        case PMM_MODEL_TYPE_SWORD1:
-            return LINK_CMC_SWORD1;
-            break;
-
-        case PMM_MODEL_TYPE_SWORD2:
-            return LINK_CMC_SWORD2;
-            break;
-
-        case PMM_MODEL_TYPE_SWORD3:
-            return LINK_CMC_SWORD3;
-            break;
-
-        case PMM_MODEL_TYPE_SWORD4:
-            return LINK_CMC_SWORD4;
-            break;
-
-        case PMM_MODEL_TYPE_SWORD5:
-            return LINK_CMC_SWORD5;
-            break;
-
-        case PMM_MODEL_TYPE_SHIELD1:
-            return LINK_CMC_SHIELD1;
-            break;
-
-        case PMM_MODEL_TYPE_SHIELD2:
-            return LINK_CMC_SHIELD2;
-            break;
-
-        case PMM_MODEL_TYPE_SHIELD3:
-            return LINK_CMC_SHIELD3;
-            break;
-
-        case PMM_MODEL_TYPE_HOOKSHOT:
-            return LINK_CMC_HOOKSHOT;
-            break;
-
-        case PMM_MODEL_TYPE_BOW:
-            return LINK_CMC_BOW;
-            break;
-
-        case PMM_MODEL_TYPE_SLINGSHOT:
-            return LINK_CMC_SLINGSHOT;
-            break;
-
-        case PMM_MODEL_TYPE_BOTTLE:
-            return LINK_CMC_BOTTLE;
-            break;
-
-        case PMM_MODEL_TYPE_OCARINA_FAIRY:
-            return LINK_CMC_OCARINA_FAIRY;
-            break;
-
-        case PMM_MODEL_TYPE_OCARINA_TIME:
-            return LINK_CMC_OCARINA_TIME;
-            break;
-
-        case PMM_MODEL_TYPE_BOOMERANG:
-            return LINK_CMC_BOOMERANG;
-            break;
-
-        case PMM_MODEL_TYPE_HAMMER:
-            return LINK_CMC_HAMMER;
-            break;
-
-        case PMM_MODEL_TYPE_DEKU_STICK:
-            return LINK_CMC_DEKU_STICK;
-            break;
-
-        case PMM_MODEL_TYPE_PIPES:
-            return LINK_CMC_PIPES;
-            break;
-
-        case PMM_MODEL_TYPE_DRUMS:
-            return LINK_CMC_DRUMS;
-            break;
-
-        case PMM_MODEL_TYPE_GUITAR:
-            return LINK_CMC_GUITAR;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_SKULL:
-            return LINK_CMC_MASK_SKULL;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_SPOOKY:
-            return LINK_CMC_MASK_SPOOKY;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_GERUDO:
-            return LINK_CMC_MASK_GERUDO;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_TRUTH:
-            return LINK_CMC_MASK_TRUTH;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_KAFEIS_MASK:
-            return LINK_CMC_MASK_KAFEIS_MASK;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_ALL_NIGHT:
-            return LINK_CMC_MASK_ALL_NIGHT;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_BUNNY:
-            return LINK_CMC_MASK_BUNNY;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_KEATON:
-            return LINK_CMC_MASK_KEATON;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_GARO:
-            return LINK_CMC_MASK_GARO;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_ROMANI:
-            return LINK_CMC_MASK_ROMANI;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_CIRCUS_LEADER:
-            return LINK_CMC_MASK_CIRCUS_LEADER;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_COUPLE:
-            return LINK_CMC_MASK_COUPLE;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_POSTMAN:
-            return LINK_CMC_MASK_POSTMAN;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_GREAT_FAIRY:
-            return LINK_CMC_MASK_GREAT_FAIRY;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_GIBDO:
-            return LINK_CMC_MASK_GIBDO;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_DON_GERO:
-            return LINK_CMC_MASK_DON_GERO;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_KAMARO:
-            return LINK_CMC_MASK_KAMARO;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_CAPTAIN:
-            return LINK_CMC_MASK_CAPTAIN;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_STONE:
-            return LINK_CMC_MASK_STONE;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_BREMEN:
-            return LINK_CMC_MASK_BREMEN;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_BLAST:
-            return LINK_CMC_MASK_BLAST;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_SCENTS:
-            return LINK_CMC_MASK_SCENTS;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_GIANT:
-            return LINK_CMC_MASK_GIANT;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_DEKU:
-            return LINK_CMC_MASK_DEKU;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_GORON:
-            return LINK_CMC_MASK_GORON;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_ZORA:
-            return LINK_CMC_MASK_ZORA;
-            break;
-
-        case PMM_MODEL_TYPE_MASK_FIERCE_DEITY:
-            return LINK_CMC_MASK_FIERCE_DEITY;
-            break;
-
-        case PMM_MODEL_TYPE_MODEL_PACK:
-            return LINK_CMC_MODEL_PACK;
-            break;
-
-        case PMM_MODEL_TYPE_BOMB:
-            return LINK_CMC_BOMB;
-            break;
-
-        case PMM_MODEL_TYPE_BOMBCHU:
-            return LINK_CMC_BOMBCHU;
-            break;
-
-        default:
-            break;
-    }
-
-    return LINK_CMC_MAX;
-}
-
-PlayerTransformation getFormFromCategory(Link_CustomModelCategory cat) {
-    switch (cat) {
-        case LINK_CMC_HUMAN:
-            return PLAYER_FORM_HUMAN;
-            break;
-
-        case LINK_CMC_DEKU:
-            return PLAYER_FORM_DEKU;
-            break;
-
-        case LINK_CMC_GORON:
-            return PLAYER_FORM_GORON;
-            break;
-
-        case LINK_CMC_ZORA:
-            return PLAYER_FORM_ZORA;
-            break;
-
-        case LINK_CMC_FIERCE_DEITY:
-            return PLAYER_FORM_FIERCE_DEITY;
-            break;
-
-        default:
-            break;
-    }
-
-    return PLAYER_FORM_MAX;
-}
-
-Link_EquipmentReplacement getEquipmentReplacementFromCategory(Link_CustomModelCategory cat) {
-    switch (cat) {
-        case LINK_CMC_SWORD1:
-            return LINK_DL_REPLACE_SWORD1;
-            break;
-
-        case LINK_CMC_SWORD2:
-            return LINK_DL_REPLACE_SWORD2;
-            break;
-
-        case LINK_CMC_SWORD3:
-            return LINK_DL_REPLACE_SWORD3;
-            break;
-
-        case LINK_CMC_SWORD4:
-            return LINK_DL_REPLACE_SWORD4;
-            break;
-
-        case LINK_CMC_SWORD5:
-            return LINK_DL_REPLACE_SWORD5;
-            break;
-
-        case LINK_CMC_SHIELD1:
-            return LINK_DL_REPLACE_SHIELD1;
-            break;
-
-        case LINK_CMC_SHIELD2:
-            return LINK_DL_REPLACE_SHIELD2;
-            break;
-
-        case LINK_CMC_SHIELD3:
-            return LINK_DL_REPLACE_SHIELD3;
-            break;
-
-        case LINK_CMC_HOOKSHOT:
-            return LINK_DL_REPLACE_HOOKSHOT;
-            break;
-
-        case LINK_CMC_BOW:
-            return LINK_DL_REPLACE_BOW;
-            break;
-
-        case LINK_CMC_SLINGSHOT:
-            return LINK_DL_REPLACE_SLINGSHOT;
-            break;
-
-        case LINK_CMC_BOTTLE:
-            return LINK_DL_REPLACE_BOTTLE;
-            break;
-
-        case LINK_CMC_OCARINA_FAIRY:
-            return LINK_DL_REPLACE_OCARINA_FAIRY;
-            break;
-
-        case LINK_CMC_OCARINA_TIME:
-            return LINK_DL_REPLACE_OCARINA_TIME;
-            break;
-
-        case LINK_CMC_BOOMERANG:
-            return LINK_DL_REPLACE_BOOMERANG;
-            break;
-
-        case LINK_CMC_HAMMER:
-            return LINK_DL_REPLACE_HAMMER;
-            break;
-
-        case LINK_CMC_DEKU_STICK:
-            return LINK_DL_REPLACE_DEKU_STICK;
-            break;
-
-        case LINK_CMC_PIPES:
-            return LINK_DL_REPLACE_PIPES;
-            break;
-
-        case LINK_CMC_DRUMS:
-            return LINK_DL_REPLACE_DRUMS;
-            break;
-
-        case LINK_CMC_GUITAR:
-            return LINK_DL_REPLACE_GUITAR;
-            break;
-
-        case LINK_CMC_MASK_SKULL:
-            return LINK_DL_REPLACE_MASK_SKULL;
-            break;
-
-        case LINK_CMC_MASK_SPOOKY:
-            return LINK_DL_REPLACE_MASK_SPOOKY;
-            break;
-
-        case LINK_CMC_MASK_GERUDO:
-            return LINK_DL_REPLACE_MASK_GERUDO;
-            break;
-
-        case LINK_CMC_MASK_TRUTH:
-            return LINK_DL_REPLACE_MASK_TRUTH;
-            break;
-
-        case LINK_CMC_MASK_KAFEIS_MASK:
-            return LINK_DL_REPLACE_MASK_KAFEIS_MASK;
-            break;
-
-        case LINK_CMC_MASK_ALL_NIGHT:
-            return LINK_DL_REPLACE_MASK_ALL_NIGHT;
-            break;
-
-        case LINK_CMC_MASK_BUNNY:
-            return LINK_DL_REPLACE_MASK_BUNNY;
-            break;
-
-        case LINK_CMC_MASK_KEATON:
-            return LINK_DL_REPLACE_MASK_KEATON;
-            break;
-
-        case LINK_CMC_MASK_GARO:
-            return LINK_DL_REPLACE_MASK_GARO;
-            break;
-
-        case LINK_CMC_MASK_ROMANI:
-            return LINK_DL_REPLACE_MASK_ROMANI;
-            break;
-
-        case LINK_CMC_MASK_CIRCUS_LEADER:
-            return LINK_DL_REPLACE_MASK_CIRCUS_LEADER;
-            break;
-
-        case LINK_CMC_MASK_COUPLE:
-            return LINK_DL_REPLACE_MASK_COUPLE;
-            break;
-
-        case LINK_CMC_MASK_POSTMAN:
-            return LINK_DL_REPLACE_MASK_POSTMAN;
-            break;
-
-        case LINK_CMC_MASK_GREAT_FAIRY:
-            return LINK_DL_REPLACE_MASK_GREAT_FAIRY;
-            break;
-
-        case LINK_CMC_MASK_GIBDO:
-            return LINK_DL_REPLACE_MASK_GIBDO;
-            break;
-
-        case LINK_CMC_MASK_DON_GERO:
-            return LINK_DL_REPLACE_MASK_DON_GERO;
-            break;
-
-        case LINK_CMC_MASK_KAMARO:
-            return LINK_DL_REPLACE_MASK_KAMARO;
-            break;
-
-        case LINK_CMC_MASK_CAPTAIN:
-            return LINK_DL_REPLACE_MASK_CAPTAIN;
-            break;
-
-        case LINK_CMC_MASK_STONE:
-            return LINK_DL_REPLACE_MASK_STONE;
-            break;
-
-        case LINK_CMC_MASK_BREMEN:
-            return LINK_DL_REPLACE_MASK_BREMEN;
-            break;
-
-        case LINK_CMC_MASK_BLAST:
-            return LINK_DL_REPLACE_MASK_BLAST;
-            break;
-
-        case LINK_CMC_MASK_SCENTS:
-            return LINK_DL_REPLACE_MASK_SCENTS;
-            break;
-
-        case LINK_CMC_MASK_GIANT:
-            return LINK_DL_REPLACE_MASK_GIANT;
-            break;
-
-        case LINK_CMC_MASK_DEKU:
-            return LINK_DL_REPLACE_MASK_DEKU;
-            break;
-
-        case LINK_CMC_MASK_GORON:
-            return LINK_DL_REPLACE_MASK_GORON;
-            break;
-
-        case LINK_CMC_MASK_ZORA:
-            return LINK_DL_REPLACE_MASK_ZORA;
-            break;
-
-        case LINK_CMC_MASK_FIERCE_DEITY:
-            return LINK_DL_REPLACE_MASK_FIERCE_DEITY;
-            break;
-
-        case LINK_CMC_BOMB:
-            return LINK_DL_REPLACE_BOMB;
-            break;
-
-        case LINK_CMC_BOMBCHU:
-            return LINK_DL_REPLACE_BOMBCHU;
-            break;
-
-        default:
-            break;
-    }
-
-    return LINK_DL_REPLACE_MAX;
-}
-
-static void applyByInternalName(Link_CustomModelCategory cat, const char *name) {
+static void applyByInternalName(PlayerModelManagerModelType modelType, const char *name) {
     u32 entryPtr;
 
     if (YAZMTCore_StringU32Dictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
-        ModelEntryManager_tryApplyEntry(cat, (ModelEntry *)entryPtr);
+        ModelEntryManager_tryApplyEntry(modelType, (ModelEntry *)entryPtr);
     }
 }
 
-bool isEquipmentCategory(Link_CustomModelCategory cat) {
-    return (cat > LINK_CMC_FIERCE_DEITY && cat < LINK_CMC_MODEL_PACK) || cat == LINK_CMC_BOMB || cat == LINK_CMC_BOMBCHU;
+bool isEquipmentModelType(PlayerModelManagerModelType modelType) {
+    return (modelType > PMM_MODEL_TYPE_FIERCE_DEITY && modelType < PMM_MODEL_TYPE_MODEL_PACK) || modelType == PMM_MODEL_TYPE_BOMB || modelType == PMM_MODEL_TYPE_BOMBCHU;
 }
 
-bool isFormCategory(Link_CustomModelCategory cat) {
-    return cat <= LINK_CMC_FIERCE_DEITY && cat >= LINK_CMC_HUMAN;
+bool isFormModelType(PlayerModelManagerModelType modelType) {
+    return modelType <= PMM_MODEL_TYPE_FIERCE_DEITY && modelType >= PMM_MODEL_TYPE_CHILD;
 }
 
-bool isPackCategory(Link_CustomModelCategory cat) {
-    return cat == LINK_CMC_MODEL_PACK;
+bool isPackModelType(PlayerModelManagerModelType modelType) {
+    return modelType == PMM_MODEL_TYPE_MODEL_PACK;
 }
 
-bool isValidCategory(Link_CustomModelCategory cat) {
-    return cat >= 0 && cat < LINK_CMC_MAX;
+bool isValidModelType(PlayerModelManagerModelType modelType) {
+    return modelType >= 0 && modelType < PMM_MODEL_TYPE_MAX;
 }
 
-const ModelEntry *ModelEntryManager_getCurrentEntry(Link_CustomModelCategory cat) {
-    if (!isValidCategory(cat)) {
+const ModelEntry *ModelEntryManager_getCurrentEntry(PlayerModelManagerModelType modelType) {
+    if (!isValidModelType(modelType)) {
         return NULL;
     }
 
-    return sCurrentModelEntries[cat];
+    return sCurrentModelEntries[modelType];
 }
 
-void ModelEntryManager_setCurrentEntry(Link_CustomModelCategory cat, const ModelEntry *e) {
+void ModelEntryManager_setCurrentEntry(PlayerModelManagerModelType modelType, const ModelEntry *e) {
     // Packs are special in that they are made up of ModelEntries
-    if (isValidCategory(cat) && !isPackCategory(cat)) {
-        sCurrentModelEntries[cat] = e;
+    if (isValidModelType(modelType) && !isPackModelType(modelType)) {
+        sCurrentModelEntries[modelType] = e;
     }
 }
 
@@ -632,23 +168,23 @@ static void pushEntry(YAZMTCore_DynamicU32Array *entryArr, ModelEntry *entry) {
     }
 }
 
-static FormProxy *getLocalFormProxyFromCategory(Link_CustomModelCategory cat) {
+static FormProxy *getLocalFormProxyFromCategory(PlayerModelManagerModelType modelType) {
     FormProxyId fpId;
 
-    switch (cat) {
-        case LINK_CMC_DEKU:
+    switch (modelType) {
+        case PMM_MODEL_TYPE_DEKU:
             fpId = FORM_PROXY_ID_DEKU;
             break;
 
-        case LINK_CMC_GORON:
+        case PMM_MODEL_TYPE_GORON:
             fpId = FORM_PROXY_ID_GORON;
             break;
 
-        case LINK_CMC_ZORA:
+        case PMM_MODEL_TYPE_ZORA:
             fpId = FORM_PROXY_ID_ZORA;
             break;
 
-        case LINK_CMC_FIERCE_DEITY:
+        case PMM_MODEL_TYPE_FIERCE_DEITY:
             fpId = FORM_PROXY_ID_FIERCE_DEITY;
             break;
 
@@ -660,17 +196,17 @@ static FormProxy *getLocalFormProxyFromCategory(Link_CustomModelCategory cat) {
     return PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
 }
 
-void ModelEntryManager_reapplyEntry(Link_CustomModelCategory cat) {
-    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(cat);
+void ModelEntryManager_reapplyEntry(PlayerModelManagerModelType modelType) {
+    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(modelType);
 
     if (currEntry) {
-        ModelEntry_applyToFormProxy(currEntry, getLocalFormProxyFromCategory(cat));
+        ModelEntry_applyToFormProxy(currEntry, getLocalFormProxyFromCategory(modelType));
     }
 }
 
 static void reapplyAllEquipmentEntries(void) {
-    for (Link_CustomModelCategory i = 0; i < LINK_CMC_MAX; ++i) {
-        if (isEquipmentCategory(i)) {
+    for (PlayerModelManagerModelType i = 0; i < PMM_MODEL_TYPE_MAX; ++i) {
+        if (isEquipmentModelType(i)) {
             const ModelEntry *tmp = ModelEntryManager_getCurrentEntry(i);
             ModelEntryManager_removeModel(i);
             ModelEntryManager_tryApplyEntry(i, tmp);
@@ -678,26 +214,26 @@ static void reapplyAllEquipmentEntries(void) {
     }
 }
 
-bool ModelEntryManager_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry) {
-    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(cat);
+bool ModelEntryManager_forceApplyEntry(PlayerModelManagerModelType modelType, const ModelEntry *newEntry) {
+    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(modelType);
 
     if (newEntry == NULL) {
-        ModelEntryManager_removeModel(cat);
+        ModelEntryManager_removeModel(modelType);
         return true;
     }
 
-    if (ModelEntry_applyToFormProxy(newEntry, getLocalFormProxyFromCategory(cat))) {
+    if (ModelEntry_applyToFormProxy(newEntry, getLocalFormProxyFromCategory(modelType))) {
         if (currEntry) {
             ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_REMOVED);
         }
 
-        ModelEntryManager_setCurrentEntry(cat, newEntry);
+        ModelEntryManager_setCurrentEntry(modelType, newEntry);
 
         if (newEntry) {
             ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_APPLIED);
         }
 
-        if (cat == LINK_CMC_HUMAN) {
+        if (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT) {
             reapplyAllEquipmentEntries();
         }
 
@@ -719,21 +255,21 @@ void ModelEntryManager_setEntryHidden(const ModelEntry *modelEntry, bool isHidde
     }
 }
 
-bool ModelEntryManager_tryApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry) {
-    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(cat);
+bool ModelEntryManager_tryApplyEntry(PlayerModelManagerModelType modelType, const ModelEntry *newEntry) {
+    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(modelType);
     if (newEntry != currEntry) {
-        return ModelEntryManager_forceApplyEntry(cat, newEntry);
+        return ModelEntryManager_forceApplyEntry(modelType, newEntry);
     }
 
     return false;
 }
 
-const ModelEntry **ModelEntryManager_getCategoryEntryData(Link_CustomModelCategory cat, size_t *count) {
-    if (!isValidCategory(cat)) {
+const ModelEntry **ModelEntryManager_getCategoryEntryData(PlayerModelManagerModelType modelType, size_t *count) {
+    if (!isValidModelType(modelType)) {
         return NULL;
     }
 
-    size_t combinedLength = YAZMTCore_DynamicU32Array_size(sModelEntries[cat]);
+    size_t combinedLength = YAZMTCore_DynamicU32Array_size(sModelEntries[modelType]);
 
     if (combinedLength == 0) {
         *count = 0;
@@ -742,26 +278,26 @@ const ModelEntry **ModelEntryManager_getCategoryEntryData(Link_CustomModelCatego
 
     *count = combinedLength;
 
-    return (const ModelEntry **)(YAZMTCore_DynamicU32Array_data(sModelEntries[cat]));
+    return (const ModelEntry **)(YAZMTCore_DynamicU32Array_data(sModelEntries[modelType]));
 }
 
-void ModelEntryManager_removeModel(Link_CustomModelCategory cat) {
-    if (!isValidCategory(cat)) {
-        Logger_printError("Called with invalid category %d\n", cat);
+void ModelEntryManager_removeModel(PlayerModelManagerModelType modelType) {
+    if (!isValidModelType(modelType)) {
+        Logger_printError("Called with invalid category %d\n", modelType);
         Utils_tryCrashGame();
         return;
     }
 
-    const ModelEntry *entry = ModelEntryManager_getCurrentEntry(cat);
+    const ModelEntry *entry = ModelEntryManager_getCurrentEntry(modelType);
 
     if (entry) {
         ModelEntry_doCallback(entry, PMM_EVENT_MODEL_REMOVED);
 
-        ModelEntryManager_setCurrentEntry(cat, NULL);
+        ModelEntryManager_setCurrentEntry(modelType, NULL);
 
-        ModelEntry_removeFromFormProxy(entry, getLocalFormProxyFromCategory(cat));
+        ModelEntry_removeFromFormProxy(entry, getLocalFormProxyFromCategory(modelType));
 
-        if (cat == LINK_CMC_HUMAN) {
+        if (modelType == PMM_MODEL_TYPE_CHILD) {
             reapplyAllEquipmentEntries();
         }
     }
@@ -773,15 +309,13 @@ PlayerModelManagerHandle ModelEntryManager_createMemoryHandle(PlayerModelManager
         return 0;
     }
 
-    Link_CustomModelCategory cat = getCategoryFromModelType(type);
-
-    if (!isValidCategory(cat)) {
+    if (!isValidModelType(type)) {
         return 0;
     }
 
-    bool isFormEntry = isFormCategory(cat);
-    bool isEquipmentEntry = isEquipmentCategory(cat);
-    bool isPackEntry = isPackCategory(cat);
+    bool isFormEntry = isFormModelType(type);
+    bool isEquipmentEntry = isEquipmentModelType(type);
+    bool isPackEntry = isPackModelType(type);
     ModelEntry *entry = NULL;
     PlayerModelManagerHandle handle = recomputil_u32_slotmap_create(sEntryHandles);
 
@@ -789,10 +323,8 @@ PlayerModelManagerHandle ModelEntryManager_createMemoryHandle(PlayerModelManager
         ModelEntryForm *formEntry = ModelEntryForm_new(handle, type, internalName);
         entry = ModelEntryForm_getModelEntry(formEntry);
     } else if (isEquipmentEntry) {
-        if (getEquipmentReplacementFromCategory(cat) < LINK_DL_REPLACE_MAX) {
-            ModelEntryEquipment *entryEquipment = ModelEntryEquipment_new(handle, type, internalName);
-            entry = ModelEntryEquipment_getModelEntry(entryEquipment);
-        }
+        ModelEntryEquipment *entryEquipment = ModelEntryEquipment_new(handle, type, internalName);
+        entry = ModelEntryEquipment_getModelEntry(entryEquipment);
     } else if (isPackEntry) {
         ModelEntryPack *entryPack = ModelEntryPack_new(handle, internalName);
         entry = ModelEntryPack_getModelEntry(entryPack);
@@ -806,7 +338,12 @@ PlayerModelManagerHandle ModelEntryManager_createMemoryHandle(PlayerModelManager
 
     recomputil_u32_slotmap_set(sEntryHandles, handle, (uintptr_t)entry);
 
-    pushEntry(sModelEntries[cat], entry);
+    pushEntry(sModelEntries[type], entry);
+
+    // TODO: REMOVE THIS AFTER ADULTS ARE DISTINCT FORM
+    if (type == PMM_MODEL_TYPE_ADULT) {
+        YAZMTCore_DynamicU32Array_push(sModelEntries[PMM_MODEL_TYPE_CHILD], (uintptr_t)entry);
+    }
 
     return handle;
 }
@@ -821,25 +358,25 @@ ModelEntry *ModelEntryManager_getEntry(PlayerModelManagerHandle h) {
     return (ModelEntry *)entry;
 }
 
-ModelEntry **ModelEntryManager_getEntries(Link_CustomModelCategory cat, size_t *count) {
-    if (isValidCategory(cat)) {
-        *count = YAZMTCore_DynamicU32Array_size(sModelEntries[cat]);
-        return (ModelEntry **)(YAZMTCore_DynamicU32Array_data(sModelEntries[cat]));
+ModelEntry **ModelEntryManager_getEntries(PlayerModelManagerModelType modelType, size_t *count) {
+    if (isValidModelType(modelType)) {
+        *count = YAZMTCore_DynamicU32Array_size(sModelEntries[modelType]);
+        return (ModelEntry **)(YAZMTCore_DynamicU32Array_data(sModelEntries[modelType]));
     }
 
     return NULL;
 }
 
-void ModelEntryManager_saveCurrentEntry(Link_CustomModelCategory cat) {
-    if (!isValidCategory(cat)) {
+void ModelEntryManager_saveCurrentEntry(PlayerModelManagerModelType modelType) {
+    if (!isValidModelType(modelType)) {
         return;
     }
 
-    const char *key = sSavedModelNames[cat].key;
+    const char *key = sSavedModelNames[modelType].key;
 
     KV_Global_Remove(key);
 
-    const ModelEntry *curr = ModelEntryManager_getCurrentEntry(cat);
+    const ModelEntry *curr = ModelEntryManager_getCurrentEntry(modelType);
     if (curr) {
         // No need to initialize this since there will be a null terminator
         char tmpNameBuf[SAVED_INTERNAL_NAME_BUFFER_SIZE];
@@ -852,7 +389,7 @@ void ModelEntryManager_saveCurrentEntry(Link_CustomModelCategory cat) {
 void ModelEntryManager_applyModelsFromDisk(void) {
     static char retrievedName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
 
-    for (Link_CustomModelCategory i = 0; i < LINK_CMC_MAX; ++i) {
+    for (PlayerModelManagerModelType i = 0; i < PMM_MODEL_TYPE_MAX; ++i) {
         if (KV_Global_Get(sSavedModelNames[i].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
             applyByInternalName(i, retrievedName);
         } else {

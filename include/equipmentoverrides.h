@@ -3,6 +3,7 @@
 
 #include "PR/ultratypes.h"
 #include "modelmatrixids.h"
+#include "playermodelmanager_api.h"
 
 typedef struct EquipmentOverrideDLs {
     Link_DisplayList *overrides;
@@ -19,6 +20,6 @@ typedef struct EquipmentOverride {
     EquipmentOverrideMtxs mtx;
 } EquipmentOverride;
 
-const EquipmentOverride *EquipmentOverrides_getEquipmentOverride(Link_EquipmentReplacement id);
+const EquipmentOverride *EquipmentOverrides_getEquipmentOverride(PlayerModelManagerModelType type);
 
 #endif

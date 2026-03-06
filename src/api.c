@@ -85,7 +85,7 @@ static ModelEntryForm *getFormEntryOrPrintErr(PlayerModelManagerHandle h, const 
         return NULL;
     }
 
-    if (!isFormCategory(ModelEntry_getCategory(entry))) {
+    if (!isFormModelType(ModelEntry_getType(entry))) {
         Logger_printWarning("Handle with internal name '%s' does not support the function '%s'", ModelEntry_getInternalName(entry), funcName);
         return NULL;
     }
@@ -108,9 +108,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
         return 0;
     }
 
-    Link_CustomModelCategory cat = getCategoryFromModelType(modelType);
-
-    if (!isValidCategory(cat)) {
+    if (!isValidModelType(modelType)) {
         Logger_printError("Passed in unsupported PlayerModelManagerModelType %d.", modelType);
         return 0;
     }
@@ -194,7 +192,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelType(PlayerModelMana
         return false;
     }
 
-    if (type >= PMM_MODEL_TYPE_MAX || type < 0) {
+    if (!isValidModelType(type)) {
         Logger_printError("Invalid model type passed in.");
         return false;
     }
@@ -205,7 +203,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelType(PlayerModelMana
         return false;
     }
 
-    if (!isEquipmentCategory(ModelEntry_getCategory(entryx))) {
+    if (!isEquipmentModelType(ModelEntry_getType(entryx))) {
         Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
         return false;
     }
@@ -246,7 +244,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrixForModelType(PlayerModelManagerHa
         return false;
     }
 
-    if (type >= PMM_MODEL_TYPE_MAX || type < 0) {
+    if (!isValidModelType(type)) {
         Logger_printCurrentFuncAndLine("Invalid model type passed in.");
     }
 
@@ -256,7 +254,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrixForModelType(PlayerModelManagerHa
         return false;
     }
 
-    if (!isEquipmentCategory(ModelEntry_getCategory(entryx))) {
+    if (!isEquipmentModelType(ModelEntry_getType(entryx))) {
         Logger_printError("Handle with internal name %s is not an equipment handle!", ModelEntry_getInternalName(entryx));
         return false;
     }
@@ -278,8 +276,8 @@ RECOMP_EXPORT bool PlayerModelManager_addHandleToPack(PlayerModelManagerHandle h
         return false;
     }
 
-    if (!isPackCategory(ModelEntry_getCategory(entry))) {
-        Logger_printError("Non-model pack passed into first arg of %s (Category was %d)", __func__, ModelEntry_getCategory(entry));
+    if (!isPackModelType(ModelEntry_getType(entry))) {
+        Logger_printError("Non-model pack passed into first arg of %s (Category was %d)", __func__, ModelEntry_getType(entry));
         return false;
     }
 
@@ -593,7 +591,7 @@ RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
         return false;
     }
 
-    return ModelEntryManager_getCurrentEntry(ModelEntry_getCategory(entry)) == entry;
+    return ModelEntryManager_getCurrentEntry(ModelEntry_getType(entry)) == entry;
 }
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {
@@ -612,27 +610,27 @@ RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransf
 }
 
 RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form) {
-    Link_CustomModelCategory cat;
+    PlayerModelManagerModelType modelType;
 
     switch (form) {
         case PLAYER_FORM_FIERCE_DEITY:
-            cat = LINK_CMC_FIERCE_DEITY;
+            modelType = PMM_MODEL_TYPE_FIERCE_DEITY;
             break;
 
         case PLAYER_FORM_GORON:
-            cat = LINK_CMC_GORON;
+            modelType = PMM_MODEL_TYPE_GORON;
             break;
 
         case PLAYER_FORM_ZORA:
-            cat = LINK_CMC_ZORA;
+            modelType = PMM_MODEL_TYPE_ZORA;
             break;
 
         case PLAYER_FORM_DEKU:
-            cat = LINK_CMC_DEKU;
+            modelType = PMM_MODEL_TYPE_DEKU;
             break;
 
         case PLAYER_FORM_HUMAN:
-            cat = LINK_CMC_HUMAN;
+            modelType = PMM_MODEL_TYPE_CHILD;
             break;
 
         default:
@@ -640,7 +638,7 @@ RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation 
             break;
     }
 
-    return !!ModelEntryManager_getCurrentEntry(cat);
+    return !!ModelEntryManager_getCurrentEntry(modelType);
 }
 
 void PlayerModelManager_lockAPI(void) {

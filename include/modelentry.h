@@ -33,7 +33,6 @@ const char *ModelEntry_getDisplayName(const ModelEntry *entry);
 void ModelEntry_setDisplayName(ModelEntry *entry, const char *name);
 const char *ModelEntry_getAuthorName(const ModelEntry *entry);
 void ModelEntry_setAuthorName(ModelEntry *entry, const char *name);
-Link_CustomModelCategory ModelEntry_getCategory(const ModelEntry *entry);
 PlayerModelManagerModelType ModelEntry_getType(const ModelEntry *entry);
 void ModelEntry_doCallback(const ModelEntry *entry, PlayerModelManagerModelEvent eventId);
 void ModelEntry_setFlags(ModelEntry *entry, u64 flags);

@@ -92,7 +92,6 @@ typedef struct ModelEntryFunctions {
 typedef struct ModelEntry {
     const ModelEntryVirtualFunctions *virtualFuncs;
     PlayerModelManagerModelType type;
-    Link_CustomModelCategory category;
     char *displayName;
     char *internalName;
     char *authorName;
@@ -115,7 +114,6 @@ typedef struct ModelEntryEquipment {
     ModelEntry modelEntry;
     ModelVisuals fallbackModelVisuals;
     U32ValueHashmapHandle modelTypeToModelVisuals;
-    Link_EquipmentReplacement equipType;
 } ModelEntryEquipment;
 
 typedef struct ModelEntryPack {
@@ -124,7 +122,7 @@ typedef struct ModelEntryPack {
 } ModelEntryPack;
 
 RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
-RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(Link_EquipmentReplacement eq));
+RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(PlayerModelManagerModelType type));
 
 const char FORMATTED_DEFAULT_VIRTUAL_FUNCTION_OVERRIDE_ERROR[] = "Model Entry with internal name %s is using function that should have been overriden!\n";
 
@@ -155,10 +153,7 @@ static Mtx *ModelEntry_getMatrix_default(const ModelEntry *entry, Link_Equipment
 }
 
 static bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName) {
-
-    Link_CustomModelCategory cat = getCategoryFromModelType(type);
-
-    if (!isValidCategory(cat)) {
+    if (!isValidModelType(type)) {
         Logger_printError("Trying to initialize ModelEntry with invalid PlayerModelManagerModelType %d", type);
         Utils_tryCrashGame();
         return false;
@@ -187,7 +182,6 @@ static bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, 
 
     entry->virtualFuncs = &funcs;
     entry->type = type;
-    entry->category = cat;
     entry->displayName = NULL;
     entry->internalName = YAZMTCore_Utils_StrDup(internalName);
     entry->authorName = NULL;
@@ -314,7 +308,7 @@ static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle 
         return false;
     }
 
-    if (!isFormCategory(entry->modelEntry.category)) {
+    if (!isFormModelType(entry->modelEntry.type)) {
         Logger_printError("ModelEntryForm with internal name %s had non-form type %d passed in!\n", internalName, type);
         Utils_tryCrashGame();
         return false;
@@ -420,15 +414,6 @@ void ModelEntry_setAuthorName(ModelEntry *entry, const char *name) {
     } else {
         entry->authorName = NULL;
     }
-}
-
-Link_CustomModelCategory ModelEntry_getCategory(const ModelEntry *entry) {
-    if (!isValidModelEntry(entry)) {
-        PRINT_INVALID_PTR_ERR();
-        return LINK_CMC_MAX;
-    }
-
-    return entry->category;
 }
 
 PlayerModelManagerModelType ModelEntry_getType(const ModelEntry *entry) {
@@ -685,7 +670,7 @@ FlexSkeletonHeader *ModelEntryForm_getShieldingSkeleton(ModelEntryForm *entry) {
 static bool ModelEntryEquipment_setDisplayList(ModelEntry *thisx, Link_DisplayList id, Gfx *dl) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-    const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
+    const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->modelEntry.type);
 
     if (override) {
         // Count generally is very small (count < 10), so a simple linear search will do
@@ -750,7 +735,7 @@ static Gfx *ModelEntryEquipment_getDisplayListForModelType(ModelEntryEquipment *
 static bool ModelEntryEquipment_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *mtx) {
     ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-    const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
+    const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->modelEntry.type);
 
     if (override) {
         // Count generally is very small (count < 10), so a simple linear search will do
@@ -799,7 +784,7 @@ static bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormPr
     if (pp) {
         ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-        const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
+        const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->modelEntry.type);
 
         if (override) {
             for (size_t i = 0; i < gFormProxyIds->size; i++) {
@@ -833,7 +818,7 @@ static bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormPr
 
             PlayerProxy_refresh(pp);
 
-            _internal_onEquipmentModelApplied(this->equipType);
+            _internal_onEquipmentModelApplied(this->modelEntry.type);
 
             return true;
         }
@@ -848,7 +833,7 @@ static bool ModelEntryEquipment_removeFromFormProxy(const ModelEntry *thisx, For
     if (pp) {
         ModelEntryEquipment *this = (ModelEntryEquipment *)((void *)thisx);
 
-        const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->equipType);
+        const EquipmentOverride *override = EquipmentOverrides_getEquipmentOverride(this->modelEntry.type);
 
         if (override) {
             for (size_t i = 0; i < override->dl.count; ++i) {
@@ -863,7 +848,7 @@ static bool ModelEntryEquipment_removeFromFormProxy(const ModelEntry *thisx, For
 
             PlayerProxy_refresh(pp);
 
-            _internal_onEquipmentModelApplied(this->equipType);
+            _internal_onEquipmentModelApplied(this->modelEntry.type);
 
             return true;
         }
@@ -877,7 +862,7 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
         return false;
     }
 
-    if (!isEquipmentCategory(entry->modelEntry.category)) {
+    if (!isEquipmentModelType(entry->modelEntry.type)) {
         Logger_printError("ModelEntryEquipment with internal name %s had non-equipment type %d passed in!\n", internalName, type);
         Utils_tryCrashGame();
         return false;
@@ -895,7 +880,6 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
     entry->modelEntry.virtualFuncs = &funcs;
     ModelVisuals_init(&entry->fallbackModelVisuals);
     entry->modelTypeToModelVisuals = recomputil_create_u32_memory_hashmap(sizeof(ModelVisuals));
-    entry->equipType = getEquipmentReplacementFromCategory(entry->modelEntry.category);
 
     recomputil_u32_hashset_insert(sValidModelEntryEquipmentPtrs, (uintptr_t)entry);
 
@@ -945,7 +929,7 @@ bool ModelEntryPack_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
     ModelEntry const *const *modelEntries = ModelEntryPack_getModelEntries(this);
 
     for (size_t i = 0; i < numEntries; ++i) {
-        ModelEntryManager_tryApplyEntry(modelEntries[i]->category, modelEntries[i]);
+        ModelEntryManager_tryApplyEntry(modelEntries[i]->type, modelEntries[i]);
     }
 
     return true;
@@ -1044,7 +1028,7 @@ static bool isEntryInPack(const ModelEntryPack *pack, const ModelEntry *entry) {
         for (size_t i = 0; i < entryCount; ++i) {
             const ModelEntry *currEntry = packEntries[i];
 
-            if (isPackCategory(ModelEntry_getCategory(currEntry))) {
+            if (isPackModelType(ModelEntry_getType(currEntry))) {
                 YAZMTCore_DynamicU32Array_push(sQueuedPacks, (uintptr_t)currEntry);
             }
         }
@@ -1065,7 +1049,7 @@ bool ModelEntryPack_addEntryToPack(ModelEntryPack *entry, ModelEntry *entryToAdd
         return NULL;
     }
 
-    if (!isPackCategory(ModelEntry_getCategory(entryToAdd)) || !isEntryInPack((ModelEntryPack *)entryToAdd, &entry->modelEntry)) {
+    if (!isPackModelType(ModelEntry_getType(entryToAdd)) || !isEntryInPack((ModelEntryPack *)entryToAdd, &entry->modelEntry)) {
         YAZMTCore_IterableU32Set_insert(entry->modelEntries, (uintptr_t)entryToAdd);
         return true;
     }

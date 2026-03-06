@@ -20,14 +20,14 @@ typedef struct CategoryInfo {
     bool isVisible;
     bool isUsedByCurrentGame;
     const ModelEntry *realEntry;
-    Link_CustomModelCategory category;
+    PlayerModelManagerModelType category;
     bool isNeedsDiskSave;
 } CategoryInfo;
 
 static bool sIsForceAllCategoriesVisible = false;
 
-#define DECLARE_DEFAULT_CAT_INFO(name, isUsed, cat, isVisibleByDefault) {.displayName = name, .isVisible = isVisibleByDefault, .isUsedByCurrentGame = isUsed, .realEntry = NULL, .category = cat, .isNeedsDiskSave = false}
-#define DECLARE_CAT_INFO(name, isUsed, cat) DECLARE_DEFAULT_CAT_INFO(name, isUsed, cat, false)
+#define DECLARE_DEFAULT_CAT_INFO(name, isUsed, modelType, isVisibleByDefault) {.displayName = name, .isVisible = isVisibleByDefault, .isUsedByCurrentGame = isUsed, .realEntry = NULL, .category = modelType, .isNeedsDiskSave = false}
+#define DECLARE_CAT_INFO(name, isUsed, modelType) DECLARE_DEFAULT_CAT_INFO(name, isUsed, modelType, false)
 
 #define CAT_USED_MM true
 
@@ -39,63 +39,63 @@ static bool sIsForceAllCategoriesVisible = false;
 
 static CategoryInfo sCategoryInfos[] = {
     // At least one category must be visible or the category selector goes into an infinite loop
-    DECLARE_CAT_INFO("Model Packs", CAT_USED_Z64, LINK_CMC_MODEL_PACK),
-    DECLARE_DEFAULT_CAT_INFO("Young Link", CAT_USED_OOT, LINK_CMC_CHILD, CAT_USED_OOT),
-    DECLARE_DEFAULT_CAT_INFO("Adult Link", CAT_USED_OOT, LINK_CMC_ADULT, CAT_USED_OOT),
-    DECLARE_DEFAULT_CAT_INFO("Human", CAT_USED_MM, LINK_CMC_HUMAN, CAT_USED_MM),
-    DECLARE_DEFAULT_CAT_INFO("Deku", CAT_USED_MM, LINK_CMC_DEKU, CAT_USED_MM),
-    DECLARE_DEFAULT_CAT_INFO("Goron", CAT_USED_MM, LINK_CMC_GORON, CAT_USED_MM),
-    DECLARE_DEFAULT_CAT_INFO("Zora", CAT_USED_MM, LINK_CMC_ZORA, CAT_USED_MM),
-    DECLARE_DEFAULT_CAT_INFO("Fierce Deity", CAT_USED_MM, LINK_CMC_FIERCE_DEITY, CAT_USED_MM),
-    DECLARE_CAT_INFO("Kokiri Sword", CAT_USED_Z64, LINK_CMC_SWORD1),
-    DECLARE_CAT_INFO("Razor Sword", CAT_USED_MM, LINK_CMC_SWORD2),
-    DECLARE_CAT_INFO("Gilded Sword", CAT_USED_Z64, LINK_CMC_SWORD3),
-    DECLARE_CAT_INFO("Fierce Deity's Sword", CAT_USED_Z64, LINK_CMC_SWORD4),
-    DECLARE_CAT_INFO("Great Fairy's Sword", CAT_USED_MM, LINK_CMC_SWORD5),
-    DECLARE_CAT_INFO("Deku Shield", CAT_USED_OOT, LINK_CMC_SHIELD1),
-    DECLARE_CAT_INFO("Hero's Shield", CAT_USED_Z64, LINK_CMC_SHIELD2),
-    DECLARE_CAT_INFO("Mirror Shield", CAT_USED_Z64, LINK_CMC_SHIELD3),
-    DECLARE_CAT_INFO("Hookshot", CAT_USED_Z64, LINK_CMC_HOOKSHOT),
-    DECLARE_CAT_INFO("Bow", CAT_USED_Z64, LINK_CMC_BOW),
-    DECLARE_CAT_INFO("Slingshot", CAT_USED_OOT, LINK_CMC_SLINGSHOT),
-    DECLARE_CAT_INFO("Bottle", CAT_USED_Z64, LINK_CMC_BOTTLE),
-    DECLARE_CAT_INFO("Boomerang", CAT_USED_OOT, LINK_CMC_BOOMERANG),
-    DECLARE_CAT_INFO("Hammer", CAT_USED_OOT, LINK_CMC_HAMMER),
-    DECLARE_CAT_INFO("Deku Stick", CAT_USED_Z64, LINK_CMC_DEKU_STICK),
-    DECLARE_CAT_INFO("Bomb", CAT_USED_Z64, LINK_CMC_BOMB),
-    DECLARE_CAT_INFO("Bombchu", CAT_USED_Z64, LINK_CMC_BOMBCHU),
-    DECLARE_CAT_INFO("Fairy Ocarina", CAT_USED_OOT, LINK_CMC_OCARINA_FAIRY),
-    DECLARE_CAT_INFO("Ocarina of Time", CAT_USED_Z64, LINK_CMC_OCARINA_TIME),
-    DECLARE_CAT_INFO("Deku Pipes", CAT_USED_MM, LINK_CMC_PIPES),
-    DECLARE_CAT_INFO("Goron Drums", CAT_USED_MM, LINK_CMC_DRUMS),
-    DECLARE_CAT_INFO("Zora Guitar", CAT_USED_MM, LINK_CMC_GUITAR),
-    DECLARE_CAT_INFO("Skull Mask", CAT_USED_OOT, LINK_CMC_MASK_SKULL),
-    DECLARE_CAT_INFO("Spooky Mask", CAT_USED_OOT, LINK_CMC_MASK_SPOOKY),
-    DECLARE_CAT_INFO("Gerudo Mask", CAT_USED_OOT, LINK_CMC_MASK_GERUDO),
-    DECLARE_CAT_INFO("Mask of Truth", CAT_USED_Z64, LINK_CMC_MASK_TRUTH),
-    DECLARE_CAT_INFO("Kafei's Mask", CAT_USED_MM, LINK_CMC_MASK_KAFEIS_MASK),
-    DECLARE_CAT_INFO("All Night Mask", CAT_USED_MM, LINK_CMC_MASK_ALL_NIGHT),
-    DECLARE_CAT_INFO("Bunny Hood", CAT_USED_Z64, LINK_CMC_MASK_BUNNY),
-    DECLARE_CAT_INFO("Keaton Mask", CAT_USED_Z64, LINK_CMC_MASK_KEATON),
-    DECLARE_CAT_INFO("Garo Mask", CAT_USED_MM, LINK_CMC_MASK_GARO),
-    DECLARE_CAT_INFO("Romani Mask", CAT_USED_MM, LINK_CMC_MASK_ROMANI),
-    DECLARE_CAT_INFO("Circus Leader's Mask", CAT_USED_MM, LINK_CMC_MASK_CIRCUS_LEADER),
-    DECLARE_CAT_INFO("Couple's Mask", CAT_USED_MM, LINK_CMC_MASK_COUPLE),
-    DECLARE_CAT_INFO("Postman's Hat", CAT_USED_MM, LINK_CMC_MASK_POSTMAN),
-    DECLARE_CAT_INFO("Great Fairy Mask", CAT_USED_MM, LINK_CMC_MASK_GREAT_FAIRY),
-    DECLARE_CAT_INFO("Gibdo Mask", CAT_USED_MM, LINK_CMC_MASK_GIBDO),
-    DECLARE_CAT_INFO("Don Gero's Mask", CAT_USED_MM, LINK_CMC_MASK_DON_GERO),
-    DECLARE_CAT_INFO("Kamaro Mask", CAT_USED_MM, LINK_CMC_MASK_KAMARO),
-    DECLARE_CAT_INFO("Captain's Hat", CAT_USED_MM, LINK_CMC_MASK_CAPTAIN),
-    DECLARE_CAT_INFO("Stone Mask", CAT_USED_MM, LINK_CMC_MASK_STONE),
-    DECLARE_CAT_INFO("Bremen Mask", CAT_USED_MM, LINK_CMC_MASK_BREMEN),
-    DECLARE_CAT_INFO("Blast Mask", CAT_USED_MM, LINK_CMC_MASK_BLAST),
-    DECLARE_CAT_INFO("Mask of Scents", CAT_USED_MM, LINK_CMC_MASK_SCENTS),
-    DECLARE_CAT_INFO("Giant's Mask", CAT_USED_MM, LINK_CMC_MASK_GIANT),
-    DECLARE_CAT_INFO("Deku Mask", CAT_USED_MM, LINK_CMC_MASK_DEKU),
-    DECLARE_CAT_INFO("Goron Mask", CAT_USED_Z64, LINK_CMC_MASK_GORON),
-    DECLARE_CAT_INFO("Zora Mask", CAT_USED_Z64, LINK_CMC_MASK_ZORA),
-    DECLARE_CAT_INFO("Fierce Deity Mask", CAT_USED_MM, LINK_CMC_MASK_FIERCE_DEITY),
+    DECLARE_CAT_INFO("Model Packs", CAT_USED_Z64, PMM_MODEL_TYPE_MODEL_PACK),
+    DECLARE_DEFAULT_CAT_INFO("Young Link", CAT_USED_OOT, PMM_MODEL_TYPE_CHILD, CAT_USED_OOT),
+    DECLARE_DEFAULT_CAT_INFO("Adult Link", CAT_USED_OOT, PMM_MODEL_TYPE_ADULT, CAT_USED_OOT),
+    DECLARE_DEFAULT_CAT_INFO("Human", CAT_USED_MM, PMM_MODEL_TYPE_CHILD, CAT_USED_MM),
+    DECLARE_DEFAULT_CAT_INFO("Deku", CAT_USED_MM, PMM_MODEL_TYPE_DEKU, CAT_USED_MM),
+    DECLARE_DEFAULT_CAT_INFO("Goron", CAT_USED_MM, PMM_MODEL_TYPE_GORON, CAT_USED_MM),
+    DECLARE_DEFAULT_CAT_INFO("Zora", CAT_USED_MM, PMM_MODEL_TYPE_ZORA, CAT_USED_MM),
+    DECLARE_DEFAULT_CAT_INFO("Fierce Deity", CAT_USED_MM, PMM_MODEL_TYPE_FIERCE_DEITY, CAT_USED_MM),
+    DECLARE_CAT_INFO("Kokiri Sword", CAT_USED_Z64, PMM_MODEL_TYPE_SWORD1),
+    DECLARE_CAT_INFO("Razor Sword", CAT_USED_MM, PMM_MODEL_TYPE_SWORD2),
+    DECLARE_CAT_INFO("Gilded Sword", CAT_USED_Z64, PMM_MODEL_TYPE_SWORD3),
+    DECLARE_CAT_INFO("Fierce Deity's Sword", CAT_USED_Z64, PMM_MODEL_TYPE_SWORD4),
+    DECLARE_CAT_INFO("Great Fairy's Sword", CAT_USED_MM, PMM_MODEL_TYPE_SWORD5),
+    DECLARE_CAT_INFO("Deku Shield", CAT_USED_OOT, PMM_MODEL_TYPE_SHIELD1),
+    DECLARE_CAT_INFO("Hero's Shield", CAT_USED_Z64, PMM_MODEL_TYPE_SHIELD2),
+    DECLARE_CAT_INFO("Mirror Shield", CAT_USED_Z64, PMM_MODEL_TYPE_SHIELD3),
+    DECLARE_CAT_INFO("Hookshot", CAT_USED_Z64, PMM_MODEL_TYPE_HOOKSHOT),
+    DECLARE_CAT_INFO("Bow", CAT_USED_Z64, PMM_MODEL_TYPE_BOW),
+    DECLARE_CAT_INFO("Slingshot", CAT_USED_OOT, PMM_MODEL_TYPE_SLINGSHOT),
+    DECLARE_CAT_INFO("Bottle", CAT_USED_Z64, PMM_MODEL_TYPE_BOTTLE),
+    DECLARE_CAT_INFO("Boomerang", CAT_USED_OOT, PMM_MODEL_TYPE_BOOMERANG),
+    DECLARE_CAT_INFO("Hammer", CAT_USED_OOT, PMM_MODEL_TYPE_HAMMER),
+    DECLARE_CAT_INFO("Deku Stick", CAT_USED_Z64, PMM_MODEL_TYPE_DEKU_STICK),
+    DECLARE_CAT_INFO("Bomb", CAT_USED_Z64, PMM_MODEL_TYPE_BOMB),
+    DECLARE_CAT_INFO("Bombchu", CAT_USED_Z64, PMM_MODEL_TYPE_BOMBCHU),
+    DECLARE_CAT_INFO("Fairy Ocarina", CAT_USED_OOT, PMM_MODEL_TYPE_OCARINA_FAIRY),
+    DECLARE_CAT_INFO("Ocarina of Time", CAT_USED_Z64, PMM_MODEL_TYPE_OCARINA_TIME),
+    DECLARE_CAT_INFO("Deku Pipes", CAT_USED_MM, PMM_MODEL_TYPE_PIPES),
+    DECLARE_CAT_INFO("Goron Drums", CAT_USED_MM, PMM_MODEL_TYPE_DRUMS),
+    DECLARE_CAT_INFO("Zora Guitar", CAT_USED_MM, PMM_MODEL_TYPE_GUITAR),
+    DECLARE_CAT_INFO("Skull Mask", CAT_USED_OOT, PMM_MODEL_TYPE_MASK_SKULL),
+    DECLARE_CAT_INFO("Spooky Mask", CAT_USED_OOT, PMM_MODEL_TYPE_MASK_SPOOKY),
+    DECLARE_CAT_INFO("Gerudo Mask", CAT_USED_OOT, PMM_MODEL_TYPE_MASK_GERUDO),
+    DECLARE_CAT_INFO("Mask of Truth", CAT_USED_Z64, PMM_MODEL_TYPE_MASK_TRUTH),
+    DECLARE_CAT_INFO("Kafei's Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_KAFEIS_MASK),
+    DECLARE_CAT_INFO("All Night Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_ALL_NIGHT),
+    DECLARE_CAT_INFO("Bunny Hood", CAT_USED_Z64, PMM_MODEL_TYPE_MASK_BUNNY),
+    DECLARE_CAT_INFO("Keaton Mask", CAT_USED_Z64, PMM_MODEL_TYPE_MASK_KEATON),
+    DECLARE_CAT_INFO("Garo Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_GARO),
+    DECLARE_CAT_INFO("Romani Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_ROMANI),
+    DECLARE_CAT_INFO("Circus Leader's Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_CIRCUS_LEADER),
+    DECLARE_CAT_INFO("Couple's Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_COUPLE),
+    DECLARE_CAT_INFO("Postman's Hat", CAT_USED_MM, PMM_MODEL_TYPE_MASK_POSTMAN),
+    DECLARE_CAT_INFO("Great Fairy Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_GREAT_FAIRY),
+    DECLARE_CAT_INFO("Gibdo Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_GIBDO),
+    DECLARE_CAT_INFO("Don Gero's Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_DON_GERO),
+    DECLARE_CAT_INFO("Kamaro Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_KAMARO),
+    DECLARE_CAT_INFO("Captain's Hat", CAT_USED_MM, PMM_MODEL_TYPE_MASK_CAPTAIN),
+    DECLARE_CAT_INFO("Stone Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_STONE),
+    DECLARE_CAT_INFO("Bremen Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_BREMEN),
+    DECLARE_CAT_INFO("Blast Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_BLAST),
+    DECLARE_CAT_INFO("Mask of Scents", CAT_USED_MM, PMM_MODEL_TYPE_MASK_SCENTS),
+    DECLARE_CAT_INFO("Giant's Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_GIANT),
+    DECLARE_CAT_INFO("Deku Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_DEKU),
+    DECLARE_CAT_INFO("Goron Mask", CAT_USED_Z64, PMM_MODEL_TYPE_MASK_GORON),
+    DECLARE_CAT_INFO("Zora Mask", CAT_USED_Z64, PMM_MODEL_TYPE_MASK_ZORA),
+    DECLARE_CAT_INFO("Fierce Deity Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_FIERCE_DEITY),
 };
 
 #define SELECTING_CATEGORY -99
@@ -421,7 +421,7 @@ static void removeAllModels(void) {
 static void removeEquipmentModels(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
-        if (isEquipmentCategory(catInf->category)) {
+        if (isEquipmentModelType(catInf->category)) {
             ModelEntryManager_tryApplyEntry(catInf->category, NULL);
         }
     }
@@ -776,12 +776,12 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
         CategoryInfo *catInf = getCurrentCategoryInfo();
 
         if (catInf) {
-            Link_CustomModelCategory cat = catInf->category;
+            PlayerModelManagerModelType modelType = catInf->category;
 
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
 
-                ModelEntryManager_tryApplyEntry(cat, entryOrNull);
+                ModelEntryManager_tryApplyEntry(modelType, entryOrNull);
 
                 catInf->realEntry = entryOrNull;
 
@@ -797,7 +797,7 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
 
                 if (shouldLivePreview()) {
                     applyRealEntries();
-                    ModelEntryManager_tryApplyEntry(cat, entryOrNull);
+                    ModelEntryManager_tryApplyEntry(modelType, entryOrNull);
                 }
             }
         }
@@ -811,11 +811,11 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
         CategoryInfo *catInf = getCurrentCategoryInfo();
 
         if (catInf) {
-            Link_CustomModelCategory cat = catInf->category;
+            PlayerModelManagerModelType modelType = catInf->category;
 
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
-                ModelEntryManager_tryApplyEntry(cat, entryOrNull);
+                ModelEntryManager_tryApplyEntry(modelType, entryOrNull);
                 saveAllModels();
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
                 if (entryOrNull) {
@@ -826,7 +826,7 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
 
                 if (shouldLivePreview()) {
                     applyRealEntries();
-                    ModelEntryManager_tryApplyEntry(cat, entryOrNull);
+                    ModelEntryManager_tryApplyEntry(modelType, entryOrNull);
                 }
             }
         }
@@ -895,7 +895,7 @@ static void createModelListButtons(void) {
     RecompuiEventHandler *removedCallback = onModelButtonPressed;
     const char *removeText = "[None]";
 
-    bool isPack = isPackCategory(catInf->category);
+    bool isPack = isPackModelType(catInf->category);
     if (isPack) {
         pressedCallback = onPackButtonPressed;
         removedCallback = removeEquipmentModelsButtonPressed;

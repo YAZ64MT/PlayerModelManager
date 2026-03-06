@@ -8,28 +8,26 @@ typedef struct ModelEntry ModelEntry;
 
 typedef unsigned long PlayerModelManagerHandle;
 
-void ModelEntryManager_setCurrentEntry(Link_CustomModelCategory cat, const ModelEntry *entry);
-const ModelEntry *ModelEntryManager_getCurrentEntry(Link_CustomModelCategory cat);
-const ModelEntry **ModelEntryManager_getCategoryEntryData(Link_CustomModelCategory cat, size_t *count);
-bool ModelEntryManager_tryApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry);
-void ModelEntryManager_removeModel(Link_CustomModelCategory cat);
+void ModelEntryManager_setCurrentEntry(PlayerModelManagerModelType modelType, const ModelEntry *entry);
+const ModelEntry *ModelEntryManager_getCurrentEntry(PlayerModelManagerModelType modelType);
+const ModelEntry **ModelEntryManager_getCategoryEntryData(PlayerModelManagerModelType modelType, size_t *count);
+bool ModelEntryManager_tryApplyEntry(PlayerModelManagerModelType modelType, const ModelEntry *newEntry);
+void ModelEntryManager_removeModel(PlayerModelManagerModelType modelType);
 PlayerModelManagerHandle ModelEntryManager_createMemoryHandle(PlayerModelManagerModelType type, const char *internalName);
 ModelEntry *ModelEntryManager_getEntry(PlayerModelManagerHandle h);
-void ModelEntryManager_saveCurrentEntry(Link_CustomModelCategory cat);
-void ModelEntryManager_reapplyEntry(Link_CustomModelCategory cat);
-bool ModelEntryManager_forceApplyEntry(Link_CustomModelCategory cat, const ModelEntry *newEntry);
+void ModelEntryManager_saveCurrentEntry(PlayerModelManagerModelType modelType);
+void ModelEntryManager_reapplyEntry(PlayerModelManagerModelType modelType);
+bool ModelEntryManager_forceApplyEntry(PlayerModelManagerModelType modelType, const ModelEntry *newEntry);
 bool ModelEntryManager_isEntryHidden(const ModelEntry *ModelEntry);
 void ModelEntryManager_setEntryHidden(const ModelEntry *modelEntry, bool isHidden);
 void ModelEntryManager_applyModelsFromDisk(void);
 
 PlayerTransformation getFormFromModelType(PlayerModelManagerModelType t);
-Link_CustomModelCategory getCategoryFromModelType(PlayerModelManagerModelType t);
-PlayerTransformation getFormFromCategory(Link_CustomModelCategory cat);
-Link_EquipmentReplacement getEquipmentReplacementFromCategory(Link_CustomModelCategory cat);
+PlayerTransformation getFormFromModelType(PlayerModelManagerModelType modelType);
 
-bool isEquipmentCategory(Link_CustomModelCategory cat);
-bool isFormCategory(Link_CustomModelCategory cat);
-bool isPackCategory(Link_CustomModelCategory cat);
-bool isValidCategory(Link_CustomModelCategory cat);
+bool isEquipmentModelType(PlayerModelManagerModelType modelType);
+bool isFormModelType(PlayerModelManagerModelType modelType);
+bool isPackModelType(PlayerModelManagerModelType modelType);
+bool isValidModelType(PlayerModelManagerModelType modelType);
 
 #endif
