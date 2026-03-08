@@ -6,7 +6,6 @@
 #include "playerproxy.h"
 #include "formproxy.h"
 #include "yazmtcorelib_api.h"
-#include "modelentrymanager.h"
 #include "logger.h"
 #include "defaultfacetex.h"
 #include "libc/string.h"
@@ -153,7 +152,7 @@ static Mtx *ModelEntry_getMatrix_default(const ModelEntry *entry, Link_Equipment
 }
 
 static bool ModelEntry_init(ModelEntry *entry, PlayerModelManagerHandle handle, PlayerModelManagerModelType type, const char *internalName) {
-    if (!isValidModelType(type)) {
+    if (!Utils_isValidModelType(type)) {
         Logger_printError("Trying to initialize ModelEntry with invalid PlayerModelManagerModelType %d", type);
         Utils_tryCrashGame();
         return false;
@@ -255,7 +254,7 @@ static bool ModelEntryForm_applyToFormProxy(const ModelEntry *thisx, FormProxy *
     if (pp) {
         FormProxy_setCurrentModelFormEntry(fp, (ModelEntryForm *)thisx);
 
-        PlayerProxy_refresh(pp);
+        PlayerProxy_requestRefresh(pp);
 
         _internal_onFormModelApplied(FormProxy_getTargetForm(fp));
 
@@ -271,7 +270,7 @@ static bool ModelEntryForm_removeFromFormProxy(const ModelEntry *thisx, FormProx
     if (pp) {
         FormProxy_setCurrentModelFormEntry(fp, NULL);
 
-        PlayerProxy_refresh(pp);
+        PlayerProxy_requestRefresh(pp);
 
         _internal_onFormModelApplied(FormProxy_getTargetForm(fp));
 
@@ -308,7 +307,7 @@ static bool ModelEntryForm_init(ModelEntryForm *entry, PlayerModelManagerHandle 
         return false;
     }
 
-    if (!isFormModelType(entry->modelEntry.type)) {
+    if (!Utils_isFormModelType(entry->modelEntry.type)) {
         Logger_printError("ModelEntryForm with internal name %s had non-form type %d passed in!\n", internalName, type);
         Utils_tryCrashGame();
         return false;
@@ -816,7 +815,7 @@ static bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormPr
                 }
             }
 
-            PlayerProxy_refresh(pp);
+            PlayerProxy_requestRefresh(pp);
 
             _internal_onEquipmentModelApplied(this->modelEntry.type);
 
@@ -846,7 +845,7 @@ static bool ModelEntryEquipment_removeFromFormProxy(const ModelEntry *thisx, For
                 PlayerProxy_setOverrideMtx(pp, id, NULL);
             }
 
-            PlayerProxy_refresh(pp);
+            PlayerProxy_requestRefresh(pp);
 
             _internal_onEquipmentModelApplied(this->modelEntry.type);
 
@@ -862,7 +861,7 @@ static bool ModelEntryEquipment_init(ModelEntryEquipment *entry, PlayerModelMana
         return false;
     }
 
-    if (!isEquipmentModelType(entry->modelEntry.type)) {
+    if (!Utils_isEquipmentModelType(entry->modelEntry.type)) {
         Logger_printError("ModelEntryEquipment with internal name %s had non-equipment type %d passed in!\n", internalName, type);
         Utils_tryCrashGame();
         return false;
@@ -925,11 +924,13 @@ bool ModelEntryPack_setMatrix(ModelEntry *thisx, Link_EquipmentMatrix id, Mtx *m
 bool ModelEntryPack_applyToFormProxy(const ModelEntry *thisx, FormProxy *fp) {
     const ModelEntryPack *this = (const ModelEntryPack *)thisx;
 
+    PlayerProxy *pp = FormProxy_getPlayerProxy(fp);
+
     size_t numEntries = ModelEntryPack_getModelEntriesCount(this);
     ModelEntry const *const *modelEntries = ModelEntryPack_getModelEntries(this);
 
     for (size_t i = 0; i < numEntries; ++i) {
-        ModelEntryManager_tryApplyEntry(modelEntries[i]->type, modelEntries[i]);
+        PlayerProxy_tryApplyEntry(pp, modelEntries[i]->type, modelEntries[i]);
     }
 
     return true;
@@ -1028,7 +1029,7 @@ static bool isEntryInPack(const ModelEntryPack *pack, const ModelEntry *entry) {
         for (size_t i = 0; i < entryCount; ++i) {
             const ModelEntry *currEntry = packEntries[i];
 
-            if (isPackModelType(ModelEntry_getType(currEntry))) {
+            if (Utils_isPackModelType(ModelEntry_getType(currEntry))) {
                 YAZMTCore_DynamicU32Array_push(sQueuedPacks, (uintptr_t)currEntry);
             }
         }
@@ -1049,7 +1050,7 @@ bool ModelEntryPack_addEntryToPack(ModelEntryPack *entry, ModelEntry *entryToAdd
         return NULL;
     }
 
-    if (!isPackModelType(ModelEntry_getType(entryToAdd)) || !isEntryInPack((ModelEntryPack *)entryToAdd, &entry->modelEntry)) {
+    if (!Utils_isPackModelType(ModelEntry_getType(entryToAdd)) || !isEntryInPack((ModelEntryPack *)entryToAdd, &entry->modelEntry)) {
         YAZMTCore_IterableU32Set_insert(entry->modelEntries, (uintptr_t)entryToAdd);
         return true;
     }

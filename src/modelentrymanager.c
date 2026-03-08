@@ -119,42 +119,11 @@ PlayerTransformation getFormFromModelType(PlayerModelManagerModelType t) {
     return PLAYER_FORM_MAX;
 }
 
-static void applyByInternalName(PlayerModelManagerModelType modelType, const char *name) {
+static void applyByInternalName(PlayerProxy *pp, PlayerModelManagerModelType modelType, const char *name) {
     u32 entryPtr;
 
     if (YAZMTCore_StringU32Dictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
-        ModelEntryManager_tryApplyEntry(modelType, (ModelEntry *)entryPtr);
-    }
-}
-
-bool isEquipmentModelType(PlayerModelManagerModelType modelType) {
-    return (modelType > PMM_MODEL_TYPE_FIERCE_DEITY && modelType < PMM_MODEL_TYPE_MODEL_PACK) || modelType == PMM_MODEL_TYPE_BOMB || modelType == PMM_MODEL_TYPE_BOMBCHU;
-}
-
-bool isFormModelType(PlayerModelManagerModelType modelType) {
-    return modelType <= PMM_MODEL_TYPE_FIERCE_DEITY && modelType >= PMM_MODEL_TYPE_CHILD;
-}
-
-bool isPackModelType(PlayerModelManagerModelType modelType) {
-    return modelType == PMM_MODEL_TYPE_MODEL_PACK;
-}
-
-bool isValidModelType(PlayerModelManagerModelType modelType) {
-    return modelType >= 0 && modelType < PMM_MODEL_TYPE_MAX;
-}
-
-const ModelEntry *ModelEntryManager_getCurrentEntry(PlayerModelManagerModelType modelType) {
-    if (!isValidModelType(modelType)) {
-        return NULL;
-    }
-
-    return sCurrentModelEntries[modelType];
-}
-
-void ModelEntryManager_setCurrentEntry(PlayerModelManagerModelType modelType, const ModelEntry *e) {
-    // Packs are special in that they are made up of ModelEntries
-    if (isValidModelType(modelType) && !isPackModelType(modelType)) {
-        sCurrentModelEntries[modelType] = e;
+        PlayerProxy_tryApplyEntry(pp, modelType, (ModelEntry *)entryPtr);
     }
 }
 
@@ -196,53 +165,6 @@ static FormProxy *getLocalFormProxyFromCategory(PlayerModelManagerModelType mode
     return PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
 }
 
-void ModelEntryManager_reapplyEntry(PlayerModelManagerModelType modelType) {
-    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(modelType);
-
-    if (currEntry) {
-        ModelEntry_applyToFormProxy(currEntry, getLocalFormProxyFromCategory(modelType));
-    }
-}
-
-static void reapplyAllEquipmentEntries(void) {
-    for (PlayerModelManagerModelType i = 0; i < PMM_MODEL_TYPE_MAX; ++i) {
-        if (isEquipmentModelType(i)) {
-            const ModelEntry *tmp = ModelEntryManager_getCurrentEntry(i);
-            ModelEntryManager_removeModel(i);
-            ModelEntryManager_tryApplyEntry(i, tmp);
-        }
-    }
-}
-
-bool ModelEntryManager_forceApplyEntry(PlayerModelManagerModelType modelType, const ModelEntry *newEntry) {
-    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(modelType);
-
-    if (newEntry == NULL) {
-        ModelEntryManager_removeModel(modelType);
-        return true;
-    }
-
-    if (ModelEntry_applyToFormProxy(newEntry, getLocalFormProxyFromCategory(modelType))) {
-        if (currEntry) {
-            ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_REMOVED);
-        }
-
-        ModelEntryManager_setCurrentEntry(modelType, newEntry);
-
-        if (newEntry) {
-            ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_APPLIED);
-        }
-
-        if (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT) {
-            reapplyAllEquipmentEntries();
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
 bool ModelEntryManager_isEntryHidden(const ModelEntry *ModelEntry) {
     return recomputil_u32_hashset_contains(sHiddenModelEntries, (uintptr_t)ModelEntry);
 }
@@ -255,17 +177,8 @@ void ModelEntryManager_setEntryHidden(const ModelEntry *modelEntry, bool isHidde
     }
 }
 
-bool ModelEntryManager_tryApplyEntry(PlayerModelManagerModelType modelType, const ModelEntry *newEntry) {
-    const ModelEntry *currEntry = ModelEntryManager_getCurrentEntry(modelType);
-    if (newEntry != currEntry) {
-        return ModelEntryManager_forceApplyEntry(modelType, newEntry);
-    }
-
-    return false;
-}
-
 const ModelEntry **ModelEntryManager_getCategoryEntryData(PlayerModelManagerModelType modelType, size_t *count) {
-    if (!isValidModelType(modelType)) {
+    if (!Utils_isValidModelType(modelType)) {
         return NULL;
     }
 
@@ -281,41 +194,19 @@ const ModelEntry **ModelEntryManager_getCategoryEntryData(PlayerModelManagerMode
     return (const ModelEntry **)(YAZMTCore_DynamicU32Array_data(sModelEntries[modelType]));
 }
 
-void ModelEntryManager_removeModel(PlayerModelManagerModelType modelType) {
-    if (!isValidModelType(modelType)) {
-        Logger_printError("Called with invalid category %d\n", modelType);
-        Utils_tryCrashGame();
-        return;
-    }
-
-    const ModelEntry *entry = ModelEntryManager_getCurrentEntry(modelType);
-
-    if (entry) {
-        ModelEntry_doCallback(entry, PMM_EVENT_MODEL_REMOVED);
-
-        ModelEntryManager_setCurrentEntry(modelType, NULL);
-
-        ModelEntry_removeFromFormProxy(entry, getLocalFormProxyFromCategory(modelType));
-
-        if (modelType == PMM_MODEL_TYPE_CHILD) {
-            reapplyAllEquipmentEntries();
-        }
-    }
-}
-
 PlayerModelManagerHandle ModelEntryManager_createMemoryHandle(PlayerModelManagerModelType type, const char *internalName) {
     if (YAZMTCore_StringU32Dictionary_contains(sInternalNamesToEntries, internalName)) {
         Logger_printError("Entry with internal name %s already exists!", internalName);
         return 0;
     }
 
-    if (!isValidModelType(type)) {
+    if (!Utils_isValidModelType(type)) {
         return 0;
     }
 
-    bool isFormEntry = isFormModelType(type);
-    bool isEquipmentEntry = isEquipmentModelType(type);
-    bool isPackEntry = isPackModelType(type);
+    bool isFormEntry = Utils_isFormModelType(type);
+    bool isEquipmentEntry = Utils_isEquipmentModelType(type);
+    bool isPackEntry = Utils_isPackModelType(type);
     ModelEntry *entry = NULL;
     PlayerModelManagerHandle handle = recomputil_u32_slotmap_create(sEntryHandles);
 
@@ -360,7 +251,7 @@ ModelEntry *ModelEntryManager_getEntry(PlayerModelManagerHandle h) {
 }
 
 ModelEntry **ModelEntryManager_getEntries(PlayerModelManagerModelType modelType, size_t *count) {
-    if (isValidModelType(modelType)) {
+    if (Utils_isValidModelType(modelType)) {
         *count = YAZMTCore_DynamicU32Array_size(sModelEntries[modelType]);
         return (ModelEntry **)(YAZMTCore_DynamicU32Array_data(sModelEntries[modelType]));
     }
@@ -368,8 +259,8 @@ ModelEntry **ModelEntryManager_getEntries(PlayerModelManagerModelType modelType,
     return NULL;
 }
 
-void ModelEntryManager_saveCurrentEntry(PlayerModelManagerModelType modelType) {
-    if (!isValidModelType(modelType)) {
+void ModelEntryManager_saveCurrentEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType) {
+    if (!Utils_isValidModelType(modelType)) {
         return;
     }
 
@@ -377,7 +268,7 @@ void ModelEntryManager_saveCurrentEntry(PlayerModelManagerModelType modelType) {
 
     KV_Global_Remove(key);
 
-    const ModelEntry *curr = ModelEntryManager_getCurrentEntry(modelType);
+    const ModelEntry *curr = PlayerProxy_getCurrentEntry(pp, modelType);
     if (curr) {
         // No need to initialize this since there will be a null terminator
         char tmpNameBuf[SAVED_INTERNAL_NAME_BUFFER_SIZE];
@@ -387,14 +278,14 @@ void ModelEntryManager_saveCurrentEntry(PlayerModelManagerModelType modelType) {
     }
 }
 
-void ModelEntryManager_applyModelsFromDisk(void) {
+void ModelEntryManager_applyModelsFromDisk(PlayerProxy *pp) {
     static char retrievedName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
 
     for (PlayerModelManagerModelType i = 0; i < PMM_MODEL_TYPE_MAX; ++i) {
         if (KV_Global_Get(sSavedModelNames[i].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
-            applyByInternalName(i, retrievedName);
+            applyByInternalName(pp, i, retrievedName);
         } else {
-            ModelEntryManager_forceApplyEntry(i, NULL);
+            PlayerProxy_forceApplyEntry(pp, i, NULL);
         }
     }
 }

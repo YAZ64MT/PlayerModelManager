@@ -3,7 +3,7 @@
 #include "modelmatrixids.h"
 #include "logger.h"
 #include "playermodelmanager_api.h"
-#include "modelentrymanager.h"
+#include "utils.h"
 
 static Link_DisplayList sSword1DLs[] = {LINK_DL_SWORD1_HILT, LINK_DL_SWORD1_BLADE, LINK_DL_SWORD1_SHEATH};
 static Link_DisplayList sSword2DLs[] = {LINK_DL_SWORD2_HILT, LINK_DL_SWORD2_BLADE, LINK_DL_SWORD2_SHEATH};
@@ -166,7 +166,7 @@ static const EquipmentOverride sEquipmentOverrideTable[] = {
 #undef DECLARE_OVERRIDE_TABLE_ENTRY
 
 const EquipmentOverride *EquipmentOverrides_getEquipmentOverride(PlayerModelManagerModelType type) {
-    if (!isValidModelType(type) || !sEquipmentOverrideTable[type].dl.overrides) {
+    if (!Utils_isValidModelType(type) || !sEquipmentOverrideTable[type].dl.overrides) {
         Logger_printError("Passed in invalid equipment model type %d", type);
         return NULL;
     }

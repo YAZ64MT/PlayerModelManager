@@ -1285,7 +1285,9 @@ PlayerModelManagerModelType FormProxy_getModelType(FormProxy *fp) {
 static YAZMTCore_IterableU32Set *sQueuedRefreshes;
 
 void FormProxy_requestRefresh(FormProxy *fp) {
-    YAZMTCore_IterableU32Set_insert(sQueuedRefreshes, (uintptr_t)fp);
+    if (fp) {
+        YAZMTCore_IterableU32Set_insert(sQueuedRefreshes, (uintptr_t)fp);
+    }
 }
 
 static void setupAltLists(void) {
@@ -1306,18 +1308,11 @@ RECOMP_CALLBACK(".", _internal_initHashObjects) void initFormProxyObjects(void) 
     sQueuedRefreshes = YAZMTCore_IterableU32Set_new();
 }
 
-void processFormProxyRefreshRequests_on_Play_Draw(void) {
-    size_t numRequests = YAZMTCore_IterableU32Set_size(sQueuedRefreshes);
+static void requestProcessor(void *fp) {
+    FormProxy_refresh(fp);
+}
 
-    if (numRequests > 0) {
-        FormProxy **proxies = (FormProxy **)YAZMTCore_IterableU32Set_values(sQueuedRefreshes);
-
-        for (size_t i = 0; i < numRequests; ++i) {
-            FormProxy *curr = proxies[i];
-
-            FormProxy_refresh(curr);
-        }
-
-        YAZMTCore_IterableU32Set_clear(sQueuedRefreshes);
-    }
+void processFormProxyRefreshRequests_on_Play_UpdateMain(void) {
+    Utils_processIterableSetPtrs(sQueuedRefreshes, requestProcessor);
+    YAZMTCore_IterableU32Set_clear(sQueuedRefreshes);
 }

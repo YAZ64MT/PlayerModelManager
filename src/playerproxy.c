@@ -4,6 +4,8 @@
 #include "formproxy.h"
 #include "logger.h"
 #include "playermodelconfig.h"
+#include "modelentry.h"
+#include "utils.h"
 
 PlayerProxy *gPlayer1Proxy;
 
@@ -63,6 +65,7 @@ void PlayerProxy_init(PlayerProxy *pp) {
     recomputil_u32_hashset_insert(sValidPlayerProxies, (uintptr_t)pp);
 
     pp->formProxies = recomputil_create_u32_memory_hashmap(sizeof(FormProxy));
+    pp->modelEntries = recomputil_create_u32_value_hashmap();
 
     PlayerProxy_createFormProxy(pp, FORM_PROXY_ID_HUMAN, PLAYER_FORM_HUMAN, &gHumanModelInfo, &gHumanModelInfoFallbackOverride);
     PlayerProxy_createFormProxy(pp, FORM_PROXY_ID_DEKU, PLAYER_FORM_DEKU, &gDekuModelInfo, &gDekuModelInfoFallbackOverride);
@@ -118,13 +121,21 @@ void PlayerProxy_init(PlayerProxy *pp) {
     }
 }
 
-void PlayerProxy_refresh(PlayerProxy *pp) {
+static void PlayerProxy_refresh(PlayerProxy *pp) {
     for (size_t i = 0; i < gFormProxyIds->size; ++i) {
         FormProxy *currFp = PlayerProxy_getFormProxy(pp, gFormProxyIds->ids[i]);
 
         if (currFp) {
             FormProxy_requestRefresh(currFp);
         }
+    }
+}
+
+static YAZMTCore_IterableU32Set *sQueuedRefreshes;
+
+void PlayerProxy_requestRefresh(PlayerProxy *pp) {
+    if (pp) {
+        YAZMTCore_IterableU32Set_insert(sQueuedRefreshes, (uintptr_t)pp);
     }
 }
 
@@ -192,11 +203,146 @@ void PlayerProxy_requestTunicColorOverride(PlayerProxy *pp, Color_RGBA8 color) {
     }
 }
 
-RECOMP_CALLBACK(".", _internal_initHashObjects) void initPlayerProxyHash(void) {
-    sValidPlayerProxies = recomputil_create_u32_hashset();
+static void PlayerProxy_setModelEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *modelEntry) {
+    if (!Utils_isValidModelType(modelType)) {
+        Logger_printError("Passed in invalid model type %d", modelType);
+        return;
+    }
+
+    if (!modelEntry) {
+        recomputil_u32_value_hashmap_erase(pp->modelEntries, modelType);
+        return;
+    }
+
+    PlayerModelManagerModelType entryType = ModelEntry_getType(modelEntry);
+
+    if (!(Utils_isFormModelType(modelType) && Utils_isFormModelType(entryType)) ||
+        !(Utils_isEquipmentModelType(modelType) && Utils_isEquipmentModelType(entryType)) ||
+        !(Utils_isPackModelType(modelType) && Utils_isPackModelType(entryType))) {
+        Logger_printError("Mismatched modelType and modelEntry type! modelType: %d, entryType: %d", modelEntry, entryType);
+        return;
+    }
+
+    if (Utils_isPackModelType(modelType)) {
+        return;
+    }
+
+    
+    recomputil_u32_value_hashmap_insert(pp->modelEntries, modelType, (uintptr_t)modelEntry);
 }
 
-RECOMP_CALLBACK(".", _internal_postInitHashObjects) void initPlayerProxyFallbacks(void) {
+const ModelEntry *PlayerProxy_getCurrentEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType) {
+    uintptr_t entry = 0;
+    recomputil_u32_value_hashmap_get(pp->modelEntries, modelType, &entry);
+    return (const ModelEntry *)entry;
+}
+
+static FormProxy *getFormProxyFromCategory(PlayerProxy *pp, PlayerModelManagerModelType modelType) {
+    FormProxyId fpId;
+
+    switch (modelType) {
+        case PMM_MODEL_TYPE_DEKU:
+            fpId = FORM_PROXY_ID_DEKU;
+            break;
+
+        case PMM_MODEL_TYPE_GORON:
+            fpId = FORM_PROXY_ID_GORON;
+            break;
+
+        case PMM_MODEL_TYPE_ZORA:
+            fpId = FORM_PROXY_ID_ZORA;
+            break;
+
+        case PMM_MODEL_TYPE_FIERCE_DEITY:
+            fpId = FORM_PROXY_ID_FIERCE_DEITY;
+            break;
+
+        default:
+            fpId = FORM_PROXY_ID_HUMAN;
+            break;
+    }
+
+    return PlayerProxy_getFormProxy(pp, fpId);
+}
+
+static void reapplyAllEquipmentEntries(PlayerProxy *pp) {
+    for (PlayerModelManagerModelType i = 0; i < PMM_MODEL_TYPE_MAX; ++i) {
+        if (Utils_isEquipmentModelType(i)) {
+            const ModelEntry *tmp = PlayerProxy_getCurrentEntry(pp, i);
+            PlayerProxy_removeEntry(pp, i);
+            PlayerProxy_tryApplyEntry(pp, i, tmp);
+        }
+    }
+}
+
+bool PlayerProxy_forceApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *newEntry) {
+    const ModelEntry *currEntry = PlayerProxy_getCurrentEntry(pp, modelType);
+
+    if (newEntry == NULL) {
+        PlayerProxy_removeEntry(pp, modelType);
+        return true;
+    }
+
+    if (ModelEntry_applyToFormProxy(newEntry, getFormProxyFromCategory(pp, modelType))) {
+        if (currEntry && gPlayer1Proxy == pp) {
+            ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_REMOVED);
+        }
+
+        PlayerProxy_setModelEntry(pp, modelType, newEntry);
+
+        if (newEntry && gPlayer1Proxy == pp) {
+            ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_APPLIED);
+        }
+
+        if (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT) {
+            reapplyAllEquipmentEntries(pp);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *newEntry) {
+    const ModelEntry *currEntry = PlayerProxy_getCurrentEntry(pp, modelType);
+    if (newEntry != currEntry) {
+        return PlayerProxy_forceApplyEntry(pp, modelType, newEntry);
+    }
+
+    return false;
+}
+
+void PlayerProxy_removeEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType) {
+    if (!Utils_isValidModelType(modelType)) {
+        Logger_printError("Called with invalid category %d\n", modelType);
+        Utils_tryCrashGame();
+        return;
+    }
+
+    const ModelEntry *entry = PlayerProxy_getCurrentEntry(pp, modelType);
+
+    if (entry) {
+        if (pp == gPlayer1Proxy) {
+            ModelEntry_doCallback(entry, PMM_EVENT_MODEL_REMOVED);
+        }
+
+        PlayerProxy_setModelEntry(pp, modelType, NULL);
+
+        ModelEntry_removeFromFormProxy(entry, getFormProxyFromCategory(pp, modelType));
+
+        if (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT) {
+            reapplyAllEquipmentEntries(pp);
+        }
+    }
+}
+
+RECOMP_CALLBACK(".", _internal_initHashObjects) void initPlayerProxyHash(void) {
+    sValidPlayerProxies = recomputil_create_u32_hashset();
+    sQueuedRefreshes = YAZMTCore_IterableU32Set_new();
+}
+
+RECOMP_CALLBACK(".", _internal_postInitHashObjects) void initPlayerProxyVars(void) {
     ModelInfo_init(&gHumanModelInfoFallbackOverride);
     ModelInfo_init(&gDekuModelInfoFallbackOverride);
     ModelInfo_init(&gGoronModelInfoFallbackOverride);
@@ -207,4 +353,13 @@ RECOMP_CALLBACK(".", _internal_postInitHashObjects) void initPlayerProxyFallback
     ModelInfo_init(&gGoronModelInfo);
     ModelInfo_init(&gZoraModelInfo);
     ModelInfo_init(&gFierceDeityModelInfo);
+}
+
+static void requestProcessor(void *pp) {
+    PlayerProxy_refresh(pp);
+}
+
+void processPlayerProxyRefreshRequests_on_Play_UpdateMain(void) {
+    Utils_processIterableSetPtrs(sQueuedRefreshes, requestProcessor);
+    YAZMTCore_IterableU32Set_clear(sQueuedRefreshes);
 }

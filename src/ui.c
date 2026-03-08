@@ -8,6 +8,8 @@
 #include "logger.h"
 #include "recompdata.h"
 #include "modelentry.h"
+#include "playerproxy.h"
+#include "utils.h"
 
 static bool sIsFileListRefreshRequested;
 
@@ -295,7 +297,7 @@ static void refreshModelButtonEntryColors(void) {
     CategoryInfo *catInf = getCurrentCategoryInfo();
 
     if (catInf) {
-        void *entry = (void *)ModelEntryManager_getCurrentEntry(catInf->category);
+        const void *entry = PlayerProxy_getCurrentEntry(gPlayer1Proxy, catInf->category);
         size_t count = getCurrentModelButtonArraySize();
         const RecompuiResource *buttons = getCurrentModelButtonArray();
 
@@ -387,9 +389,9 @@ static void setAuthor(const char *author) {
 
 static void applyRealEntry(int entryIndex) {
     if (entryIndex >= 0 && entryIndex < ARRAY_COUNT(sCategoryInfos)) {
-        ModelEntryManager_tryApplyEntry(sCategoryInfos[entryIndex].category, sCategoryInfos[entryIndex].realEntry);
+        PlayerProxy_tryApplyEntry(gPlayer1Proxy, sCategoryInfos[entryIndex].category, sCategoryInfos[entryIndex].realEntry);
     } else {
-        Logger_printWarning("applyRealEntry received invalid entryIndex %d\n", entryIndex);
+        Logger_printWarning("applyRealEntry received invalid entryIndex %d", entryIndex);
     }
 }
 
@@ -407,22 +409,22 @@ static void clearRealEntries(void) {
 
 static void fillRealEntries(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
-        sCategoryInfos[i].realEntry = ModelEntryManager_getCurrentEntry(sCategoryInfos[i].category);
+        sCategoryInfos[i].realEntry = PlayerProxy_getCurrentEntry(gPlayer1Proxy, sCategoryInfos[i].category);
     }
 }
 
 static void removeAllModels(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
-        ModelEntryManager_tryApplyEntry(catInf->category, NULL);
+        PlayerProxy_tryApplyEntry(gPlayer1Proxy, catInf->category, NULL);
     }
 }
 
 static void removeEquipmentModels(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
-        if (isEquipmentModelType(catInf->category)) {
-            ModelEntryManager_tryApplyEntry(catInf->category, NULL);
+        if (Utils_isEquipmentModelType(catInf->category)) {
+            PlayerProxy_tryApplyEntry(gPlayer1Proxy, catInf->category, NULL);
         }
     }
 }
@@ -431,7 +433,7 @@ static void saveAllModels(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         catInf->isNeedsDiskSave = true;
-        catInf->realEntry = ModelEntryManager_getCurrentEntry(catInf->category);
+        catInf->realEntry = PlayerProxy_getCurrentEntry(gPlayer1Proxy, catInf->category);
     }
 }
 
@@ -509,7 +511,7 @@ static void closeButtonPressed(RecompuiResource resource, const RecompuiEventDat
                 if (catInf->isNeedsDiskSave) {
                     catInf->isNeedsDiskSave = false;
                     wasModelChanged = true;
-                    ModelEntryManager_saveCurrentEntry(catInf->category);
+                    ModelEntryManager_saveCurrentEntry(gPlayer1Proxy, catInf->category);
                 }
             }
 
@@ -781,7 +783,7 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
 
-                ModelEntryManager_tryApplyEntry(modelType, entryOrNull);
+                PlayerProxy_tryApplyEntry(gPlayer1Proxy, modelType, entryOrNull);
 
                 catInf->realEntry = entryOrNull;
 
@@ -797,7 +799,7 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
 
                 if (shouldLivePreview()) {
                     applyRealEntries();
-                    ModelEntryManager_tryApplyEntry(modelType, entryOrNull);
+                    PlayerProxy_tryApplyEntry(gPlayer1Proxy, modelType, entryOrNull);
                 }
             }
         }
@@ -815,7 +817,7 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
 
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
-                ModelEntryManager_tryApplyEntry(modelType, entryOrNull);
+                PlayerProxy_tryApplyEntry(gPlayer1Proxy, modelType, entryOrNull);
                 saveAllModels();
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
                 if (entryOrNull) {
@@ -826,7 +828,7 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
 
                 if (shouldLivePreview()) {
                     applyRealEntries();
-                    ModelEntryManager_tryApplyEntry(modelType, entryOrNull);
+                    PlayerProxy_tryApplyEntry(gPlayer1Proxy, modelType, entryOrNull);
                 }
             }
         }
@@ -895,7 +897,7 @@ static void createModelListButtons(void) {
     RecompuiEventHandler *removedCallback = onModelButtonPressed;
     const char *removeText = "[None]";
 
-    bool isPack = isPackModelType(catInf->category);
+    bool isPack = Utils_isPackModelType(catInf->category);
     if (isPack) {
         pressedCallback = onPackButtonPressed;
         removedCallback = removeEquipmentModelsButtonPressed;

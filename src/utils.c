@@ -7,6 +7,8 @@
 #include "logger.h"
 #include "globalobjects_api.h"
 #include "string.h"
+#include "yazmtcorelib_api.h"
+#include "playermodelmanager_api.h"
 
 Gfx *Utils_createShimDisplayList(Gfx *dls[], int n) {
     if (n < 1) {
@@ -87,4 +89,32 @@ void *Utils_recompCalloc(size_t size) {
     }
 
     return alloc;
+}
+
+void Utils_processIterableSetPtrs(YAZMTCore_IterableU32Set *set, void processorFunc(void *item)) {
+    size_t numItems = YAZMTCore_IterableU32Set_size(set);
+
+    if (numItems > 0) {
+        void **items = (void **)YAZMTCore_IterableU32Set_values(set);
+
+        for (size_t i = 0; i < numItems; ++i) {
+            processorFunc(items[i]);
+        }
+    }
+}
+
+bool Utils_isEquipmentModelType(PlayerModelManagerModelType modelType) {
+    return (modelType > PMM_MODEL_TYPE_FIERCE_DEITY && modelType < PMM_MODEL_TYPE_MODEL_PACK) || modelType == PMM_MODEL_TYPE_BOMB || modelType == PMM_MODEL_TYPE_BOMBCHU;
+}
+
+bool Utils_isFormModelType(PlayerModelManagerModelType modelType) {
+    return modelType <= PMM_MODEL_TYPE_FIERCE_DEITY && modelType >= PMM_MODEL_TYPE_CHILD;
+}
+
+bool Utils_isPackModelType(PlayerModelManagerModelType modelType) {
+    return modelType == PMM_MODEL_TYPE_MODEL_PACK;
+}
+
+bool Utils_isValidModelType(PlayerModelManagerModelType modelType) {
+    return modelType >= 0 && modelType < PMM_MODEL_TYPE_MAX;
 }

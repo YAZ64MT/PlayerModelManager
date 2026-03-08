@@ -41,7 +41,7 @@ void PlayerProxyManager_refreshAll(void) {
         PlayerProxy *currPp = proxies[i];
 
         if (currPp) {
-            PlayerProxy_refresh(currPp);
+            PlayerProxy_requestRefresh(currPp);
         }
     }
 }
@@ -60,7 +60,7 @@ void PlayerProxyManager_refreshFullAllWithModelEntry(ModelEntry *modelEntry) {
                 if (isModelEntryInModelInfo(FormProxy_getCurrentModelInfo(currFp), modelEntry) ||
                     isModelEntryInModelInfo(FormProxy_getFallbackModelInfo(currFp), modelEntry) ||
                     isModelEntryInModelInfo(FormProxy_getFallbackOverrideModelInfo(currFp), modelEntry)) {
-                    PlayerProxy_refresh(currPp);
+                    PlayerProxy_requestRefresh(currPp);
                 }                
             }
         }

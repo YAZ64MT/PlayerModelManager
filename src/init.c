@@ -102,5 +102,5 @@ static void doRegisterModels(void) {
 // Need to do this in ConsoleLogo_Destroy for Rando compatibility
 // TODO: Remove when filesystem API fo Recomp exists
 void applyDiskModels_on_return_ConsoleLogo_Destroy(void) {
-    ModelEntryManager_applyModelsFromDisk();
+    ModelEntryManager_applyModelsFromDisk(gPlayer1Proxy);
 }

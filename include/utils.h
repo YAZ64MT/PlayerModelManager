@@ -6,6 +6,8 @@
 #include "z64animation.h"
 #include "stdbool.h"
 #include "globalobjects_api.h"
+#include "yazmtcorelib_api.h"
+#include "playermodelmanager_api.h"
 
 Gfx *Utils_createShimWithMatrix(Mtx *matrix, Gfx *dls[], int n);
 Gfx *Utils_createShimDisplayList(Gfx *dls[], int n);
@@ -23,5 +25,12 @@ void Utils_setCrashEnabled(bool isEnabled);
 void Utils_tryCrashGame();
 
 void *Utils_recompCalloc(size_t size);
+
+void Utils_processIterableSetPtrs(YAZMTCore_IterableU32Set *set, void processorFunc(void *item));
+
+bool Utils_isEquipmentModelType(PlayerModelManagerModelType modelType);
+bool Utils_isFormModelType(PlayerModelManagerModelType modelType);
+bool Utils_isPackModelType(PlayerModelManagerModelType modelType);
+bool Utils_isValidModelType(PlayerModelManagerModelType modelType);
 
 #endif

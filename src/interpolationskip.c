@@ -26,7 +26,7 @@ RECOMP_CALLBACK(".", _internal_onEquipmentModelApplied) void refreshEquipmentOnE
     }
 }
 
-void skipInterpolation_on_Play_Draw(PlayState *play) {
+void skipInterpolation_on_Play_UpdateMain(PlayState *play) {
     Player *player = GET_PLAYER(play);
 
     while (player) {
