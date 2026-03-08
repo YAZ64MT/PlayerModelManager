@@ -10,6 +10,7 @@
 #include "modelentry.h"
 #include "playerproxy.h"
 #include "utils.h"
+#include "fallbackmodels.h"
 
 static bool sIsFileListRefreshRequested;
 
@@ -477,6 +478,8 @@ static void removeAllModels(void) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         PlayerProxy_tryApplyEntry(getProxyFromIndex(catInf->ppIndex), catInf->category, NULL);
     }
+
+    PlayerProxy_tryApplyEntry(gPlayer2Proxy, PMM_MODEL_TYPE_CHILD, ModelEntryManager_getEntry(gKafeiModelHandle));
 }
 
 static void removeEquipmentModels(void) {
@@ -866,6 +869,10 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
     }
 }
 
+static void onKafeiRemoveButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
+    onModelButtonPressed(resource, data, ModelEntryManager_getEntry(gKafeiModelHandle));
+}
+
 static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (sIsUIContextShown) {
         ModelEntry *entryOrNull = userdata;
@@ -957,6 +964,10 @@ static void createModelListButtons(void) {
     RecompuiEventHandler *pressedCallback = onModelButtonPressed;
     RecompuiEventHandler *removedCallback = onModelButtonPressed;
     const char *removeText = "[None]";
+
+    if (catInf->ppIndex == PP_IDX_KAFEI) {
+        removedCallback = onKafeiRemoveButtonPressed;
+    }
 
     bool isPack = Utils_isPackModelType(catInf->category);
     if (isPack) {
