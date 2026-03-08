@@ -690,13 +690,8 @@ void FormProxy_refreshAllDLs(FormProxy *fp) {
         return;
     }
 
-    WrappedDisplayList *wDLs = fp->wrappedDisplayLists;
-    ModelInfo *current = &fp->currentModelInfo;
-    ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
-    ModelInfo *fallback = fp->fallbackModelInfo;
-
     for (size_t i = 0; i < fp->numDLs; ++i) {
-        gSPDisplayList(&wDLs[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
+        gSPDisplayList(&fp->wrappedDisplayLists[i].displayList[WRAPPED_DL_DRAW], gEmptyDL);
     }
 
     setDLsToShims(fp);
