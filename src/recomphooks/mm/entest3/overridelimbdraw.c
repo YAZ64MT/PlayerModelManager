@@ -18,8 +18,8 @@ RECOMP_HOOK("EnTest3_OverrideLimbDraw") void on_EnTest3_OverrideLimbDraw(PlaySta
     sEnTest3 = (EnTest3 *)thisx;
 }
 
-void removeBackEquipment_on_return_EnTest3_OverrideLimbDraw(s32 limbIndex, Gfx **dList);
+void fixIdleAnimOddities_on_return_EnTest3_OverrideLimbDraw(EnTest3 *kafei, s32 limbIndex, Gfx **dList, Vec3s *rot);
 
 RECOMP_HOOK_RETURN("EnTest3_OverrideLimbDraw") void on_return_EnTest3_OverrideLimbDraw(void) {
-    removeBackEquipment_on_return_EnTest3_OverrideLimbDraw(sLimbIndex, sDList);
+    fixIdleAnimOddities_on_return_EnTest3_OverrideLimbDraw(sEnTest3, sLimbIndex, sDList, sRot);
 }

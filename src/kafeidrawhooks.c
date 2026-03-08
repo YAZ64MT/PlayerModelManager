@@ -1,7 +1,10 @@
 #include "global.h"
 #include "formproxy.h"
 #include "proxyactorext.h"
+#include "playerproxy.h"
+#include "modelinfo.h"
 #include "overlays/actors/ovl_En_Test3/z_en_test3.h"
+#include "logger.h"
 
 void updatePlayerAssetsCommon(Player *player, FormProxy *fp, TexturePtr eyesTex[], TexturePtr mouthTex[]);
 
@@ -17,8 +20,22 @@ void updateAssets_on_EnTest3_Draw(EnTest3 *enTest3) {
     }
 }
 
-void removeBackEquipment_on_return_EnTest3_OverrideLimbDraw(s32 limbIndex, Gfx **dList) {
-    if (limbIndex == PLAYER_LIMB_SHEATH) {
-        *dList = NULL;
+void fixIdleAnimOddities_on_return_EnTest3_OverrideLimbDraw(EnTest3 *kafei, s32 limbIndex, Gfx **dList, Vec3s *rot) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(&kafei->player.actor);
+
+    if (fp) {
+        extern LinkAnimationHeader gPlayerAnim_pz_wait;
+
+        Player *player = &kafei->player;
+
+        if (limbIndex == PLAYER_LIMB_HAT && player->transformation == PLAYER_FORM_HUMAN && player->skelAnime.animation == &gPlayerAnim_pz_wait) {
+            extern LinkAnimationHeader gPlayerAnim_link_normal_wait_free;
+
+            static Vec3s hatRot = {0, 0, DEG_TO_BINANG(100.f)};
+
+            *rot = hatRot;
+        } else if (limbIndex == PLAYER_LIMB_SHEATH) {
+            *dList = NULL;
+        }
     }
 }
