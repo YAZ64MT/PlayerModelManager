@@ -217,17 +217,16 @@ static void PlayerProxy_setModelEntry(PlayerProxy *pp, PlayerModelManagerModelTy
 
     PlayerModelManagerModelType entryType = ModelEntry_getType(modelEntry);
 
-    if (!(Utils_isFormModelType(modelType) && Utils_isFormModelType(entryType)) ||
-        !(Utils_isEquipmentModelType(modelType) && Utils_isEquipmentModelType(entryType)) ||
-        !(Utils_isPackModelType(modelType) && Utils_isPackModelType(entryType))) {
-        Logger_printError("Mismatched modelType and modelEntry type! modelType: %d, entryType: %d", modelEntry, entryType);
+    if ((Utils_isFormModelType(modelType) != Utils_isFormModelType(entryType)) ||
+        (Utils_isEquipmentModelType(modelType) != Utils_isEquipmentModelType(entryType)) ||
+        (Utils_isPackModelType(modelType) != Utils_isPackModelType(entryType))) {
+        Logger_printError("Mismatched modelType and modelEntry type! modelType: %d, entryType: %d", modelType, entryType);
         return;
     }
 
     if (Utils_isPackModelType(modelType)) {
         return;
     }
-
     
     recomputil_u32_value_hashmap_insert(pp->modelEntries, modelType, (uintptr_t)modelEntry);
 }
