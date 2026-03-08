@@ -29,8 +29,6 @@ void fixIdleAnimOddities_on_return_EnTest3_OverrideLimbDraw(EnTest3 *kafei, s32 
         Player *player = &kafei->player;
 
         if (limbIndex == PLAYER_LIMB_HAT && player->transformation == PLAYER_FORM_HUMAN && player->skelAnime.animation == &gPlayerAnim_pz_wait) {
-            extern LinkAnimationHeader gPlayerAnim_link_normal_wait_free;
-
             static Vec3s hatRot = {0, 0, DEG_TO_BINANG(100.f)};
 
             *rot = hatRot;
