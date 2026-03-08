@@ -16,20 +16,64 @@ static bool sIsFileListRefreshRequested;
 static void requestRefreshFileList(void);
 static void onUpOneLevelButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata);
 
+static PlayerProxy *sTargetPlayerProxy;
+
+typedef enum PlayerProxyIndex {
+    PP_IDX_LOCAL,
+    PP_IDX_KAFEI
+} PlayerProxyIndex;
+
 typedef struct CategoryInfo {
     int index;
     const char *displayName;
     bool isVisible;
     bool isUsedByCurrentGame;
-    const ModelEntry *realEntry;
+    U32ValueHashmapHandle playerProxyToRealEntry;
     PlayerModelManagerModelType category;
     bool isNeedsDiskSave;
+    PlayerProxyIndex ppIndex;
 } CategoryInfo;
+
+static void CategoryInfo_clearRealEntryMap(CategoryInfo *ci) {
+    if (ci->playerProxyToRealEntry) {
+        recomputil_destroy_u32_value_hashmap(ci->playerProxyToRealEntry);
+        ci->playerProxyToRealEntry = 0;
+    }
+}
+
+static void CategoryInfo_createRealEntryMap(CategoryInfo *ci) {
+    CategoryInfo_clearRealEntryMap(ci);
+    ci->playerProxyToRealEntry = recomputil_create_u32_value_hashmap();
+}
+
+static const ModelEntry *CategoryInfo_getRealEntry(CategoryInfo *ci, const PlayerProxy *pp) {
+    uintptr_t result = 0;
+    if (ci->playerProxyToRealEntry) {
+        recomputil_u32_value_hashmap_get(ci->playerProxyToRealEntry, (uintptr_t)pp, &result);
+    }
+    return (const ModelEntry *)result;
+}
+
+static void CategoryInfo_setRealEntry(CategoryInfo *ci, const PlayerProxy *pp, const ModelEntry *entry) {
+    if (!ci->playerProxyToRealEntry) {
+        CategoryInfo_createRealEntryMap(ci);
+    }
+
+    uintptr_t key = (uintptr_t)pp;
+    uintptr_t value = (uintptr_t)entry;
+
+    if (value == 0) {
+        recomputil_u32_value_hashmap_erase(ci->playerProxyToRealEntry, key);
+    } else {
+        recomputil_u32_value_hashmap_insert(ci->playerProxyToRealEntry, key, value);
+    }
+}
 
 static bool sIsForceAllCategoriesVisible = false;
 
-#define DECLARE_DEFAULT_CAT_INFO(name, isUsed, modelType, isVisibleByDefault) {.displayName = name, .isVisible = isVisibleByDefault, .isUsedByCurrentGame = isUsed, .realEntry = NULL, .category = modelType, .isNeedsDiskSave = false}
-#define DECLARE_CAT_INFO(name, isUsed, modelType) DECLARE_DEFAULT_CAT_INFO(name, isUsed, modelType, false)
+#define DECLARE_DEFAULT_CAT_INFO(name, isUsed, modelType, isVisibleByDefault, ppIdx) {.displayName = name, .isVisible = isVisibleByDefault, .isUsedByCurrentGame = isUsed, .category = modelType, .isNeedsDiskSave = false, .ppIndex = ppIdx}
+#define DECLARE_CAT_INFO(name, isUsed, modelType) DECLARE_DEFAULT_CAT_INFO(name, isUsed, modelType, false, PP_IDX_LOCAL)
+#define DECLARE_CAT_INFO_KAFEI(name, isUsed, modelType) DECLARE_DEFAULT_CAT_INFO(name, isUsed, modelType, false, PP_IDX_KAFEI)
 
 #define CAT_USED_MM true
 
@@ -41,14 +85,14 @@ static bool sIsForceAllCategoriesVisible = false;
 
 static CategoryInfo sCategoryInfos[] = {
     // At least one category must be visible or the category selector goes into an infinite loop
-    DECLARE_CAT_INFO("Model Packs", CAT_USED_Z64, PMM_MODEL_TYPE_MODEL_PACK),
-    DECLARE_DEFAULT_CAT_INFO("Young Link", CAT_USED_OOT, PMM_MODEL_TYPE_CHILD, CAT_USED_OOT),
-    DECLARE_DEFAULT_CAT_INFO("Adult Link", CAT_USED_OOT, PMM_MODEL_TYPE_ADULT, CAT_USED_OOT),
-    DECLARE_DEFAULT_CAT_INFO("Human", CAT_USED_MM, PMM_MODEL_TYPE_CHILD, CAT_USED_MM),
-    DECLARE_DEFAULT_CAT_INFO("Deku", CAT_USED_MM, PMM_MODEL_TYPE_DEKU, CAT_USED_MM),
-    DECLARE_DEFAULT_CAT_INFO("Goron", CAT_USED_MM, PMM_MODEL_TYPE_GORON, CAT_USED_MM),
-    DECLARE_DEFAULT_CAT_INFO("Zora", CAT_USED_MM, PMM_MODEL_TYPE_ZORA, CAT_USED_MM),
-    DECLARE_DEFAULT_CAT_INFO("Fierce Deity", CAT_USED_MM, PMM_MODEL_TYPE_FIERCE_DEITY, CAT_USED_MM),
+    DECLARE_DEFAULT_CAT_INFO("Model Packs", CAT_USED_Z64, PMM_MODEL_TYPE_MODEL_PACK, CAT_USED_Z64, PP_IDX_LOCAL),
+    DECLARE_DEFAULT_CAT_INFO("Young Link", CAT_USED_OOT, PMM_MODEL_TYPE_CHILD, CAT_USED_OOT, PP_IDX_LOCAL),
+    DECLARE_DEFAULT_CAT_INFO("Adult Link", CAT_USED_OOT, PMM_MODEL_TYPE_ADULT, CAT_USED_OOT, PP_IDX_LOCAL),
+    DECLARE_DEFAULT_CAT_INFO("Human", CAT_USED_MM, PMM_MODEL_TYPE_CHILD, CAT_USED_MM, PP_IDX_LOCAL),
+    DECLARE_DEFAULT_CAT_INFO("Deku", CAT_USED_MM, PMM_MODEL_TYPE_DEKU, CAT_USED_MM, PP_IDX_LOCAL),
+    DECLARE_DEFAULT_CAT_INFO("Goron", CAT_USED_MM, PMM_MODEL_TYPE_GORON, CAT_USED_MM, PP_IDX_LOCAL),
+    DECLARE_DEFAULT_CAT_INFO("Zora", CAT_USED_MM, PMM_MODEL_TYPE_ZORA, CAT_USED_MM, PP_IDX_LOCAL),
+    DECLARE_DEFAULT_CAT_INFO("Fierce Deity", CAT_USED_MM, PMM_MODEL_TYPE_FIERCE_DEITY, CAT_USED_MM, PP_IDX_LOCAL),
     DECLARE_CAT_INFO("Kokiri Sword", CAT_USED_Z64, PMM_MODEL_TYPE_SWORD1),
     DECLARE_CAT_INFO("Razor Sword", CAT_USED_MM, PMM_MODEL_TYPE_SWORD2),
     DECLARE_CAT_INFO("Gilded Sword", CAT_USED_Z64, PMM_MODEL_TYPE_SWORD3),
@@ -98,6 +142,8 @@ static CategoryInfo sCategoryInfos[] = {
     DECLARE_CAT_INFO("Goron Mask", CAT_USED_Z64, PMM_MODEL_TYPE_MASK_GORON),
     DECLARE_CAT_INFO("Zora Mask", CAT_USED_Z64, PMM_MODEL_TYPE_MASK_ZORA),
     DECLARE_CAT_INFO("Fierce Deity Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_FIERCE_DEITY),
+    DECLARE_CAT_INFO_KAFEI("Kafei", CAT_USED_MM, PMM_MODEL_TYPE_CHILD),
+    DECLARE_CAT_INFO_KAFEI("Kafei's Keaton Mask", CAT_USED_MM, PMM_MODEL_TYPE_MASK_KEATON),
 };
 
 #define SELECTING_CATEGORY -99
@@ -297,7 +343,7 @@ static void refreshModelButtonEntryColors(void) {
     CategoryInfo *catInf = getCurrentCategoryInfo();
 
     if (catInf) {
-        const void *entry = PlayerProxy_getCurrentEntry(gPlayer1Proxy, catInf->category);
+        const void *entry = PlayerProxy_getCurrentEntry(sTargetPlayerProxy, catInf->category);
         size_t count = getCurrentModelButtonArraySize();
         const RecompuiResource *buttons = getCurrentModelButtonArray();
 
@@ -387,53 +433,53 @@ static void setAuthor(const char *author) {
     sLabelAuthor = recompui_create_label(sUIContext, sRowAuthor, author, LABELSTYLE_NORMAL);
 }
 
-static void applyRealEntry(int entryIndex) {
+static void applyRealEntry(PlayerProxy *pp, int entryIndex) {
     if (entryIndex >= 0 && entryIndex < ARRAY_COUNT(sCategoryInfos)) {
-        PlayerProxy_tryApplyEntry(gPlayer1Proxy, sCategoryInfos[entryIndex].category, sCategoryInfos[entryIndex].realEntry);
+        PlayerProxy_tryApplyEntry(pp, sCategoryInfos[entryIndex].category, CategoryInfo_getRealEntry(&sCategoryInfos[entryIndex], pp));
     } else {
         Logger_printWarning("applyRealEntry received invalid entryIndex %d", entryIndex);
     }
 }
 
-static void applyRealEntries(void) {
+static void applyRealEntries(PlayerProxy *pp) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
-        applyRealEntry(i);
+        applyRealEntry(pp, i);
     }
 }
 
-static void clearRealEntries(void) {
+static void clearRealEntries(PlayerProxy *pp) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
-        sCategoryInfos[i].realEntry = NULL;
+        CategoryInfo_setRealEntry(&sCategoryInfos[i], pp, NULL);
     }
 }
 
-static void fillRealEntries(void) {
+static void fillRealEntries(PlayerProxy *pp) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
-        sCategoryInfos[i].realEntry = PlayerProxy_getCurrentEntry(gPlayer1Proxy, sCategoryInfos[i].category);
+        CategoryInfo_setRealEntry(&sCategoryInfos[i], pp, PlayerProxy_getCurrentEntry(pp, sCategoryInfos[i].category));
     }
 }
 
-static void removeAllModels(void) {
+static void removeAllModels(PlayerProxy *pp) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
-        PlayerProxy_tryApplyEntry(gPlayer1Proxy, catInf->category, NULL);
+        PlayerProxy_tryApplyEntry(pp, catInf->category, NULL);
     }
 }
 
-static void removeEquipmentModels(void) {
+static void removeEquipmentModels(PlayerProxy *pp) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         if (Utils_isEquipmentModelType(catInf->category)) {
-            PlayerProxy_tryApplyEntry(gPlayer1Proxy, catInf->category, NULL);
+            PlayerProxy_tryApplyEntry(pp, catInf->category, NULL);
         }
     }
 }
 
-static void saveAllModels(void) {
+static void saveAllModels(PlayerProxy *pp) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         catInf->isNeedsDiskSave = true;
-        catInf->realEntry = PlayerProxy_getCurrentEntry(gPlayer1Proxy, catInf->category);
+        CategoryInfo_setRealEntry(catInf, pp, PlayerProxy_getCurrentEntry(pp, catInf->category));
     }
 }
 
@@ -441,8 +487,10 @@ static void removeAllModelsButtonPressed(RecompuiResource resource, const Recomp
     if (sIsUIContextShown) {
         if (data->type == UI_EVENT_CLICK) {
             Audio_PlaySfx(NA_SE_SY_DECIDE);
-            removeAllModels();
-            saveAllModels();
+            removeAllModels(gPlayer1Proxy);
+            removeAllModels(gPlayer2Proxy);
+            saveAllModels(gPlayer1Proxy);
+            saveAllModels(gPlayer2Proxy);
         }
     }
 }
@@ -454,9 +502,12 @@ static void removeEquipmentModelsButtonPressed(RecompuiResource resource, const 
                 CategoryInfo *catInf = getCurrentCategoryInfo();
                 if (catInf) {
                     Audio_PlaySfx(NA_SE_SY_DECIDE);
-                    applyRealEntries();
-                    removeEquipmentModels();
-                    saveAllModels();
+                    applyRealEntries(gPlayer1Proxy);
+                    applyRealEntries(gPlayer2Proxy);
+                    removeEquipmentModels(gPlayer1Proxy);
+                    removeEquipmentModels(gPlayer2Proxy);
+                    saveAllModels(gPlayer1Proxy);
+                    saveAllModels(gPlayer2Proxy);
                 } else {
                     Audio_PlaySfx(NA_SE_SY_ERROR);
                 }
@@ -465,8 +516,10 @@ static void removeEquipmentModelsButtonPressed(RecompuiResource resource, const 
             destroyAuthor();
 
             if (shouldLivePreview()) {
-                applyRealEntries();
-                removeEquipmentModels();
+                applyRealEntries(gPlayer1Proxy);
+                applyRealEntries(gPlayer2Proxy);
+                removeEquipmentModels(gPlayer1Proxy);
+                removeEquipmentModels(gPlayer2Proxy);
             }
         }
     }
@@ -479,8 +532,10 @@ static void removePackButtonPressed(RecompuiResource resource, const RecompuiEve
                 CategoryInfo *catInf = getCurrentCategoryInfo();
                 if (catInf) {
                     Audio_PlaySfx(NA_SE_SY_DECIDE);
-                    removeAllModels();
-                    saveAllModels();
+                    removeAllModels(gPlayer1Proxy);
+                    removeAllModels(gPlayer2Proxy);
+                    saveAllModels(gPlayer1Proxy);
+                    saveAllModels(gPlayer2Proxy);
                 } else {
                     Audio_PlaySfx(NA_SE_SY_ERROR);
                 }
@@ -489,7 +544,8 @@ static void removePackButtonPressed(RecompuiResource resource, const RecompuiEve
             destroyAuthor();
 
             if (shouldLivePreview()) {
-                removeAllModels();
+                removeAllModels(gPlayer1Proxy);
+                removeAllModels(gPlayer2Proxy);
             }
         }
     }
@@ -500,7 +556,8 @@ static bool sShouldClearAllButtonsNextFrame;
 static void closeButtonPressed(RecompuiResource resource, const RecompuiEventData *data, void *userdata) {
     if (sIsUIContextShown) {
         if (data->type == UI_EVENT_CLICK) {
-            applyRealEntries();
+            applyRealEntries(gPlayer1Proxy);
+            applyRealEntries(gPlayer2Proxy);
             recompui_hide_context(sUIContext);
             sIsUIContextShown = false;
             bool wasModelChanged = false;
@@ -521,14 +578,16 @@ static void closeButtonPressed(RecompuiResource resource, const RecompuiEventDat
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
             }
 
-            clearRealEntries();
+            clearRealEntries(gPlayer1Proxy);
+            clearRealEntries(gPlayer2Proxy);
 
             sShouldClearAllButtonsNextFrame = true;
         } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
             destroyAuthor();
 
             if (shouldLivePreview()) {
-                applyRealEntries();
+                applyRealEntries(gPlayer1Proxy);
+                applyRealEntries(gPlayer2Proxy);
             }
         }
     }
@@ -579,7 +638,8 @@ static void changeCategoryButtonPressed(RecompuiResource resource, const Recompu
         if (data->type == UI_EVENT_CLICK) {
             Audio_PlaySfx(NA_SE_SY_DECIDE);
 
-            applyRealEntries();
+            applyRealEntries(gPlayer1Proxy);
+            applyRealEntries(gPlayer2Proxy);
 
             bool isNextButton = !!userdata;
 
@@ -594,7 +654,8 @@ static void changeCategoryButtonPressed(RecompuiResource resource, const Recompu
             destroyAuthor();
 
             if (shouldLivePreview()) {
-                applyRealEntries();
+                applyRealEntries(gPlayer1Proxy);
+                applyRealEntries(gPlayer2Proxy);
             }
         }
     }
@@ -783,9 +844,9 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
 
-                PlayerProxy_tryApplyEntry(gPlayer1Proxy, modelType, entryOrNull);
+                PlayerProxy_tryApplyEntry(sTargetPlayerProxy, modelType, entryOrNull);
 
-                catInf->realEntry = entryOrNull;
+                CategoryInfo_setRealEntry(catInf, sTargetPlayerProxy, entryOrNull);
 
                 refreshModelButtonEntryColors();
 
@@ -798,8 +859,9 @@ static void onModelButtonPressed(RecompuiResource resource, const RecompuiEventD
                 }
 
                 if (shouldLivePreview()) {
-                    applyRealEntries();
-                    PlayerProxy_tryApplyEntry(gPlayer1Proxy, modelType, entryOrNull);
+                    applyRealEntries(gPlayer1Proxy);
+                    applyRealEntries(gPlayer2Proxy);
+                    PlayerProxy_tryApplyEntry(sTargetPlayerProxy, modelType, entryOrNull);
                 }
             }
         }
@@ -817,8 +879,8 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
 
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
-                PlayerProxy_tryApplyEntry(gPlayer1Proxy, modelType, entryOrNull);
-                saveAllModels();
+                PlayerProxy_tryApplyEntry(sTargetPlayerProxy, modelType, entryOrNull);
+                saveAllModels(sTargetPlayerProxy);
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
                 if (entryOrNull) {
                     setAuthor(ModelEntry_getAuthorName(entryOrNull));
@@ -827,8 +889,9 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
                 }
 
                 if (shouldLivePreview()) {
-                    applyRealEntries();
-                    PlayerProxy_tryApplyEntry(gPlayer1Proxy, modelType, entryOrNull);
+                    applyRealEntries(gPlayer1Proxy);
+                    applyRealEntries(gPlayer2Proxy);
+                    PlayerProxy_tryApplyEntry(sTargetPlayerProxy, modelType, entryOrNull);
                 }
             }
         }
@@ -873,7 +936,8 @@ static void onUpOneLevelButtonPressed(RecompuiResource resource, const RecompuiE
             destroyAuthor();
 
             if (shouldLivePreview()) {
-                applyRealEntries();
+                applyRealEntries(gPlayer1Proxy);
+                applyRealEntries(gPlayer2Proxy);
             }
         }
     }
@@ -947,6 +1011,13 @@ static void refreshFileList(void) {
     destroyModelButtons();
     
     if (isSelectingModel()) {
+        CategoryInfo *catInf = getCurrentCategoryInfo();
+        if (catInf->ppIndex == PP_IDX_KAFEI) {
+            sTargetPlayerProxy = gPlayer2Proxy;
+        } else {
+            sTargetPlayerProxy = gPlayer1Proxy;
+        }
+
         createModelListButtons();
 
         refreshModelButtonEntryColors();
@@ -983,7 +1054,8 @@ static void refreshFileList(void) {
         }
     }
     refreshCategoryName();
-    applyRealEntries();
+    applyRealEntries(gPlayer1Proxy);
+    applyRealEntries(gPlayer2Proxy);
 }
 
 typedef enum {
@@ -1027,7 +1099,8 @@ static bool isOpenMenuComboPressed(PlayState *play) {
 static void openModelMenu(void) {
     if (!sIsUIContextShown) {
         sIsLivePreviewEnabled = recomp_get_config_u32("is_live_preview_enabled");
-        fillRealEntries();
+        fillRealEntries(gPlayer1Proxy);
+        fillRealEntries(gPlayer2Proxy);
         recompui_show_context(sUIContext);
         sIsUIContextShown = true;
     }
