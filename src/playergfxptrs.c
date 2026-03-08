@@ -188,28 +188,34 @@ static void repointSharedModelsToProxy(FormProxy *formProxy) {
 #undef SET_MASK_DL
 }
 
+void updatePlayerAssetsCommon(Player *player, FormProxy *fp, TexturePtr eyesTex[], TexturePtr mouthTex[]) {
+    FormProxy_repointPlayerFaceTexturePtrs(fp, eyesTex, mouthTex);
+    FlexSkeletonHeader *skel = FormProxy_getSkeleton(fp);
+    if (skel) {
+        player->skelAnime.dListCount = player->skelAnimeUpper.dListCount = skel->dListCount;
+        player->skelAnime.skeleton = player->skelAnimeUpper.skeleton = skel->sh.segment;
+    }
+
+    if (player->transformation == PLAYER_FORM_GORON) {
+        FlexSkeletonHeader *shieldingSkel = FormProxy_getShieldingSkeleton(fp);
+
+        if (shieldingSkel) {
+            player->unk_2C8.dListCount = shieldingSkel->dListCount;
+            player->unk_2C8.skeleton = shieldingSkel->sh.segment;
+        }
+    }
+}
+
 void updateAssets_on_Player_Draw(Player *player) {
     FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
     if (fp) {
-        extern TexturePtr sPlayerEyesTextures[];
-        extern TexturePtr sPlayerMouthTextures[];
-        FormProxy_repointPlayerFaceTexturePtrs(fp, sPlayerEyesTextures, sPlayerMouthTextures);
         repointSharedModelsToProxy(fp);
         repointFormPtrsToProxy(player, fp);
-        FlexSkeletonHeader *skel = FormProxy_getSkeleton(fp);
-        if (skel) {
-            player->skelAnime.dListCount = player->skelAnimeUpper.dListCount = skel->dListCount;
-            player->skelAnime.skeleton = player->skelAnimeUpper.skeleton = skel->sh.segment;
-        }
 
-        if (player->transformation == PLAYER_FORM_GORON) {
-            FlexSkeletonHeader *shieldingSkel = FormProxy_getShieldingSkeleton(fp);
+        extern TexturePtr sPlayerEyesTextures[];
+        extern TexturePtr sPlayerMouthTextures[];
 
-            if (shieldingSkel) {
-                player->unk_2C8.dListCount = shieldingSkel->dListCount;
-                player->unk_2C8.skeleton = shieldingSkel->sh.segment;
-            }
-        }
+        updatePlayerAssetsCommon(player, fp, sPlayerEyesTextures, sPlayerMouthTextures);
     }
 }
