@@ -21,6 +21,7 @@ void registerDeku(void);
 void registerGoron(void);
 void registerZora(void);
 void registerFierceDeity(void);
+void registerKafei(void);
 
 // initialize player models as blank display lists
 static void forceInitFormProxies(void) {
@@ -34,7 +35,12 @@ static void forceInitFormProxies(void) {
     ModelInfo_setModelEntryForm(&gZoraModelInfo, (ModelEntryForm *)ModelEntryManager_getEntry(gZoraModelHandle));
     registerFierceDeity();
     ModelInfo_setModelEntryForm(&gFierceDeityModelInfo, (ModelEntryForm *)ModelEntryManager_getEntry(gFierceDeityModelHandle));
+
+    registerKafei();
+
     gPlayer1Proxy = PlayerProxyManager_createPlayerProxy();
+    gPlayer2Proxy = PlayerProxyManager_createPlayerProxy();
+    FormProxy_setCurrentModelFormEntry(PlayerProxy_getFormProxy(gPlayer2Proxy, FORM_PROXY_ID_HUMAN), (ModelEntryForm *)ModelEntryManager_getEntry(gKafeiModelHandle));
 }
 
 void initFormProxies(void) {

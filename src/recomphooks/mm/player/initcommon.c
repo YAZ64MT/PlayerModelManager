@@ -5,6 +5,7 @@ static Player *sPlayer;
 static PlayState *sPlay;
 static FlexSkeletonHeader *sSkelHeader;
 
+void setupPlayerFormProxy_on_Player_InitCommon(Player *player);
 void fixAdultAgeProps_on_Player_InitCommon(Player *player);
 
 RECOMP_HOOK("Player_InitCommon") void on_Player_InitCommon(Player *player, PlayState *play, FlexSkeletonHeader *skelHeader) {
@@ -12,6 +13,7 @@ RECOMP_HOOK("Player_InitCommon") void on_Player_InitCommon(Player *player, PlayS
     sPlay = play;
     sSkelHeader = skelHeader;
 
+    setupPlayerFormProxy_on_Player_InitCommon(sPlayer);
     fixAdultAgeProps_on_Player_InitCommon(sPlayer);
 }
 

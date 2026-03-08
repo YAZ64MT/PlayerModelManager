@@ -192,7 +192,9 @@ void updateAssets_on_Player_Draw(Player *player) {
     FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
     if (fp) {
-        FormProxy_repointPlayerFaceTexturePtrs(fp);
+        extern TexturePtr sPlayerEyesTextures[];
+        extern TexturePtr sPlayerMouthTextures[];
+        FormProxy_repointPlayerFaceTexturePtrs(fp, sPlayerEyesTextures, sPlayerMouthTextures);
         repointSharedModelsToProxy(fp);
         repointFormPtrsToProxy(player, fp);
         FlexSkeletonHeader *skel = FormProxy_getSkeleton(fp);

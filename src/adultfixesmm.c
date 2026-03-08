@@ -156,6 +156,24 @@ void updateAdultProperties_on_Play_UpdateMain(PlayState *play) {
         updateAgeProps(player);
         player = (Player *)player->actor.next;
     }
+
+    if (gActorOverlayTable[ACTOR_EN_TEST3].loadedRamAddr != NULL) {
+        Actor *actor = play->actorCtx.actorLists[ACTORCAT_NPC].first;
+        while (actor) {
+            if (actor->id == ACTOR_EN_TEST3) {
+                Player *kafei = (Player *)actor;
+
+                if (shouldUseAdultFixes(kafei)) {
+                    kafei->ageProperties = &gAdultLinkAgeProps;
+                } else if (kafei->transformation == PLAYER_FORM_HUMAN) {
+                    extern PlayerAgeProperties sAgeProperties;
+                    kafei->ageProperties = &sAgeProperties;
+                }
+            }
+
+            actor = actor->next;
+        }
+    }
 }
 
 static PlayerTransformation sRealPlayerFormHeight;

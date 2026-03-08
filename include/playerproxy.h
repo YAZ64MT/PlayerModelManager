@@ -30,5 +30,6 @@ bool PlayerProxy_forceApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mo
 void PlayerProxy_removeEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType);
 
 extern PlayerProxy *gPlayer1Proxy;
+extern PlayerProxy *gPlayer2Proxy;
 
 #endif
