@@ -137,34 +137,6 @@ static void pushEntry(YAZMTCore_DynamicU32Array *entryArr, ModelEntry *entry) {
     }
 }
 
-static FormProxy *getLocalFormProxyFromCategory(PlayerModelManagerModelType modelType) {
-    FormProxyId fpId;
-
-    switch (modelType) {
-        case PMM_MODEL_TYPE_DEKU:
-            fpId = FORM_PROXY_ID_DEKU;
-            break;
-
-        case PMM_MODEL_TYPE_GORON:
-            fpId = FORM_PROXY_ID_GORON;
-            break;
-
-        case PMM_MODEL_TYPE_ZORA:
-            fpId = FORM_PROXY_ID_ZORA;
-            break;
-
-        case PMM_MODEL_TYPE_FIERCE_DEITY:
-            fpId = FORM_PROXY_ID_FIERCE_DEITY;
-            break;
-
-        default:
-            fpId = FORM_PROXY_ID_HUMAN;
-            break;
-    }
-
-    return PlayerProxy_getFormProxy(gPlayer1Proxy, fpId);
-}
-
 bool ModelEntryManager_isEntryHidden(const ModelEntry *ModelEntry) {
     return recomputil_u32_hashset_contains(sHiddenModelEntries, (uintptr_t)ModelEntry);
 }
