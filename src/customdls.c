@@ -10,11 +10,6 @@
 
 // handless ocarina DL
 Gfx gLinkHumanOcarinaDL[] = {
-    gsSPEndDisplayList(), // branch to copy of gLinkHumanRightHandHoldingOcarinaDL
-};
-
-// ocarina-less hand DL
-Gfx gLinkHumanRightHandOcarinaDL[] = {
     gsDPPipeSync(),
     gsDPSetTextureLUT(G_TT_NONE),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
@@ -23,7 +18,12 @@ Gfx gLinkHumanRightHandOcarinaDL[] = {
     gsSPClearGeometryMode(G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR),
     gsSPSetGeometryMode(G_CULL_BACK | G_FOG | G_LIGHTING),
     gsDPSetPrimColor(0, 0, 255, 255, 255, 255),
-    gsSPEndDisplayList(), // branch to middle of gLinkHumanRightHandHoldingOcarinaDL
+    gsSPEndDisplayList(), // branch to gLinkHumanRightHandHoldingOcarinaDL
+};
+
+// ocarina-less hand DL
+Gfx gLinkHumanRightHandOcarinaDL[] = {
+    gsSPEndDisplayList(), // branch to gLinkHumanRightHandHoldingOcarinaDL
 };
 
 // weaponless first person arm DL
