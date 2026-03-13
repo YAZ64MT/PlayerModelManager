@@ -3,6 +3,7 @@
 #include "modelmatrixids.h"
 #include "z64recomp_api.h"
 #include "playermodelmanager_api.h"
+#include "overlays/actors/ovl_En_Test3/z_en_test3.h"
 
 static bool sShouldSkipFormInterpolation[PLAYER_FORM_MAX];
 static bool sShouldSkipMirrorShieldInterpolation;
@@ -30,13 +31,26 @@ void skipInterpolation_on_Play_UpdateMain(PlayState *play) {
     Player *player = GET_PLAYER(play);
 
     while (player) {
-        if (sShouldSkipFormInterpolation[player->transformation] && player->actor.scale.y >= 0.0f) {
+        if (sShouldSkipFormInterpolation[player->transformation]) {
             actor_set_interpolation_skipped(&player->actor);
             sShouldSkipMirrorShieldInterpolation = true;
             sShouldSkipHookshotInterpolation = true;
         }
 
         player = (Player *)player->actor.next;
+    }
+
+    Actor *npc = play->actorCtx.actorLists[ACTORCAT_NPC].first;
+
+    while (npc) {
+        if (npc->id == ACTOR_EN_TEST3) {
+            EnTest3 *kafei = (EnTest3 *)npc;
+            if (sShouldSkipFormInterpolation[kafei->player.transformation]) {
+                actor_set_interpolation_skipped(npc);
+            }
+        }
+
+        npc = npc->next;
     }
 
     for (int i = 0; i < PLAYER_FORM_MAX; ++i) {
