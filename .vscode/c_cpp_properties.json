@@ -14,10 +14,10 @@
                 "F3DEX_GBI_2",
                 "_LANGUAGE_C",
                 "MIPS",
-                "YAZMT_PMM_NO_API_IMPORTS",
                 "F3DEX_GBI_2",
                 "F3DEX_GBI_PL",
                 "GBI_DOWHILE",
+                "YAZMT_PMM_NO_API_IMPORTS",
                 "LOGGER_PROJECT_NAME=\"PlayerModelManager\""
             ],
             "compilerPath": "clang",
