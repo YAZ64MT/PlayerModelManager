@@ -383,6 +383,22 @@ ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp) {
     return &fp->currentModelInfo;
 }
 
+ModelEntryForm *FormProxy_getModelEntryForm(FormProxy *fp) {
+    RETURN_IF_INVALID_PTR(fp, NULL);
+
+    ModelEntryForm *entryForm = ModelInfo_getModelEntryForm(&fp->currentModelInfo);
+
+    if (!entryForm && fp->fallbackOverrideModelInfo) {
+        entryForm = ModelInfo_getModelEntryForm(fp->fallbackOverrideModelInfo);
+    }
+
+    if (!entryForm && fp->fallbackModelInfo) {
+        entryForm = ModelInfo_getModelEntryForm(fp->fallbackModelInfo);
+    }
+
+    return entryForm;
+}
+
 ModelInfo *FormProxy_getFallbackOverrideModelInfo(FormProxy *fp) {
     RETURN_IF_INVALID_PTR(fp, NULL);
 

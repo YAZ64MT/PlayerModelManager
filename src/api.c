@@ -709,17 +709,9 @@ RECOMP_EXPORT bool PlayerModelManager_Actor_isModelApplied(Actor *actor, PlayerM
             FormProxy *fp = ProxyActorExt_getFormProxy(actor);
 
             if (fp) {
-                ModelInfo *currInfo = FormProxy_getCurrentModelInfo(fp);
+                ModelEntryForm *entryForm = FormProxy_getModelEntryForm(fp);
 
-                if (currInfo) {
-                    ModelEntryForm *entryForm = ModelInfo_getModelEntryForm(currInfo);
-
-                    if (entryForm) {
-                        ModelEntry *currEntry = ModelEntryForm_getModelEntry(entryForm);
-
-                        return currEntry == entryToCheck;
-                    }
-                }
+                return entryForm && ModelEntryForm_getModelEntry(entryForm) == entryToCheck;
             }
         } else if (Utils_isEquipmentModelType(type)) {
             PlayerProxy *pp = ProxyActorExt_getPlayerProxy(actor);

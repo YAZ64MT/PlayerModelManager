@@ -81,5 +81,6 @@ bool FormProxy_isAdultModelType(FormProxy *fp);
 PlayerProxy *FormProxy_getPlayerProxy(FormProxy *fp);
 PlayerTransformation FormProxy_getTargetForm(FormProxy *fp);
 PlayerModelManagerModelType FormProxy_getModelType(FormProxy *fp);
+ModelEntryForm *FormProxy_getModelEntryForm(FormProxy *fp);
 
 #endif
