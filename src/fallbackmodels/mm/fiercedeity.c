@@ -7,6 +7,7 @@
 #include "defaultfacetex.h"
 #include "apilocal.h"
 #include "fallbackmodels.h"
+#include "mm/vanillawrapperdls.h"
 
 PlayerModelManagerHandle gFierceDeityModelHandle;
 
@@ -22,6 +23,8 @@ void registerFierceDeity(void) {
     gFierceDeityModelHandle = PlayerModelManager_registerModel(PMM_API_VERSION, "__mm_object_link_boy__", PMM_MODEL_TYPE_FIERCE_DEITY);
 
     FallbackModelsCommon_doCommonAssignments(gFierceDeityModelHandle, skel, fd, GlobalObjects_getGlobalObject(GAMEPLAY_KEEP));
+
+    PlayerModelManager_setDisplayList(gFierceDeityModelHandle, LINK_DL_ELEGY_OF_EMPTINESS_SHELL, gCallHumanElegyShellDL);
 
     FallbackModelsCommon_addEquipmentAdultMM(gFierceDeityModelHandle);
 }

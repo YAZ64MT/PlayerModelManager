@@ -357,7 +357,6 @@ void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, F
     ModelInfo_init(&fp->currentModelInfo);
     fp->fallbackOverrideModelInfo = fallbackOverride;
     fp->fallbackModelInfo = fallback;
-    fp->displayListAlternates = recomputil_create_u32_value_hashmap();
     fp->tunicColor.isOverrideRequested = false;
     fp->numDLs = LINK_DL_MAX;
     fp->displayLists = recomp_alloc(fp->numDLs * sizeof(*fp->displayLists));
@@ -376,28 +375,6 @@ FormProxyId FormProxy_getFormProxyId(const FormProxy *fp) {
     RETURN_IF_INVALID_PTR(fp, FORM_PROXY_ID_NONE);
 
     return fp->fpId;
-}
-
-bool FormProxy_setAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id, FormProxy *alt) {
-    RETURN_IF_INVALID_PTR(fp, false);
-    RETURN_IF_INVALID_PTR(alt, false);
-
-    if (alt == fp) {
-        Logger_printWarning("fp == alt! Trying to assign would create circular reference! Ignoring...");
-        return false;
-    }
-
-    if (alt) {
-        return recomputil_u32_value_hashmap_insert(fp->displayListAlternates, id, (uintptr_t)alt);
-    }
-
-    return FormProxy_unsetAlternateFormProxyDL(fp, id);
-}
-
-bool FormProxy_unsetAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id) {
-    RETURN_IF_INVALID_PTR(fp, false);
-
-    return recomputil_u32_value_hashmap_erase(fp->displayListAlternates, id);
 }
 
 ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp) {
@@ -1072,16 +1049,6 @@ Gfx *FormProxy_getNextRefreshDL(FormProxy *fp, Link_DisplayList id) {
     RETURN_IF_INVALID_PTR(fp, NULL);
 
     Gfx *dl = NULL;
-
-    if (!dl) {
-        FormProxy *fpAlt = NULL;
-        recomputil_u32_value_hashmap_get(fp->displayListAlternates, id, (uintptr_t *)&fpAlt);
-        if (fpAlt) {
-            if (fpAlt && fpAlt != fp) {
-                dl = FormProxy_getNextRefreshDL(fpAlt, id);
-            }
-        }
-    }
 
     ModelInfo *current = &fp->currentModelInfo;
     ModelInfo *fallback = fp->fallbackModelInfo;

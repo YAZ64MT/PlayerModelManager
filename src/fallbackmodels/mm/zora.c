@@ -6,6 +6,7 @@
 #include "defaultfacetex.h"
 #include "apilocal.h"
 #include "fallbackmodels.h"
+#include "mm/vanillawrapperdls.h"
 
 PlayerModelManagerHandle gZoraModelHandle;
 
@@ -24,15 +25,14 @@ void registerZora(void) {
 
 #define SET_ENTRY_DL(id, dl) PlayerModelManager_setDisplayList(gZoraModelHandle, id, dl)
 
-    // hands
     // gLinkZoraSkel has fists on skeleton limbs, so we manually specify the open hands here
-    SET_ENTRY_DL(LINK_DL_LHAND, getZoraDL(gLinkZoraLeftHandOpenDL));
-    SET_ENTRY_DL(LINK_DL_OPT_LFIST, getZoraDL(gLinkZoraLeftHandClosedDL));
-    SET_ENTRY_DL(LINK_DL_OPT_LHAND_BOTTLE, getZoraDL(gLinkZoraLeftHandHoldBottleDL));
-    SET_ENTRY_DL(LINK_DL_OPT_LHAND_GUITAR, getZoraDL(object_link_zora_DL_00E088));
-
-    SET_ENTRY_DL(LINK_DL_RHAND, getZoraDL(gLinkZoraRightHandOpenDL));
-    SET_ENTRY_DL(LINK_DL_OPT_RFIST, getZoraDL(gLinkZoraRightHandClosedDL));;
+    PlayerModelManager_setDisplayList(gZoraModelHandle, LINK_DL_LHAND, getZoraDL(gLinkZoraLeftHandOpenDL));
+    PlayerModelManager_setDisplayList(gZoraModelHandle, LINK_DL_OPT_LFIST, getZoraDL(gLinkZoraLeftHandClosedDL));
+    PlayerModelManager_setDisplayList(gZoraModelHandle, LINK_DL_OPT_LHAND_BOTTLE, getZoraDL(gLinkZoraLeftHandHoldBottleDL));
+    PlayerModelManager_setDisplayList(gZoraModelHandle, LINK_DL_OPT_LHAND_GUITAR, getZoraDL(object_link_zora_DL_00E088));
+    PlayerModelManager_setDisplayList(gZoraModelHandle, LINK_DL_RHAND, getZoraDL(gLinkZoraRightHandOpenDL));
+    PlayerModelManager_setDisplayList(gZoraModelHandle, LINK_DL_OPT_RFIST, getZoraDL(gLinkZoraRightHandClosedDL));;
+    PlayerModelManager_setDisplayList(gZoraModelHandle, LINK_DL_ELEGY_OF_EMPTINESS_SHELL, gCallZoraElegyShellDL);
 
 #undef SET_ENTRY_DL
 

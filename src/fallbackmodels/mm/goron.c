@@ -7,6 +7,7 @@
 #include "defaultfacetex.h"
 #include "apilocal.h"
 #include "fallbackmodels.h"
+#include "mm/vanillawrapperdls.h"
 
 PlayerModelManagerHandle gGoronModelHandle;
 
@@ -41,15 +42,10 @@ void registerGoron(void) {
 
     PlayerModelManager_setShieldingSkeleton(gGoronModelHandle, shieldingSkel);
 
-#define SET_ENTRY_DL(id, dl) PlayerModelManager_setDisplayList(gGoronModelHandle, id, dl)
-
-    // hands
-    SET_ENTRY_DL(LINK_DL_OPT_LFIST, getGoronDL(gLinkGoronLeftHandClosedDL));
-    SET_ENTRY_DL(LINK_DL_OPT_LHAND_BOTTLE, getGoronDL(gLinkGoronLeftHandHoldBottleDL));
-
-    SET_ENTRY_DL(LINK_DL_OPT_RFIST, getGoronDL(gLinkGoronRightHandClosedDL));
-
-#undef SET_ENTRY_DL
+    PlayerModelManager_setDisplayList(gGoronModelHandle, LINK_DL_OPT_LFIST, getGoronDL(gLinkGoronLeftHandClosedDL));
+    PlayerModelManager_setDisplayList(gGoronModelHandle, LINK_DL_OPT_LHAND_BOTTLE, getGoronDL(gLinkGoronLeftHandHoldBottleDL));
+    PlayerModelManager_setDisplayList(gGoronModelHandle, LINK_DL_OPT_RFIST, getGoronDL(gLinkGoronRightHandClosedDL));
+    PlayerModelManager_setDisplayList(gGoronModelHandle, LINK_DL_ELEGY_OF_EMPTINESS_SHELL, gCallGoronElegyShellDL);
 
     FallbackModelsCommon_addEquipmentAdultMM(gGoronModelHandle);
 }

@@ -167,6 +167,52 @@ RECOMP_EXPORT bool PlayerModelManager_setAuthor(PlayerModelManagerHandle h, cons
     return true;
 }
 
+static bool isOldElegyId(Link_DisplayList id) {
+    switch (id) {
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN_UNUSED:
+            FALLTHROUGH;
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU_UNUSED:
+            FALLTHROUGH;
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON_UNUSED:
+            FALLTHROUGH;
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA_UNUSED:
+            FALLTHROUGH;
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY_UNUSED:
+            return true;
+            break;
+
+        default:
+            break;
+    }
+
+    return false;
+}
+
+static bool isOldElegyIdMatchesModelType(Link_DisplayList id, PlayerModelManagerModelType type) {
+    switch (id) {
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN_UNUSED:
+            return type == PMM_MODEL_TYPE_CHILD || type == PMM_MODEL_TYPE_ADULT;
+            break;
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU_UNUSED:
+            return type == PMM_MODEL_TYPE_DEKU;
+            break;
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON_UNUSED:
+            return type == PMM_MODEL_TYPE_GORON;
+            break;
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA_UNUSED:
+            return type == PMM_MODEL_TYPE_ZORA;
+            break;
+        case LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY_UNUSED:
+            return type == PMM_MODEL_TYPE_FIERCE_DEITY;
+            break;
+
+        default:
+            break;
+    }
+
+    return false;
+}
+
 RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, Link_DisplayList dlId, Gfx *dl) {
     if (dlId >= LINK_DL_MAX || dlId < 0) {
         Logger_printError("Invalid display list ID passed in.");
@@ -177,6 +223,16 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
 
     if (!entry) {
         return false;
+    }
+
+    // Backwards compatibility
+    // LINK_DL_ELEGY_OF_EMPTINESS_SHELL_<FORM> were consolidated into just LINK_DL_ELEGY_OF_EMPTINESS_SHELL
+    if (isOldElegyId(dlId)) {
+        if (isOldElegyIdMatchesModelType(dlId, ModelEntry_getType(entry))) {
+            dlId = LINK_DL_ELEGY_OF_EMPTINESS_SHELL;
+        } else {
+            return false;
+        }
     }
 
     if (ModelEntry_setDisplayList(entry, dlId, dl)) {

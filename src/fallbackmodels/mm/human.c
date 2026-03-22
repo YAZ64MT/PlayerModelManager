@@ -9,6 +9,7 @@
 #include "apilocal.h"
 #include "fallbackmodels.h"
 #include "logger.h"
+#include "mm/vanillawrapperdls.h"
 
 PlayerModelManagerHandle gHumanModelHandle;
 
@@ -25,22 +26,14 @@ void registerHuman(void) {
 
     FallbackModelsCommon_doCommonAssignments(gHumanModelHandle, skel, human, GlobalObjects_getGlobalObject(GAMEPLAY_KEEP));
 
-#define SET_ENTRY_DL(id, dl) PlayerModelManager_setDisplayList(gHumanModelHandle, id, dl)
-
-    // hands
-    SET_ENTRY_DL(LINK_DL_OPT_LFIST, getHumanDL(gLinkHumanLeftHandClosedDL));
-    SET_ENTRY_DL(LINK_DL_OPT_LHAND_BOTTLE, getHumanDL(gLinkHumanLeftHandHoldBottleDL));
-    SET_ENTRY_DL(LINK_DL_OPT_LHAND_GUITAR, getHumanDL(gLinkHumanLeftHandOpenDL));
-
-    SET_ENTRY_DL(LINK_DL_OPT_RFIST, getHumanDL(gLinkHumanRightHandClosedDL));
-
-    SET_ENTRY_DL(LINK_DL_OPT_RHAND_OCARINA, gLinkHumanRightHandOcarinaDL);
-
-    // First Person
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_RFOREARM, gEmptyDL);
-    SET_ENTRY_DL(LINK_DL_OPT_FPS_RHAND, gLinkHumanFirstPersonArmDL);
-
-#undef SET_ENTRY_DL
+    PlayerModelManager_setDisplayList(gHumanModelHandle, LINK_DL_OPT_LFIST, getHumanDL(gLinkHumanLeftHandClosedDL));
+    PlayerModelManager_setDisplayList(gHumanModelHandle, LINK_DL_OPT_LHAND_BOTTLE, getHumanDL(gLinkHumanLeftHandHoldBottleDL));
+    PlayerModelManager_setDisplayList(gHumanModelHandle, LINK_DL_OPT_LHAND_GUITAR, getHumanDL(gLinkHumanLeftHandOpenDL));
+    PlayerModelManager_setDisplayList(gHumanModelHandle, LINK_DL_OPT_RFIST, getHumanDL(gLinkHumanRightHandClosedDL));
+    PlayerModelManager_setDisplayList(gHumanModelHandle, LINK_DL_OPT_RHAND_OCARINA, gLinkHumanRightHandOcarinaDL);
+    PlayerModelManager_setDisplayList(gHumanModelHandle, LINK_DL_OPT_FPS_RFOREARM, gEmptyDL);
+    PlayerModelManager_setDisplayList(gHumanModelHandle, LINK_DL_OPT_FPS_RHAND, gLinkHumanFirstPersonArmDL);
+    PlayerModelManager_setDisplayList(gHumanModelHandle, LINK_DL_ELEGY_OF_EMPTINESS_SHELL, gCallHumanElegyShellDL);
 
     FallbackModelsCommon_addEquipmentChildMM(gHumanModelHandle);
 }

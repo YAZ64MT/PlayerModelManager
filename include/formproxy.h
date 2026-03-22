@@ -44,7 +44,6 @@ typedef struct FormProxy {
     ModelInfo currentModelInfo;
     ModelInfo *fallbackOverrideModelInfo;
     ModelInfo *fallbackModelInfo;
-    U32ValueHashmapHandle displayListAlternates;
     SkeletonProxy skeleton;
     ShieldingSkeletonProxy shieldingSkeleton;
     TunicColor tunicColor;
@@ -64,8 +63,6 @@ bool FormProxy_setCurrentOverrideDL(FormProxy *fp, Link_DisplayList dlId, Gfx *d
 bool FormProxy_unsetCurrentOverrideDL(FormProxy *fp, Link_DisplayList dlId);
 bool FormProxy_setCurrentOverrideMtx(FormProxy *fp, Link_EquipmentMatrix mtxId, Mtx *mtx);
 bool FormProxy_unsetCurrentOverrideMtx(FormProxy *fp, Link_EquipmentMatrix mtxId);
-bool FormProxy_setAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id, FormProxy *alt);
-bool FormProxy_unsetAlternateFormProxyDL(FormProxy *fp, Link_DisplayList id);
 void FormProxy_requestTunicColorOverride(FormProxy *fp, Color_RGBA8 color);
 bool FormProxy_isTunicColorOverrideRequested(FormProxy *fp);
 Color_RGBA8 FormProxy_getRequestedTunicColor(FormProxy *fp);

@@ -13,14 +13,6 @@ void setupElegyStatueProxy_on_return_func_80848640(PlayState *play, Player *play
 }
 
 void replaceElegyStatue_on_EnTorch2_Draw(Actor *actor, PlayState *play) {
-    static Link_DisplayList formToDLid[] = {
-        [PLAYER_FORM_HUMAN] = LINK_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN,
-        [PLAYER_FORM_DEKU] = LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU,
-        [PLAYER_FORM_GORON] = LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON,
-        [PLAYER_FORM_ZORA] = LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA,
-        [PLAYER_FORM_FIERCE_DEITY] = LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY,
-    };
-
     PlayerTransformation form = actor->params;
 
     FormProxyId formId;
@@ -34,7 +26,7 @@ void replaceElegyStatue_on_EnTorch2_Draw(Actor *actor, PlayState *play) {
     if (fp) {
         extern Gfx *sShellDLists[];
 
-        Gfx *dl = FormProxy_getDL(fp, formToDLid[form]);
+        Gfx *dl = FormProxy_getDL(fp, LINK_DL_ELEGY_OF_EMPTINESS_SHELL);
 
         if (dl) {
             sShellDLists[form] = dl;

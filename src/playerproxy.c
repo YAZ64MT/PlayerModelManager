@@ -63,47 +63,6 @@ void PlayerProxy_init(PlayerProxy *pp) {
     FormProxy *goron = PlayerProxy_getFormProxy(pp, FORM_PROXY_ID_GORON);
     FormProxy *zora = PlayerProxy_getFormProxy(pp, FORM_PROXY_ID_ZORA);
     FormProxy *fd = PlayerProxy_getFormProxy(pp, FORM_PROXY_ID_FIERCE_DEITY);
-
-    FormProxy *formProxies[] = {human, deku, goron, zora, fd};
-
-    typedef struct FormAlternateDL {
-        FormProxyId formProxyId;
-        Link_DisplayList dlId;
-    } FormAlternateDL;
-
-#define DECLARE_FORM_ALT_DL(proxyId, linkDlId)   \
-    {                                            \
-        .formProxyId = proxyId, .dlId = linkDlId \
-    }
-
-    const FormAlternateDL formAlternates[] = {
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_DEKU, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_DEKU, LINK_DL_MASK_DEKU),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_DEKU, LINK_DL_MASK_DEKU_SCREAM),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_GORON, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_GORON),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_GORON, LINK_DL_MASK_GORON),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_GORON, LINK_DL_MASK_GORON_SCREAM),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_ZORA, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_ZORA, LINK_DL_MASK_ZORA),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_ZORA, LINK_DL_MASK_ZORA_SCREAM),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_FIERCE_DEITY, LINK_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY),
-        DECLARE_FORM_ALT_DL(FORM_PROXY_ID_FIERCE_DEITY, LINK_DL_MASK_FIERCE_DEITY_SCREAM),
-    };
-
-    for (int i = 0; i < ARRAY_COUNT(formProxies); ++i) {
-        FormProxy *currFp = formProxies[i];
-
-        if (currFp) {
-            for (int j = 0; j < ARRAY_COUNT(formAlternates); ++j) {
-                const FormAlternateDL *currAlt = &formAlternates[j];
-
-                if (FormProxy_getFormProxyId(currFp) != currAlt->formProxyId) {
-                    FormProxy_setAlternateFormProxyDL(currFp, currAlt->dlId, PlayerProxy_getFormProxy(pp, currAlt->formProxyId));
-                }
-            }
-        }
-    }
 }
 
 static void PlayerProxy_refresh(PlayerProxy *pp) {
