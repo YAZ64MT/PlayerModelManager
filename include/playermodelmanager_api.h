@@ -5,7 +5,7 @@ typedef unsigned long PlayerModelManagerHandle;
 
 // Used for keeping compatibility between versions
 // DO NOT EDIT
-#define PMM_API_VERSION 3UL
+#define PMM_API_VERSION 4UL
 
 #define YAZMT_PMM_MOD_NAME "yazmt_mm_playermodelmanager"
 
