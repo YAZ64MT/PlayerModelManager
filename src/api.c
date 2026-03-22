@@ -14,6 +14,7 @@
 #include "customdls.h"
 #include "equipmentbuiltin.h"
 #include "utils.h"
+#include "proxyactorext.h"
 
 static Gfx sBelowV3FirstPersonRightForearmDL[] = {
     gsSPEndDisplayList(),
@@ -696,6 +697,40 @@ RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation 
     }
 
     return !!PlayerProxy_getCurrentEntry(gPlayer1Proxy, modelType);
+}
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_isModelApplied(Actor *actor, PlayerModelManagerHandle h) {
+    const ModelEntry *entryToCheck = ModelEntryManager_getEntry(h);
+
+    if (entryToCheck) {
+        PlayerModelManagerModelType type = ModelEntry_getType(entryToCheck);
+
+        if (Utils_isFormModelType(type)) {
+            FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+            if (fp) {
+                ModelInfo *currInfo = FormProxy_getCurrentModelInfo(fp);
+
+                if (currInfo) {
+                    ModelEntryForm *entryForm = ModelInfo_getModelEntryForm(currInfo);
+
+                    if (entryForm) {
+                        ModelEntry *currEntry = ModelEntryForm_getModelEntry(entryForm);
+
+                        return currEntry == entryToCheck;
+                    }
+                }
+            }
+        } else if (Utils_isEquipmentModelType(type)) {
+            PlayerProxy *pp = ProxyActorExt_getPlayerProxy(actor);
+
+            if (pp) {
+                return PlayerProxy_isModelEntryApplied(pp, entryToCheck);
+            }
+        }
+    }
+
+    return false;
 }
 
 void PlayerModelManager_lockAPI(void) {
