@@ -93,13 +93,10 @@ void *Utils_recompCalloc(size_t size) {
 
 void Utils_processIterableSetPtrs(YAZMTCore_IterableU32Set *set, void processorFunc(void *item)) {
     size_t numItems = YAZMTCore_IterableU32Set_size(set);
+    void **items = (void **)YAZMTCore_IterableU32Set_values(set);
 
-    if (numItems > 0) {
-        void **items = (void **)YAZMTCore_IterableU32Set_values(set);
-
-        for (size_t i = 0; i < numItems; ++i) {
-            processorFunc(items[i]);
-        }
+    for (size_t i = 0; i < numItems; ++i) {
+        processorFunc(items[i]);
     }
 }
 

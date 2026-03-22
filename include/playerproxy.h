@@ -9,12 +9,14 @@
 #include "playermodelmanager_api.h"
 #include "stdbool.h"
 #include "modelentry.h"
+#include "yazmtcorelib_api.h"
 
 typedef struct FormProxy FormProxy;
 
 typedef struct PlayerProxy {
     U32MemoryHashmapHandle formProxies;
     U32ValueHashmapHandle modelEntries;
+    YAZMTCore_IterableU32Set *currentlyEquippedEntries;
 } PlayerProxy;
 
 void PlayerProxy_init(PlayerProxy *pp);
@@ -28,6 +30,7 @@ const ModelEntry *PlayerProxy_getCurrentEntry(PlayerProxy *pp, PlayerModelManage
 bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *newEntry);
 bool PlayerProxy_forceApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *newEntry);
 void PlayerProxy_removeEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType);
+bool PlayerProxy_isModelEntryApplied(PlayerProxy *pp, const ModelEntry *entry);
 
 extern PlayerProxy *gPlayer1Proxy;
 extern PlayerProxy *gPlayer2Proxy;

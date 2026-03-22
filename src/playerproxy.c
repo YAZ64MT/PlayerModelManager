@@ -8,6 +8,9 @@
 #include "utils.h"
 #include "ptrvalidate.h"
 
+// this function should only be called by PlayerProxy
+void FormProxy_requestRefresh(FormProxy *fp);
+
 PlayerProxy *gPlayer1Proxy;
 PlayerProxy *gPlayer2Proxy;
 
@@ -51,6 +54,7 @@ void PlayerProxy_init(PlayerProxy *pp) {
 
     pp->formProxies = recomputil_create_u32_memory_hashmap(sizeof(FormProxy));
     pp->modelEntries = recomputil_create_u32_value_hashmap();
+    pp->currentlyEquippedEntries = YAZMTCore_IterableU32Set_new();
 
     PlayerProxy_createFormProxy(pp, FORM_PROXY_ID_HUMAN, PLAYER_FORM_HUMAN, &gHumanModelInfo, &gHumanModelInfoFallbackOverride);
     PlayerProxy_createFormProxy(pp, FORM_PROXY_ID_DEKU, PLAYER_FORM_DEKU, &gDekuModelInfo, &gDekuModelInfoFallbackOverride);
@@ -73,6 +77,16 @@ static void PlayerProxy_refresh(PlayerProxy *pp) {
 
         if (currFp) {
             FormProxy_requestRefresh(currFp);
+        }
+    }
+
+    YAZMTCore_IterableU32Set_clear(pp->currentlyEquippedEntries);
+
+    for (PlayerModelManagerModelType type = 0; type < PMM_MODEL_TYPE_MAX; ++type) {
+        uintptr_t entry = 0;
+        recomputil_u32_value_hashmap_get(pp->modelEntries, type, &entry);
+        if (entry) {
+            YAZMTCore_IterableU32Set_insert(pp->currentlyEquippedEntries, entry);
         }
     }
 }
@@ -302,6 +316,10 @@ void PlayerProxy_removeEntry(PlayerProxy *pp, PlayerModelManagerModelType modelT
             reapplyAllEquipmentEntries(pp);
         }
     }
+}
+
+bool PlayerProxy_isModelEntryApplied(PlayerProxy *pp, const ModelEntry *entry) {
+    return YAZMTCore_IterableU32Set_contains(pp->currentlyEquippedEntries, (uintptr_t)entry);
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects) void initPlayerProxyHash(void) {
