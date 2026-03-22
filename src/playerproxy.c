@@ -6,6 +6,7 @@
 #include "playermodelconfig.h"
 #include "modelentry.h"
 #include "utils.h"
+#include "ptrvalidate.h"
 
 PlayerProxy *gPlayer1Proxy;
 PlayerProxy *gPlayer2Proxy;
@@ -21,28 +22,16 @@ ModelInfo gGoronModelInfo;
 ModelInfo gZoraModelInfo;
 ModelInfo gFierceDeityModelInfo;
 
-static U32HashsetHandle sValidPlayerProxies;
-
-#define PRINT_INVALID_PTR_ERR() Logger_printError("Received invalid PlayerProxy pointer.")
-
-static bool isValidPlayerProxy(const PlayerProxy *pp) {
-    return recomputil_u32_hashset_contains(sValidPlayerProxies, (uintptr_t)pp);
-}
+SETUP_PTR_VALIDATION(sPlayerProxyPtrSet, PlayerProxy);
 
 FormProxy *PlayerProxy_getFormProxy(PlayerProxy *pp, FormProxyId formId) {
-    if (!isValidPlayerProxy(pp)) {
-        PRINT_INVALID_PTR_ERR();
-        return NULL;
-    }
+    RETURN_IF_INVALID_PTR(pp, NULL);
 
     return recomputil_u32_memory_hashmap_get(pp->formProxies, formId);
 }
 
 void PlayerProxy_createFormProxy(PlayerProxy *pp, FormProxyId proxyId, PlayerTransformation form, ModelInfo *fallback, ModelInfo *fallbackOverride) {
-    if (!isValidPlayerProxy(pp)) {
-        PRINT_INVALID_PTR_ERR();
-        return;
-    }
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
 
     if (recomputil_u32_memory_hashmap_create(pp->formProxies, proxyId)) {
         FormProxy *fp = PlayerProxy_getFormProxy(pp, proxyId);
@@ -54,16 +43,11 @@ void PlayerProxy_createFormProxy(PlayerProxy *pp, FormProxyId proxyId, PlayerTra
 
 void PlayerProxy_init(PlayerProxy *pp) {
     if (!pp) {
-        Logger_printWarning("Passed in a NULL pointer!");
+        Logger_printError("Passed in a NULL pointer!");
         return;
     }
 
-    if (isValidPlayerProxy(pp)) {
-        Logger_printWarning("Tried to initialize a PlayerProxy twice!");
-        return; // don't init twice
-    }
-
-    recomputil_u32_hashset_insert(sValidPlayerProxies, (uintptr_t)pp);
+    ADD_VALIDATED_PTR(pp);
 
     pp->formProxies = recomputil_create_u32_memory_hashmap(sizeof(FormProxy));
     pp->modelEntries = recomputil_create_u32_value_hashmap();
@@ -123,6 +107,8 @@ void PlayerProxy_init(PlayerProxy *pp) {
 }
 
 static void PlayerProxy_refresh(PlayerProxy *pp) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
     for (size_t i = 0; i < gFormProxyIds->size; ++i) {
         FormProxy *currFp = PlayerProxy_getFormProxy(pp, gFormProxyIds->ids[i]);
 
@@ -135,12 +121,16 @@ static void PlayerProxy_refresh(PlayerProxy *pp) {
 static YAZMTCore_IterableU32Set *sQueuedRefreshes;
 
 void PlayerProxy_requestRefresh(PlayerProxy *pp) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
     if (pp) {
         YAZMTCore_IterableU32Set_insert(sQueuedRefreshes, (uintptr_t)pp);
     }
 }
 
 void PlayerProxy_setOverrideDL(PlayerProxy *pp, Link_DisplayList dlId, Gfx *dl) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
     for (size_t i = 0; i < gFormProxyIds->size; ++i) {
         FormProxy *currFp = PlayerProxy_getFormProxy(pp, gFormProxyIds->ids[i]);
 
@@ -151,6 +141,8 @@ void PlayerProxy_setOverrideDL(PlayerProxy *pp, Link_DisplayList dlId, Gfx *dl) 
 }
 
 void PlayerProxy_setOverrideMtx(PlayerProxy *pp, Link_EquipmentMatrix mtxId, Mtx *mtx) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
     for (size_t i = 0; i < gFormProxyIds->size; ++i) {
         FormProxy *currFp = PlayerProxy_getFormProxy(pp, gFormProxyIds->ids[i]);
 
@@ -195,6 +187,8 @@ bool PlayerProxy_getProxyIdFromForm(PlayerTransformation form, FormProxyId *out)
 }
 
 void PlayerProxy_requestTunicColorOverride(PlayerProxy *pp, Color_RGBA8 color) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
     for (size_t i = 0; i < gFormProxyIds->size; ++i) {
         FormProxy *currFp = PlayerProxy_getFormProxy(pp, gFormProxyIds->ids[i]);
 
@@ -205,6 +199,8 @@ void PlayerProxy_requestTunicColorOverride(PlayerProxy *pp, Color_RGBA8 color) {
 }
 
 static void PlayerProxy_setModelEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *modelEntry) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
     if (!Utils_isValidModelType(modelType)) {
         Logger_printError("Passed in invalid model type %d", modelType);
         return;
@@ -232,12 +228,16 @@ static void PlayerProxy_setModelEntry(PlayerProxy *pp, PlayerModelManagerModelTy
 }
 
 const ModelEntry *PlayerProxy_getCurrentEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType) {
+    RETURN_IF_INVALID_PTR(pp, NULL);
+
     uintptr_t entry = 0;
     recomputil_u32_value_hashmap_get(pp->modelEntries, modelType, &entry);
     return (const ModelEntry *)entry;
 }
 
 static FormProxy *getFormProxyFromCategory(PlayerProxy *pp, PlayerModelManagerModelType modelType) {
+    RETURN_IF_INVALID_PTR(pp, NULL);
+
     FormProxyId fpId;
 
     switch (modelType) {
@@ -266,6 +266,8 @@ static FormProxy *getFormProxyFromCategory(PlayerProxy *pp, PlayerModelManagerMo
 }
 
 static void reapplyAllEquipmentEntries(PlayerProxy *pp) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
     for (PlayerModelManagerModelType i = 0; i < PMM_MODEL_TYPE_MAX; ++i) {
         if (Utils_isEquipmentModelType(i)) {
             const ModelEntry *tmp = PlayerProxy_getCurrentEntry(pp, i);
@@ -276,6 +278,8 @@ static void reapplyAllEquipmentEntries(PlayerProxy *pp) {
 }
 
 bool PlayerProxy_forceApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *newEntry) {
+    RETURN_IF_INVALID_PTR(pp, false);
+
     const ModelEntry *currEntry = PlayerProxy_getCurrentEntry(pp, modelType);
 
     if (newEntry == NULL) {
@@ -305,6 +309,8 @@ bool PlayerProxy_forceApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mo
 }
 
 bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *newEntry) {
+    RETURN_IF_INVALID_PTR(pp, false);
+
     const ModelEntry *currEntry = PlayerProxy_getCurrentEntry(pp, modelType);
     if (newEntry != currEntry) {
         return PlayerProxy_forceApplyEntry(pp, modelType, newEntry);
@@ -314,6 +320,8 @@ bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mode
 }
 
 void PlayerProxy_removeEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
     if (!Utils_isValidModelType(modelType)) {
         Logger_printError("Called with invalid category %d\n", modelType);
         Utils_tryCrashGame();
@@ -338,7 +346,6 @@ void PlayerProxy_removeEntry(PlayerProxy *pp, PlayerModelManagerModelType modelT
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects) void initPlayerProxyHash(void) {
-    sValidPlayerProxies = recomputil_create_u32_hashset();
     sQueuedRefreshes = YAZMTCore_IterableU32Set_new();
 }
 
