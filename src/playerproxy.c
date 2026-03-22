@@ -319,6 +319,8 @@ void PlayerProxy_removeEntry(PlayerProxy *pp, PlayerModelManagerModelType modelT
 }
 
 bool PlayerProxy_isModelEntryApplied(PlayerProxy *pp, const ModelEntry *entry) {
+    RETURN_IF_INVALID_PTR(pp, false);
+
     return YAZMTCore_IterableU32Set_contains(pp->currentlyEquippedEntries, (uintptr_t)entry);
 }
 
