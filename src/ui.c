@@ -574,12 +574,11 @@ static void closeButtonPressed(RecompuiResource resource, const RecompuiEventDat
                 if (catInf->isNeedsDiskSave) {
                     catInf->isNeedsDiskSave = false;
                     wasModelChanged = true;
-                    ModelEntryManager_saveCurrentEntry(gPlayer1Proxy, catInf->category);
                 }
             }
 
             if (wasModelChanged) {
-                Audio_PlaySfx(NA_SE_SY_PIECE_OF_HEART);
+                Audio_PlaySfx(ModelEntryManager_saveModelsToDisk() ? NA_SE_SY_PIECE_OF_HEART : NA_SE_SY_ERROR);
             } else {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
             }
@@ -794,7 +793,7 @@ RECOMP_CALLBACK(".", _internal_preInitHashObjects) void initUIOnRecompInit(void)
     setupScrollingList(sModelListElement);
 
     // TODO: Restore author preview after UI crashes are mitigated in Recomp
-    //setupAuthorRow();
+    // setupAuthorRow();
 
     // Setup category container
     sContainerCategories = recompui_create_element(sUIContext, sUIRoot);
@@ -1017,7 +1016,7 @@ static void refreshFileList(void) {
     // MUST CALL INSIDE UI CONTEXT
 
     destroyModelButtons();
-    
+
     if (isSelectingModel()) {
         createModelListButtons();
 
@@ -1084,8 +1083,8 @@ static bool isOpenMenuComboPressed(PlayState *play) {
 
             if ((CHECK_BTN_ALL(input->press.button, BTN_L) && CHECK_BTN_ALL(input->cur.button, BTN_A)) ||
                 (CHECK_BTN_ALL(input->cur.button, BTN_L) && CHECK_BTN_ALL(input->press.button, BTN_A))) {
-                    clearPressedInputButtons(input, BTN_L | BTN_A);
-                    return true;
+                clearPressedInputButtons(input, BTN_L | BTN_A);
+                return true;
             }
             break;
 

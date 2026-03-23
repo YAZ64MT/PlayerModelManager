@@ -37,7 +37,7 @@ dependencies = [
 # Example dependency:
 #    "modname:1.0.0"
     "yazmt_mm_global_objects:0.1.1",
-    "ProxyMM_KV:0.0.5",
+    "RecompExternalPython_API:2.0.0",
     "yazmt_mm_corelib:0.1.1",
 ]
 

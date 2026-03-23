@@ -13,12 +13,10 @@ void ModelEntryManager_setCurrentEntry(PlayerModelManagerModelType modelType, co
 const ModelEntry **ModelEntryManager_getCategoryEntryData(PlayerModelManagerModelType modelType, size_t *count);
 PlayerModelManagerHandle ModelEntryManager_createMemoryHandle(PlayerModelManagerModelType type, const char *internalName);
 ModelEntry *ModelEntryManager_getEntry(PlayerModelManagerHandle h);
-void ModelEntryManager_saveCurrentEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType);
 bool ModelEntryManager_isEntryHidden(const ModelEntry *ModelEntry);
 void ModelEntryManager_setEntryHidden(const ModelEntry *modelEntry, bool isHidden);
-void ModelEntryManager_applyModelsFromDisk(PlayerProxy *pp);
-
-PlayerTransformation getFormFromModelType(PlayerModelManagerModelType t);
-PlayerTransformation getFormFromModelType(PlayerModelManagerModelType modelType);
+bool ModelEntryManager_saveModelsToDisk(void);
+void ModelEntryManager_registerProxyToSave(PlayerProxy *pp, const char *id);
+void ModelEntryManager_applySavedEntriesToProxy(PlayerProxy *pp, const char *id);
 
 #endif

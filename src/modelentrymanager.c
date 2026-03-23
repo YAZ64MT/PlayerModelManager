@@ -5,11 +5,20 @@
 #include "libc/string.h"
 #include "modelentrymanager.h"
 #include "recompdata.h"
-#include "proxymm_kv_api.h"
+#include "recompconfig.h"
 #include "playermodelmanager_api.h"
 #include "yazmtcorelib_api.h"
 #include "playerproxy.h"
 #include "logger.h"
+#include "repy_api.h"
+#include "string.h"
+
+static YAZMTCore_DynamicDataArray *sProxiesToSave;
+
+typedef struct SavedProxyEntry {
+    PlayerProxy *pp;
+    const char *sectionName;
+} SavedProxyEntry;
 
 static U32SlotmapHandle sEntryHandles;
 
@@ -17,113 +26,87 @@ static YAZMTCore_StringU32Dictionary *sInternalNamesToEntries;
 
 static YAZMTCore_DynamicU32Array *sModelEntries[PMM_MODEL_TYPE_MAX];
 
-static const ModelEntry *sCurrentModelEntries[PMM_MODEL_TYPE_MAX];
-
 static U32HashsetHandle sHiddenModelEntries;
+
+static char *sSavedModelCfgPath;
 
 #define SAVED_INTERNAL_NAME_BUFFER_SIZE (INTERNAL_NAME_MAX_LENGTH + 1)
 
-typedef struct {
-    const char *key;
+typedef struct SavedModelName {
+    char *key;
+    PlayerModelManagerModelType modelType;
 } SavedModelName;
 
-static SavedModelName sSavedModelNames[PMM_MODEL_TYPE_MAX] = {
-    {.key = "pmm_saved_none_name"}, // FAKE!
-    {.key = "pmm_saved_child_name"},
-    {.key = "pmm_saved_adult_name"},
-    {.key = "pmm_saved_deku_name"},
-    {.key = "pmm_saved_goron_name"},
-    {.key = "pmm_saved_zora_name"},
-    {.key = "pmm_saved_fierce_deity_name"},
-    {.key = "pmm_saved_sword1"},
-    {.key = "pmm_saved_sword2"},
-    {.key = "pmm_saved_sword3"},
-    {.key = "pmm_saved_sword4"},
-    {.key = "pmm_saved_sword5"},
-    {.key = "pmm_saved_shield1"},
-    {.key = "pmm_saved_shield2"},
-    {.key = "pmm_saved_shield3"},
-    {.key = "pmm_saved_hookshot"},
-    {.key = "pmm_saved_bow"},
-    {.key = "pmm_saved_slingshot"},
-    {.key = "pmm_saved_bottle"},
-    {.key = "pmm_saved_ocarina_fairy"},
-    {.key = "pmm_saved_ocarina_time"},
-    {.key = "pmm_saved_boomerang"},
-    {.key = "pmm_saved_hammer"},
-    {.key = "pmm_saved_deku_stick"},
-    {.key = "pmm_saved_pipes"},
-    {.key = "pmm_saved_drums"},
-    {.key = "pmm_saved_guitar"},
-    {.key = "pmm_saved_mask_skull"},
-    {.key = "pmm_saved_mask_spooky"},
-    {.key = "pmm_saved_mask_gerudo"},
-    {.key = "pmm_saved_mask_truth"},
-    {.key = "pmm_saved_mask_kafeis_mask"},
-    {.key = "pmm_saved_mask_all_night"},
-    {.key = "pmm_saved_mask_bunny"},
-    {.key = "pmm_saved_mask_keaton"},
-    {.key = "pmm_saved_mask_garo"},
-    {.key = "pmm_saved_mask_romani"},
-    {.key = "pmm_saved_mask_circus_leader"},
-    {.key = "pmm_saved_mask_couple"},
-    {.key = "pmm_saved_mask_postman"},
-    {.key = "pmm_saved_mask_great_fairy"},
-    {.key = "pmm_saved_mask_gibdo"},
-    {.key = "pmm_saved_mask_don_gero"},
-    {.key = "pmm_saved_mask_kamaro"},
-    {.key = "pmm_saved_mask_captain"},
-    {.key = "pmm_saved_mask_stone"},
-    {.key = "pmm_saved_mask_bremen"},
-    {.key = "pmm_saved_mask_blast"},
-    {.key = "pmm_saved_mask_scents"},
-    {.key = "pmm_saved_mask_giant"},
-    {.key = "pmm_saved_mask_deku"},
-    {.key = "pmm_saved_mask_goron"},
-    {.key = "pmm_saved_mask_zora"},
-    {.key = "pmm_saved_mask_fierce_deity"},
-    {.key = "pmm_saved_model_pack"}, // FAKE!
-    {.key = "pmm_saved_bomb"},
-    {.key = "pmm_saved_bombchu"},
+#define DECLARE_SAVED_MODEL_NAME(keyName, type) {.key = keyName, .modelType = type}
+
+static SavedModelName sSavedModelNames[] = {
+    DECLARE_SAVED_MODEL_NAME("child", PMM_MODEL_TYPE_CHILD),
+    DECLARE_SAVED_MODEL_NAME("adult", PMM_MODEL_TYPE_ADULT),
+    DECLARE_SAVED_MODEL_NAME("deku", PMM_MODEL_TYPE_DEKU),
+    DECLARE_SAVED_MODEL_NAME("goron", PMM_MODEL_TYPE_GORON),
+    DECLARE_SAVED_MODEL_NAME("zora", PMM_MODEL_TYPE_ZORA),
+    DECLARE_SAVED_MODEL_NAME("fierce_deity", PMM_MODEL_TYPE_FIERCE_DEITY),
+    DECLARE_SAVED_MODEL_NAME("sword1", PMM_MODEL_TYPE_SWORD1),
+    DECLARE_SAVED_MODEL_NAME("sword2", PMM_MODEL_TYPE_SWORD2),
+    DECLARE_SAVED_MODEL_NAME("sword3", PMM_MODEL_TYPE_SWORD3),
+    DECLARE_SAVED_MODEL_NAME("sword4", PMM_MODEL_TYPE_SWORD4),
+    DECLARE_SAVED_MODEL_NAME("sword5", PMM_MODEL_TYPE_SWORD5),
+    DECLARE_SAVED_MODEL_NAME("shield1", PMM_MODEL_TYPE_SHIELD1),
+    DECLARE_SAVED_MODEL_NAME("shield2", PMM_MODEL_TYPE_SHIELD2),
+    DECLARE_SAVED_MODEL_NAME("shield3", PMM_MODEL_TYPE_SHIELD3),
+    DECLARE_SAVED_MODEL_NAME("hookshot", PMM_MODEL_TYPE_HOOKSHOT),
+    DECLARE_SAVED_MODEL_NAME("bow", PMM_MODEL_TYPE_BOW),
+    DECLARE_SAVED_MODEL_NAME("slingshot", PMM_MODEL_TYPE_SLINGSHOT),
+    DECLARE_SAVED_MODEL_NAME("bottle", PMM_MODEL_TYPE_BOTTLE),
+    DECLARE_SAVED_MODEL_NAME("ocarina_fairy", PMM_MODEL_TYPE_OCARINA_FAIRY),
+    DECLARE_SAVED_MODEL_NAME("ocarina_time", PMM_MODEL_TYPE_OCARINA_TIME),
+    DECLARE_SAVED_MODEL_NAME("boomerang", PMM_MODEL_TYPE_BOOMERANG),
+    DECLARE_SAVED_MODEL_NAME("hammer", PMM_MODEL_TYPE_HAMMER),
+    DECLARE_SAVED_MODEL_NAME("stick", PMM_MODEL_TYPE_DEKU_STICK),
+    DECLARE_SAVED_MODEL_NAME("pipes", PMM_MODEL_TYPE_PIPES),
+    DECLARE_SAVED_MODEL_NAME("drums", PMM_MODEL_TYPE_DRUMS),
+    DECLARE_SAVED_MODEL_NAME("guitar", PMM_MODEL_TYPE_GUITAR),
+    DECLARE_SAVED_MODEL_NAME("mask_skull", PMM_MODEL_TYPE_MASK_SKULL),
+    DECLARE_SAVED_MODEL_NAME("mask_spooky", PMM_MODEL_TYPE_MASK_SPOOKY),
+    DECLARE_SAVED_MODEL_NAME("mask_gerudo", PMM_MODEL_TYPE_MASK_GERUDO),
+    DECLARE_SAVED_MODEL_NAME("mask_truth", PMM_MODEL_TYPE_MASK_TRUTH),
+    DECLARE_SAVED_MODEL_NAME("mask_kafei", PMM_MODEL_TYPE_MASK_KAFEIS_MASK),
+    DECLARE_SAVED_MODEL_NAME("mask_all_night", PMM_MODEL_TYPE_MASK_ALL_NIGHT),
+    DECLARE_SAVED_MODEL_NAME("mask_bunny", PMM_MODEL_TYPE_MASK_BUNNY),
+    DECLARE_SAVED_MODEL_NAME("mask_keaton", PMM_MODEL_TYPE_MASK_KEATON),
+    DECLARE_SAVED_MODEL_NAME("mask_garo", PMM_MODEL_TYPE_MASK_GARO),
+    DECLARE_SAVED_MODEL_NAME("mask_romani", PMM_MODEL_TYPE_MASK_ROMANI),
+    DECLARE_SAVED_MODEL_NAME("mask_circus_leader", PMM_MODEL_TYPE_MASK_CIRCUS_LEADER),
+    DECLARE_SAVED_MODEL_NAME("mask_couple", PMM_MODEL_TYPE_MASK_COUPLE),
+    DECLARE_SAVED_MODEL_NAME("mask_postman", PMM_MODEL_TYPE_MASK_POSTMAN),
+    DECLARE_SAVED_MODEL_NAME("mask_great_fairy", PMM_MODEL_TYPE_MASK_GREAT_FAIRY),
+    DECLARE_SAVED_MODEL_NAME("mask_gibdo", PMM_MODEL_TYPE_MASK_GIBDO),
+    DECLARE_SAVED_MODEL_NAME("mask_don_gero", PMM_MODEL_TYPE_MASK_DON_GERO),
+    DECLARE_SAVED_MODEL_NAME("mask_kamaro", PMM_MODEL_TYPE_MASK_KAMARO),
+    DECLARE_SAVED_MODEL_NAME("mask_captain", PMM_MODEL_TYPE_MASK_CAPTAIN),
+    DECLARE_SAVED_MODEL_NAME("mask_stone", PMM_MODEL_TYPE_MASK_STONE),
+    DECLARE_SAVED_MODEL_NAME("mask_bremen", PMM_MODEL_TYPE_MASK_BREMEN),
+    DECLARE_SAVED_MODEL_NAME("mask_blast", PMM_MODEL_TYPE_MASK_BLAST),
+    DECLARE_SAVED_MODEL_NAME("mask_scents", PMM_MODEL_TYPE_MASK_SCENTS),
+    DECLARE_SAVED_MODEL_NAME("mask_giant", PMM_MODEL_TYPE_MASK_GIANT),
+    DECLARE_SAVED_MODEL_NAME("mask_deku", PMM_MODEL_TYPE_MASK_DEKU),
+    DECLARE_SAVED_MODEL_NAME("mask_goron", PMM_MODEL_TYPE_MASK_GORON),
+    DECLARE_SAVED_MODEL_NAME("mask_zora", PMM_MODEL_TYPE_MASK_ZORA),
+    DECLARE_SAVED_MODEL_NAME("mask_fierce_deity", PMM_MODEL_TYPE_MASK_FIERCE_DEITY),
+    DECLARE_SAVED_MODEL_NAME("bomb", PMM_MODEL_TYPE_BOMB),
+    DECLARE_SAVED_MODEL_NAME("bombchu", PMM_MODEL_TYPE_BOMBCHU),
 };
 
-// Returns PLAYER_FORM_MAX on invalid type passed in
-PlayerTransformation getFormFromModelType(PlayerModelManagerModelType t) {
-    switch (t) {
-        case PMM_MODEL_TYPE_CHILD:
-        case PMM_MODEL_TYPE_ADULT:
-            return PLAYER_FORM_HUMAN;
-            break;
+#undef DECLARE_SAVED_MODEL_NAME
 
-        case PMM_MODEL_TYPE_DEKU:
-            return PLAYER_FORM_DEKU;
-            break;
-
-        case PMM_MODEL_TYPE_GORON:
-            return PLAYER_FORM_GORON;
-            break;
-
-        case PMM_MODEL_TYPE_ZORA:
-            return PLAYER_FORM_ZORA;
-            break;
-
-        case PMM_MODEL_TYPE_FIERCE_DEITY:
-            return PLAYER_FORM_FIERCE_DEITY;
-            break;
-
-        default:
-            break;
-    }
-
-    return PLAYER_FORM_MAX;
-}
-
-static void applyByInternalName(PlayerProxy *pp, PlayerModelManagerModelType modelType, const char *name) {
+static bool applyByInternalName(PlayerProxy *pp, PlayerModelManagerModelType modelType, const char *name) {
     u32 entryPtr;
 
     if (YAZMTCore_StringU32Dictionary_get(sInternalNamesToEntries, name, &entryPtr)) {
-        PlayerProxy_tryApplyEntry(pp, modelType, (ModelEntry *)entryPtr);
+        return PlayerProxy_tryApplyEntry(pp, modelType, (ModelEntry *)entryPtr);
     }
+
+    return false;
 }
 
 static void pushEntry(YAZMTCore_DynamicU32Array *entryArr, ModelEntry *entry) {
@@ -230,35 +213,140 @@ ModelEntry **ModelEntryManager_getEntries(PlayerModelManagerModelType modelType,
     return NULL;
 }
 
-void ModelEntryManager_saveCurrentEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType) {
-    if (!Utils_isValidModelType(modelType)) {
+bool ModelEntryManager_saveModelsToDisk(void) {
+    if (!sSavedModelCfgPath) {
+        Logger_printError("sSavedModelCfgPath has not been set!");
+        return false;
+    }
+
+    if (!sProxiesToSave) {
+        Logger_printError("sProxiesToSave has not been set!");
+        return false;
+    }
+
+    bool ret = false;
+
+    REPY_FN_SETUP;
+    REPY_FN_IMPORT("configparser");
+
+    size_t numProxies = YAZMTCore_DynamicDataArray_size(sProxiesToSave);
+    SavedProxyEntry *savedProxies = YAZMTCore_DynamicDataArray_data(sProxiesToSave);
+
+    REPY_Handle savedProxiesDict = REPY_CreateDict(0);
+    REPY_FN_DEFER_RELEASE(savedProxiesDict);
+
+    for (size_t i = 0; i < numProxies; ++i) {
+        PlayerProxy *pp = savedProxies[i].pp;
+        char *sectionName = (char *)(savedProxies[i].sectionName);
+
+        REPY_Handle d = REPY_CreateDict(0);
+        REPY_FN_DEFER_RELEASE(d);
+
+        REPY_DictSetCStr(savedProxiesDict, sectionName, d);
+
+        for (int i = 0; i < ARRAY_COUNT(sSavedModelNames); ++i) {
+            SavedModelName *curr = &sSavedModelNames[i];
+
+            const ModelEntry *entry = PlayerProxy_getCurrentEntry(pp, curr->modelType);
+
+            if (entry) {
+                REPY_DictSetCStr(d, curr->key, REPY_CreateStr_SUH(ModelEntry_getInternalName(entry)));
+            } else {
+                REPY_DictSetCStr(d, curr->key, REPY_CreateStr_SUH(""));
+            }
+        }
+    }
+
+    REPY_FN_SET_STR("cfg_path", sSavedModelCfgPath);
+    REPY_FN_SET("saved_proxies", savedProxiesDict);
+
+    REPY_FN_EXEC_CACHE(
+        saveModelsToDiskExec,
+        "config = configparser.ConfigParser()\n"
+        "for section_name,models in saved_proxies.items():\n"
+        "   config[section_name] = {}\n"
+        "   for key,value in models.items():\n"
+        "      config[section_name][key] = value\n"
+        "with open(cfg_path, 'w') as configfile:\n"
+        "   config.write(configfile)\n"
+        "\n");
+
+    ret = saveModelsToDiskExec_success;
+
+    REPY_FN_CLEANUP;
+
+    return ret;
+}
+
+void ModelEntryManager_applySavedEntriesToProxy(PlayerProxy *pp, const char *id) {
+    if (!id) {
+        Logger_printError("id was NULL!");
         return;
     }
 
-    const char *key = sSavedModelNames[modelType].key;
-
-    KV_Global_Remove(key);
-
-    const ModelEntry *curr = PlayerProxy_getCurrentEntry(pp, modelType);
-    if (curr) {
-        // No need to initialize this since there will be a null terminator
-        char tmpNameBuf[SAVED_INTERNAL_NAME_BUFFER_SIZE];
-
-        strcpy(tmpNameBuf, ModelEntry_getInternalName(curr));
-        KV_Global_Set(key, tmpNameBuf, INTERNAL_NAME_MAX_LENGTH);
+    if (!pp) {
+        Logger_printError("pp was NULL!");
+        return;
     }
-}
 
-void ModelEntryManager_applyModelsFromDisk(PlayerProxy *pp) {
-    static char retrievedName[SAVED_INTERNAL_NAME_BUFFER_SIZE];
+    if (!sSavedModelCfgPath) {
+        Logger_printError("sSavedModelCfgPath is not set!");
+        return;
+    }
 
-    for (PlayerModelManagerModelType i = 0; i < PMM_MODEL_TYPE_MAX; ++i) {
-        if (KV_Global_Get(sSavedModelNames[i].key, retrievedName, INTERNAL_NAME_MAX_LENGTH)) {
-            applyByInternalName(pp, i, retrievedName);
-        } else {
-            PlayerProxy_forceApplyEntry(pp, i, NULL);
+    REPY_FN_SETUP;
+    REPY_FN_IMPORT("configparser");
+
+    REPY_Handle entriesDict = REPY_CreateDict(0);
+    REPY_FN_DEFER_RELEASE(entriesDict);
+
+    REPY_FN_SET("saved_entries", entriesDict);
+
+    REPY_FN_SET_STR("section_name", id);
+    REPY_FN_SET_STR("cfg_path", sSavedModelCfgPath);
+
+    REPY_FN_EXEC_CACHE(
+        readModelsExec1,
+        "config = configparser.ConfigParser()\n"
+        "try:\n"
+        "    config.read(cfg_path)\n"
+        "    if config.has_section(section_name):\n"
+        "         for key,val in config[section_name].items():\n"
+        "             saved_entries[key] = str(val)\n"
+        "except IOError:\n"
+        "   pass\n"
+        "\n");
+
+    for (int i = 0; i < ARRAY_COUNT(sSavedModelNames); ++i) {
+        SavedModelName *curr = &sSavedModelNames[i];
+        REPY_FN_SET_STR("key", curr->key);
+        REPY_FN_EXEC_CACHE(
+            readModelsExec2,
+            "internal_name = ''\n"
+            "is_model_found = False\n"
+            "if key in saved_entries and saved_entries[key]:\n"
+            "   internal_name = saved_entries[key]\n"
+            "   is_model_found = True\n"
+            "\n");
+
+        bool isModelFound = REPY_FN_GET_BOOL("is_model_found");
+
+        if (isModelFound) {
+            char *modelInternalName = REPY_FN_GET_STR("internal_name");
+
+            if (modelInternalName) {
+                if (!applyByInternalName(pp, curr->modelType, modelInternalName)) {
+                    PlayerProxy_forceApplyEntry(pp, curr->modelType, NULL);
+                }
+
+                recomp_free(modelInternalName);
+            } else {
+                PlayerProxy_forceApplyEntry(pp, curr->modelType, NULL);
+            }
         }
     }
+
+    REPY_FN_CLEANUP;
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects) void initCMEMHash(void) {
@@ -267,5 +355,44 @@ RECOMP_CALLBACK(".", _internal_initHashObjects) void initCMEMHash(void) {
     sHiddenModelEntries = recomputil_create_u32_hashset();
     for (int i = 0; i < ARRAY_COUNT(sModelEntries); ++i) {
         sModelEntries[i] = YAZMTCore_DynamicU32Array_new();
+    }
+
+    char *modFolderPath = (char *)recomp_get_mod_folder_path();
+
+    if (modFolderPath) {
+        REPY_FN_SETUP;
+        REPY_FN_SET_STR("mods_folder_str", modFolderPath);
+        REPY_FN_IMPORT("pathlib");
+
+        REPY_FN_EXEC_CSTR(
+            "mod_folder_path = pathlib.Path(mods_folder_str)\n"
+            "mod_data_folder_path = mod_folder_path.parents[0] / 'mod_data' / 'yazmt_z64_playermodelmanager'\n"
+            "mod_data_folder_path.mkdir(parents=True, exist_ok=True)\n"
+            "dir_exists = mod_data_folder_path.is_dir()\n"
+            "config_path = (mod_data_folder_path / 'models.ini').as_posix()\n"
+            "\n");
+
+        if (REPY_FN_GET_BOOL("dir_exists")) {
+            sSavedModelCfgPath = REPY_FN_GET_STR("config_path");
+        } else {
+            Logger_printError("Could not create mod data folder!");
+        }
+
+        REPY_FN_CLEANUP;
+        recomp_free(modFolderPath);
+    } else {
+        Logger_printError("recomp_get_mod_folder_path returned NULL! Cannot read saved models!");
+    }
+
+    sProxiesToSave = YAZMTCore_DynamicDataArray_new(sizeof(SavedProxyEntry));
+}
+
+void ModelEntryManager_registerProxyToSave(PlayerProxy *pp, const char *sectionName) {
+    if (pp && sectionName) {
+        SavedProxyEntry *spe = YAZMTCore_DynamicDataArray_createElement(sProxiesToSave);
+        if (spe) {
+            spe->pp = pp;
+            spe->sectionName = YAZMTCore_Utils_StrDup(sectionName);
+        }
     }
 }

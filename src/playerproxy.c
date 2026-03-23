@@ -174,6 +174,16 @@ void PlayerProxy_requestTunicColorOverride(PlayerProxy *pp, Color_RGBA8 color) {
     }
 }
 
+bool isCompatibleModelTypes(PlayerModelManagerModelType a, PlayerModelManagerModelType b) {
+    if (a == PMM_MODEL_TYPE_NONE || b == PMM_MODEL_TYPE_NONE) {
+        return false;
+    }
+
+    return a == b ||
+           (a == PMM_MODEL_TYPE_CHILD && b == PMM_MODEL_TYPE_ADULT) ||
+           (a == PMM_MODEL_TYPE_ADULT && b == PMM_MODEL_TYPE_CHILD);
+}
+
 static void PlayerProxy_setModelEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *modelEntry) {
     RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
 
@@ -189,9 +199,7 @@ static void PlayerProxy_setModelEntry(PlayerProxy *pp, PlayerModelManagerModelTy
 
     PlayerModelManagerModelType entryType = ModelEntry_getType(modelEntry);
 
-    if ((Utils_isFormModelType(modelType) != Utils_isFormModelType(entryType)) ||
-        (Utils_isEquipmentModelType(modelType) != Utils_isEquipmentModelType(entryType)) ||
-        (Utils_isPackModelType(modelType) != Utils_isPackModelType(entryType))) {
+    if (!isCompatibleModelTypes(modelType, entryType)) {
         Logger_printError("Mismatched modelType and modelEntry type! modelType: %d, entryType: %d", modelType, entryType);
         return;
     }
@@ -300,6 +308,14 @@ bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mode
 
     const ModelEntry *currEntry = PlayerProxy_getCurrentEntry(pp, modelType);
     if (newEntry != currEntry) {
+        if (newEntry) {
+            PlayerModelManagerModelType t = ModelEntry_getType(newEntry);
+            if (!isCompatibleModelTypes(t, modelType)) {
+                Logger_printError("ModelEntry passed in with model type %d not compatible with model type %d. Not applying!", modelType, t);
+                return false;
+            }
+        }
+
         return PlayerProxy_forceApplyEntry(pp, modelType, newEntry);
     }
 

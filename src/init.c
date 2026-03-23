@@ -9,10 +9,11 @@
 #include "modelinfo.h"
 #include "modelentrymanager.h"
 #include "fallbackmodels.h"
+#include "repy_api.h"
 
 static bool sIsGlobalObjectsReady;
-static bool sIsModelsRegistered;
 static bool sIsAllHashObjectsInitialized;
+static bool sIsREPYReady;
 
 static void doRegisterModels(void);
 
@@ -40,10 +41,9 @@ static void forceInitFormProxies(void) {
 
     gPlayer1Proxy = PlayerProxyManager_createPlayerProxy();
     gPlayer2Proxy = PlayerProxyManager_createPlayerProxy();
-    FormProxy_setCurrentModelFormEntry(PlayerProxy_getFormProxy(gPlayer2Proxy, FORM_PROXY_ID_HUMAN), (ModelEntryForm *)ModelEntryManager_getEntry(gKafeiModelHandle));
 }
 
-void initFormProxies(void) {
+static void initProxies(void) {
     static bool isFormProxiesInitialized;
 
     if (!isFormProxiesInitialized) {
@@ -59,6 +59,11 @@ GLOBAL_OBJECTS_CALLBACK_ON_READY void initCustomDLsOnGlobalObjects(void) {
     initCustomDLs();
     initVanillaMMDLs();
     sIsGlobalObjectsReady = true;
+    doRegisterModels();
+}
+
+REPY_ON_POST_INIT void onREPYReady(void) {
+    sIsREPYReady = true;
     doRegisterModels();
 }
 
@@ -79,17 +84,34 @@ RECOMP_DECLARE_EVENT(onReady(void));
 
 void initUIFileList(void);
 
+#define ID_PREFIX "mm."
+#define PLAYER1_CFG_ID ID_PREFIX "player1"
+#define PLAYER2_CFG_ID ID_PREFIX "kafei"
+
+static void applyDiskModels(void) {
+    ModelEntryManager_applySavedEntriesToProxy(gPlayer1Proxy, PLAYER1_CFG_ID);
+
+    ModelEntryManager_applySavedEntriesToProxy(gPlayer2Proxy, PLAYER2_CFG_ID);
+    if (!PlayerProxy_getCurrentEntry(gPlayer2Proxy, PMM_MODEL_TYPE_CHILD)) {
+        PlayerProxy_tryApplyEntry(gPlayer2Proxy, PMM_MODEL_TYPE_CHILD, ModelEntryManager_getEntry(gKafeiModelHandle));
+    }
+}
+
 static void doRegisterModels(void) {
-    if (sIsModelsRegistered || !sIsAllHashObjectsInitialized || !sIsGlobalObjectsReady) {
+    static bool isModelsRegistered;
+
+    if (isModelsRegistered || !sIsAllHashObjectsInitialized || !sIsGlobalObjectsReady || !sIsREPYReady) {
         return;
     }
 
-    sIsModelsRegistered = true;
+    isModelsRegistered = true;
 
     PlayerModelManager_unlockAPI();
 
     Logger_printInfo("Setting up vanilla models...");
-    initFormProxies();
+    initProxies();
+    ModelEntryManager_registerProxyToSave(gPlayer1Proxy, PLAYER1_CFG_ID);
+    ModelEntryManager_registerProxyToSave(gPlayer2Proxy, PLAYER2_CFG_ID);
 
     Logger_printInfo("Registering custom models...");
     onRegisterModels();
@@ -101,12 +123,9 @@ static void doRegisterModels(void) {
 
     PlayerProxyManager_refreshAll();
 
-    Logger_printInfo("Ready!");
-    onReady();
-}
+    applyDiskModels();
 
-// Need to do this in ConsoleLogo_Destroy for Rando compatibility
-// TODO: Remove when filesystem API fo Recomp exists
-void applyDiskModels_on_return_ConsoleLogo_Destroy(void) {
-    ModelEntryManager_applyModelsFromDisk(gPlayer1Proxy);
+    Logger_printInfo("Ready!");
+
+    onReady();
 }
