@@ -145,7 +145,7 @@ static void initMatrixes(FormProxy *fp) {
         Gfx dl[2];
     } MatrixPushDL;
 
-    MatrixPushDL *mtxDLs = recomp_alloc(sizeof(*mtxDLs) * LINK_EQUIP_MATRIX_MAX);
+    MatrixPushDL *mtxDLs = fp->mtxArrAlloc = recomp_alloc(sizeof(*mtxDLs) * LINK_EQUIP_MATRIX_MAX);
 
     for (int i = 0; i < LINK_EQUIP_MATRIX_MAX; ++i) {
         MatrixPushDL *curr = &mtxDLs[i];
@@ -162,7 +162,7 @@ static void initProxyShims(FormProxy *fp) {
     Gfx **mtxDls = fp->mtxDisplayLists;
     Gfx **shims = fp->shimDisplayListPtrs;
 
-    Gfx *shimArr = recomp_alloc(sizeof(*shimArr) * LINK_SHIMDL_MAX);
+    Gfx *shimArr = fp->shimArrAlloc = recomp_alloc(sizeof(*shimArr) * LINK_SHIMDL_MAX);
 
     // init by pointing all to DF command
     for (int i = 0; i < LINK_SHIMDL_MAX; ++i) {
@@ -361,6 +361,8 @@ void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, F
     fp->numDLs = LINK_DL_MAX;
     fp->displayLists = recomp_alloc(fp->numDLs * sizeof(*fp->displayLists));
     fp->wrappedDisplayLists = recomp_alloc(fp->numDLs * sizeof(*fp->wrappedDisplayLists));
+    fp->shimArrAlloc = NULL;
+    fp->mtxArrAlloc = NULL;
     initSkeleton(fp);
     initShieldingSkeleton(fp);
     initMatrixes(fp);
@@ -369,6 +371,22 @@ void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, F
     initProxyDLs(fp);
 
     FormProxy_resetTunicColor(fp);
+}
+
+void FormProxy_destroy(FormProxy *fp) {
+    RETURN_IF_INVALID_PTR(fp, PTR_VAL_VOID_RET);
+
+    ModelInfo_destroy(&fp->currentModelInfo);
+    recomp_free(fp->displayLists);
+    fp->displayLists = NULL;
+    recomp_free(fp->wrappedDisplayLists);
+    fp->wrappedDisplayLists = NULL;
+    recomp_free(fp->shimArrAlloc);
+    fp->shimArrAlloc = NULL;
+    recomp_free(fp->mtxArrAlloc);
+    fp->mtxArrAlloc = NULL;
+
+    INVALIDATE_PTR(fp);
 }
 
 FormProxyId FormProxy_getFormProxyId(const FormProxy *fp) {

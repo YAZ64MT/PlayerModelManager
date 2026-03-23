@@ -49,12 +49,15 @@ typedef struct FormProxy {
     TunicColor tunicColor;
     Gfx *shimDisplayListPtrs[LINK_SHIMDL_MAX];
     Gfx *mtxDisplayLists[LINK_EQUIP_MATRIX_MAX];
+    void *shimArrAlloc;
+    void *mtxArrAlloc;
     size_t numDLs;
     Gfx *displayLists;
     WrappedDisplayList *wrappedDisplayLists;
 } FormProxy;
 
 void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, FormProxyId fpId, ModelInfo *fallback, ModelInfo *fallbackOverride);
+void FormProxy_destroy(FormProxy *fp);
 FormProxyId FormProxy_getFormProxyId(const FormProxy *fp);
 ModelInfo *FormProxy_getCurrentModelInfo(FormProxy *fp);
 ModelInfo *FormProxy_getFallbackOverrideModelInfo(FormProxy *fp);
