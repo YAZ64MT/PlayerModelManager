@@ -215,7 +215,7 @@ static bool isOldElegyIdMatchesModelType(Link_DisplayList id, PlayerModelManager
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, Link_DisplayList dlId, Gfx *dl) {
-    if (dlId >= LINK_DL_MAX || dlId < 0) {
+    if (!Utils_isValidDisplayListId(dlId)) {
         Logger_printError("Invalid display list ID passed in.");
         return false;
     }
@@ -245,7 +245,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_DisplayList dlId, Gfx *dl) {
-    if (dlId >= LINK_DL_MAX || dlId < 0) {
+    if (!Utils_isValidDisplayListId(dlId)) {
         Logger_printError("Invalid display list ID passed in.");
         return false;
     }
@@ -277,7 +277,7 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelType(PlayerModelMana
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix) {
-    if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
+    if (!Utils_isValidMatrixId(mtxId)) {
         Logger_printError("Invalid matrix ID passed in.");
         return false;
     }
@@ -297,7 +297,7 @@ RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setMatrixForModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_EquipmentMatrix mtxId, Mtx *matrix) {
-    if (mtxId >= LINK_EQUIP_MATRIX_MAX || mtxId < 0) {
+    if (!Utils_isValidMatrixId(mtxId)) {
         Logger_printError("Invalid matrix ID passed in.");
         return false;
     }
@@ -514,7 +514,7 @@ RECOMP_EXPORT Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersio
         return NULL;
     }
 
-    if (dlId >= LINK_DL_MAX) {
+    if (!Utils_isValidDisplayListId(dlId)) {
         Logger_printError("Mod requesting display list ID %d!", dlId);
         return NULL;
     }
@@ -550,8 +550,8 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaDisplayList(unsigned long a
         return false;
     }
 
-    if (dlId >= LINK_DL_MAX) {
-        Logger_printError("Mod requesting invalid display list ID %d! (ID too high!)", form);
+    if (!Utils_isValidDisplayListId(dlId)) {
+        Logger_printError("Mod requesting invalid display list ID %d! (ID too high!)", dlId);
         return false;
     }
 
@@ -614,8 +614,8 @@ RECOMP_EXPORT bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVer
         return false;
     }
 
-    if (mtxId >= LINK_EQUIP_MATRIX_MAX) {
-        Logger_printError("Mod requesting invalid matrix ID %d! (ID too high!)", form);
+    if (!Utils_isValidMatrixId(mtxId)) {
+        Logger_printError("Mod requesting invalid matrix ID %d!", mtxId);
         return false;
     }
 
@@ -700,7 +700,7 @@ RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation 
 }
 
 RECOMP_EXPORT bool PlayerModelManager_Actor_isModelApplied(Actor *actor, PlayerModelManagerHandle h) {
-    const ModelEntry *entryToCheck = ModelEntryManager_getEntry(h);
+    const ModelEntry *entryToCheck = getEntryOrPrintErr(h, __func__);
 
     if (entryToCheck) {
         PlayerModelManagerModelType type = ModelEntry_getType(entryToCheck);
@@ -723,6 +723,36 @@ RECOMP_EXPORT bool PlayerModelManager_Actor_isModelApplied(Actor *actor, PlayerM
     }
 
     return false;
+}
+
+RECOMP_EXPORT Gfx *PlayerModelManager_Actor_getDisplayList(Actor *actor, Link_DisplayList dlId) {
+    if (!Utils_isValidDisplayListId(dlId)) {
+        Logger_printError("Mod requesting invalid display list ID %d!", dlId);
+        return NULL;
+    }
+
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (fp) {
+        return FormProxy_getDL(fp, dlId);
+    }
+
+    return NULL;
+}
+
+RECOMP_EXPORT Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, Link_EquipmentMatrix mtxId) {
+    if (!Utils_isValidMatrixId(mtxId)) {
+        Logger_printError("Mod requesting invalid matrix ID %d!", mtxId);
+        return NULL;
+    }
+
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (fp) {
+        return FormProxy_getMatrix(fp, mtxId);
+    }
+
+    return NULL;
 }
 
 void PlayerModelManager_lockAPI(void) {

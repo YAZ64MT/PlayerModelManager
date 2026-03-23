@@ -196,7 +196,7 @@ static void PlayerProxy_setModelEntry(PlayerProxy *pp, PlayerModelManagerModelTy
     if (Utils_isPackModelType(modelType)) {
         return;
     }
-    
+
     recomputil_u32_value_hashmap_insert(pp->modelEntries, modelType, (uintptr_t)modelEntry);
 }
 

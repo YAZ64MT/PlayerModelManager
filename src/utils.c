@@ -115,3 +115,11 @@ bool Utils_isPackModelType(PlayerModelManagerModelType modelType) {
 bool Utils_isValidModelType(PlayerModelManagerModelType modelType) {
     return modelType >= 0 && modelType < PMM_MODEL_TYPE_MAX;
 }
+
+bool Utils_isValidDisplayListId(Link_DisplayList dlId) {
+    return dlId >= LINK_DL_WAIST && dlId < LINK_DL_MAX;
+}
+
+bool Utils_isValidMatrixId(Link_EquipmentMatrix mtxId) {
+    return mtxId >= LINK_EQUIP_MATRIX_SWORD1_BACK && mtxId < LINK_EQUIP_MATRIX_MAX;
+}

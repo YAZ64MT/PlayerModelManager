@@ -8,6 +8,7 @@
 #include "globalobjects_api.h"
 #include "yazmtcorelib_api.h"
 #include "playermodelmanager_api.h"
+#include "modelmatrixids.h"
 
 Gfx *Utils_createShimWithMatrix(Mtx *matrix, Gfx *dls[], int n);
 Gfx *Utils_createShimDisplayList(Gfx *dls[], int n);
@@ -32,5 +33,8 @@ bool Utils_isEquipmentModelType(PlayerModelManagerModelType modelType);
 bool Utils_isFormModelType(PlayerModelManagerModelType modelType);
 bool Utils_isPackModelType(PlayerModelManagerModelType modelType);
 bool Utils_isValidModelType(PlayerModelManagerModelType modelType);
+
+bool Utils_isValidDisplayListId(Link_DisplayList dlId);
+bool Utils_isValidMatrixId(Link_EquipmentMatrix mtxId);
 
 #endif

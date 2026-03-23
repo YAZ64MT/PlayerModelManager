@@ -29,7 +29,7 @@ bool ModelInfo_hasModelEntry(ModelInfo *modelInfo) {
 Gfx *ModelInfo_getDL(ModelInfo *modelInfo, Link_DisplayList id) {
     RETURN_IF_INVALID_PTR(modelInfo, NULL);
 
-    if (id >= LINK_DL_MAX || id < 0) {
+    if (!Utils_isValidDisplayListId(id)) {
         Logger_printWarning("Invalid display list ID %d.", id);
     }
 
@@ -48,8 +48,8 @@ Gfx *ModelInfo_getDL(ModelInfo *modelInfo, Link_DisplayList id) {
 Mtx *ModelInfo_getMtx(ModelInfo *modelInfo, Link_EquipmentMatrix id) {
     RETURN_IF_INVALID_PTR(modelInfo, NULL);
 
-    if (id >= LINK_EQUIP_MATRIX_MAX || id < 0) {
-        Logger_printWarning("ModelInfo_getMtx called with invalid matrix ID %d.", id);
+    if (!Utils_isValidMatrixId(id)) {
+        Logger_printWarning("Invalid matrix ID %d.", id);
         return NULL;
     }
 
