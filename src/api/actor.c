@@ -65,17 +65,6 @@ RECOMP_EXPORT Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, Link_Equipme
     return NULL;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_Actor_requestTunicColor(Actor *actor, u8 r, u8 g, u8 b, u8 a) {
-    PlayerProxy *pp = ProxyActorExt_getPlayerProxy(actor);
-
-    if (pp) {
-        PlayerProxy_requestTunicColorOverride(pp, (Color_RGBA8){r, g, b, a});
-        return true;
-    }
-
-    return false;
-}
-
 RECOMP_EXPORT bool PlayerModelManager_Actor_hasAppearanceData(Actor *actor) {
     return !!ProxyActorExt_getPlayerProxy(actor);
 }
