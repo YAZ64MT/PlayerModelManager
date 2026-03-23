@@ -523,8 +523,10 @@ typedef enum PlayerModelManagerModelType {
 #define PMM_MODEL_TYPE_SHIELD_MIRROR PMM_MODEL_TYPE_SHIELD3
 
 typedef enum PlayerModelManagerModelEvent {
-    PMM_EVENT_MODEL_APPLIED,
-    PMM_EVENT_MODEL_REMOVED,
+    PMM_EVENT_MODEL_APPLIED_TO_MAIN_PLAYER,
+    PMM_EVENT_MODEL_REMOVED_FROM_MAIN_PLAYER,
+    PMM_EVENT_MODEL_APPLIED_TO_OTHER,
+    PMM_EVENT_MODEL_REMOVED_FROM_OTHER,
 } PlayerModelManagerModelEvent;
 
 typedef void PlayerModelManagerEventHandler(PlayerModelManagerHandle handle, PlayerModelManagerModelEvent event, void *userdata);

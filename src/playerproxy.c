@@ -261,14 +261,25 @@ bool PlayerProxy_forceApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mo
     }
 
     if (ModelEntry_applyToFormProxy(newEntry, getFormProxyFromCategory(pp, modelType))) {
-        if (currEntry && gPlayer1Proxy == pp) {
-            ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_REMOVED);
+        PlayerModelManagerModelEvent removedEvt;
+        PlayerModelManagerModelEvent appliedEvt;
+
+        if (gPlayer1Proxy == pp) {
+            appliedEvt = PMM_EVENT_MODEL_APPLIED_TO_MAIN_PLAYER;
+            removedEvt = PMM_EVENT_MODEL_REMOVED_FROM_MAIN_PLAYER;
+        } else {
+            appliedEvt = PMM_EVENT_MODEL_APPLIED_TO_OTHER;
+            removedEvt = PMM_EVENT_MODEL_REMOVED_FROM_OTHER;
+        }
+
+        if (currEntry) {
+            ModelEntry_doCallback(currEntry, removedEvt);
         }
 
         PlayerProxy_setModelEntry(pp, modelType, newEntry);
 
-        if (newEntry && gPlayer1Proxy == pp) {
-            ModelEntry_doCallback(newEntry, PMM_EVENT_MODEL_APPLIED);
+        if (newEntry) {
+            ModelEntry_doCallback(newEntry, appliedEvt);
         }
 
         if (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT) {
@@ -304,9 +315,7 @@ void PlayerProxy_removeEntry(PlayerProxy *pp, PlayerModelManagerModelType modelT
     const ModelEntry *entry = PlayerProxy_getCurrentEntry(pp, modelType);
 
     if (entry) {
-        if (pp == gPlayer1Proxy) {
-            ModelEntry_doCallback(entry, PMM_EVENT_MODEL_REMOVED);
-        }
+        ModelEntry_doCallback(entry, pp == gPlayer1Proxy ? PMM_EVENT_MODEL_REMOVED_FROM_MAIN_PLAYER : PMM_EVENT_MODEL_REMOVED_FROM_OTHER);
 
         PlayerProxy_setModelEntry(pp, modelType, NULL);
 
