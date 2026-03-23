@@ -27,6 +27,7 @@ typedef struct PlayerProxy {
 } PlayerProxy;
 
 void PlayerProxy_init(PlayerProxy *pp);
+void PlayerProxy_destroy(PlayerProxy *pp);
 FormProxy *PlayerProxy_getFormProxy(PlayerProxy *pp, FormProxyId formId);
 void PlayerProxy_requestRefresh(PlayerProxy *pp);
 void PlayerProxy_setOverrideDL(PlayerProxy *pp, Link_DisplayList dlId, Gfx *dl);

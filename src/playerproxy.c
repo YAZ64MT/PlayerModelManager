@@ -44,6 +44,10 @@ void PlayerProxy_createFormProxy(PlayerProxy *pp, FormProxyId proxyId, PlayerTra
     }
 }
 
+void PlayerProxy_destroyFormProxy(PlayerProxy *pp, FormProxyId proxyId) {
+
+}
+
 void PlayerProxy_init(PlayerProxy *pp) {
     if (!pp) {
         Logger_printError("Passed in a NULL pointer!");
@@ -62,12 +66,26 @@ void PlayerProxy_init(PlayerProxy *pp) {
     PlayerProxy_createFormProxy(pp, FORM_PROXY_ID_GORON, PLAYER_FORM_GORON, &gGoronModelInfo, &gGoronModelInfoFallbackOverride);
     PlayerProxy_createFormProxy(pp, FORM_PROXY_ID_ZORA, PLAYER_FORM_ZORA, &gZoraModelInfo, &gZoraModelInfoFallbackOverride);
     PlayerProxy_createFormProxy(pp, FORM_PROXY_ID_FIERCE_DEITY, PLAYER_FORM_FIERCE_DEITY, &gFierceDeityModelInfo, &gFierceDeityModelInfoFallbackOverride);
+}
 
-    FormProxy *human = PlayerProxy_getFormProxy(pp, FORM_PROXY_ID_HUMAN);
-    FormProxy *deku = PlayerProxy_getFormProxy(pp, FORM_PROXY_ID_DEKU);
-    FormProxy *goron = PlayerProxy_getFormProxy(pp, FORM_PROXY_ID_GORON);
-    FormProxy *zora = PlayerProxy_getFormProxy(pp, FORM_PROXY_ID_ZORA);
-    FormProxy *fd = PlayerProxy_getFormProxy(pp, FORM_PROXY_ID_FIERCE_DEITY);
+void PlayerProxy_destroy(PlayerProxy *pp) {
+    for (size_t i = 0; i < gFormProxyIds->size; ++i) {
+        FormProxy *fp = PlayerProxy_getFormProxy(pp, i);
+
+        if (fp) {
+            FormProxy_destroy(fp);
+            recomputil_u32_memory_hashmap_erase(pp->formProxies, i);
+        }
+    }
+
+    recomputil_destroy_u32_memory_hashmap(pp->formProxies);
+    pp->formProxies = 0;
+    recomputil_destroy_u32_value_hashmap(pp->modelEntries);
+    pp->modelEntries = 0;
+    YAZMTCore_IterableU32Set_destroy(pp->currentlyEquippedEntries);
+    pp->currentlyEquippedEntries = NULL;
+
+    INVALIDATE_PTR(pp);
 }
 
 static void PlayerProxy_refresh(PlayerProxy *pp) {
