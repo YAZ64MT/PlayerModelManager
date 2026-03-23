@@ -8,21 +8,92 @@
 #include "yazmtcorelib_api.h"
 #include "logger.h"
 #include "utils.h"
+#include "recompdata.h"
 
-static YAZMTCore_IterableU32Set *sPlayerProxies;
+PlayerProxyHandle gPlayer1ProxyHandle;
+PlayerProxyHandle gPlayer2ProxyHandle;
+
+typedef struct PlayerProxyEntry PlayerProxyEntry;
+
+typedef struct PlayerProxyEntry {
+    PlayerProxy *pp;
+    PlayerProxyAllocType allocType;
+    s32 refCount;
+    PlayerProxyEntry *next;
+} PlayerProxyEntry;
+
+static PlayerProxyEntry *sPlayerProxyEntryListStart;
+
+static U32SlotmapHandle sPlayerProxyEntryReferences;
 
 RECOMP_CALLBACK(".", _internal_initHashObjects) void initPPMHash(void) {
-    sPlayerProxies = YAZMTCore_IterableU32Set_new();
+    sPlayerProxyEntryReferences = recomputil_create_u32_slotmap();
 }
 
-PlayerProxy *PlayerProxyManager_createPlayerProxy(void) {
-    PlayerProxy *pp = Utils_recompCalloc(sizeof(PlayerProxy));
+static PlayerProxyHandle createReferenceFromEntry(PlayerProxyEntry *proxyEntry) {
+    PlayerProxyHandle h = recomputil_u32_slotmap_create(sPlayerProxyEntryReferences);
+    recomputil_u32_slotmap_set(sPlayerProxyEntryReferences, h, (uintptr_t)proxyEntry);
+    proxyEntry->refCount++;
+    return h;
+}
+
+PlayerProxyHandle PlayerProxyManager_createPlayerProxy(PlayerProxyAllocType allocType) {
+    PlayerProxyEntry *proxyEntry = Utils_recompCalloc(sizeof(*proxyEntry));
+    proxyEntry->allocType = allocType;
+    proxyEntry->refCount = 0;
+    proxyEntry->next = NULL;
+
+    PlayerProxy *pp = proxyEntry->pp = Utils_recompCalloc(sizeof(*pp));
 
     PlayerProxy_init(pp);
 
-    YAZMTCore_IterableU32Set_insert(sPlayerProxies, (uintptr_t)pp);
+    proxyEntry->next = sPlayerProxyEntryListStart;
 
-    return pp;
+    sPlayerProxyEntryListStart = proxyEntry;
+
+    return createReferenceFromEntry(proxyEntry);
+}
+
+static PlayerProxyEntry *getProxyEntryFromRef(PlayerProxyHandle h) {
+    uintptr_t out = 0;
+    if (h) {
+        recomputil_u32_slotmap_get(sPlayerProxyEntryReferences, h, &out);
+    }
+    return (PlayerProxyEntry *)out;
+}
+
+PlayerProxy *PlayerProxyManager_getPlayerProxy(PlayerProxyHandle h) {
+    PlayerProxyEntry *proxyEntry = getProxyEntryFromRef(h);
+
+    return proxyEntry ? proxyEntry->pp : NULL;
+}
+
+PlayerProxyHandle PlayerProxyManager_createNewReference(PlayerProxyHandle h) {
+    PlayerProxyHandle newHandle = 0;
+
+    PlayerProxyEntry *proxyEntry = getProxyEntryFromRef(h);
+
+    if (proxyEntry) {
+        newHandle = createReferenceFromEntry(proxyEntry);
+    } else {
+        Logger_printWarning("Tried to duplicate invalid reference 0x%lX", h);
+    }
+
+    return newHandle;
+}
+
+bool PlayerProxyManager_releaseReference(PlayerProxyHandle h) {
+    PlayerProxyEntry *proxyEntry = getProxyEntryFromRef(h);
+
+    if (proxyEntry) {
+        recomputil_u32_slotmap_erase(sPlayerProxyEntryReferences, h);
+        proxyEntry->refCount--;
+        return true;
+    } else {
+        Logger_printWarning("Tried to release invalid reference 0x%lX", h);
+    }
+
+    return false;
 }
 
 static bool isModelEntryInModelInfo(ModelInfo *mi, ModelEntry *entry) {
@@ -34,44 +105,54 @@ static bool isModelEntryInModelInfo(ModelInfo *mi, ModelEntry *entry) {
 }
 
 void PlayerProxyManager_refreshAll(void) {
-    PlayerProxy *const *proxies = (PlayerProxy *const *)YAZMTCore_IterableU32Set_values(sPlayerProxies);
-    size_t numProxies = YAZMTCore_IterableU32Set_size(sPlayerProxies);
+    PlayerProxyEntry *curr = sPlayerProxyEntryListStart;
 
-    for (size_t i = 0; i < numProxies; ++i) {
-        PlayerProxy *currPp = proxies[i];
-
-        if (currPp) {
-            PlayerProxy_requestRefresh(currPp);
+    while (curr) {
+        if (curr->pp) {
+            PlayerProxy_requestRefresh(curr->pp);
         }
+
+        curr = curr->next;
     }
 }
 
 void PlayerProxyManager_refreshFullAllWithModelEntry(ModelEntry *modelEntry) {
-    PlayerProxy *const *proxies = (PlayerProxy *const *)YAZMTCore_IterableU32Set_values(sPlayerProxies);
-    size_t numProxies = YAZMTCore_IterableU32Set_size(sPlayerProxies);
+    PlayerProxyEntry *curr = sPlayerProxyEntryListStart;
 
-    for (size_t i = 0; i < numProxies; ++i) {
-        PlayerProxy *currPp = proxies[i];
-
-        for (size_t j = 0; j < gFormProxyIds->size; ++j) {
-            FormProxy *currFp = PlayerProxy_getFormProxy(currPp, gFormProxyIds->ids[j]);
+    while (curr) {
+        for (size_t i = 0; i < gFormProxyIds->size; ++i) {
+            FormProxy *currFp = PlayerProxy_getFormProxy(curr->pp, gFormProxyIds->ids[i]);
 
             if (currFp) {
                 if (isModelEntryInModelInfo(FormProxy_getCurrentModelInfo(currFp), modelEntry) ||
                     isModelEntryInModelInfo(FormProxy_getFallbackModelInfo(currFp), modelEntry) ||
                     isModelEntryInModelInfo(FormProxy_getFallbackOverrideModelInfo(currFp), modelEntry)) {
-                    PlayerProxy_requestRefresh(currPp);
-                }                
+                    PlayerProxy_requestRefresh(curr->pp);
+                }
             }
         }
+
+        curr = curr->next;
     }
 }
 
-void PlayerProxyManager_updatePlayerProxies_on_UpdateMain(void) {
-    PlayerProxy *const *proxies = (PlayerProxy *const *)YAZMTCore_IterableU32Set_values(sPlayerProxies);
-    size_t numProxies = YAZMTCore_IterableU32Set_size(sPlayerProxies);
+void updatePlayerProxyManager_on_UpdateMain(void) {
+    PlayerProxyEntry *curr = sPlayerProxyEntryListStart;
 
-    for (size_t i = 0; i < numProxies; ++i) {
-        PlayerProxy_updateInterpolationStatus(proxies[i]);
+    while (curr) {
+        PlayerProxyEntry *const next = curr->next;
+
+        PlayerProxy_updateInterpolationStatus(curr->pp);
+
+        if (curr->allocType == PPALLOC_REF_COUNT && curr->refCount <= 0) {
+            PlayerProxy_destroy(curr->pp);
+            if (curr == sPlayerProxyEntryListStart) {
+                sPlayerProxyEntryListStart = curr->next;
+            }
+
+            recomp_free(curr);
+        }
+
+        curr = next;
     }
 }

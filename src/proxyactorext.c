@@ -6,10 +6,11 @@
 #include "proxyactorext.h"
 #include "playermodelconfig.h"
 #include "logger.h"
+#include "playerproxymanager.h"
 
 typedef struct PlayerProxyInfo {
-    PlayerProxy *pp;
-    FormProxyId id;
+    PlayerProxyHandle proxyHandle;
+    FormProxyId formId;
 } PlayerProxyInfo;
 
 static ActorExtensionId sActorExtIdPlayerProxyInfo;
@@ -26,7 +27,7 @@ PlayerProxy *ProxyActorExt_getPlayerProxy(Actor *actor) {
     PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
 
     if (proxyInfo) {
-        return proxyInfo->pp;
+        return PlayerProxyManager_getPlayerProxy(proxyInfo->proxyHandle);
     }
 
     return NULL;
@@ -36,7 +37,7 @@ bool ProxyActorExt_getFormProxyId(Actor *actor, FormProxyId *out) {
     PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
 
     if (proxyInfo) {
-        *out = proxyInfo->id;
+        *out = proxyInfo->formId;
         return true;
     }
 
@@ -61,19 +62,30 @@ bool ProxyActorExt_setFormProxyId(Actor *actor, FormProxyId id) {
     PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
 
     if (proxyInfo) {
-        proxyInfo->id = id;
+        proxyInfo->formId = id;
         return true;
     }
 
     return false;
 }
 
-bool ProxyActorExt_setPlayerProxy(Actor *actor, PlayerProxy *pp) {
-    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
+bool ProxyActorExt_setPlayerProxyHandle(Actor *actor, PlayerProxyHandle h) {
+    if (h) {
+        PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
 
-    if (proxyInfo) {
-        proxyInfo->pp = pp;
-        return true;
+        if (proxyInfo) {
+            PlayerProxyHandle newRef = PlayerProxyManager_createNewReference(h);
+
+            if (newRef) {
+                if (proxyInfo->proxyHandle) {
+                    PlayerProxyManager_releaseReference(proxyInfo->proxyHandle);
+                }
+
+                proxyInfo->proxyHandle = newRef;
+
+                return true;
+            }
+        }
     }
 
     return false;
@@ -81,15 +93,11 @@ bool ProxyActorExt_setPlayerProxy(Actor *actor, PlayerProxy *pp) {
 
 bool ProxyActorExt_copyProxyInformation(Actor *dest, Actor *src) {
     if (dest && src) {
-        FormProxyId fpId;
-
-        if (ProxyActorExt_getFormProxyId(src, &fpId)) {
-            PlayerProxy *pp = ProxyActorExt_getPlayerProxy(src);
-
-            if (pp) {
-                ProxyActorExt_setPlayerProxy(dest, pp);
-                ProxyActorExt_setFormProxyId(dest, fpId);
-                return true;
+        PlayerProxyInfo *srcProxyInfo = getPlayerProxyInfo(src);
+        
+        if (srcProxyInfo) {
+            if (ProxyActorExt_setFormProxyId(dest, srcProxyInfo->formId)) {
+                return ProxyActorExt_setPlayerProxyHandle(dest, srcProxyInfo->proxyHandle);
             }
         }
     }
@@ -116,8 +124,8 @@ RECOMP_CALLBACK(".", _internal_preInitHashObjects) void handleFormProxyExtension
 }
 
 static void resetProxyInfo(PlayerProxyInfo *proxyInfo) {
-    proxyInfo->id = FORM_PROXY_ID_NONE;
-    proxyInfo->pp = NULL;
+    proxyInfo->formId = FORM_PROXY_ID_NONE;
+    proxyInfo->proxyHandle = 0;
 }
 
 void PlayerProxyInfo_init(PlayerProxyInfo *proxyInfo) {
@@ -125,6 +133,10 @@ void PlayerProxyInfo_init(PlayerProxyInfo *proxyInfo) {
 }
 
 void PlayerProxyInfo_destroy(PlayerProxyInfo *proxyInfo) {
+    if (proxyInfo->proxyHandle) {
+        PlayerProxyManager_releaseReference(proxyInfo->proxyHandle);
+    }
+
     resetProxyInfo(proxyInfo);
 }
 
@@ -142,15 +154,15 @@ void setupPlayerFormProxy_on_Player_InitCommon(Player *player) {
         FormProxyId id;
 
         if (PlayerProxy_getProxyIdFromForm(player->transformation, &id)) {
-            PlayerProxy *proxy = NULL;
+            PlayerProxyHandle proxyHandle = 0;
             if (player->actor.id == ACTOR_PLAYER) {
-                proxy = gPlayer1Proxy;
+                proxyHandle = gPlayer1ProxyHandle;
             } else if (player->actor.id == ACTOR_EN_TEST3) {
-                proxy = gPlayer2Proxy;
+                proxyHandle = gPlayer2ProxyHandle;
             }
 
-            if (proxy) {
-                ProxyActorExt_setPlayerProxy(&player->actor, proxy);
+            if (proxyHandle) {
+                ProxyActorExt_setPlayerProxyHandle(&player->actor, proxyHandle);
                 ProxyActorExt_setFormProxyId(&player->actor, id);
             }
         }

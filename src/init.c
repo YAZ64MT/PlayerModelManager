@@ -39,8 +39,11 @@ static void forceInitFormProxies(void) {
 
     registerKafei();
 
-    gPlayer1Proxy = PlayerProxyManager_createPlayerProxy();
-    gPlayer2Proxy = PlayerProxyManager_createPlayerProxy();
+    gPlayer1ProxyHandle = PlayerProxyManager_createPlayerProxy(PPALLOC_PERMANENT);
+    gPlayer1Proxy = PlayerProxyManager_getPlayerProxy(gPlayer1ProxyHandle);
+
+    gPlayer2ProxyHandle = PlayerProxyManager_createPlayerProxy(PPALLOC_PERMANENT);
+    gPlayer2Proxy = PlayerProxyManager_getPlayerProxy(gPlayer2ProxyHandle);
 }
 
 static void initProxies(void) {

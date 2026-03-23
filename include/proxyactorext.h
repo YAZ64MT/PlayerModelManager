@@ -3,6 +3,7 @@
 
 #include "stdbool.h"
 #include "modelmatrixids.h"
+#include "playerproxymanager.h"
 
 typedef struct Actor Actor;
 typedef struct PlayerProxy PlayerProxy;
@@ -13,7 +14,7 @@ FormProxy *ProxyActorExt_getFormProxy(Actor *actor);
 PlayerProxy *ProxyActorExt_getPlayerProxy(Actor *actor);
 bool ProxyActorExt_getFormProxyId(Actor *actor, FormProxyId *out);
 bool ProxyActorExt_setFormProxyId(Actor *actor, FormProxyId id);
-bool ProxyActorExt_setPlayerProxy(Actor *actor, PlayerProxy *pp);
+bool ProxyActorExt_setPlayerProxyHandle(Actor *actor, PlayerProxyHandle h);
 bool ProxyActorExt_copyProxyInformation(Actor *dest, Actor *src);
 FormProxy *ProxyActorExt_getFormProxyOrFallback(Actor *actor, FormProxyId fallbackId, PlayState *play);
 
