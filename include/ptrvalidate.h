@@ -16,6 +16,9 @@
     }                                                                                 \
     static void addPtrToValidSet__(const structType *ptr) {                           \
         recomputil_u32_hashset_insert(ptrSetVarName, (uintptr_t)ptr);                 \
+    }                                                                                 \
+    static void removePtrFromValidSet__(const structType *ptr) {                      \
+        recomputil_u32_hashset_erase(ptrSetVarName, (uintptr_t)ptr);                  \
     }
 
 #define ADD_VALIDATED_PTR(ptr)                                           \
@@ -23,6 +26,12 @@
         Logger_printWarning("Pointer already exists in validated set!"); \
     }                                                                    \
     addPtrToValidSet__(ptr)
+
+#define INVALIDATE_PTR(ptr)                                              \
+    if (!isValidPtr__(ptr)) {                                            \
+        Logger_printWarning("Pointer is already invalid!"); \
+    }                                                                    \
+    removePtrFromValidSet__(ptr);
 
 #define RETURN_IF_INVALID_PTR(ptr, ...)                                             \
     if (!isValidPtr__(ptr)) {                                                       \
@@ -36,6 +45,7 @@
 #define SETUP_PTR_VALIDATION(ptrSetVarName, structType)
 #define ADD_VALIDATED_PTR(ptr)
 #define RETURN_IF_INVALID_PTR(ptr, ...)
+#define INVALIDATE_PTR(ptr)
 
 #endif
 #endif
