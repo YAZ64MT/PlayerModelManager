@@ -123,7 +123,7 @@ RECOMP_EXPORT PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned
         return 0;
     }
 
-    if (modelType == PMM_MODEL_TYPE_ADULT) {
+    if (modelType == PMM_MODEL_TYPE_ADULT || modelType == PMM_MODEL_TYPE_ZORA || modelType == PMM_MODEL_TYPE_FIERCE_DEITY) {
         ModelEntry_setFlags(entry, MODELENTRY_FLAG_IS_ADULT);
     }
 
