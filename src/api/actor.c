@@ -75,3 +75,7 @@ RECOMP_EXPORT bool PlayerModelManager_Actor_requestTunicColor(Actor *actor, u8 r
 
     return false;
 }
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_hasAppearanceData(Actor *actor) {
+    return !!ProxyActorExt_getPlayerProxy(actor);
+}
