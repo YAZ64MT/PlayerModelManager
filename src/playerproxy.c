@@ -55,6 +55,7 @@ void PlayerProxy_init(PlayerProxy *pp) {
     pp->formProxies = recomputil_create_u32_memory_hashmap(sizeof(FormProxy));
     pp->modelEntries = recomputil_create_u32_value_hashmap();
     pp->currentlyEquippedEntries = YAZMTCore_IterableU32Set_new();
+    pp->interpStatus = PP_INTERP_STAT_NO_SKIP;
 
     PlayerProxy_createFormProxy(pp, FORM_PROXY_ID_HUMAN, PLAYER_FORM_HUMAN, &gHumanModelInfo, &gHumanModelInfoFallbackOverride);
     PlayerProxy_createFormProxy(pp, FORM_PROXY_ID_DEKU, PLAYER_FORM_DEKU, &gDekuModelInfo, &gDekuModelInfoFallbackOverride);
@@ -89,6 +90,8 @@ static void PlayerProxy_refresh(PlayerProxy *pp) {
             YAZMTCore_IterableU32Set_insert(pp->currentlyEquippedEntries, entry);
         }
     }
+
+    PlayerProxy_requestInterpolationSkip(pp);
 }
 
 static YAZMTCore_IterableU32Set *sQueuedRefreshes;
@@ -331,6 +334,26 @@ bool PlayerProxy_isModelEntryApplied(PlayerProxy *pp, const ModelEntry *entry) {
     RETURN_IF_INVALID_PTR(pp, false);
 
     return YAZMTCore_IterableU32Set_contains(pp->currentlyEquippedEntries, (uintptr_t)entry);
+}
+
+bool PlayerProxy_shouldSkipInterpolation(const PlayerProxy *pp) {
+    RETURN_IF_INVALID_PTR(pp, false);
+
+    return pp->interpStatus != PP_INTERP_STAT_NO_SKIP;
+}
+
+void PlayerProxy_updateInterpolationStatus(PlayerProxy *pp) {
+    if (pp->interpStatus == PP_INTERP_STAT_SKIPPING) {
+        pp->interpStatus = PP_INTERP_STAT_RESUME_NEXT_FRAME;
+    } else if (pp->interpStatus == PP_INTERP_STAT_RESUME_NEXT_FRAME) {
+        pp->interpStatus = PP_INTERP_STAT_NO_SKIP;
+    }
+}
+
+void PlayerProxy_requestInterpolationSkip(PlayerProxy *pp) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
+    pp->interpStatus = PP_INTERP_STAT_SKIPPING;
 }
 
 RECOMP_CALLBACK(".", _internal_initHashObjects) void initPlayerProxyHash(void) {

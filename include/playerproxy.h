@@ -13,10 +13,17 @@
 
 typedef struct FormProxy FormProxy;
 
+typedef enum PlayerProxyInterpolationStatus {
+    PP_INTERP_STAT_NO_SKIP,
+    PP_INTERP_STAT_SKIPPING,
+    PP_INTERP_STAT_RESUME_NEXT_FRAME,
+} PlayerProxyInterpolationStatus;
+
 typedef struct PlayerProxy {
     U32MemoryHashmapHandle formProxies;
     U32ValueHashmapHandle modelEntries;
     YAZMTCore_IterableU32Set *currentlyEquippedEntries;
+    PlayerProxyInterpolationStatus interpStatus;
 } PlayerProxy;
 
 void PlayerProxy_init(PlayerProxy *pp);
@@ -31,6 +38,9 @@ bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mode
 bool PlayerProxy_forceApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *newEntry);
 void PlayerProxy_removeEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType);
 bool PlayerProxy_isModelEntryApplied(PlayerProxy *pp, const ModelEntry *entry);
+bool PlayerProxy_shouldSkipInterpolation(const PlayerProxy *pp);
+void PlayerProxy_updateInterpolationStatus(PlayerProxy *pp);
+void PlayerProxy_requestInterpolationSkip(PlayerProxy *pp);
 
 extern PlayerProxy *gPlayer1Proxy;
 extern PlayerProxy *gPlayer2Proxy;

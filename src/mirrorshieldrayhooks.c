@@ -4,6 +4,7 @@
 #include "z64recomp_api.h"
 #include "formproxy.h"
 #include "proxyactorext.h"
+#include "playerproxy.h"
 #include "overlays/actors/ovl_Mir_Ray3/z_mir_ray3.h"
 
 ActorExtensionId gPlayerExtIdMirrorShieldBackMf;
@@ -40,6 +41,10 @@ static Player *sMirRay3Player;
 
 void overwriteShieldMtx_on_MirRay3_Draw(MirRay3 *mirRay3, PlayState *play) {
     Player *player = GET_PLAYER(play);
+
+    if (!ProxyActorExt_getPlayerProxy(&mirRay3->actor) && PlayerProxy_shouldSkipInterpolation(gPlayer1Proxy)) {
+        actor_set_interpolation_skipped(&mirRay3->actor);
+    }
 
     sRealShieldMf = player->shieldMf;
     sMirRay3Player = player;

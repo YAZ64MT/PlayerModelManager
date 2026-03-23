@@ -66,3 +66,12 @@ void PlayerProxyManager_refreshFullAllWithModelEntry(ModelEntry *modelEntry) {
         }
     }
 }
+
+void PlayerProxyManager_updatePlayerProxies_on_UpdateMain(void) {
+    PlayerProxy *const *proxies = (PlayerProxy *const *)YAZMTCore_IterableU32Set_values(sPlayerProxies);
+    size_t numProxies = YAZMTCore_IterableU32Set_size(sPlayerProxies);
+
+    for (size_t i = 0; i < numProxies; ++i) {
+        PlayerProxy_updateInterpolationStatus(proxies[i]);
+    }
+}

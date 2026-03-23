@@ -7,7 +7,7 @@ void updateAdultProperties_on_Play_UpdateMain(PlayState *play);
 void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play);
 void processPlayerProxyRefreshRequests_on_Play_UpdateMain(void);
 void processFormProxyRefreshRequests_on_Play_UpdateMain(void);
-void skipInterpolation_on_Play_UpdateMain(PlayState *play);
+void PlayerProxyManager_updatePlayerProxies_on_UpdateMain(void);
 
 RECOMP_HOOK("Play_UpdateMain") void on_Play_UpdateMain(PlayState *this) {
     sPlay = this;
@@ -16,7 +16,7 @@ RECOMP_HOOK("Play_UpdateMain") void on_Play_UpdateMain(PlayState *this) {
     checkToOpenModelMenu_on_Play_UpdateMain(sPlay);
     processPlayerProxyRefreshRequests_on_Play_UpdateMain();
     processFormProxyRefreshRequests_on_Play_UpdateMain();
-    skipInterpolation_on_Play_UpdateMain(sPlay);
+    PlayerProxyManager_updatePlayerProxies_on_UpdateMain();
 }
 
 RECOMP_HOOK_RETURN("Play_UpdateMain") void on_return_Play_UpdateMain(void) {

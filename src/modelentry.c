@@ -97,9 +97,6 @@ typedef struct ModelEntryPack {
     YAZMTCore_IterableU32Set *modelEntries;
 } ModelEntryPack;
 
-RECOMP_DECLARE_EVENT(_internal_onFormModelApplied(PlayerTransformation form));
-RECOMP_DECLARE_EVENT(_internal_onEquipmentModelApplied(PlayerModelManagerModelType type));
-
 const char FORMATTED_DEFAULT_VIRTUAL_FUNCTION_OVERRIDE_ERROR[] = "Model Entry with internal name %s is using function that should have been overriden!\n";
 
 static bool ModelEntry_applyToFormProxy_default(const ModelEntry *entry, FormProxy *fp) {
@@ -215,8 +212,6 @@ static bool ModelEntryForm_applyToFormProxy(const ModelEntry *thisx, FormProxy *
 
         PlayerProxy_requestRefresh(pp);
 
-        _internal_onFormModelApplied(FormProxy_getTargetForm(fp));
-
         return true;
     }
 
@@ -230,8 +225,6 @@ static bool ModelEntryForm_removeFromFormProxy(const ModelEntry *thisx, FormProx
         FormProxy_setCurrentModelFormEntry(fp, NULL);
 
         PlayerProxy_requestRefresh(pp);
-
-        _internal_onFormModelApplied(FormProxy_getTargetForm(fp));
 
         return true;
     }
@@ -727,8 +720,6 @@ static bool ModelEntryEquipment_applyToFormProxy(const ModelEntry *thisx, FormPr
 
             PlayerProxy_requestRefresh(pp);
 
-            _internal_onEquipmentModelApplied(this->modelEntry.type);
-
             return true;
         }
     }
@@ -758,8 +749,6 @@ static bool ModelEntryEquipment_removeFromFormProxy(const ModelEntry *thisx, For
             }
 
             PlayerProxy_requestRefresh(pp);
-
-            _internal_onEquipmentModelApplied(this->modelEntry.type);
 
             return true;
         }
