@@ -13,6 +13,7 @@ typedef struct ModelInfo {
 } ModelInfo;
 
 void ModelInfo_init(ModelInfo *modelInfo);
+void ModelInfo_destroy(ModelInfo *modelInfo);
 bool ModelInfo_hasModelEntry(ModelInfo *modelInfo);
 Gfx *ModelInfo_getDL(ModelInfo *modelInfo, Link_DisplayList id);
 Mtx *ModelInfo_getMtx(ModelInfo *modelInfo, Link_EquipmentMatrix id);

@@ -20,6 +20,16 @@ void ModelInfo_init(ModelInfo *modelInfo) {
     ADD_VALIDATED_PTR(modelInfo);
 }
 
+void ModelInfo_destroy(ModelInfo *modelInfo) {
+    RETURN_IF_INVALID_PTR(modelInfo, PTR_VAL_VOID_RET);
+
+    modelInfo->modelEntryForm = NULL;
+    recomputil_destroy_u32_value_hashmap(modelInfo->gfxOverrides);
+    recomputil_destroy_u32_value_hashmap(modelInfo->mtxOverrides);
+
+    INVALIDATE_PTR(modelInfo);
+}
+
 bool ModelInfo_hasModelEntry(ModelInfo *modelInfo) {
     RETURN_IF_INVALID_PTR(modelInfo, false);
 
