@@ -115,9 +115,25 @@ RECOMP_CALLBACK(".", _internal_preInitHashObjects) void handleFormProxyExtension
     sActorExtIdPlayerProxyInfo = z64recomp_extend_actor_all(sizeof(PlayerProxyInfo));
 }
 
+static void resetProxyInfo(PlayerProxyInfo *proxyInfo) {
+    proxyInfo->id = FORM_PROXY_ID_NONE;
+    proxyInfo->pp = NULL;
+}
+
+void PlayerProxyInfo_init(PlayerProxyInfo *proxyInfo) {
+    resetProxyInfo(proxyInfo);
+}
+
+void PlayerProxyInfo_destroy(PlayerProxyInfo *proxyInfo) {
+    resetProxyInfo(proxyInfo);
+}
+
 void initFormProxyExtension_on_Actor_Init(Actor *actor) {
-    ProxyActorExt_setPlayerProxy(actor, NULL);
-    ProxyActorExt_setFormProxyId(actor, FORM_PROXY_ID_NONE);
+    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
+
+    if (proxyInfo) {
+        PlayerProxyInfo_init(proxyInfo);
+    }
 }
 
 void setupPlayerFormProxy_on_Player_InitCommon(Player *player) {
@@ -138,5 +154,13 @@ void setupPlayerFormProxy_on_Player_InitCommon(Player *player) {
                 ProxyActorExt_setFormProxyId(&player->actor, id);
             }
         }
+    }
+}
+
+void clearProxyExt_on_Actor_Destroy(Actor *actor) {
+    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
+
+    if (proxyInfo) {
+        PlayerProxyInfo_destroy(proxyInfo);
     }
 }
