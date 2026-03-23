@@ -28,7 +28,7 @@ static YAZMTCore_DynamicU32Array *sModelEntries[PMM_MODEL_TYPE_MAX];
 
 static U32HashsetHandle sHiddenModelEntries;
 
-static char *sSavedModelCfgPath;
+static char *sModDataFolderPath;
 
 #define SAVED_INTERNAL_NAME_BUFFER_SIZE (INTERNAL_NAME_MAX_LENGTH + 1)
 
@@ -214,8 +214,8 @@ ModelEntry **ModelEntryManager_getEntries(PlayerModelManagerModelType modelType,
 }
 
 bool ModelEntryManager_saveModelsToDisk(void) {
-    if (!sSavedModelCfgPath) {
-        Logger_printError("sSavedModelCfgPath has not been set!");
+    if (!sModDataFolderPath) {
+        Logger_printError("sModDataFolderPath has not been set!");
         return false;
     }
 
@@ -228,6 +228,7 @@ bool ModelEntryManager_saveModelsToDisk(void) {
 
     REPY_FN_SETUP;
     REPY_FN_IMPORT("configparser");
+    REPY_FN_IMPORT("pathlib");
 
     size_t numProxies = YAZMTCore_DynamicDataArray_size(sProxiesToSave);
     SavedProxyEntry *savedProxies = YAZMTCore_DynamicDataArray_data(sProxiesToSave);
@@ -257,11 +258,12 @@ bool ModelEntryManager_saveModelsToDisk(void) {
         }
     }
 
-    REPY_FN_SET_STR("cfg_path", sSavedModelCfgPath);
+    REPY_FN_SET_STR("mod_folder_path", sModDataFolderPath);
     REPY_FN_SET("saved_proxies", savedProxiesDict);
 
     REPY_FN_EXEC_CACHE(
         saveModelsToDiskExec,
+        "cfg_path = pathlib.Path(mod_folder_path) / 'models.ini'\n"
         "config = configparser.ConfigParser()\n"
         "for section_name,models in saved_proxies.items():\n"
         "   config[section_name] = {}\n"
@@ -289,13 +291,14 @@ void ModelEntryManager_applySavedEntriesToProxy(PlayerProxy *pp, const char *id)
         return;
     }
 
-    if (!sSavedModelCfgPath) {
-        Logger_printError("sSavedModelCfgPath is not set!");
+    if (!sModDataFolderPath) {
+        Logger_printError("sModDataFolderPath is not set!");
         return;
     }
 
     REPY_FN_SETUP;
     REPY_FN_IMPORT("configparser");
+    REPY_FN_IMPORT("pathlib");
 
     REPY_Handle entriesDict = REPY_CreateDict(0);
     REPY_FN_DEFER_RELEASE(entriesDict);
@@ -303,12 +306,13 @@ void ModelEntryManager_applySavedEntriesToProxy(PlayerProxy *pp, const char *id)
     REPY_FN_SET("saved_entries", entriesDict);
 
     REPY_FN_SET_STR("section_name", id);
-    REPY_FN_SET_STR("cfg_path", sSavedModelCfgPath);
+    REPY_FN_SET_STR("mod_data_folder", sModDataFolderPath);
 
     REPY_FN_EXEC_CACHE(
         readModelsExec1,
         "config = configparser.ConfigParser()\n"
         "try:\n"
+        "    cfg_path = pathlib.Path(mod_data_folder) / 'models.ini'\n"
         "    config.read(cfg_path)\n"
         "    if config.has_section(section_name):\n"
         "         for key,val in config[section_name].items():\n"
@@ -369,11 +373,11 @@ RECOMP_CALLBACK(".", _internal_initHashObjects) void initCMEMHash(void) {
             "mod_data_folder_path = mod_folder_path.parents[0] / 'mod_data' / 'yazmt_z64_playermodelmanager'\n"
             "mod_data_folder_path.mkdir(parents=True, exist_ok=True)\n"
             "dir_exists = mod_data_folder_path.is_dir()\n"
-            "config_path = (mod_data_folder_path / 'models.ini').as_posix()\n"
+            "data_folder_str = (mod_data_folder_path).as_posix()\n"
             "\n");
 
         if (REPY_FN_GET_BOOL("dir_exists")) {
-            sSavedModelCfgPath = REPY_FN_GET_STR("config_path");
+            sModDataFolderPath = REPY_FN_GET_STR("data_folder_str");
         } else {
             Logger_printError("Could not create mod data folder!");
         }
