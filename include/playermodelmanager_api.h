@@ -629,52 +629,6 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setEyesTextures(Player
 // Returns true if successfully set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle h, TexturePtr mouthTextures[]));
 
-// Get a static pointer to a DL in a particular form. The visual will be automatically updated if the model for that form changes.
-//
-// If an invalid display list ID is passed in, NULL will be returned.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Gfx *PlayerModelManager_getFormDisplayList(unsigned long apiVersion, PlayerTransformation form, PlayerModelManagerDisplayListId dlId));
-
-// Helper define for PlayerModelManager_getFormDisplayList. See PlayerModelManager_getFormDisplayList description for functionality.
-#define PLAYERMODELMANAGER_GET_FORM_DISPLAY_LIST(form, displayListId) PlayerModelManager_getFormDisplayList(PMM_API_VERSION, form, displayListId)
-
-// Returns true if the model attached to the passed in handle is currently equipped, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isApplied(PlayerModelManagerHandle h));
-
-// Set tunic color of a specific form.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a));
-
-// Set tunic color for all forms. Replaces any form-specific tunic colors.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a));
-
-// Allows mods to override display lists used by the models used when no custom model is found.
-// This should be used sparingly, but there are some use cases, like if you are exchanging
-// the first person models for non-human forms.
-//
-// Attempts to override shim DLs will be ignored.
-//
-// This function can only be used during the PlayerModelManager_onRegisterModels event.
-//
-// This returns true on successful override, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_overrideVanillaDisplayList(unsigned long apiVersion, PlayerTransformation form, PlayerModelManagerDisplayListId displayListId, Gfx *displayList));
-
-// Helper define for PlayerModelManager_overrideVanillaDisplayList. See PlayerModelManager_overrideVanillaDisplayList description for functionality.
-#define PLAYERMODELMANAGER_OVERRIDE_VANILLA_DISPLAY_LIST(form, displayListId, displayList) PlayerModelManager_overrideVanillaDisplayList(PMM_API_VERSION, form, displayListId, displayList)
-
-// Allows mods to override matrixes used by the models used when no custom matrix is found.
-// This should be used sparingly, but there are some use cases, like if you are exchanging
-// equipment models with PlayerModelManager_overrideVanillaDisplayList.
-//
-// This function can only be used during the PlayerModelManager_onRegisterModels event.
-//
-// This returns true on successful override, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_overrideVanillaMatrix(unsigned long apiVersion, PlayerTransformation form, PlayerModelManagerMatrixId displayListId, Mtx *mtx));
-
-// Helper define for PlayerModelManager_overrideVanillaDisplayList. See PlayerModelManager_overrideVanillaDisplayList description for functionality.
-#define PLAYERMODELMANAGER_OVERRIDE_VANILLA_MATRIX(form, matrixId, matrix) PlayerModelManager_overrideVanillaMatrix(PMM_API_VERSION, form, matrixId, matrix)
-
-// Returns true if there is a custom player model applied to the passed in form, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form));
-
 // Helper define for register models event.
 #define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
 
