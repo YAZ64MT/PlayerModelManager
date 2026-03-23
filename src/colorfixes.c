@@ -55,25 +55,10 @@ void readTunicColor_on_Player_Draw(Player *player, PlayState *play) {
     FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
     if (fp) {
-        switch (recomp_get_config_u32("is_modify_tunic_color")) {
-            case TUNIC_COLOR_OFF:
-                return;
-                break;
-
-            case TUNIC_COLOR_AUTO:
-                if (FormProxy_isTunicColorOverrideRequested(fp)) {
-                    FormProxy_pullCurrentTunicColorFromRequested(fp);
-                } else {
-                    FormProxy_pullCurrentTunicColorFromConfig(fp);
-                }
-                break;
-
-            case TUNIC_COLOR_FORCE:
-                FormProxy_pullCurrentTunicColorFromConfig(fp);
-                break;
-
-            default:
-                break;
+        if (FormProxy_isTunicColorOverrideRequested(fp)) {
+            FormProxy_pullCurrentTunicColorFromRequested(fp);
+        } else {
+            FormProxy_pullCurrentTunicColorFromConfig(fp);
         }
 
         Color_RGBA8 tunicColor = FormProxy_getCurrentTunicColor(fp);

@@ -106,24 +106,6 @@ options = [ "OFF", "ON" ]
 default = "ON"
 
 [[manifest.config_options]]
-id = "is_modify_tunic_color"
-name = "Set Tunic Color"
-description = """
-Some models may have a colorable tunic.
-
-If they do, this option is necessary to render the tunic properly in Majora's Mask.
-
-This option may conflict with other tunic color mods, so feel free to disable it.
-
-AUTO will allow other mods to override the tunic color but use user-configured color as a fallback.
-
-FORCE will have this mod always use the user-configured color.
-"""
-type = "Enum"
-options = [ "OFF", "AUTO", "FORCE" ]
-default = "AUTO"
-
-[[manifest.config_options]]
 id = "tunic_color"
 name = "Tunic Color"
 description = "Hex string color value of tunic.\n\nDoes nothing if 'Set Tunic Color' is disabled.\n\nDefault: 1E691B"
