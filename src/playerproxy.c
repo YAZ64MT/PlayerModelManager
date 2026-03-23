@@ -25,6 +25,8 @@ ModelInfo gGoronModelInfo;
 ModelInfo gZoraModelInfo;
 ModelInfo gFierceDeityModelInfo;
 
+static YAZMTCore_IterableU32Set *sQueuedRefreshes;
+
 SETUP_PTR_VALIDATION(sPlayerProxyPtrSet, PlayerProxy);
 
 FormProxy *PlayerProxy_getFormProxy(PlayerProxy *pp, FormProxyId formId) {
@@ -42,10 +44,6 @@ void PlayerProxy_createFormProxy(PlayerProxy *pp, FormProxyId proxyId, PlayerTra
     } else {
         Logger_printWarning("Tried to create a FormProxy, but key %d already existed!", proxyId);
     }
-}
-
-void PlayerProxy_destroyFormProxy(PlayerProxy *pp, FormProxyId proxyId) {
-
 }
 
 void PlayerProxy_init(PlayerProxy *pp) {
@@ -69,6 +67,10 @@ void PlayerProxy_init(PlayerProxy *pp) {
 }
 
 void PlayerProxy_destroy(PlayerProxy *pp) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
+    YAZMTCore_IterableU32Set_erase(sQueuedRefreshes, (uintptr_t)pp);
+
     for (size_t i = 0; i < gFormProxyIds->size; ++i) {
         FormProxy *fp = PlayerProxy_getFormProxy(pp, i);
 
@@ -111,8 +113,6 @@ static void PlayerProxy_refresh(PlayerProxy *pp) {
 
     PlayerProxy_requestInterpolationSkip(pp);
 }
-
-static YAZMTCore_IterableU32Set *sQueuedRefreshes;
 
 void PlayerProxy_requestRefresh(PlayerProxy *pp) {
     RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);

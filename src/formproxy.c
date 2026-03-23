@@ -13,6 +13,8 @@
 
 SETUP_PTR_VALIDATION(sValidFormProxySet, FormProxy);
 
+static YAZMTCore_IterableU32Set *sQueuedRefreshes;
+
 static Gfx sPopModelViewMtx[] = {
     gsSPPopMatrix(G_MTX_MODELVIEW),
     gsSPEndDisplayList(),
@@ -375,6 +377,8 @@ void FormProxy_init(FormProxy *fp, PlayerProxy *pp, PlayerTransformation form, F
 
 void FormProxy_destroy(FormProxy *fp) {
     RETURN_IF_INVALID_PTR(fp, PTR_VAL_VOID_RET);
+
+    YAZMTCore_IterableU32Set_erase(sQueuedRefreshes, (uintptr_t)fp);
 
     ModelInfo_destroy(&fp->currentModelInfo);
     recomp_free(fp->displayLists);
@@ -1168,8 +1172,6 @@ PlayerModelManagerModelType FormProxy_getModelType(FormProxy *fp) {
 
     return PMM_MODEL_TYPE_NONE;
 }
-
-static YAZMTCore_IterableU32Set *sQueuedRefreshes;
 
 void FormProxy_requestRefresh(FormProxy *fp) {
     if (fp) {
