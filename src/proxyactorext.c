@@ -119,6 +119,10 @@ FormProxy *ProxyActorExt_getFormProxyOrFallback(Actor *actor, FormProxyId fallba
     return fp;
 }
 
+bool ProxyActorExt_isActorHasAppearanceData(Actor *actor) {
+    return !!ProxyActorExt_getPlayerProxy(actor);
+}
+
 RECOMP_CALLBACK(".", _internal_preInitHashObjects) void handleFormProxyExtensionInits(void) {
     sActorExtIdPlayerProxyInfo = z64recomp_extend_actor_all(sizeof(PlayerProxyInfo));
 }
