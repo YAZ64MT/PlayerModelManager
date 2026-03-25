@@ -367,6 +367,7 @@ RECOMP_CALLBACK(".", _internal_initHashObjects) void initCMEMHash(void) {
         REPY_FN_IMPORT("pathlib");
 
         REPY_FN_EXEC_CSTR(
+            "dir_exists = False\n"
             "mod_folder_path = pathlib.Path(mods_folder_str)\n"
             "mod_data_folder_path = mod_folder_path.parents[0] / 'mod_data' / 'yazmt_z64_playermodelmanager'\n"
             "mod_data_folder_path.mkdir(parents=True, exist_ok=True)\n"
