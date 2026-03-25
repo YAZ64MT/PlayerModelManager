@@ -9,7 +9,7 @@
 #include "logger.h"
 #include "modelentrymanager.h"
 
-RECOMP_EXPORT bool PlayerModelManager_Actor_isModelApplied(Actor *actor, PlayerModelManagerHandle h) {
+RECOMP_EXPORT bool PMM_Actor_isModelApplied(Actor *actor, PlayerModelManagerHandle h) {
     const ModelEntry *entryToCheck = ModelEntryManager_getEntry(h);
 
     if (entryToCheck) {
@@ -35,7 +35,7 @@ RECOMP_EXPORT bool PlayerModelManager_Actor_isModelApplied(Actor *actor, PlayerM
     return false;
 }
 
-RECOMP_EXPORT Gfx *PlayerModelManager_Actor_getDisplayList(Actor *actor, Link_DisplayList dlId) {
+RECOMP_EXPORT Gfx *PMM_Actor_getDisplayList(Actor *actor, Link_DisplayList dlId) {
     if (!Utils_isValidDisplayListId(dlId)) {
         Logger_printError("Mod requesting invalid display list ID %d!", dlId);
         return NULL;
@@ -50,7 +50,7 @@ RECOMP_EXPORT Gfx *PlayerModelManager_Actor_getDisplayList(Actor *actor, Link_Di
     return NULL;
 }
 
-RECOMP_EXPORT Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, Link_EquipmentMatrix mtxId) {
+RECOMP_EXPORT Mtx *PMM_Actor_getMatrix(Actor *actor, Link_EquipmentMatrix mtxId) {
     if (!Utils_isValidMatrixId(mtxId)) {
         Logger_printError("Mod requesting invalid matrix ID %d!", mtxId);
         return NULL;
@@ -65,6 +65,6 @@ RECOMP_EXPORT Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, Link_Equipme
     return NULL;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_Actor_hasAppearanceData(Actor *actor) {
-    return !!ProxyActorExt_getPlayerProxy(actor);
+RECOMP_EXPORT bool PMM_Actor_hasAppearanceData(Actor *actor) {
+    return ProxyActorExt_isActorHasAppearanceData(actor);
 }
