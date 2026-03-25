@@ -30,8 +30,6 @@ static U32HashsetHandle sHiddenModelEntries;
 
 static char *sModDataFolderPath;
 
-#define SAVED_INTERNAL_NAME_BUFFER_SIZE (INTERNAL_NAME_MAX_LENGTH + 1)
-
 typedef struct SavedModelName {
     char *key;
     PlayerModelManagerModelType modelType;
