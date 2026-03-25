@@ -3,6 +3,8 @@
 
 typedef unsigned long PlayerModelManagerHandle;
 
+typedef unsigned long ActorAppearanceDataHandle;
+
 // Used for keeping compatibility between versions
 // DO NOT EDIT
 #define PMM_API_VERSION 4UL
