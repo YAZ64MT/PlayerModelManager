@@ -491,11 +491,11 @@ static void removeEquipmentModels(void) {
     }
 }
 
-static void saveAllModels(PlayerProxy *pp) {
+static void saveAllModels(void) {
     for (int i = 0; i < ARRAY_COUNT(sCategoryInfos); ++i) {
         CategoryInfo *catInf = &sCategoryInfos[i];
         catInf->isNeedsDiskSave = true;
-        setRealEntry(catInf, PlayerProxy_getCurrentEntry(pp, catInf->category));
+        setRealEntry(catInf, PlayerProxy_getCurrentEntry(getProxyFromIndex(catInf->ppIndex), catInf->category));
     }
 }
 
@@ -504,7 +504,7 @@ static void removeAllModelsButtonPressed(RecompuiResource resource, const Recomp
         if (data->type == UI_EVENT_CLICK) {
             Audio_PlaySfx(NA_SE_SY_DECIDE);
             removeAllModels();
-            saveAllModels(gPlayer1Proxy);
+            saveAllModels();
         }
     }
 }
@@ -518,7 +518,7 @@ static void removeEquipmentModelsButtonPressed(RecompuiResource resource, const 
                     Audio_PlaySfx(NA_SE_SY_DECIDE);
                     applyRealEntries();
                     removeEquipmentModels();
-                    saveAllModels(gPlayer1Proxy);
+                    saveAllModels();
                 } else {
                     Audio_PlaySfx(NA_SE_SY_ERROR);
                 }
@@ -542,8 +542,7 @@ static void removePackButtonPressed(RecompuiResource resource, const RecompuiEve
                 if (catInf) {
                     Audio_PlaySfx(NA_SE_SY_DECIDE);
                     removeAllModels();
-                    saveAllModels(gPlayer1Proxy);
-                    saveAllModels(gPlayer2Proxy);
+                    saveAllModels();
                 } else {
                     Audio_PlaySfx(NA_SE_SY_ERROR);
                 }
@@ -885,7 +884,7 @@ static void onPackButtonPressed(RecompuiResource resource, const RecompuiEventDa
             if (data->type == UI_EVENT_CLICK) {
                 Audio_PlaySfx(NA_SE_SY_DECIDE);
                 PlayerProxy_tryApplyEntry(pp, modelType, entryOrNull);
-                saveAllModels(pp);
+                saveAllModels();
             } else if (data->type == UI_EVENT_FOCUS || data->type == UI_EVENT_HOVER) {
                 if (entryOrNull) {
                     setAuthor(ModelEntry_getAuthorName(entryOrNull));
