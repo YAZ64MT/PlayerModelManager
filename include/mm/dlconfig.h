@@ -1,7 +1,3 @@
-#ifndef DECLARE_MM_DL_CFG
-#define DECLARE_MM_DL_CFG(objectId, segmentedDL, wrapperDLName)
-#endif
-
 DECLARE_MM_DL_CFG(GAMEPLAY_KEEP, gBombBodyDL, gCallHumanBombBodyDL)
 DECLARE_MM_DL_CFG(GAMEPLAY_KEEP, gBombCapDL, gCallHumanBombCapDL)
 DECLARE_MM_DL_CFG(GAMEPLAY_KEEP, gBombchuDL, gCallHumanBombchuDL)
