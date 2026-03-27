@@ -519,8 +519,11 @@ typedef enum PlayerModelManagerModelType {
 #define PMM_MODEL_TYPE_SHIELD_MIRROR PMM_MODEL_TYPE_SHIELD3
 
 typedef enum PlayerModelManagerModelEvent {
+    // Model was applied to "main" appearance data, typically used by Link
     PMM_EVENT_MODEL_APPLIED_TO_MAIN_PLAYER,
     PMM_EVENT_MODEL_REMOVED_FROM_MAIN_PLAYER,
+
+    // Model was applied to any other appearance data (e.g. Kafei)
     PMM_EVENT_MODEL_APPLIED_TO_OTHER,
     PMM_EVENT_MODEL_REMOVED_FROM_OTHER,
 } PlayerModelManagerModelEvent;
@@ -529,7 +532,6 @@ typedef void PlayerModelManagerEventHandler(PlayerModelManagerHandle handle, Pla
 
 #ifndef YAZMT_PMM_NO_API_IMPORTS
 
-#include "PR/ultratypes.h"
 #include "stdbool.h"
 #include "modding.h"
 #include "z64animation.h"
@@ -631,6 +633,30 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, void PlayerModelManager_requestOverrideTunicCo
 
 // Changes the color of the tunic on a specific form of Link.
 RECOMP_IMPORT(void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a));
+
+// Returns true if actor is using the model represented by handle h, false otherwise.
+//
+// Models in form categories take form into account. As a simple example, if the actor
+// is Link in Zora form and h represents a model with category PMM_MODEL_TYPE_GORON, then
+// this will return false even if h represents the model equipped to his Goron form.
+//
+// Equipment models do not take form into account.
+//
+// If h represents a PMM_MODEL_TYPE_MODEL_PACK, this function always returns false.
+RECOMP_IMPORT(bool PlayerModelManager_Actor_isModelApplied(Actor *actor, PlayerModelManagerHandle h));
+
+// Returns a pointer to the display list with the given ID on an actor with PMM appearance data.
+//
+// Returns NULL if the actor does not have appearance data or if the passed in id is invalid.
+RECOMP_IMPORT(Gfx *PlayerModelManager_Actor_getDisplayList(Actor *actor, PlayerModelManagerDisplayListId dlId));
+
+// Returns a pointer to the matrix with the given ID on an actor with PMM appearance data.
+//
+// Returns NULL if the actor does not have appearance data or if the passed in id is invalid.
+RECOMP_IMPORT(Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, PlayerModelManagerMatrixId mtxId));
+
+// Returns true if the actor has PMM appearance data assigned to it, false otherwise.
+RECOMP_IMPORT(bool PlayerModelManager_Actor_hasAppearanceData(Actor *actor));
 
 // Helper define for register models event.
 #define PLAYERMODELMANAGER_CALLBACK_REGISTER_MODELS RECOMP_CALLBACK(YAZMT_PMM_MOD_NAME, onRegisterModels)
