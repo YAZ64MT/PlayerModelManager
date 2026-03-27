@@ -8,7 +8,7 @@ static Gfx **sDList2;
 static Vec3s *sRot;
 static Player *sPlayer;
 
-void refreshColor_on_Player_PostLimbDrawGameplay(PlayState *play);
+void handleTunicColor_on_Player_PostLimbDrawGameplay(PlayState *play);
 void handleMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Gfx **dList1, Player *player);
 void repositionHeldActors_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex, Player *player);
 void setMirrorShieldMtxF_on_Player_PostLimbDrawGameplay(Player *player, s32 limbIndex);
@@ -21,16 +21,16 @@ RECOMP_HOOK("Player_PostLimbDrawGameplay") void on_Player_PostLimbDrawGameplay(P
     sRot = rot;
     sPlayer = (Player *)actor;
 
-    refreshColor_on_Player_PostLimbDrawGameplay(sPlay);
+    handleTunicColor_on_Player_PostLimbDrawGameplay(sPlay);
     handleMaskMtx_on_Player_PostLimbDrawGameplay(sPlay, sLimbIndex, sDList1, sPlayer);
     repositionHeldActors_on_Player_PostLimbDrawGameplay(sPlay, sLimbIndex, sPlayer);
     setMirrorShieldMtxF_on_Player_PostLimbDrawGameplay(sPlayer, sLimbIndex);
 }
 
-void refreshColor_on_return_Player_PostLimbDrawGameplay(PlayState *play);
+void handleTunicColor_on_return_Player_PostLimbDrawGameplay(PlayState *play);
 void handleMaskMtx_on_return_Player_PostLimbDrawGameplay(void);
 
 RECOMP_HOOK_RETURN("Player_PostLimbDrawGameplay") void on_return_Player_PostLimbDrawGameplay(void) {
     handleMaskMtx_on_return_Player_PostLimbDrawGameplay();
-    refreshColor_on_return_Player_PostLimbDrawGameplay(sPlay);
+    handleTunicColor_on_return_Player_PostLimbDrawGameplay(sPlay);
 }

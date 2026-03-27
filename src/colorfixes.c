@@ -69,13 +69,13 @@ void readTunicColor_on_Player_Draw(Player *player, PlayState *play) {
     }
 }
 
-void refreshColor_on_Player_PostLimbDrawGameplay(PlayState *play) {
+void handleTunicColor_on_Player_PostLimbDrawGameplay(PlayState *play) {
     OPEN_DISPS(play->state.gfxCtx);
     gEXPushEnvColor(POLY_OPA_DISP++);
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
-void refreshColor_on_return_Player_PostLimbDrawGameplay(PlayState *play) {
+void handleTunicColor_on_return_Player_PostLimbDrawGameplay(PlayState *play) {
     OPEN_DISPS(play->state.gfxCtx);
     gEXPopEnvColor(POLY_OPA_DISP++);
     CLOSE_DISPS(play->state.gfxCtx);
