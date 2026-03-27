@@ -4,6 +4,23 @@
 #include "modelmatrixids.h"
 #include "formproxy.h"
 #include "proxyactorext.h"
+#include "yazmtcorelib_api.h"
+
+static bool isMatrixesEqual(const Mtx *a, const Mtx *b) {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (a->intPart[i][j] != b->intPart[i][j] || a->fracPart[i][j] != b->fracPart[i][j]) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+static bool isIdentityMtx(const Mtx *m) {
+    return isMatrixesEqual(m, &gIdentityMtx);
+}
 
 static bool sIsMaskMatrixPushed = false;
 
@@ -15,7 +32,7 @@ void handleMaskMtx_on_Player_PostLimbDrawGameplay(PlayState *play, s32 limbIndex
 
         if (fp) {
             Mtx *maskMtx = FormProxy_getMatrix(fp, LINK_EQUIP_MATRIX_MASKS);
-            if (maskMtx) {
+            if (maskMtx && !isIdentityMtx(maskMtx)) {
                 if (((*dList1 != NULL) && ((u32)player->currentMask != PLAYER_MASK_NONE)) &&
                     (((player->transformation == PLAYER_FORM_HUMAN) &&
                       ((player->skelAnime.animation != &gPlayerAnim_cl_setmask) || (player->skelAnime.curFrame >= 12.0f))) ||
@@ -84,7 +101,7 @@ void repositionHeldActors_on_Player_PostLimbDrawGameplay(PlayState *play, s32 li
                         if ((player->stateFlags3 & PLAYER_STATE3_40) && (player->transformation != PLAYER_FORM_DEKU)) {
                             Mtx *arrowMtx = FormProxy_getMatrix(fp, LINK_EQUIP_MATRIX_ARROW_DRAWN);
 
-                            if (arrowMtx) {
+                            if (arrowMtx && !isIdentityMtx(arrowMtx)) {
                                 OPEN_DISPS(play->state.gfxCtx);
                                 MtxF arrowMtxF;
                                 Matrix_MtxToMtxF(arrowMtx, &arrowMtxF);
@@ -96,7 +113,7 @@ void repositionHeldActors_on_Player_PostLimbDrawGameplay(PlayState *play, s32 li
                 } else if (limbIndex == PLAYER_LIMB_RIGHT_HAND && Player_IsHoldingHookshot(player)) {
                     Mtx *hookMtx = FormProxy_getMatrix(fp, LINK_EQUIP_MATRIX_HOOKSHOT_CHAIN_AND_HOOK);
 
-                    if (hookMtx) {
+                    if (hookMtx && !isIdentityMtx(hookMtx)) {
                         OPEN_DISPS(play->state.gfxCtx);
                         MtxF hookMtxF;
                         Matrix_MtxToMtxF(hookMtx, &hookMtxF);
