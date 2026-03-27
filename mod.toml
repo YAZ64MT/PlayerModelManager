@@ -111,8 +111,6 @@ name = "Tunic Color"
 description = """\
 Hex string color value of tunic on models that support tunic colors.
 
-Does nothing if 'Set Tunic Color' is disabled.
-
 Default: 1E691B"""
 type = "String"
 default = "1E691B"
