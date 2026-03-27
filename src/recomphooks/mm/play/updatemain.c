@@ -5,7 +5,6 @@ static PlayState *sPlay;
 
 void updatePlayerProxyManager_on_UpdateMain(void);
 void updateAdultProperties_on_Play_UpdateMain(PlayState *play);
-void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play);
 void processPlayerProxyRefreshRequests_on_Play_UpdateMain(void);
 void processFormProxyRefreshRequests_on_Play_UpdateMain(void);
 
@@ -14,7 +13,6 @@ RECOMP_HOOK("Play_UpdateMain") void on_Play_UpdateMain(PlayState *this) {
 
     updatePlayerProxyManager_on_UpdateMain();
     updateAdultProperties_on_Play_UpdateMain(sPlay);
-    checkToOpenModelMenu_on_Play_UpdateMain(sPlay);
     processPlayerProxyRefreshRequests_on_Play_UpdateMain();
     processFormProxyRefreshRequests_on_Play_UpdateMain();
 }

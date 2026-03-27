@@ -1067,8 +1067,8 @@ static void clearPressedInputButtons(Input *input, u16 buttons) {
     input->press.button &= (~buttons);
 }
 
-static bool isOpenMenuComboPressed(PlayState *play) {
-    Input *input = CONTROLLER1(&play->state);
+static bool isOpenMenuComboPressed(GameState *state) {
+    Input *input = CONTROLLER1(state);
 
     switch (recomp_get_config_u32("open_menu_buttons")) {
         case MODCFG_BUTTON_COMBO_LR:
@@ -1111,8 +1111,12 @@ RECOMP_CALLBACK(".", onReady) void allowUIOnReady(void) {
 }
 
 // Hook Play_UpdateMain to check if the L button is pressed and show this mod's UI if so.
-void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play) {
-    if (isOpenMenuComboPressed(play) && sIsModelManagerReady) {
+void handleUIRequests_on_GameState_Update(GameState *state) {
+    if (!sIsModelManagerReady) {
+        return;
+    }
+
+    if (isOpenMenuComboPressed(state)) {
         openModelMenu();
     }
 
@@ -1124,7 +1128,7 @@ void checkToOpenModelMenu_on_Play_UpdateMain(PlayState *play) {
     }
 
     if (sShouldClearAllButtonsNextFrame) {
-        clearPressedInputButtons(CONTROLLER1(&play->state), 0xFFFFU);
+        clearPressedInputButtons(CONTROLLER1(state), 0xFFFFU);
     }
 
     sShouldClearAllButtonsNextFrame = false;
