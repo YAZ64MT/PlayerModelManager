@@ -21,12 +21,6 @@ RECOMP_EXPORT bool PlayerModelManager_isApplied(PlayerModelManagerHandle h) {
     return false;
 }
 
-RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {
-}
-
-RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a) {
-}
-
 RECOMP_EXPORT bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form) {
     return false;
 }

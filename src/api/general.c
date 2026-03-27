@@ -503,6 +503,47 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle 
     return true;
 }
 
+RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {
+    PlayerProxy_requestTunicColorOverride(gPlayer1Proxy, (Color_RGBA8){r, g, b, a});
+}
+
+RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a) {
+    FormProxyId id;
+
+    switch (form) {
+        case PLAYER_FORM_FIERCE_DEITY:
+            id = FORM_PROXY_ID_FIERCE_DEITY;
+            break;
+
+        case PLAYER_FORM_GORON:
+            id = FORM_PROXY_ID_GORON;
+            break;
+
+        case PLAYER_FORM_ZORA:
+            id = FORM_PROXY_ID_ZORA;
+            break;
+
+        case PLAYER_FORM_DEKU:
+            id = FORM_PROXY_ID_DEKU;
+            break;
+
+        case PLAYER_FORM_HUMAN:
+            id = FORM_PROXY_ID_HUMAN;
+            break;
+
+        default:
+            Logger_printError("Invalid form %d passed in!", form);
+            id = FORM_PROXY_ID_NONE;
+            break;
+    }
+
+    FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, id);
+
+    if (fp) {
+        FormProxy_requestTunicColorOverride(fp, (Color_RGBA8){r, g, b, a});
+    }
+}
+
 void PlayerModelManager_lockAPI(void) {
     sIsAPILocked = true;
 }
