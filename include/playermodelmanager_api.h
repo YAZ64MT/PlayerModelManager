@@ -354,7 +354,6 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_SHIM_LFIST_SWORD1,
     PMM_DL_SHIM_LFIST_SWORD2,
     PMM_DL_SHIM_LFIST_SWORD3,
-    PMM_DL_SHIM_LFIST_SWORD3_PEDESTAL_GRABBED,
     PMM_DL_SHIM_LFIST_SWORD4,
     PMM_DL_SHIM_LFIST_SWORD5 = 207,
 
@@ -421,7 +420,6 @@ typedef enum PlayerModelManagerDisplayListId {
 #define PMM_DL_SHIELD_DEKU PMM_DL_SHIELD1
 
 #define PMM_DL_SHIELD_HERO PMM_DL_SHIELD2
-#define PMM_DL_SHIELD_HYLIAN PMM_DL_SHIELD2
 
 #define PMM_DL_SHIELD_MIRROR PMM_DL_SHIELD3
 #define PMM_DL_SHIELD_MIRROR_RAY PMM_DL_SHIELD3_RAY
@@ -448,7 +446,6 @@ typedef enum {
 
 #define PMM_MTX_SHIELD_DEKU_BACK PMM_MTX_SHIELD1_BACK
 #define PMM_MTX_SHIELD_HERO_BACK PMM_MTX_SHIELD2_BACK
-#define PMM_MTX_SHIELD_HYLIAN_BACK PMM_MTX_SHIELD2_BACK
 #define PMM_MTX_SHIELD_MIRROR_BACK PMM_MTX_SHIELD3_BACK
 
 typedef enum PlayerModelManagerModelType {
@@ -518,7 +515,6 @@ typedef enum PlayerModelManagerModelType {
 #define PMM_MODEL_TYPE_SWORD_FIERCE_DIETY PMM_MODEL_TYPE_SWORD4
 #define PMM_MODEL_TYPE_SWORD_GREAT_FAIRY PMM_MODEL_TYPE_SWORD5
 #define PMM_MODEL_TYPE_SHIELD_DEKU PMM_MODEL_TYPE_SHIELD1
-#define PMM_MODEL_TYPE_SHIELD_HYLIAN PMM_MODEL_TYPE_SHIELD2
 #define PMM_MODEL_TYPE_SHIELD_HERO PMM_MODEL_TYPE_SHIELD2
 #define PMM_MODEL_TYPE_SHIELD_MIRROR PMM_MODEL_TYPE_SHIELD3
 
@@ -533,8 +529,10 @@ typedef void PlayerModelManagerEventHandler(PlayerModelManagerHandle handle, Pla
 
 #ifndef YAZMT_PMM_NO_API_IMPORTS
 
-#include "global.h"
+#include "PR/ultratypes.h"
+#include "stdbool.h"
 #include "modding.h"
+#include "z64animation.h"
 
 // Registers a new player model and returns a handle to it.
 //
@@ -580,8 +578,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setShieldingSkeleton(P
 
 // Set a display list on the model. The ID can be obtained from PlayerModelManagerDisplayListId.
 //
-// Display lists prefixed with SHIM are automatically generated, and while you can replace them, you are encouraged not to
-// to increase compatibility with equipment replacement mods.
+// Display lists prefixed with SHIM are automatically generated, so you may not replace them.
 //
 // Returns true upon successful display list set, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, PlayerModelManagerDisplayListId dlId, Gfx *dl));

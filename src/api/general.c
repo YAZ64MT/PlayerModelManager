@@ -16,6 +16,89 @@
 #include "utils.h"
 #include "proxyactorext.h"
 
+static bool isShimDL(Link_DisplayList id) {
+    static bool shimDLIds[] = {
+        [LINK_DL_SWORD1] = true,
+        [LINK_DL_SWORD2] = true,
+        [LINK_DL_SWORD3] = true,
+        [LINK_DL_SWORD4] = true,
+        [LINK_DL_SWORD4_BROKEN] = true,
+        [LINK_DL_SWORD5] = true,
+        [LINK_DL_SWORD1_HILT_BACK] = true,
+        [LINK_DL_SWORD2_HILT_BACK] = true,
+        [LINK_DL_SWORD3_HILT_BACK] = true,
+        [LINK_DL_SWORD4_HILT_BACK] = true,
+        [LINK_DL_SWORD5_HILT_BACK] = true,
+        [LINK_DL_SWORD1_SHEATHED] = true,
+        [LINK_DL_SWORD2_SHEATHED] = true,
+        [LINK_DL_SWORD3_SHEATHED] = true,
+        [LINK_DL_SWORD4_SHEATHED] = true,
+        [LINK_DL_SWORD5_SHEATHED] = true,
+        [LINK_DL_SHIELD1_BACK] = true,
+        [LINK_DL_SHIELD2_BACK] = true,
+        [LINK_DL_SHIELD3_BACK] = true,
+        [LINK_DL_SWORD1_SHIELD1_SHEATH] = true,
+        [LINK_DL_SWORD1_SHIELD2_SHEATH] = true,
+        [LINK_DL_SWORD1_SHIELD3_SHEATH] = true,
+        [LINK_DL_SWORD2_SHIELD1_SHEATH] = true,
+        [LINK_DL_SWORD2_SHIELD2_SHEATH] = true,
+        [LINK_DL_SWORD2_SHIELD3_SHEATH] = true,
+        [LINK_DL_SWORD3_SHIELD1_SHEATH] = true,
+        [LINK_DL_SWORD3_SHIELD2_SHEATH] = true,
+        [LINK_DL_SWORD3_SHIELD3_SHEATH] = true,
+        [LINK_DL_SWORD4_SHIELD1_SHEATH] = true,
+        [LINK_DL_SWORD4_SHIELD2_SHEATH] = true,
+        [LINK_DL_SWORD4_SHIELD3_SHEATH] = true,
+        [LINK_DL_SWORD5_SHIELD1_SHEATH] = true,
+        [LINK_DL_SWORD5_SHIELD2_SHEATH] = true,
+        [LINK_DL_SWORD5_SHIELD3_SHEATH] = true,
+        [LINK_DL_SWORD1_SHIELD1_SHEATHED] = true,
+        [LINK_DL_SWORD1_SHIELD2_SHEATHED] = true,
+        [LINK_DL_SWORD1_SHIELD3_SHEATHED] = true,
+        [LINK_DL_SWORD2_SHIELD1_SHEATHED] = true,
+        [LINK_DL_SWORD2_SHIELD2_SHEATHED] = true,
+        [LINK_DL_SWORD2_SHIELD3_SHEATHED] = true,
+        [LINK_DL_SWORD3_SHIELD1_SHEATHED] = true,
+        [LINK_DL_SWORD3_SHIELD2_SHEATHED] = true,
+        [LINK_DL_SWORD3_SHIELD3_SHEATHED] = true,
+        [LINK_DL_SWORD4_SHIELD1_SHEATHED] = true,
+        [LINK_DL_SWORD4_SHIELD2_SHEATHED] = true,
+        [LINK_DL_SWORD4_SHIELD3_SHEATHED] = true,
+        [LINK_DL_SWORD5_SHIELD1_SHEATHED] = true,
+        [LINK_DL_SWORD5_SHIELD2_SHEATHED] = true,
+        [LINK_DL_SWORD5_SHIELD3_SHEATHED] = true,
+        [LINK_DL_LFIST_SWORD1] = true,
+        [LINK_DL_LFIST_SWORD2] = true,
+        [LINK_DL_LFIST_SWORD3] = true,
+        [LINK_DL_LFIST_SWORD3_PEDESTAL_GRABBED] = true,
+        [LINK_DL_LFIST_SWORD4] = true,
+        [LINK_DL_LFIST_SWORD4_BROKEN] = true,
+        [LINK_DL_LFIST_SWORD5] = true,
+        [LINK_DL_RFIST_SHIELD1] = true,
+        [LINK_DL_RFIST_SHIELD2] = true,
+        [LINK_DL_RFIST_SHIELD3] = true,
+        [LINK_DL_LFIST_HAMMER] = true,
+        [LINK_DL_LFIST_BOOMERANG] = true,
+        [LINK_DL_RFIST_BOW] = true,
+        [LINK_DL_RFIST_SLINGSHOT] = true,
+        [LINK_DL_RFIST_HOOKSHOT] = true,
+        [LINK_DL_RFIST_LONGSHOT] = true,
+        [LINK_DL_RHAND_OCARINA_FAIRY] = true,
+        [LINK_DL_RHAND_OCARINA_TIME] = true,
+        [LINK_DL_FPS_RHAND_BOW] = true,
+        [LINK_DL_FPS_RHAND_SLINGSHOT] = true,
+        [LINK_DL_FPS_RHAND_HOOKSHOT] = true,
+        [LINK_DL_FPS_RHAND_LONGSHOT] = true,
+        [LINK_DL_SHIELD1_ITEM] = true,
+        [LINK_DL_SWORD3_PEDESTAL] = true,
+        [LINK_DL_SWORD3_PEDESTAL_GRABBED] = true,
+        [LINK_DL_CENTER_FLOWER_PROPELLER_OPEN] = true,
+        [LINK_DL_CENTER_FLOWER_PROPELLER_CLOSED] = true,
+    };
+
+    return id >= 0 && id < ARRAY_COUNT(shimDLIds) && shimDLIds[id]; 
+}
+
 static Gfx sBelowV3FirstPersonRightForearmDL[] = {
     gsSPEndDisplayList(),
 };
@@ -215,14 +298,19 @@ static bool isOldElegyIdMatchesModelType(Link_DisplayList id, PlayerModelManager
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h, Link_DisplayList dlId, Gfx *dl) {
-    if (!Utils_isValidDisplayListId(dlId)) {
-        Logger_printError("Invalid display list ID passed in.");
-        return false;
-    }
-
     ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
+        return false;
+    }
+
+    if (!Utils_isValidDisplayListId(dlId)) {
+        Logger_printError("Tried to set invalid display list ID %d on model %s.", dlId, ModelEntry_getInternalName(entry));
+        return false;
+    }
+
+    if (isShimDL(dlId)) {
+        Logger_printError("Tried to set shim DL %d on model %s. This is not allowed.", dlId, ModelEntry_getInternalName(entry));
         return false;
     }
 
@@ -245,19 +333,19 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayList(PlayerModelManagerHandle h,
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelType(PlayerModelManagerHandle h, PlayerModelManagerModelType type, Link_DisplayList dlId, Gfx *dl) {
-    if (!Utils_isValidDisplayListId(dlId)) {
-        Logger_printError("Invalid display list ID passed in.");
-        return false;
-    }
-
-    if (!Utils_isValidModelType(type)) {
-        Logger_printError("Invalid model type passed in.");
-        return false;
-    }
-
     ModelEntry *entryx = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entryx) {
+        return false;
+    }
+
+    if (!Utils_isValidDisplayListId(dlId)) {
+        Logger_printError("Tried to set invalid display list ID %d on model %s.", dlId, ModelEntry_getInternalName(entryx));
+        return false;
+    }
+
+    if (isShimDL(dlId)) {
+        Logger_printError("Tried to set shim DL %d on model %s. This is not allowed.", dlId, ModelEntry_getInternalName(entryx));
         return false;
     }
 
@@ -277,14 +365,14 @@ RECOMP_EXPORT bool PlayerModelManager_setDisplayListForModelType(PlayerModelMana
 }
 
 RECOMP_EXPORT bool PlayerModelManager_setMatrix(PlayerModelManagerHandle h, Link_EquipmentMatrix mtxId, Mtx *matrix) {
-    if (!Utils_isValidMatrixId(mtxId)) {
-        Logger_printError("Invalid matrix ID passed in.");
-        return false;
-    }
-
     ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
 
     if (!entry) {
+        return false;
+    }
+
+    if (!Utils_isValidMatrixId(mtxId)) {
+        Logger_printError("Invalid matrix ID %d passed in to model %s.", mtxId, ModelEntry_getInternalName(entry));
         return false;
     }
 
