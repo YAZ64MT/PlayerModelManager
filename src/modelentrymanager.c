@@ -12,6 +12,7 @@
 #include "logger.h"
 #include "repy_api.h"
 #include "string.h"
+#include "fallbackmodels.h"
 
 static YAZMTCore_DynamicDataArray *sProxiesToSave;
 
@@ -234,6 +235,8 @@ bool ModelEntryManager_saveModelsToDisk(void) {
     REPY_Handle savedProxiesDict = REPY_CreateDict(0);
     REPY_FN_DEFER_RELEASE(savedProxiesDict);
 
+    const ModelEntry *kafeiEntry = ModelEntryManager_getEntry(gKafeiModelHandle);
+
     for (size_t i = 0; i < numProxies; ++i) {
         PlayerProxy *pp = savedProxies[i].pp;
         char *sectionName = (char *)(savedProxies[i].sectionName);
@@ -248,11 +251,16 @@ bool ModelEntryManager_saveModelsToDisk(void) {
 
             const ModelEntry *entry = PlayerProxy_getCurrentEntry(pp, curr->modelType);
 
+            const char *internalName = "";
+
             if (entry) {
-                REPY_DictSetCStr(d, curr->key, REPY_CreateStr_SUH(ModelEntry_getInternalName(entry)));
-            } else {
-                REPY_DictSetCStr(d, curr->key, REPY_CreateStr_SUH(""));
+                // avoid writing Kafei's internal name to the child slot for consistency with player config behavior
+                if (!(entry == kafeiEntry && pp == gPlayer2Proxy && curr->modelType == PMM_MODEL_TYPE_CHILD)) {
+                    internalName = ModelEntry_getInternalName(entry);
+                }
             }
+
+            REPY_DictSetCStr(d, curr->key, REPY_CreateStr_SUH(internalName));
         }
     }
 
@@ -263,6 +271,8 @@ bool ModelEntryManager_saveModelsToDisk(void) {
         saveModelsToDiskExec,
         "cfg_path = pathlib.Path(mod_folder_path) / 'models.ini'\n"
         "config = configparser.ConfigParser()\n"
+        "config['meta'] = {}\n"
+        "config['meta']['cfg_version'] = '1'\n"
         "for section_name,models in saved_proxies.items():\n"
         "   config[section_name] = {}\n"
         "   for key,value in models.items():\n"
