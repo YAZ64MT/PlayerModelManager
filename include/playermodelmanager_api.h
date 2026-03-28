@@ -536,6 +536,8 @@ typedef void PlayerModelManagerEventHandler(PlayerModelManagerHandle handle, Pla
 #include "modding.h"
 #include "z64animation.h"
 
+typedef struct Actor Actor;
+
 // Registers a new player model and returns a handle to it.
 //
 // A handle represents an entry in the in-game model manager menu, so hold onto it.
