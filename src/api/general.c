@@ -632,6 +632,12 @@ RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransf
     }
 }
 
+void updateAssets_on_Player_Draw(Player *player);
+
+RECOMP_EXPORT void PlayerModelManager_updatePlayerAssets(Player *player) {
+    updateAssets_on_Player_Draw(player);
+}
+
 void PlayerModelManager_lockAPI(void) {
     sIsAPILocked = true;
 }

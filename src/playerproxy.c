@@ -321,6 +321,8 @@ bool PlayerProxy_forceApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mo
     return false;
 }
 
+RECOMP_DECLARE_EVENT(onMainModelChanged(PlayerModelManagerModelType modelType, const char *internalNameOrNull));
+
 bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *newEntry) {
     RETURN_IF_INVALID_PTR(pp, false);
 
@@ -334,7 +336,19 @@ bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mode
             }
         }
 
-        return PlayerProxy_forceApplyEntry(pp, modelType, newEntry);
+        if (PlayerProxy_forceApplyEntry(pp, modelType, newEntry)) {
+            const char *name = NULL;
+
+            if (newEntry) {
+                name = ModelEntry_getInternalName(newEntry);
+            }
+
+            if (pp == gPlayer1Proxy) {
+                onMainModelChanged(modelType, name);
+            }
+
+            return true;
+        }
     }
 
     return false;
