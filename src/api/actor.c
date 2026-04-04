@@ -66,5 +66,42 @@ RECOMP_EXPORT Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, Link_Equipme
 }
 
 RECOMP_EXPORT bool PlayerModelManager_Actor_hasAppearanceData(Actor *actor) {
-    return !!ProxyActorExt_getPlayerProxy(actor);
+    return ProxyActorExt_isActorHasAppearanceData(actor);
+}
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_setFormModelType(Actor *actor, PlayerModelManagerModelType type) {
+    if (Utils_isFormModelType(type)) {
+        FormProxyId id;
+
+        switch (type) {
+            case PMM_MODEL_TYPE_CHILD:
+            case PMM_MODEL_TYPE_ADULT:
+                id = FORM_PROXY_ID_HUMAN;
+                break;
+
+            case PMM_MODEL_TYPE_GORON:
+                id = FORM_PROXY_ID_GORON;
+                break;
+
+            case PMM_MODEL_TYPE_DEKU:
+                id = FORM_PROXY_ID_DEKU;
+                break;
+
+            case PMM_MODEL_TYPE_ZORA:
+                id = FORM_PROXY_ID_DEKU;
+                break;
+
+            case PMM_MODEL_TYPE_FIERCE_DEITY:
+                id = FORM_PROXY_ID_FIERCE_DEITY;
+                break;
+
+            default:
+                id = FORM_PROXY_ID_HUMAN;
+                break;
+        }
+
+        return ProxyActorExt_setFormProxyId(actor, id);
+    }
+
+    return false;
 }
