@@ -20,6 +20,7 @@ typedef struct PlayerProxyEntry {
     PlayerProxyAllocType allocType;
     s32 refCount;
     PlayerProxyEntry *next;
+    PlayerProxyEntry *prev;
 } PlayerProxyEntry;
 
 static PlayerProxyEntry *sPlayerProxyEntryListStart;
@@ -42,12 +43,17 @@ PlayerProxyHandle PlayerProxyManager_createPlayerProxy(PlayerProxyAllocType allo
     proxyEntry->allocType = allocType;
     proxyEntry->refCount = 0;
     proxyEntry->next = NULL;
+    proxyEntry->prev = NULL;
 
     PlayerProxy *pp = proxyEntry->pp = Utils_recompCalloc(sizeof(*pp));
 
     PlayerProxy_init(pp);
 
     proxyEntry->next = sPlayerProxyEntryListStart;
+
+    if (proxyEntry->next) {
+        proxyEntry->next->prev = proxyEntry;
+    }
 
     sPlayerProxyEntryListStart = proxyEntry;
 
@@ -148,6 +154,14 @@ void updatePlayerProxyManager_on_UpdateMain(void) {
             PlayerProxy_destroy(curr->pp);
             if (curr == sPlayerProxyEntryListStart) {
                 sPlayerProxyEntryListStart = curr->next;
+            } else {
+                if (curr->prev) {
+                    curr->prev->next = curr->next;
+                }
+            }
+
+            if (curr->next) {
+                curr->next->prev = curr->prev;
             }
 
             recomp_free(curr);
