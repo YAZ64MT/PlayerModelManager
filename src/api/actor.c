@@ -88,7 +88,7 @@ RECOMP_EXPORT bool PlayerModelManager_Actor_setFormModelType(Actor *actor, Playe
                 break;
 
             case PMM_MODEL_TYPE_ZORA:
-                id = FORM_PROXY_ID_DEKU;
+                id = FORM_PROXY_ID_ZORA;
                 break;
 
             case PMM_MODEL_TYPE_FIERCE_DEITY:
