@@ -30,7 +30,9 @@ void setMirrorShieldMtxF_on_Player_PostLimbDrawGameplay(Player *player, s32 limb
 
                 MtxF *dest = z64recomp_get_extended_actor_data(&player->actor, gPlayerExtIdMirrorShieldBackMf);
 
-                SkinMatrix_MtxFMtxFMult(currMf, &formProxyMf, dest);
+                if (dest) {
+                    SkinMatrix_MtxFMtxFMult(currMf, &formProxyMf, dest);
+                }
             }
         }
     }
