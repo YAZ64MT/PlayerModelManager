@@ -108,6 +108,14 @@ static bool applyByInternalName(PlayerProxy *pp, PlayerModelManagerModelType mod
     return false;
 }
 
+bool ModelEntryManager_applyByInternalName(PlayerProxy *pp, PlayerModelManagerModelType modelType, const char *name) {
+    if (name && YAZMTCore_StringU32Dictionary_contains(sInternalNamesToEntries, name)) {
+        return applyByInternalName(pp, modelType, name);
+    } else {
+        return PlayerProxy_tryApplyEntry(pp, modelType, NULL);
+    }
+}
+
 static void pushEntry(YAZMTCore_DynamicU32Array *entryArr, ModelEntry *entry) {
     ModelEntry *modelEntry = entry;
     const char *internalName = ModelEntry_getInternalName(entry);

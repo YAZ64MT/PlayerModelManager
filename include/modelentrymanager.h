@@ -18,5 +18,6 @@ void ModelEntryManager_setEntryHidden(const ModelEntry *modelEntry, bool isHidde
 bool ModelEntryManager_saveModelsToDisk(void);
 void ModelEntryManager_registerProxyToSave(PlayerProxy *pp, const char *id);
 void ModelEntryManager_applySavedEntriesToProxy(PlayerProxy *pp, const char *id);
+bool ModelEntryManager_applyByInternalName(PlayerProxy *pp, PlayerModelManagerModelType modelType, const char *name);
 
 #endif
