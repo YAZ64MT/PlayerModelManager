@@ -371,7 +371,7 @@ bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mode
         }
 
         if (PlayerProxy_forceApplyEntry(pp, modelType, newEntry)) {
-            const char *name = NULL;
+            const char *name = "";
 
             if (newEntry) {
                 name = ModelEntry_getInternalName(newEntry);
