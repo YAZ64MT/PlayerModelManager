@@ -57,7 +57,7 @@ static FormProxy *getFormProxyFromCategory(PlayerProxy *pp, PlayerModelManagerMo
             break;
 
         default:
-            fpId = FORM_PROXY_ID_NONE;
+            fpId = FORM_PROXY_ID_HUMAN;
             break;
     }
 
