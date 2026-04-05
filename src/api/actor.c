@@ -137,3 +137,17 @@ RECOMP_EXPORT PlayerModelManagerModelType PlayerModelManager_Actor_getFormModelT
 
     return PMM_MODEL_TYPE_NONE;
 }
+
+RECOMP_EXPORT const char *PlayerModelManager_Actor_getModelName(Actor *actor, PlayerModelManagerModelType type) {
+    PlayerProxy *pp = ProxyActorExt_getPlayerProxy(actor);
+
+    if (pp) {
+        const ModelEntry *entry = PlayerProxy_getCurrentEntry(pp, type);
+
+        if (entry) {
+            return ModelEntry_getInternalName(entry);
+        }
+    }
+
+    return NULL;
+}
