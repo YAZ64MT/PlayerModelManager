@@ -105,3 +105,35 @@ RECOMP_EXPORT bool PlayerModelManager_Actor_setFormModelType(Actor *actor, Playe
 
     return false;
 }
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_setTunicColor(Actor *actor, Color_RGBA8 color) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (fp) {
+        FormProxy_requestTunicColorOverride(fp, color);
+        return true;
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_getTunicColor(Actor *actor, Color_RGBA8 *out) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (out && fp) {
+        *out = FormProxy_getCurrentTunicColor(fp);
+        return true;
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT PlayerModelManagerModelType PlayerModelManager_Actor_getFormModelType(Actor *actor) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (fp) {
+        return FormProxy_getModelType(fp);
+    }
+
+    return PMM_MODEL_TYPE_NONE;
+}

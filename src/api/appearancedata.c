@@ -5,6 +5,7 @@
 #include "playerproxy.h"
 #include "proxyactorext.h"
 #include "modelentrymanager.h"
+#include "utils.h"
 
 RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_ActorAppearanceData_createData(void) {
     PlayerProxyHandle h = PlayerProxyManager_createPlayerProxy(PPALLOC_REF_COUNT);
@@ -42,4 +43,43 @@ RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_Actor_getAppearanceDa
 
 RECOMP_EXPORT bool PlayerModelManager_ActorAppearanceData_releaseHandle(ActorAppearanceDataHandle h) {
     return PlayerProxyManager_releaseReference(h);
+}
+
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_setTunicColor(ActorAppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 color) {
+    if (Utils_isFormModelType(type)) {
+        PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
+
+        if (pp) {
+            PlayerProxy_requestTunicColorOverrideForModelType(pp, type, color);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_getTunicColor(ActorAppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 *out) {
+    if (Utils_isFormModelType(type)) {
+        PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
+
+        if (pp) {
+            return PlayerProxy_getTunicColor(pp, type, out);
+        }
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT const char *PlayerModelManager_AppearanceData_getModelName(ActorAppearanceDataHandle h, PlayerModelManagerModelType type) {
+    PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
+
+    if (pp) {
+        const ModelEntry *entry = PlayerProxy_getCurrentEntry(pp, type);
+
+        if (entry) {
+            return ModelEntry_getInternalName(entry);
+        }
+    }
+
+    return NULL;
 }

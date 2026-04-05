@@ -29,6 +29,41 @@ static YAZMTCore_IterableU32Set *sQueuedRefreshes;
 
 SETUP_PTR_VALIDATION(sPlayerProxyPtrSet, PlayerProxy);
 
+static FormProxy *getFormProxyFromCategory(PlayerProxy *pp, PlayerModelManagerModelType modelType) {
+    RETURN_IF_INVALID_PTR(pp, NULL);
+
+    FormProxyId fpId;
+
+    switch (modelType) {
+        case PMM_MODEL_TYPE_CHILD:
+        case PMM_MODEL_TYPE_ADULT:
+            fpId = FORM_PROXY_ID_HUMAN;
+            break;
+
+        case PMM_MODEL_TYPE_DEKU:
+            fpId = FORM_PROXY_ID_DEKU;
+            break;
+
+        case PMM_MODEL_TYPE_GORON:
+            fpId = FORM_PROXY_ID_GORON;
+            break;
+
+        case PMM_MODEL_TYPE_ZORA:
+            fpId = FORM_PROXY_ID_ZORA;
+            break;
+
+        case PMM_MODEL_TYPE_FIERCE_DEITY:
+            fpId = FORM_PROXY_ID_FIERCE_DEITY;
+            break;
+
+        default:
+            fpId = FORM_PROXY_ID_NONE;
+            break;
+    }
+
+    return PlayerProxy_getFormProxy(pp, fpId);
+}
+
 FormProxy *PlayerProxy_getFormProxy(PlayerProxy *pp, FormProxyId formId) {
     RETURN_IF_INVALID_PTR(pp, NULL);
 
@@ -192,6 +227,16 @@ void PlayerProxy_requestTunicColorOverride(PlayerProxy *pp, Color_RGBA8 color) {
     }
 }
 
+void PlayerProxy_requestTunicColorOverrideForModelType(PlayerProxy *pp, PlayerModelManagerModelType type, Color_RGBA8 color) {
+    RETURN_IF_INVALID_PTR(pp, PTR_VAL_VOID_RET);
+
+    FormProxy *fp = getFormProxyFromCategory(pp, type);
+
+    if (fp) {
+        FormProxy_requestTunicColorOverride(fp, color);
+    }
+}
+
 bool isCompatibleModelTypes(PlayerModelManagerModelType a, PlayerModelManagerModelType b) {
     if (a == PMM_MODEL_TYPE_NONE || b == PMM_MODEL_TYPE_NONE) {
         return false;
@@ -237,34 +282,19 @@ const ModelEntry *PlayerProxy_getCurrentEntry(PlayerProxy *pp, PlayerModelManage
     return (const ModelEntry *)entry;
 }
 
-static FormProxy *getFormProxyFromCategory(PlayerProxy *pp, PlayerModelManagerModelType modelType) {
-    RETURN_IF_INVALID_PTR(pp, NULL);
+bool PlayerProxy_getTunicColor(PlayerProxy *pp, PlayerModelManagerModelType type, Color_RGBA8 *out) {
+    RETURN_IF_INVALID_PTR(pp, false);
 
-    FormProxyId fpId;
+    if (out && Utils_isFormModelType(type)) {
+        FormProxy *fp = getFormProxyFromCategory(pp, type);
 
-    switch (modelType) {
-        case PMM_MODEL_TYPE_DEKU:
-            fpId = FORM_PROXY_ID_DEKU;
-            break;
-
-        case PMM_MODEL_TYPE_GORON:
-            fpId = FORM_PROXY_ID_GORON;
-            break;
-
-        case PMM_MODEL_TYPE_ZORA:
-            fpId = FORM_PROXY_ID_ZORA;
-            break;
-
-        case PMM_MODEL_TYPE_FIERCE_DEITY:
-            fpId = FORM_PROXY_ID_FIERCE_DEITY;
-            break;
-
-        default:
-            fpId = FORM_PROXY_ID_HUMAN;
-            break;
+        if (fp) {
+            *out = FormProxy_getCurrentTunicColor(fp);
+            return true;
+        }
     }
 
-    return PlayerProxy_getFormProxy(pp, fpId);
+    return false;
 }
 
 static void reapplyAllEquipmentEntries(PlayerProxy *pp) {
@@ -289,33 +319,37 @@ bool PlayerProxy_forceApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mo
         return true;
     }
 
-    if (ModelEntry_applyToFormProxy(newEntry, getFormProxyFromCategory(pp, modelType))) {
-        PlayerModelManagerModelEvent removedEvt;
-        PlayerModelManagerModelEvent appliedEvt;
+    FormProxy *fp = getFormProxyFromCategory(pp, modelType);
 
-        if (gPlayer1Proxy == pp) {
-            appliedEvt = PMM_EVENT_MODEL_APPLIED_TO_MAIN_PLAYER;
-            removedEvt = PMM_EVENT_MODEL_REMOVED_FROM_MAIN_PLAYER;
-        } else {
-            appliedEvt = PMM_EVENT_MODEL_APPLIED_TO_OTHER;
-            removedEvt = PMM_EVENT_MODEL_REMOVED_FROM_OTHER;
+    if (fp) {
+        if (ModelEntry_applyToFormProxy(newEntry, getFormProxyFromCategory(pp, modelType))) {
+            PlayerModelManagerModelEvent removedEvt;
+            PlayerModelManagerModelEvent appliedEvt;
+
+            if (gPlayer1Proxy == pp) {
+                appliedEvt = PMM_EVENT_MODEL_APPLIED_TO_MAIN_PLAYER;
+                removedEvt = PMM_EVENT_MODEL_REMOVED_FROM_MAIN_PLAYER;
+            } else {
+                appliedEvt = PMM_EVENT_MODEL_APPLIED_TO_OTHER;
+                removedEvt = PMM_EVENT_MODEL_REMOVED_FROM_OTHER;
+            }
+
+            if (currEntry) {
+                ModelEntry_doCallback(currEntry, removedEvt);
+            }
+
+            PlayerProxy_setModelEntry(pp, modelType, newEntry);
+
+            if (newEntry) {
+                ModelEntry_doCallback(newEntry, appliedEvt);
+            }
+
+            if (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT) {
+                reapplyAllEquipmentEntries(pp);
+            }
+
+            return true;
         }
-
-        if (currEntry) {
-            ModelEntry_doCallback(currEntry, removedEvt);
-        }
-
-        PlayerProxy_setModelEntry(pp, modelType, newEntry);
-
-        if (newEntry) {
-            ModelEntry_doCallback(newEntry, appliedEvt);
-        }
-
-        if (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT) {
-            reapplyAllEquipmentEntries(pp);
-        }
-
-        return true;
     }
 
     return false;
@@ -370,10 +404,14 @@ void PlayerProxy_removeEntry(PlayerProxy *pp, PlayerModelManagerModelType modelT
 
         PlayerProxy_setModelEntry(pp, modelType, NULL);
 
-        ModelEntry_removeFromFormProxy(entry, getFormProxyFromCategory(pp, modelType));
+        FormProxy *fp = getFormProxyFromCategory(pp, modelType);
 
-        if (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT) {
-            reapplyAllEquipmentEntries(pp);
+        if (fp) {
+            ModelEntry_removeFromFormProxy(entry, getFormProxyFromCategory(pp, modelType));
+
+            if (modelType == PMM_MODEL_TYPE_CHILD || modelType == PMM_MODEL_TYPE_ADULT) {
+                reapplyAllEquipmentEntries(pp);
+            }
         }
     }
 }

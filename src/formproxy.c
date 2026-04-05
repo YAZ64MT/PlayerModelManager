@@ -706,6 +706,7 @@ void FormProxy_requestTunicColorOverride(FormProxy *fp, Color_RGBA8 color) {
 
     fp->tunicColor.isOverrideRequested = true;
     fp->tunicColor.requested = color;
+    fp->tunicColor.current = color;
 }
 
 bool FormProxy_isTunicColorOverrideRequested(FormProxy *fp) {
