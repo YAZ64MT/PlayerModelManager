@@ -7,7 +7,7 @@
 #include "modelentrymanager.h"
 #include "utils.h"
 
-RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_ActorAppearanceData_createData(void) {
+RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_AppearanceData_createData(void) {
     PlayerProxyHandle h = PlayerProxyManager_createPlayerProxy(PPALLOC_REF_COUNT);
 
     PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
@@ -19,15 +19,15 @@ RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_ActorAppearanceData_c
     return h;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_ActorAppearanceData_assignDataToActor(Actor *actor, ActorAppearanceDataHandle h) {
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignDataToActor(Actor *actor, ActorAppearanceDataHandle h) {
     return ProxyActorExt_setPlayerProxyHandle(actor, h);
 }
 
-RECOMP_EXPORT bool PlayerModelManager_ActorAppearanceData_assignDataFromOtherActor(Actor *dest, Actor *src) {
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignDataFromOtherActor(Actor *dest, Actor *src) {
     return ProxyActorExt_copyProxyInformation(dest, src);
 }
 
-RECOMP_EXPORT bool PlayerModelManager_ActorAppearanceData_assignModel(ActorAppearanceDataHandle h, PlayerModelManagerModelType type, const char *internalName) {
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignModel(ActorAppearanceDataHandle h, PlayerModelManagerModelType type, const char *internalName) {
     PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
 
     if (pp) {
@@ -41,7 +41,7 @@ RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_Actor_getAppearanceDa
     return ProxyActorExt_getAppearanceDataHandleCopy(actor);
 }
 
-RECOMP_EXPORT bool PlayerModelManager_ActorAppearanceData_releaseHandle(ActorAppearanceDataHandle h) {
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_releaseHandle(ActorAppearanceDataHandle h) {
     return PlayerProxyManager_releaseReference(h);
 }
 
