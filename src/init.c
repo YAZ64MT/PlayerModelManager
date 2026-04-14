@@ -65,20 +65,21 @@ GLOBAL_OBJECTS_CALLBACK_ON_READY void initCustomDLsOnGlobalObjects(void) {
     doRegisterModels();
 }
 
-REPY_ON_POST_INIT void onREPYReady(void) {
-    sIsREPYReady = true;
-    doRegisterModels();
-}
-
 RECOMP_DECLARE_EVENT(_internal_preInitHashObjects(void));
 RECOMP_DECLARE_EVENT(_internal_initHashObjects(void));
 RECOMP_DECLARE_EVENT(_internal_postInitHashObjects(void));
 
-RECOMP_CALLBACK("*", recomp_on_init) void handleInits(void) {
+static void handleObjectInits(void) {
     _internal_preInitHashObjects();
     _internal_initHashObjects();
     _internal_postInitHashObjects();
     sIsAllHashObjectsInitialized = true;
+    doRegisterModels();
+}
+
+REPY_ON_POST_INIT void onREPYReady(void) {
+    sIsREPYReady = true;
+    handleObjectInits();
     doRegisterModels();
 }
 
