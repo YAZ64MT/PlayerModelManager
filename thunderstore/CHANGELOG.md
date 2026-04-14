@@ -1,3 +1,6 @@
+### 0.6.1
+* Fixed crash that would occur if PlayerModelManager came before REPY in the load order
+
 ### 0.6.0
 * Removed dependency on [ProxyMM-KV](https://thunderstore.io/c/zelda-64-recompiled/p/ProxyMM/KV/)
 * Added dependency on [RecompExternalPython for Zelda64Recompiled](https://thunderstore.io/c/zelda-64-recompiled/p/LT_Schmiddy/RecompExternalPython_for_Zelda64Recompiled/)

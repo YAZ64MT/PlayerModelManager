@@ -1,6 +1,6 @@
 {
     "name": "Player_Model_Manager",
-    "version_number": "0.6.0",
+    "version_number": "0.6.1",
     "website_url": "https://github.com/YAZ64MT/PlayerModelManager",
     "description": "Link model replacement API.",
     "dependencies": [
