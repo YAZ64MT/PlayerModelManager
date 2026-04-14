@@ -592,7 +592,9 @@ RECOMP_EXPORT bool PlayerModelManager_setMouthTextures(PlayerModelManagerHandle 
 }
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a) {
-    PlayerProxy_requestTunicColorOverride(gPlayer1Proxy, (Color_RGBA8){r, g, b, a});
+    Color_RGBA8 color = {r, g, b, a};
+    PlayerProxy_requestTunicColorOverride(gPlayer1Proxy, color);
+    PlayerProxy_requestTunicColorOverride(gPlayer2Proxy, color);
 }
 
 RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransformation form, u8 r, u8 g, u8 b, u8 a) {
@@ -626,6 +628,12 @@ RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransf
     }
 
     FormProxy *fp = PlayerProxy_getFormProxy(gPlayer1Proxy, id);
+
+    if (fp) {
+        FormProxy_requestTunicColorOverride(fp, (Color_RGBA8){r, g, b, a});
+    }
+
+    fp = PlayerProxy_getFormProxy(gPlayer2Proxy, id);
 
     if (fp) {
         FormProxy_requestTunicColorOverride(fp, (Color_RGBA8){r, g, b, a});
