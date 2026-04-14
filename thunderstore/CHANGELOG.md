@@ -1,3 +1,41 @@
+### 0.6.0
+* Removed dependency on [ProxyMM-KV](https://thunderstore.io/c/zelda-64-recompiled/p/ProxyMM/KV/)
+* Added dependency on [RecompExternalPython for Zelda64Recompiled](https://thunderstore.io/c/zelda-64-recompiled/p/LT_Schmiddy/RecompExternalPython_for_Zelda64Recompiled/)
+* Model config is now saved in a separate location from the save file
+    * PMM's model saving is no longer affected when another mod changes the save file path
+* Kafei can now wear registered human player models and Keaton mask models
+* Human Link's tunic is now colorable
+* Removed options to disable and force tunic color
+* UI will now respond during day transitions and other scenarios where it would become unresponsive
+* Updated API
+    * Changed the following values to the PlayerModelManagerEvent enum:
+      * PMM_EVENT_MODEL_APPLIED -> PMM_EVENT_MODEL_APPLIED_TO_MAIN_PLAYER
+      * PMM_EVENT_MODEL_REMOVED -> PMM_EVENT_MODEL_REMOVED_FROM_MAIN_PLAYER
+    * Added the following values to the PlayerModelManagerEvent enum:
+        * PMM_EVENT_MODEL_APPLIED_TO_OTHER
+        * PMM_EVENT_MODEL_REMOVED_FROM_OTHER
+    * Stubbed the following API functions:
+        * PlayerModelManager_overrideVanillaDisplayList
+        * PlayerModelManager_overrideVanillaMatrix
+        * PlayerModelManager_getFormDisplayList
+        * PlayerModelManager_isApplied
+        * PlayerModelManager_isCustomModelApplied
+    * Added the following API functions:
+        * PlayerModelManager_Actor_isModelApplied
+        * PlayerModelManager_Actor_getDisplayList
+        * PlayerModelManager_Actor_getMatrix
+        * PlayerModelManager_Actor_hasAppearanceData
+    * Added the following display list ID:
+        * PMM_DL_ELEGY_OF_EMPTINESS_SHELL
+    * Deprecated the following display list IDs:
+        * PMM_DL_ELEGY_OF_EMPTINESS_SHELL_HUMAN
+        * PMM_DL_ELEGY_OF_EMPTINESS_SHELL_DEKU
+        * PMM_DL_ELEGY_OF_EMPTINESS_SHELL_GORON
+        * PMM_DL_ELEGY_OF_EMPTINESS_SHELL_ZORA
+        * PMM_DL_ELEGY_OF_EMPTINESS_SHELL_FIERCE_DEITY
+    * Removed some unused display list and matrix IDs in the API
+    * See playermodelmanager_api.h for more details
+
 ### 0.5.1
 * Fix child voice being used for adult models during certain scene transitions
 * Adult models no longer use child sound cues during the big chest opening cutscene
