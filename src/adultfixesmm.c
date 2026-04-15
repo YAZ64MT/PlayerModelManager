@@ -52,26 +52,102 @@ void addCustomFirstPersonDLs_on_return_Player_OverrideLimbDrawFirstPerson(Gfx **
     }
 }
 
-PlayerAgeProperties gAdultLinkAgeProps;
-
-extern PlayerAgeProperties sPlayerAgeProperties[];
-
-void initAdultLinkAgeProperties(void) {
-    PlayerAgeProperties *fdProps = &sPlayerAgeProperties[PLAYER_FORM_FIERCE_DEITY];
-    gAdultLinkAgeProps = sPlayerAgeProperties[PLAYER_FORM_ZORA];
-
-    gAdultLinkAgeProps.unk_28 = 44.6f;
-    gAdultLinkAgeProps.unk_3C = 15.0f;
-    gAdultLinkAgeProps.unk_44 = fdProps->unk_44;
-
-    for (int i = 0; i < ARRAY_COUNT(gAdultLinkAgeProps.unk_4A); ++i) {
-        gAdultLinkAgeProps.unk_4A[i] = fdProps->unk_4A[i];
-        gAdultLinkAgeProps.unk_62[i] = fdProps->unk_62[i];
-        gAdultLinkAgeProps.unk_7A[i] = fdProps->unk_7A[i];
-    }
-    gAdultLinkAgeProps.voiceSfxIdOffset = SFX_VOICE_BANK_SIZE * 0;
-    gAdultLinkAgeProps.surfaceSfxIdOffset = 0x80;
-}
+PlayerAgeProperties gAdultLinkAgeProperties = {
+    // ceilingCheckHeight
+    56.0f,
+    // shadowScale
+    90.0f,
+    // unk_08
+    1.0f,
+    // unk_0C
+    111.0f,
+    // unk_10
+    70.0f,
+    // unk_14
+    79.4f,
+    // unk_18
+    59.0f,
+    // unk_1C
+    41.0f,
+    // unk_20
+    19.0f,
+    // unk_24
+    36.0f,
+    // unk_28
+    50.0f,
+    // unk_2C
+    56.0f,
+    // unk_30
+    68.0f,
+    // unk_34
+    70.0f,
+    // wallCheckRadius
+    18.0f,
+    // unk_3C
+    23.0f,
+    // unk_40
+    70.0f,
+    // unk_44
+    {9, 0x123F, 0x167},
+    {
+        {8, 0x1256, 0x17C},
+        {9, 0x17EA, 0x167},
+        {8, 0x1256, 0x17C},
+        {9, 0x17EA, 0x167},
+    },
+    {
+        {9, 0x17EA, 0x167},
+        {9, 0x1E0D, 0x17C},
+        {9, 0x17EA, 0x167},
+        {9, 0x1E0D, 0x17C},
+    },
+    {
+        {8, 0x1256, 0x17C},
+        {9, 0x17EA, 0x167},
+        {-0x638, 0x1256, 0x17C},
+        {-0x637, 0x17EA, 0x167},
+    },
+    // voiceSfxIdOffset
+    SFX_VOICE_BANK_SIZE * 0,
+    // surfaceSfxIdOffset
+    0x80,
+    // unk_98
+    22.0f,
+    // unk_9C
+    36.0f,
+    // openChestAnim
+    &gPlayerAnim_link_demo_Tbox_open,
+    // timeTravelStartAnim
+    &gPlayerAnim_link_demo_back_to_past,
+    // timeTravelEndAnim
+    &gPlayerAnim_link_demo_return_to_past,
+    // unk_AC
+    &gPlayerAnim_link_normal_climb_startA,
+    // unk_B0
+    &gPlayerAnim_link_normal_climb_startB,
+    // unk_B4
+    {
+        &gPlayerAnim_link_normal_climb_upL,
+        &gPlayerAnim_link_normal_climb_upR,
+        &gPlayerAnim_link_normal_Fclimb_upL,
+        &gPlayerAnim_link_normal_Fclimb_upR,
+    },
+    // unk_C4
+    {
+        &gPlayerAnim_link_normal_Fclimb_sideL,
+        &gPlayerAnim_link_normal_Fclimb_sideR,
+    },
+    // unk_CC
+    {
+        &gPlayerAnim_link_normal_climb_endAL,
+        &gPlayerAnim_link_normal_climb_endAR,
+    },
+    // unk_D4
+    {
+        &gPlayerAnim_link_normal_climb_endBR,
+        &gPlayerAnim_link_normal_climb_endBL,
+    },
+};
 
 extern u8 sPlayerMass[PLAYER_FORM_MAX];
 static u8 sHumanMass;
@@ -130,18 +206,12 @@ void replaceDoorAnim_on_return_Player_Door_Knob(Player *player) {
     player->transformation = sRealPlayerFormPlayerDoorKnob;
 }
 
-void initVanillaProps_on_Player_Init(void) {
-    static bool isFirstTimeInitDone;
-    if (!isFirstTimeInitDone) {
-        isFirstTimeInitDone = true;
-        initAdultLinkAgeProperties();
-    }
-}
-
 static void updateAgeProps(Player *player) {
+    extern PlayerAgeProperties sPlayerAgeProperties[];
+
     if (player->transformation == PLAYER_FORM_HUMAN) {
         if (shouldUseAdultFixes(player)) {
-            player->ageProperties = &gAdultLinkAgeProps;
+            player->ageProperties = &gAdultLinkAgeProperties;
         } else {
             player->ageProperties = &sPlayerAgeProperties[PLAYER_FORM_HUMAN];
         }
@@ -164,7 +234,7 @@ void updateAdultProperties_on_Play_UpdateMain(PlayState *play) {
                 Player *kafei = (Player *)actor;
 
                 if (shouldUseAdultFixes(kafei)) {
-                    kafei->ageProperties = &gAdultLinkAgeProps;
+                    kafei->ageProperties = &gAdultLinkAgeProperties;
                 } else if (kafei->transformation == PLAYER_FORM_HUMAN) {
                     extern PlayerAgeProperties sAgeProperties;
                     kafei->ageProperties = &sAgeProperties;
