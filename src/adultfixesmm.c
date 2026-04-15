@@ -20,35 +20,33 @@ static bool shouldUseAdultFixes(Player *player) {
     return fp && FormProxy_isAdultModelType(fp);
 }
 
-static Gfx *sFirstPersonDLToOverrideWith;
-
-static void setFirstPersonPlayerDLOverride(Player *player, Link_DisplayList hookshotDLId, Link_DisplayList bowDLId) {
+static void setFirstPersonPlayerDLOverride(Player *player, Gfx **dList, Link_DisplayList hookshotDLId, Link_DisplayList bowDLId) {
     FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
 
     if (fp) {
         if (Player_IsHoldingHookshot(player)) {
-            sFirstPersonDLToOverrideWith = FormProxy_getDL(fp, hookshotDLId);
+            Gfx *hookshotFpDL = FormProxy_getDL(fp, hookshotDLId);
+
+            if (hookshotFpDL) {
+                *dList = hookshotFpDL;
+            }
         } else {
-            sFirstPersonDLToOverrideWith = FormProxy_getDL(fp, bowDLId);
+            Gfx *bowFpDL = FormProxy_getDL(fp, bowDLId);
+
+            if (bowFpDL) {
+                *dList = bowFpDL;
+            }
         }
     }
 }
 
-void addCustomFirstPersonDLs_on_Player_OverrideLimbDrawFirstPerson(Player *player, s32 limbIndex) {
-    sFirstPersonDLToOverrideWith = NULL;
-
-    if (player->unk_AA5 == PLAYER_UNKAA5_3) { // vanilla first person limb override doesn't draw unless this condition is met
+void addCustomFirstPersonDLs_on_return_Player_OverrideLimbDrawFirstPerson(Player *player, s32 limbIndex, Gfx **dList) {
+    if (player->unk_AA5 == PLAYER_UNKAA5_3) { // first person camera mode variable?
         if (limbIndex == PLAYER_LIMB_LEFT_SHOULDER) {
-            setFirstPersonPlayerDLOverride(player, LINK_DL_OPT_FPS_LSHOULDER_HOOKSHOT, LINK_DL_OPT_FPS_LSHOULDER_BOW);
+            setFirstPersonPlayerDLOverride(player, dList, LINK_DL_OPT_FPS_LSHOULDER_HOOKSHOT, LINK_DL_OPT_FPS_LSHOULDER_BOW);
         } else if (limbIndex == PLAYER_LIMB_RIGHT_FOREARM) {
-            setFirstPersonPlayerDLOverride(player, LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT, LINK_DL_OPT_FPS_RFOREARM_BOW);
+            setFirstPersonPlayerDLOverride(player, dList, LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT, LINK_DL_OPT_FPS_RFOREARM_BOW);
         }
-    }
-}
-
-void addCustomFirstPersonDLs_on_return_Player_OverrideLimbDrawFirstPerson(Gfx **dList) {
-    if (sFirstPersonDLToOverrideWith) {
-        *dList = sFirstPersonDLToOverrideWith;
     }
 }
 
