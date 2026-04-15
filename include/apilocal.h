@@ -33,4 +33,8 @@ bool PlayerModelManager_isCustomModelApplied(PlayerTransformation form);
 void PlayerModelManager_lockAPI(void);
 void PlayerModelManager_unlockAPI(void);
 
+Gfx *PlayerModelManager_Actor_getDisplayList(Actor *actor, Link_DisplayList dlId);
+Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, Link_EquipmentMatrix mtxId);
+bool PlayerModelManager_Actor_hasAppearanceData(Actor *actor);
+
 #endif

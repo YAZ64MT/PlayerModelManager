@@ -37,7 +37,7 @@ RECOMP_EXPORT bool PlayerModelManager_Actor_isModelApplied(Actor *actor, PlayerM
 
 RECOMP_EXPORT Gfx *PlayerModelManager_Actor_getDisplayList(Actor *actor, Link_DisplayList dlId) {
     if (!Utils_isValidDisplayListId(dlId)) {
-        Logger_printError("Mod requesting invalid display list ID %d!", dlId);
+        Logger_printError("Requested invalid display list ID %d!", dlId);
         return NULL;
     }
 
@@ -52,7 +52,7 @@ RECOMP_EXPORT Gfx *PlayerModelManager_Actor_getDisplayList(Actor *actor, Link_Di
 
 RECOMP_EXPORT Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, Link_EquipmentMatrix mtxId) {
     if (!Utils_isValidMatrixId(mtxId)) {
-        Logger_printError("Mod requesting invalid matrix ID %d!", mtxId);
+        Logger_printError("Requested invalid matrix ID %d!", mtxId);
         return NULL;
     }
 
