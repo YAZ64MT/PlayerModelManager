@@ -212,8 +212,11 @@ static void updateAgeProps(Player *player) {
     if (player->transformation == PLAYER_FORM_HUMAN) {
         if (shouldUseAdultFixes(player)) {
             player->ageProperties = &gAdultLinkAgeProperties;
-        } else {
+        } else if (player->actor.id == ACTOR_PLAYER) {
             player->ageProperties = &sPlayerAgeProperties[PLAYER_FORM_HUMAN];
+        } else if (player->actor.id == ACTOR_EN_TEST3) {
+            extern PlayerAgeProperties sAgeProperties;
+            player->ageProperties = &sAgeProperties;
         }
     }
 }
@@ -231,14 +234,7 @@ void updateAdultProperties_on_Play_UpdateMain(PlayState *play) {
         Actor *actor = play->actorCtx.actorLists[ACTORCAT_NPC].first;
         while (actor) {
             if (actor->id == ACTOR_EN_TEST3) {
-                Player *kafei = (Player *)actor;
-
-                if (shouldUseAdultFixes(kafei)) {
-                    kafei->ageProperties = &gAdultLinkAgeProperties;
-                } else if (kafei->transformation == PLAYER_FORM_HUMAN) {
-                    extern PlayerAgeProperties sAgeProperties;
-                    kafei->ageProperties = &sAgeProperties;
-                }
+                updateAgeProps((Player *)actor);
             }
 
             actor = actor->next;
@@ -414,9 +410,7 @@ void fixAdultAgeProps_on_Player_InitCommon(Player *player) {
     // Earliest point age props can be updated without a RECOMP_PATCH
     // Makes adult Link use right voice during certain transitions
     // (e.g. getting thrown out of the Pirate's Fortress)
-    if (player->actor.id == ACTOR_PLAYER) { // obligatory Kafei check
-        updateAgeProps(player);
-    }
+    updateAgeProps(player);
 }
 
 typedef struct struct_8085D224 {
