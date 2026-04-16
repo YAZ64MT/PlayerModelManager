@@ -8,13 +8,13 @@
 id = "yazmt_mm_playermodelmanager"
 
 # Version of this mod.
-version = "0.6.0"
+version = "0.6.1"
 
 # The name that will show up for this mod in the mod menu. This should be human readable.
 display_name = "Player Model Manager"
 
 # The description that will show up when this mod is displayed in the mod menu. This should be human readable.
-description =  """
+description =  """\
 This is a mod for Majora's Mask: Recompiled that allows Link's model to be swapped out on the fly.
 
 To open the model menu, use the button combo you have configured. By default, it is L + A."""

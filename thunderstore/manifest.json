@@ -1,11 +1,11 @@
 {
     "name": "Player_Model_Manager",
-    "version_number": "0.5.1",
+    "version_number": "0.6.1",
     "website_url": "https://github.com/YAZ64MT/PlayerModelManager",
     "description": "Link model replacement API.",
     "dependencies": [
         "YAZMT-YAZMT_Core-0.1.1",
         "YAZMT-Global_Objects-0.1.1",
-        "ProxyMM-KV-0.0.5"
+        "LT_Schmiddy-RecompExternalPython_for_Zelda64Recompiled-2.0.0"
     ]
 }
