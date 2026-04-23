@@ -18,5 +18,6 @@ bool ProxyActorExt_setPlayerProxyHandle(Actor *actor, PlayerProxyHandle h);
 bool ProxyActorExt_copyProxyInformation(Actor *dest, Actor *src);
 FormProxy *ProxyActorExt_getFormProxyOrFallback(Actor *actor, FormProxyId fallbackId, PlayState *play);
 bool ProxyActorExt_isActorHasAppearanceData(Actor *actor);
+PlayerProxyHandle ProxyActorExt_getAppearanceDataHandleCopy(Actor *actor);
 
 #endif

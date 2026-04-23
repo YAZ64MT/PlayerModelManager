@@ -2,6 +2,7 @@
 #define __PLAYERMODELMANAGER_API__
 
 typedef unsigned long PlayerModelManagerHandle;
+typedef unsigned long ActorAppearanceDataHandle;
 
 // Used for keeping compatibility between versions
 // DO NOT EDIT

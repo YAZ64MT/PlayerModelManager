@@ -14,9 +14,6 @@ typedef enum ModelEntryFlag {
     MODELENTRY_FLAG_USE_OLD_EQUIP_BEHAVIOR = 0x01ULL << 1,
 } ModelEntryFlag;
 
-// This is the max file name length for most Linux distros and MacOS
-#define INTERNAL_NAME_MAX_LENGTH 255
-
 typedef struct ModelEntry ModelEntry;
 typedef struct ModelEntryForm ModelEntryForm;
 typedef struct ModelEntryEquipment ModelEntryEquipment;

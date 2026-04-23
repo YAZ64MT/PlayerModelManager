@@ -36,5 +36,7 @@ void PlayerModelManager_unlockAPI(void);
 Gfx *PlayerModelManager_Actor_getDisplayList(Actor *actor, Link_DisplayList dlId);
 Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, Link_EquipmentMatrix mtxId);
 bool PlayerModelManager_Actor_hasAppearanceData(Actor *actor);
+bool PlayerModelManager_AppearanceData_getModelName(ActorAppearanceDataHandle h, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize);
+bool PlayerModelManager_AppearanceData_getTunicColor(ActorAppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 *out);
 
 #endif
