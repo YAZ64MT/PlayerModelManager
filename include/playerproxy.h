@@ -42,6 +42,8 @@ bool PlayerProxy_isModelEntryApplied(PlayerProxy *pp, const ModelEntry *entry);
 bool PlayerProxy_shouldSkipInterpolation(const PlayerProxy *pp);
 void PlayerProxy_updateInterpolationStatus(PlayerProxy *pp);
 void PlayerProxy_requestInterpolationSkip(PlayerProxy *pp);
+void PlayerProxy_requestTunicColorOverrideForModelType(PlayerProxy *pp, PlayerModelManagerModelType type, Color_RGBA8 color);
+bool PlayerProxy_getTunicColor(PlayerProxy *pp, PlayerModelManagerModelType type, Color_RGBA8 *out);
 
 extern PlayerProxy *gPlayer1Proxy;
 extern PlayerProxy *gPlayer2Proxy;

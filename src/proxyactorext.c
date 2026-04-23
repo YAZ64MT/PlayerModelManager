@@ -94,7 +94,7 @@ bool ProxyActorExt_setPlayerProxyHandle(Actor *actor, PlayerProxyHandle h) {
 bool ProxyActorExt_copyProxyInformation(Actor *dest, Actor *src) {
     if (dest && src) {
         PlayerProxyInfo *srcProxyInfo = getPlayerProxyInfo(src);
-        
+
         if (srcProxyInfo) {
             if (ProxyActorExt_setFormProxyId(dest, srcProxyInfo->formId)) {
                 return ProxyActorExt_setPlayerProxyHandle(dest, srcProxyInfo->proxyHandle);
@@ -121,6 +121,16 @@ FormProxy *ProxyActorExt_getFormProxyOrFallback(Actor *actor, FormProxyId fallba
 
 bool ProxyActorExt_isActorHasAppearanceData(Actor *actor) {
     return !!ProxyActorExt_getPlayerProxy(actor);
+}
+
+PlayerProxyHandle ProxyActorExt_getAppearanceDataHandleCopy(Actor *actor) {
+    if (ProxyActorExt_isActorHasAppearanceData(actor)) {
+        PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
+
+        return PlayerProxyManager_createNewReference(proxyInfo->proxyHandle);
+    }
+
+    return 0;
 }
 
 RECOMP_CALLBACK(".", _internal_preInitHashObjects) void handleFormProxyExtensionInits(void) {
