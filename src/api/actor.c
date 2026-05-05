@@ -139,6 +139,26 @@ RECOMP_EXPORT bool PlayerModelManager_Actor_getModelName(Actor *actor, PlayerMod
     return ret;
 }
 
+RECOMP_EXPORT TexturePtr PlayerModelManager_Actor_getEyesTexturePtr(Actor *actor, PlayerEyeIndex index) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (fp) {
+        FormProxy_getEyesTexturePtr(fp, index);
+    }
+
+    return NULL;
+}
+
+RECOMP_EXPORT TexturePtr PlayerModelManager_Actor_getMouthTexturePtr(Actor *actor, PlayerMouthIndex index) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (fp) {
+        FormProxy_getEyesTexturePtr(fp, index);
+    }
+
+    return NULL;
+}
+
 RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_Actor_getAppearanceDataHandle(Actor *actor) {
     return ProxyActorExt_getAppearanceDataHandleCopy(actor);
 }
