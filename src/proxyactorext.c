@@ -180,3 +180,11 @@ void clearProxyExt_on_Actor_Destroy(Actor *actor) {
         PlayerProxyInfo_destroy(proxyInfo);
     }
 }
+
+void clearProxyExt_on_Actor_Delete(Actor *actor) {
+    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
+
+    if (proxyInfo) {
+        PlayerProxyInfo_destroy(proxyInfo);
+    }
+}
