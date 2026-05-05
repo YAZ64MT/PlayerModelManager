@@ -95,3 +95,7 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_getModelName(ActorAppearanc
 RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_AppearanceData_getMainPlayerHandle() {
     return gPlayer1ProxyHandle;
 }
+
+RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_AppearanceData_getKafeiHandle() {
+    return gPlayer2ProxyHandle;
+}

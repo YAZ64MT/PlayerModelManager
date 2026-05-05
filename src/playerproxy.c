@@ -357,6 +357,7 @@ bool PlayerProxy_forceApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mo
 }
 
 RECOMP_DECLARE_EVENT(onMainPlayerAppearanceChanged(PlayerModelManagerModelType modelType));
+RECOMP_DECLARE_EVENT(onKafeiAppearanceChanged(PlayerModelManagerModelType modelType));
 
 bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType modelType, const ModelEntry *newEntry) {
     RETURN_IF_INVALID_PTR(pp, false);
@@ -376,6 +377,8 @@ bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mode
 
             if (pp == gPlayer1Proxy) {
                 onMainPlayerAppearanceChanged(modelType);
+            } else if (pp == gPlayer2Proxy) {
+                onKafeiAppearanceChanged(modelType);
             }
 
             return true;
