@@ -131,10 +131,9 @@ RECOMP_EXPORT PlayerModelManagerModelType PlayerModelManager_Actor_getFormModelT
 RECOMP_EXPORT bool PlayerModelManager_Actor_getModelName(Actor *actor, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize) {
     bool ret = false;
 
-    PlayerProxyHandle h = ProxyActorExt_getAppearanceDataHandleCopy(actor);
+    PlayerProxyHandle h = ProxyActorExt_getAppearanceDataHandleRaw(actor);
     if (h) {
         ret = PlayerModelManager_AppearanceData_getModelName(h, type, outBuf, outBufSize);
-        PlayerProxyManager_releaseReference(h);
     }
 
     return ret;

@@ -124,10 +124,20 @@ bool ProxyActorExt_isActorHasAppearanceData(Actor *actor) {
 }
 
 PlayerProxyHandle ProxyActorExt_getAppearanceDataHandleCopy(Actor *actor) {
-    if (ProxyActorExt_isActorHasAppearanceData(actor)) {
-        PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
+    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
 
+    if (proxyInfo) {
         return PlayerProxyManager_createNewReference(proxyInfo->proxyHandle);
+    }
+
+    return 0;
+}
+
+PlayerProxyHandle ProxyActorExt_getAppearanceDataHandleRaw(Actor *actor) {
+    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
+
+    if (proxyInfo) {
+        return proxyInfo->proxyHandle;
     }
 
     return 0;
