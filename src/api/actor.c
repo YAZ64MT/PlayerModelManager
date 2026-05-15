@@ -9,6 +9,8 @@
 #include "logger.h"
 #include "modelentrymanager.h"
 #include "apilocal.h"
+#include "playermodelmanager_api.h"
+#include "playermodelmanager_advanced_api.h"
 
 RECOMP_EXPORT bool PlayerModelManager_Actor_isModelApplied(Actor *actor, PlayerModelManagerHandle h) {
     const ModelEntry *entryToCheck = ModelEntryManager_getEntry(h);
@@ -74,6 +76,8 @@ RECOMP_EXPORT bool PlayerModelManager_Actor_setFormModelType(Actor *actor, Playe
     if (Utils_isFormModelType(type)) {
         FormProxyId id;
 
+        bool isFormModel = true;
+
         switch (type) {
             case PMM_MODEL_TYPE_CHILD:
             case PMM_MODEL_TYPE_ADULT:
@@ -97,11 +101,13 @@ RECOMP_EXPORT bool PlayerModelManager_Actor_setFormModelType(Actor *actor, Playe
                 break;
 
             default:
-                id = FORM_PROXY_ID_HUMAN;
+                isFormModel = false;
                 break;
         }
 
-        return ProxyActorExt_setFormProxyId(actor, id);
+        if (isFormModel) {
+            return ProxyActorExt_setFormProxyId(actor, id);
+        }
     }
 
     return false;
@@ -128,15 +134,13 @@ RECOMP_EXPORT PlayerModelManagerModelType PlayerModelManager_Actor_getFormModelT
     return PMM_MODEL_TYPE_NONE;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_Actor_getModelName(Actor *actor, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize) {
-    bool ret = false;
-
+RECOMP_EXPORT bool PlayerModelManager_Actor_getModelInternalName(Actor *actor, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize) {
     PlayerProxyHandle h = ProxyActorExt_getAppearanceDataHandleRaw(actor);
     if (h) {
-        ret = PlayerModelManager_AppearanceData_getModelName(h, type, outBuf, outBufSize);
+        return PlayerModelManager_AppearanceData_getModelInternalName(h, type, outBuf, outBufSize);
     }
 
-    return ret;
+    return false;
 }
 
 RECOMP_EXPORT TexturePtr PlayerModelManager_Actor_getEyesTexturePtr(Actor *actor, PlayerEyeIndex index) {
@@ -159,6 +163,6 @@ RECOMP_EXPORT TexturePtr PlayerModelManager_Actor_getMouthTexturePtr(Actor *acto
     return NULL;
 }
 
-RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_Actor_getAppearanceDataHandle(Actor *actor) {
+RECOMP_EXPORT AppearanceDataHandle PlayerModelManager_Actor_getAppearanceDataHandle(Actor *actor) {
     return ProxyActorExt_getAppearanceDataHandleCopy(actor);
 }

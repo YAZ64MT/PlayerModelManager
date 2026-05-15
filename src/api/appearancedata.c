@@ -1,6 +1,7 @@
 #include "global.h"
 #include "modding.h"
 #include "playermodelmanager_api.h"
+#include "playermodelmanager_advanced_api.h"
 #include "playerproxymanager.h"
 #include "playerproxy.h"
 #include "proxyactorext.h"
@@ -8,7 +9,7 @@
 #include "utils.h"
 #include "string.h"
 
-RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_AppearanceData_createData(void) {
+RECOMP_EXPORT AppearanceDataHandle PlayerModelManager_AppearanceData_createData(void) {
     PlayerProxyHandle h = PlayerProxyManager_createPlayerProxy(PPALLOC_REF_COUNT);
 
     PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
@@ -20,7 +21,7 @@ RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_AppearanceData_create
     return h;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignDataToActor(Actor *actor, ActorAppearanceDataHandle h) {
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignDataToActor(Actor *actor, AppearanceDataHandle h) {
     return ProxyActorExt_setPlayerProxyHandle(actor, h);
 }
 
@@ -28,7 +29,7 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignDataFromOtherActor(Ac
     return ProxyActorExt_copyProxyInformation(dest, src);
 }
 
-RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignModel(ActorAppearanceDataHandle h, PlayerModelManagerModelType type, const char *internalName) {
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignModel(AppearanceDataHandle h, PlayerModelManagerModelType type, const char *internalName) {
     PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
 
     if (pp) {
@@ -38,7 +39,7 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignModel(ActorAppearance
     return false;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_AppearanceData_releaseHandle(ActorAppearanceDataHandle h) {
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_releaseHandle(AppearanceDataHandle h) {
     if (h != gPlayer1ProxyHandle && h != gPlayer2ProxyHandle) {
         PlayerProxyManager_releaseReference(h);
         return true;
@@ -47,7 +48,7 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_releaseHandle(ActorAppearan
     return false;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_AppearanceData_setTunicColor(ActorAppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 color) {
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_setTunicColor(AppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 color) {
     if (Utils_isFormModelType(type)) {
         PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
 
@@ -60,7 +61,7 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_setTunicColor(ActorAppearan
     return false;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_AppearanceData_getTunicColor(ActorAppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 *out) {
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_getTunicColor(AppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 *out) {
     if (Utils_isFormModelType(type)) {
         PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
 
@@ -72,7 +73,7 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_getTunicColor(ActorAppearan
     return false;
 }
 
-RECOMP_EXPORT bool PlayerModelManager_AppearanceData_getModelName(ActorAppearanceDataHandle h, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize) {
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_getModelInternalName(AppearanceDataHandle h, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize) {
     PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
 
     if (pp) {
@@ -92,10 +93,10 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_getModelName(ActorAppearanc
     return false;
 }
 
-RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_AppearanceData_getMainPlayerHandle() {
+RECOMP_EXPORT AppearanceDataHandle PlayerModelManager_AppearanceData_getMainPlayerHandle() {
     return gPlayer1ProxyHandle;
 }
 
-RECOMP_EXPORT ActorAppearanceDataHandle PlayerModelManager_AppearanceData_getKafeiHandle() {
+RECOMP_EXPORT AppearanceDataHandle PlayerModelManager_AppearanceData_getKafeiHandle() {
     return gPlayer2ProxyHandle;
 }
