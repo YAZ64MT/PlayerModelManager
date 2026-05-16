@@ -134,6 +134,32 @@ RECOMP_EXPORT PlayerModelManagerModelType PlayerModelManager_Actor_getFormModelT
     return PMM_MODEL_TYPE_NONE;
 }
 
+RECOMP_EXPORT bool PlayerModelManager_Actor_overwriteSkeleton(Actor *actor, FlexSkeletonHeader *skel) {
+    if (skel) {
+        FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+        if (fp) {
+            *skel = *FormProxy_getSkeleton(fp);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_overwriteShieldingSkeleton(Actor *actor, FlexSkeletonHeader *skel) {
+    if (skel) {
+        FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+        if (fp) {
+            *skel = *FormProxy_getShieldingSkeleton(fp);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 RECOMP_EXPORT bool PlayerModelManager_Actor_getModelInternalName(Actor *actor, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize) {
     PlayerProxyHandle h = ProxyActorExt_getAppearanceDataHandleRaw(actor);
     if (h) {

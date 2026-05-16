@@ -51,6 +51,10 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_setFormModelType
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerModelType PlayerModelManager_Actor_getFormModelType(Actor *actor));
 
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_overwriteSkeleton(Actor *actor, FlexSkeletonHeader *skel));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_overwriteShieldingSkeleton(Actor *actor, FlexSkeletonHeader *skel));
+
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_getModelInternalName(Actor *actor, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize));
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, TexturePtr PlayerModelManager_Actor_getEyesTexturePtr(Actor *actor, PlayerEyeIndex index));
