@@ -5,6 +5,7 @@
 #include "PR/gbi.h"
 #include "z64player.h"
 #include "playermodelmanager_api.h"
+#include "playermodelmanager_advanced_api.h"
 #include "modelmatrixids.h"
 
 PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType);

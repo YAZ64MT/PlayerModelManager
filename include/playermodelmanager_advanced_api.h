@@ -41,14 +41,44 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, Mtx *PlayerModelManager_Actor_getMatrix(Actor 
 // Returns true if the actor has PMM appearance data assigned to it, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_hasAppearanceData(Actor *actor));
 
-// Sets the form model type of the actor. Returns true if successfully set, false otherwise.
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_setFormModelType(Actor *actor, PlayerModelManagerModelType type));
-
 // Gets the actor's tunic color according to its AppearanceData and form model type. Returns true and writes the color to out if successful, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_getTunicColor(Actor *actor, Color_RGBA8 *out));
 
+// Sets the form model type of the actor. Returns true if successfully set, false otherwise.
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_setFormModelType(Actor *actor, PlayerModelManagerModelType type));
+
+// TODO: DOCUMENT THIS HEADER
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_getModelInternalName(Actor *actor, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, TexturePtr PlayerModelManager_Actor_getEyesTexturePtr(Actor *actor, PlayerEyeIndex index));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, TexturePtr PlayerModelManager_Actor_getMouthTexturePtr(Actor *actor, PlayerMouthIndex index));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, AppearanceDataHandle PlayerModelManager_Actor_getAppearanceDataHandle(Actor *actor));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, AppearanceDataHandle PlayerModelManager_AppearanceData_createData(void));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignDataToActor(Actor *actor, AppearanceDataHandle h));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignDataToActor(Actor *actor, AppearanceDataHandle h));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignDataFromOtherActor(Actor *dest, Actor *src));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignModel(AppearanceDataHandle h, PlayerModelManagerModelType type, const char *internalName));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_releaseHandle(AppearanceDataHandle h));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_setTunicColor(AppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 color));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_getTunicColor(AppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 *out));
+
 // Copies internal name of model into outBuf, provided outBuf is large enough. Returns true if the name was successfully copied, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_getModelInternalName(AppearanceDataHandle h, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, AppearanceDataHandle PlayerModelManager_AppearanceData_getMainPlayerHandle(void));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, AppearanceDataHandle PlayerModelManager_AppearanceData_getKafeiHandle(void));
 
 #endif
 

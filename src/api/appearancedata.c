@@ -93,10 +93,10 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_getModelInternalName(Appear
     return false;
 }
 
-RECOMP_EXPORT AppearanceDataHandle PlayerModelManager_AppearanceData_getMainPlayerHandle() {
+RECOMP_EXPORT AppearanceDataHandle PlayerModelManager_AppearanceData_getMainPlayerHandle(void) {
     return gPlayer1ProxyHandle;
 }
 
-RECOMP_EXPORT AppearanceDataHandle PlayerModelManager_AppearanceData_getKafeiHandle() {
+RECOMP_EXPORT AppearanceDataHandle PlayerModelManager_AppearanceData_getKafeiHandle(void) {
     return gPlayer2ProxyHandle;
 }
