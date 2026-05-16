@@ -61,8 +61,6 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, AppearanceDataHandle PlayerModelManager_Appear
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignDataToActor(Actor *actor, AppearanceDataHandle h));
 
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignDataToActor(Actor *actor, AppearanceDataHandle h));
-
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignDataFromOtherActor(Actor *dest, Actor *src));
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignModel(AppearanceDataHandle h, PlayerModelManagerModelType type, const char *internalName));
