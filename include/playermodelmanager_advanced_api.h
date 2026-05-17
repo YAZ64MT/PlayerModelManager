@@ -6,6 +6,7 @@
 #include "stdbool.h"
 #include "modding.h"
 #include "color.h"
+#include "z64animation.h"
 
 typedef unsigned long AppearanceDataHandle;
 
@@ -51,9 +52,9 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_setFormModelType
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, PlayerModelManagerModelType PlayerModelManager_Actor_getFormModelType(Actor *actor));
 
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_overwriteSkeleton(Actor *actor, FlexSkeletonHeader *skel));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_getModelSkeleton(Actor *actor, FlexSkeletonHeader *dest));
 
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_overwriteShieldingSkeleton(Actor *actor, FlexSkeletonHeader *skel));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_getModelShieldingSkeleton(Actor *actor, FlexSkeletonHeader *dest));
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_Actor_getModelInternalName(Actor *actor, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize));
 
