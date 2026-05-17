@@ -173,7 +173,7 @@ RECOMP_EXPORT TexturePtr PlayerModelManager_Actor_getEyesTexturePtr(Actor *actor
     FormProxy *fp = ProxyActorExt_getFormProxy(actor);
 
     if (fp) {
-        FormProxy_getEyesTexturePtr(fp, index);
+        return FormProxy_getEyesTexturePtr(fp, index);
     }
 
     return NULL;
@@ -183,7 +183,7 @@ RECOMP_EXPORT TexturePtr PlayerModelManager_Actor_getMouthTexturePtr(Actor *acto
     FormProxy *fp = ProxyActorExt_getFormProxy(actor);
 
     if (fp) {
-        FormProxy_getMouthTexturePtr(fp, index);
+        return FormProxy_getMouthTexturePtr(fp, index);
     }
 
     return NULL;
