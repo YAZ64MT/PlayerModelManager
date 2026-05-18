@@ -354,7 +354,7 @@ typedef enum PlayerModelManagerDisplayListId {
     PMM_DL_SHIM_LFIST_SWORD1,
     PMM_DL_SHIM_LFIST_SWORD2,
     PMM_DL_SHIM_LFIST_SWORD3,
-    PMM_DL_SHIM_LFIST_SWORD4,
+    PMM_DL_SHIM_LFIST_SWORD4 = 205,
     PMM_DL_SHIM_LFIST_SWORD5 = 207,
 
     // Right Fist + Shield
