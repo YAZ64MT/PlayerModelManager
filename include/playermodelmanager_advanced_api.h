@@ -85,6 +85,8 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, AppearanceDataHandle PlayerModelManager_Appear
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, AppearanceDataHandle PlayerModelManager_AppearanceData_getKafeiHandle(void));
 
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_setHiddenFromModelMenu(PlayerModelManagerHandle h, bool isHidden));
+
 #endif
 
 #endif

@@ -640,6 +640,17 @@ RECOMP_EXPORT void PlayerModelManager_requestOverrideFormTunicColor(PlayerTransf
     }
 }
 
+RECOMP_EXPORT bool PlayerModelManager_setHiddenFromModelMenu(PlayerModelManagerHandle h, bool isHidden) {
+    ModelEntry *entry = getEntryOrPrintErrLocked(h, __func__);
+
+    if (entry) {
+        ModelEntryManager_setEntryHidden(entry, isHidden);
+        return true;
+    }
+
+    return false;
+}
+
 void PlayerModelManager_lockAPI(void) {
     sIsAPILocked = true;
 }
