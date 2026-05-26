@@ -2,19 +2,25 @@
 #include "formproxy.h"
 #include "proxyactorext.h"
 
-static void tryReplaceCodeDL(FormProxy *fp, Link_DisplayList dlId, Gfx **dest) {
+static bool tryReplaceCodeDL(FormProxy *fp, Link_DisplayList dlId, Gfx **dest) {
     Gfx *newDL = FormProxy_getDL(fp, dlId);
     if (newDL) {
         *dest = newDL;
+        return true;
     }
+
+    return false;
 }
 
-static void tryReplaceCodeLodDL(FormProxy *fp, Link_DisplayList dlId, Gfx *dest[]) {
+static bool tryReplaceCodeLodDL(FormProxy *fp, Link_DisplayList dlId, Gfx *dest[]) {
     Gfx *newDL = FormProxy_getDL(fp, dlId);
     if (newDL) {
         dest[0] = newDL;
         dest[1] = newDL;
+        return true;
     }
+
+    return false;
 }
 
 void repointFormPtrsToProxy(Player *player, FormProxy *formProxy) {
@@ -186,6 +192,11 @@ static void repointSharedModelsToProxy(FormProxy *formProxy) {
     SET_MASK_DL(PLAYER_MASK_DEKU + 4, LINK_DL_MASK_DEKU_SCREAM);
 
 #undef SET_MASK_DL
+
+    // Flower Propeller stems
+    extern Gfx *D_801C0B14[];
+    tryReplaceCodeDL(formProxy, LINK_DL_STEM_LEFT, &D_801C0B14[0]);
+    tryReplaceCodeDL(formProxy, LINK_DL_STEM_RIGHT, &D_801C0B14[1]);
 }
 
 void updatePlayerAssetsCommon(Player *player, FormProxy *fp, TexturePtr eyesTex[], TexturePtr mouthTex[]) {
