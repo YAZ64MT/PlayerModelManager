@@ -2,19 +2,25 @@
 #include "formproxy.h"
 #include "proxyactorext.h"
 
-static void tryReplaceCodeDL(FormProxy *fp, Link_DisplayList dlId, Gfx **dest) {
+static bool tryReplaceCodeDL(FormProxy *fp, Link_DisplayList dlId, Gfx **dest) {
     Gfx *newDL = FormProxy_getDL(fp, dlId);
     if (newDL) {
         *dest = newDL;
+        return true;
     }
+
+    return false;
 }
 
-static void tryReplaceCodeLodDL(FormProxy *fp, Link_DisplayList dlId, Gfx *dest[]) {
+static bool tryReplaceCodeLodDL(FormProxy *fp, Link_DisplayList dlId, Gfx *dest[]) {
     Gfx *newDL = FormProxy_getDL(fp, dlId);
     if (newDL) {
         dest[0] = newDL;
         dest[1] = newDL;
+        return true;
     }
+
+    return false;
 }
 
 void repointFormPtrsToProxy(Player *player, FormProxy *formProxy) {
@@ -186,6 +192,11 @@ static void repointSharedModelsToProxy(FormProxy *formProxy) {
     SET_MASK_DL(PLAYER_MASK_DEKU + 4, LINK_DL_MASK_DEKU_SCREAM);
 
 #undef SET_MASK_DL
+
+    // Flower Propeller stems
+    extern Gfx *D_801C0B14[];
+    tryReplaceCodeDL(formProxy, LINK_DL_STEM_LEFT, &D_801C0B14[0]);
+    tryReplaceCodeDL(formProxy, LINK_DL_STEM_RIGHT, &D_801C0B14[1]);
 }
 
 void updatePlayerAssetsCommon(Player *player, FormProxy *fp, TexturePtr eyesTex[], TexturePtr mouthTex[]) {
@@ -217,5 +228,35 @@ void updateAssets_on_Player_Draw(Player *player) {
         extern TexturePtr sPlayerMouthTextures[];
 
         updatePlayerAssetsCommon(player, fp, sPlayerEyesTextures, sPlayerMouthTextures);
+    }
+}
+
+// Patch Deku Link petal spawn
+RECOMP_PATCH void func_80836C70(PlayState *play, Player *player, PlayerBodyPart bodyPartIndex) {
+    static Vec3f acceleration = {0, 0, 0};
+
+    extern Gfx object_link_nuts_DL_008860[];
+
+    ObjectId objId = OBJECT_LINK_NUTS;
+    Gfx *dl = object_link_nuts_DL_008860;
+
+    FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
+    if (fp) {
+        objId = GAMEPLAY_KEEP;
+        dl = FormProxy_getDL(fp, LINK_DL_PETAL_PARTICLE);
+        // Fragments live for maximum 200 frames (see comment above EffectSsHahen_Spawn),
+        // so make sure reference exists at least that long
+        PlayerProxyManager_setMinimumLifeTime(ProxyActorExt_getAppearanceDataHandleRaw(&player->actor), 201);
+    }
+
+    for (int i = 0; i < 4; i++) {
+        Vec3f velocity;
+
+        velocity.x = Rand_CenteredFloat(4.0f);
+        velocity.y = Rand_ZeroFloat(2.0f);
+        velocity.z = Rand_CenteredFloat(4.0f);
+        acceleration.y = -0.2f;
+        EffectSsHahen_Spawn(play, &player->bodyPartsPos[bodyPartIndex], &velocity, &acceleration, 0, 10, objId,
+                            16, dl);
     }
 }
