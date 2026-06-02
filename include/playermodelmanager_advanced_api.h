@@ -1,16 +1,17 @@
 #ifndef PLAYERMODELMANAGER_ADVANCED_API_H
 #define PLAYERMODELMANAGER_ADVANCED_API_H
 
+typedef unsigned long AppearanceDataHandle;
+
+#ifndef YAZMT_PMM_NO_API_IMPORTS
+
 #include "PR/ultratypes.h"
 #include "playermodelmanager_api.h"
 #include "stdbool.h"
 #include "modding.h"
 #include "color.h"
 #include "z64animation.h"
-
-typedef unsigned long AppearanceDataHandle;
-
-#ifndef YAZMT_PMM_NO_API_IMPORTS
+#include "z64player.h"
 
 // Changes the color of the tunic on all forms on Link and Kafei.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, void PlayerModelManager_requestOverrideTunicColor(u8 r, u8 g, u8 b, u8 a));
@@ -80,6 +81,8 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_getTuni
 
 // Copies internal name of model into outBuf, provided outBuf is large enough. Returns true if the name was successfully copied, false otherwise.
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_getModelInternalName(AppearanceDataHandle h, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize));
+
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_setMinimumLifetime(AppearanceDataHandle h, u32 lifetime));
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, AppearanceDataHandle PlayerModelManager_AppearanceData_getMainPlayerHandle(void));
 

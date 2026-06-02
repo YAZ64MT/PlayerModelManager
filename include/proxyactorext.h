@@ -24,8 +24,4 @@ PlayerProxyHandle ProxyActorExt_getAppearanceDataHandleCopy(Actor *actor);
 // DO NOT RELEASE THIS REFERENCE UNDER ANY CIRCUMSTANCES
 PlayerProxyHandle ProxyActorExt_getAppearanceDataHandleRaw(Actor *actor);
 
-// This reference will be invalidated when the actor is destroyed, but it avoids creating a copy
-// DO NOT RELEASE THIS REFERENCE UNDER ANY CIRCUMSTANCES
-PlayerProxyHandle ProxyActorExt_getAppearanceDataHandleRaw(Actor *actor);
-
 #endif

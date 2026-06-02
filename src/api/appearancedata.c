@@ -93,6 +93,10 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_getModelInternalName(Appear
     return false;
 }
 
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_setMinimumLifetime(AppearanceDataHandle h, u32 lifetime) {
+    return PlayerProxyManager_setMinimumLifeTime(h, lifetime);
+}
+
 RECOMP_EXPORT AppearanceDataHandle PlayerModelManager_AppearanceData_getMainPlayerHandle(void) {
     return gPlayer1ProxyHandle;
 }
