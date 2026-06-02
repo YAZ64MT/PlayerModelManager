@@ -239,14 +239,13 @@ RECOMP_PATCH void func_80836C70(PlayState *play, Player *player, PlayerBodyPart 
 
     ObjectId objId = OBJECT_LINK_NUTS;
     Gfx *dl = object_link_nuts_DL_008860;
+    u16 lifetime = 10;
 
     FormProxy *fp = ProxyActorExt_getFormProxy(&player->actor);
     if (fp) {
         objId = GAMEPLAY_KEEP;
         dl = FormProxy_getDL(fp, LINK_DL_PETAL_PARTICLE);
-        // Fragments live for maximum 200 frames (see comment above EffectSsHahen_Spawn),
-        // so make sure reference exists at least that long
-        PlayerProxyManager_setMinimumLifeTime(ProxyActorExt_getAppearanceDataHandleRaw(&player->actor), 201);
+        PlayerProxyManager_setMinimumLifeTime(ProxyActorExt_getAppearanceDataHandleRaw(&player->actor), lifetime + 1);
     }
 
     for (int i = 0; i < 4; i++) {
@@ -256,7 +255,7 @@ RECOMP_PATCH void func_80836C70(PlayState *play, Player *player, PlayerBodyPart 
         velocity.y = Rand_ZeroFloat(2.0f);
         velocity.z = Rand_CenteredFloat(4.0f);
         acceleration.y = -0.2f;
-        EffectSsHahen_Spawn(play, &player->bodyPartsPos[bodyPartIndex], &velocity, &acceleration, 0, 10, objId,
+        EffectSsHahen_Spawn(play, &player->bodyPartsPos[bodyPartIndex], &velocity, &acceleration, 0, lifetime, objId,
                             16, dl);
     }
 }
