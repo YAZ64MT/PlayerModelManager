@@ -19,6 +19,7 @@ typedef struct PlayerProxyEntry {
     PlayerProxy *pp;
     PlayerProxyAllocType allocType;
     s32 refCount;
+    u32 minLifetime;
     PlayerProxyEntry *next;
     PlayerProxyEntry *prev;
 } PlayerProxyEntry;
@@ -42,6 +43,7 @@ PlayerProxyHandle PlayerProxyManager_createPlayerProxy(PlayerProxyAllocType allo
     PlayerProxyEntry *proxyEntry = Utils_recompCalloc(sizeof(*proxyEntry));
     proxyEntry->allocType = allocType;
     proxyEntry->refCount = 0;
+    proxyEntry->minLifetime = 0;
     proxyEntry->next = NULL;
     proxyEntry->prev = NULL;
 
@@ -142,6 +144,21 @@ void PlayerProxyManager_refreshFullAllWithModelEntry(ModelEntry *modelEntry) {
     }
 }
 
+bool PlayerProxyManager_setMinimumLifeTime(PlayerProxyHandle h, u32 lifetime) {
+    PlayerProxyEntry *proxyEntry = getProxyEntryFromRef(h);
+
+    if (proxyEntry) {
+        if (proxyEntry->minLifetime < lifetime) {
+            proxyEntry->minLifetime = lifetime;
+        }
+        return true;
+    } else {
+        Logger_printWarning("Tried to set min lifetime of invalid reference 0x%lX", h);
+    }
+
+    return false;
+}
+
 void updatePlayerProxyManager_on_UpdateMain(void) {
     PlayerProxyEntry *curr = sPlayerProxyEntryListStart;
 
@@ -150,7 +167,7 @@ void updatePlayerProxyManager_on_UpdateMain(void) {
 
         PlayerProxy_updateInterpolationStatus(curr->pp);
 
-        if (curr->allocType == PPALLOC_REF_COUNT && curr->refCount <= 0) {
+        if (curr->allocType == PPALLOC_REF_COUNT && curr->refCount <= 0 && curr->minLifetime == 0) {
             PlayerProxy_destroy(curr->pp);
             if (curr == sPlayerProxyEntryListStart) {
                 sPlayerProxyEntryListStart = curr->next;
@@ -165,6 +182,10 @@ void updatePlayerProxyManager_on_UpdateMain(void) {
             }
 
             recomp_free(curr);
+        }
+
+        if (curr->minLifetime > 0) {
+            curr->minLifetime--;
         }
 
         curr = next;

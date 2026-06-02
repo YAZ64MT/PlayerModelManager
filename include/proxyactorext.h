@@ -19,4 +19,8 @@ bool ProxyActorExt_copyProxyInformation(Actor *dest, Actor *src);
 FormProxy *ProxyActorExt_getFormProxyOrFallback(Actor *actor, FormProxyId fallbackId, PlayState *play);
 bool ProxyActorExt_isActorHasAppearanceData(Actor *actor);
 
+// This reference will be invalidated when the actor is destroyed, but it avoids creating a copy
+// DO NOT RELEASE THIS REFERENCE UNDER ANY CIRCUMSTANCES
+PlayerProxyHandle ProxyActorExt_getAppearanceDataHandleRaw(Actor *actor);
+
 #endif

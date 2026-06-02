@@ -24,5 +24,6 @@ void PlayerProxyManager_refreshFullAllWithModelEntry(ModelEntry *modelEntry);
 PlayerProxy *PlayerProxyManager_getPlayerProxy(PlayerProxyHandle h);
 PlayerProxyHandle PlayerProxyManager_createNewReference(PlayerProxyHandle h);
 bool PlayerProxyManager_releaseReference(PlayerProxyHandle h);
+bool PlayerProxyManager_setMinimumLifeTime(PlayerProxyHandle h, u32 lifetime);
 
 #endif

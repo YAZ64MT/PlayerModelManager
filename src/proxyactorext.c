@@ -123,6 +123,16 @@ bool ProxyActorExt_isActorHasAppearanceData(Actor *actor) {
     return !!ProxyActorExt_getPlayerProxy(actor);
 }
 
+PlayerProxyHandle ProxyActorExt_getAppearanceDataHandleRaw(Actor *actor) {
+    PlayerProxyInfo *proxyInfo = getPlayerProxyInfo(actor);
+
+    if (proxyInfo) {
+        return proxyInfo->proxyHandle;
+    }
+
+    return 0;
+}
+
 RECOMP_CALLBACK(".", _internal_preInitHashObjects) void handleFormProxyExtensionInits(void) {
     sActorExtIdPlayerProxyInfo = z64recomp_extend_actor_all(sizeof(PlayerProxyInfo));
 }
