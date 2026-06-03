@@ -941,9 +941,9 @@ static Link_DisplayList sRightHandHookshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_R
 static Link_DisplayList sLeftShoulderLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_LSHOULDER_HOOKSHOT};
 static Link_DisplayList sLeftForearmLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_LFOREARM_HOOKSHOT};
 static Link_DisplayList sLeftHandLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_LHAND_HOOKSHOT};
-static Link_DisplayList sRightShoulderLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER_HOOKSHOT};
-static Link_DisplayList sRightForearmLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT};
-static Link_DisplayList sRightHandLongshotFirstPersonAlts[] = {LINK_DL_FPS_RHAND_HOOKSHOT};
+static Link_DisplayList sRightShoulderLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RSHOULDER_HOOKSHOT, LINK_DL_OPT_FPS_RSHOULDER};
+static Link_DisplayList sRightForearmLongshotFirstPersonAlts[] = {LINK_DL_OPT_FPS_RFOREARM_HOOKSHOT, LINK_DL_OPT_FPS_RFOREARM};
+static Link_DisplayList sRightHandLongshotFirstPersonAlts[] = {LINK_DL_FPS_RHAND_HOOKSHOT, LINK_DL_OPT_FPS_RHAND};
 static Link_DisplayList sLeftShoulderBowFirstPersonAlts[] = {LINK_DL_OPT_FPS_LSHOULDER};
 static Link_DisplayList sLeftForearmBowFirstPersonAlts[] = {LINK_DL_OPT_FPS_LFOREARM};
 static Link_DisplayList sLeftHandBowFirstPersonAlts[] = {LINK_DL_OPT_FPS_LHAND};
@@ -1041,15 +1041,18 @@ static Gfx *getDLOrAltFromModelEntry(ModelEntry *me, Link_DisplayList dlId) {
     Gfx *result = ModelEntry_getDisplayList(me, dlId);
 
     if (!result) {
-        if (dlId == LINK_DL_OPT_FPS_LONGSHOT) {
-            // Without this check, the 3rd person hookshot would take priority over 3rd person longshot
-            result = ModelEntry_getDisplayList(me, LINK_DL_OPT_LONGSHOT);
-        }
-
         DisplayListAltList *alts = getAltList(dlId);
 
         if (alts) {
-            for (size_t i = 0; i < alts->numAlts && !result; ++i) {
+            // 1st non-recursive pass
+            // Required for correct handling of the 1st person longshot DLs
+            for (size_t i = 0; !result && (i < alts->numAlts); ++i) {
+                Link_DisplayList curr = alts->alternates[i];
+
+                result = ModelEntry_getDisplayList(me, dlId);
+            }
+
+            for (size_t i = 0; !result && (i < alts->numAlts); ++i) {
                 Link_DisplayList curr = alts->alternates[i];
 
                 result = getDLOrAltFromModelEntry(me, curr);
