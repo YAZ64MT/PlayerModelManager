@@ -963,7 +963,7 @@ static void createModelListButtons(void) {
     RecompuiEventHandler *removedCallback = onModelButtonPressed;
     const char *removeText = "[None]";
 
-    if (catInf->ppIndex == PP_IDX_KAFEI) {
+    if (catInf->ppIndex == PP_IDX_KAFEI && catInf->category == PMM_MODEL_TYPE_CHILD) {
         removedCallback = onKafeiRemoveButtonPressed;
     }
 

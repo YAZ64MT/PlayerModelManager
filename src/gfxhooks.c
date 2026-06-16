@@ -20,6 +20,7 @@
 #include "overlays/actors/ovl_Arms_Hook/z_arms_hook.h"
 #include "overlays/actors/ovl_Mir_Ray3/z_mir_ray3.h"
 #include "overlays/actors/ovl_En_Bom_Chu/z_en_bom_chu.h"
+#include "overlays/actors/ovl_En_Test3/z_en_test3.h"
 
 typedef struct {
     Gfx *target;
@@ -124,6 +125,11 @@ static GfxHookDisplayList sBlastMaskDLReplacements[] = {
 };
 static GfxHookLookup sBlastMaskDLMap = DECLARE_GFX_HOOK_LUT(sBlastMaskDLReplacements);
 
+static GfxHookDisplayList sKeatonMaskDLReplacements[] = {
+    DECLARE_GFX_HOOK_DL(object_mask_ki_tan_DL_0004A0, LINK_DL_MASK_KEATON),
+};
+static GfxHookLookup sKeatonMaskDLMap = DECLARE_GFX_HOOK_LUT(sKeatonMaskDLReplacements);
+
 void GfxHookLookup_init(GfxHookLookup *ghl) {
     ghl->gfxPtrsToDLs = recomputil_create_u32_value_hashmap();
     for (size_t i = 0; i < ghl->numHookDLEntries; ++i) {
@@ -142,6 +148,7 @@ RECOMP_CALLBACK(".", _internal_initHashObjects) void initGfxHookReplacmentMaps(v
     GfxHookLookup_init(&sLinkGoronDLMap);
     GfxHookLookup_init(&sShieldMirrorDLMap);
     GfxHookLookup_init(&sBlastMaskDLMap);
+    GfxHookLookup_init(&sKeatonMaskDLMap);
 }
 
 // assumed hookdat has valid playstate ptr
@@ -176,9 +183,9 @@ static void replaceHookedGfxCommands(GfxHookData *hookDat, Gfx *startDL, Gfx *en
     U32HashsetHandle seg0AHandle = hookDat->segment0A ? hookDat->segment0A->gfxPtrsToDLs : 0;
     U32HashsetHandle savedSeg0AHandle = seg0AHandle;
 
-    uintptr_t origSeg04 = gSegments[0x04];
-    uintptr_t origSeg06 = gSegments[0x06];
-    uintptr_t origSeg0A = gSegments[0x0A];
+    uintptr_t origSeg04 = (uintptr_t)OS_PHYSICAL_TO_K0(gSegments[0x04]);
+    uintptr_t origSeg06 = (uintptr_t)OS_PHYSICAL_TO_K0(gSegments[0x06]);
+    uintptr_t origSeg0A = (uintptr_t)OS_PHYSICAL_TO_K0(gSegments[0x0A]);
 
     while (curr <= endDL) {
         // encountered a gSPSegment command
@@ -406,4 +413,20 @@ void hookGfx_on_Player_DrawZoraShield(PlayState *play, Player *player) {
 
 void hookGfx_on_return_Player_DrawZoraShield(void) {
     replaceHookedXluGfxCommands(&sZoraMagicBarrierGfxHook);
+}
+
+static GfxHookData sKafeiPostLimbDrawGfxHook;
+
+void hookGfx_on_EnTest3_PostLimbDraw(PlayState *play, EnTest3 *enTest3) {
+    if (enTest3->player.currentMask != PLAYER_MASK_NONE) {
+        gSegments[0x0A] = OS_K0_TO_PHYSICAL(enTest3->player.maskObjectSegment);
+        fillGfxHookData(&sKafeiPostLimbDrawGfxHook, play, ProxyActorExt_getFormProxy(&enTest3->player.actor), &sGameplayKeepDLMap, NULL, &sKeatonMaskDLMap);
+    }
+}
+
+void hookGfx_on_return_EnTest3_PostLimbDraw(EnTest3 *enTest3) {
+    if (enTest3->player.currentMask != PLAYER_MASK_NONE) {
+        replaceHookedOpaGfxCommands(&sKafeiPostLimbDrawGfxHook);
+        replaceHookedXluGfxCommands(&sKafeiPostLimbDrawGfxHook);
+    }
 }
