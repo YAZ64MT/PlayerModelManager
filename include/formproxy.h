@@ -74,6 +74,8 @@ void FormProxy_resetTunicColor(FormProxy *fp);
 void FormProxy_pullCurrentTunicColorFromConfig(FormProxy *fp);
 void FormProxy_pullCurrentTunicColorFromRequested(FormProxy *fp);
 void FormProxy_setCurrentModelFormEntry(FormProxy *fp, ModelEntryForm *modelEntry);
+TexturePtr FormProxy_getEyesTexturePtr(FormProxy *fp, PlayerEyeIndex i);
+TexturePtr FormProxy_getMouthTexturePtr(FormProxy *fp, PlayerMouthIndex i);
 void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp, TexturePtr eyesTextures[], TexturePtr mouthTextures[]);
 Mtx *FormProxy_getMatrix(FormProxy *fp, Link_EquipmentMatrix id);
 Gfx *FormProxy_getNextRefreshDL(FormProxy *fp, Link_DisplayList id);

@@ -817,42 +817,46 @@ static void switchFallbackToFierceDeityIfNeeded(FormProxy *fp) {
     }
 }
 
+TexturePtr FormProxy_getEyesTexturePtr(FormProxy *fp, PlayerEyeIndex i) {
+    TexturePtr eyesTex = ModelInfo_getEyesTexture(&fp->currentModelInfo, i);
+
+    if (!eyesTex) {
+        eyesTex = ModelInfo_getEyesTexture(fp->fallbackOverrideModelInfo, i);
+    }
+
+    if (!eyesTex) {
+        eyesTex = ModelInfo_getEyesTexture(fp->fallbackModelInfo, i);
+    }
+
+    return eyesTex;
+}
+
+TexturePtr FormProxy_getMouthTexturePtr(FormProxy *fp, PlayerMouthIndex i) {
+    TexturePtr mouthTex = ModelInfo_getMouthTexture(&fp->currentModelInfo, i);
+
+    if (!mouthTex) {
+        mouthTex = ModelInfo_getMouthTexture(fp->fallbackOverrideModelInfo, i);
+    }
+
+    if (!mouthTex) {
+        mouthTex = ModelInfo_getMouthTexture(fp->fallbackModelInfo, i);
+    }
+
+    return mouthTex;
+}
+
 void FormProxy_repointPlayerFaceTexturePtrs(FormProxy *fp, TexturePtr eyesTextures[], TexturePtr mouthTextures[]) {
     RETURN_IF_INVALID_PTR(fp, PTR_VAL_VOID_RET);
 
     ModelInfo *tempFallback = fp->fallbackModelInfo;
     switchFallbackToFierceDeityIfNeeded(fp);
 
-    ModelInfo *current = &fp->currentModelInfo;
-    ModelInfo *fallbackOverride = fp->fallbackOverrideModelInfo;
-    ModelInfo *fallback = fp->fallbackModelInfo;
-
     for (PlayerEyeIndex i = 0; i < PLAYER_EYES_MAX; ++i) {
-        TexturePtr eyesTex = ModelInfo_getEyesTexture(current, i);
-
-        if (!eyesTex) {
-            eyesTex = ModelInfo_getEyesTexture(fallbackOverride, i);
-        }
-
-        if (!eyesTex) {
-            eyesTex = ModelInfo_getEyesTexture(fallback, i);
-        }
-
-        eyesTextures[i] = eyesTex;
+        eyesTextures[i] = FormProxy_getEyesTexturePtr(fp, i);
     }
 
     for (PlayerMouthIndex i = 0; i < PLAYER_MOUTH_MAX; ++i) {
-        TexturePtr mouthTex = ModelInfo_getMouthTexture(current, i);
-
-        if (!mouthTex) {
-            mouthTex = ModelInfo_getMouthTexture(fallbackOverride, i);
-        }
-
-        if (!mouthTex) {
-            mouthTex = ModelInfo_getMouthTexture(fallback, i);
-        }
-
-        mouthTextures[i] = mouthTex;
+        mouthTextures[i] = FormProxy_getMouthTexturePtr(fp, i);
     }
 
     fp->fallbackModelInfo = tempFallback;

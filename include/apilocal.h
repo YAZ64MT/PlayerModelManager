@@ -5,6 +5,7 @@
 #include "PR/gbi.h"
 #include "z64player.h"
 #include "playermodelmanager_api.h"
+#include "playermodelmanager_advanced_api.h"
 #include "modelmatrixids.h"
 
 PlayerModelManagerHandle PlayerModelManager_registerModel(unsigned long apiVersion, const char *internalName, PlayerModelManagerModelType modelType);
@@ -36,5 +37,7 @@ void PlayerModelManager_unlockAPI(void);
 Gfx *PlayerModelManager_Actor_getDisplayList(Actor *actor, Link_DisplayList dlId);
 Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, Link_EquipmentMatrix mtxId);
 bool PlayerModelManager_Actor_hasAppearanceData(Actor *actor);
+bool PlayerModelManager_AppearanceData_getModelInternalName(AppearanceDataHandle h, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize);
+bool PlayerModelManager_AppearanceData_getTunicColor(AppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 *out);
 
 #endif

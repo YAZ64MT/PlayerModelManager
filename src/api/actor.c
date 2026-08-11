@@ -8,6 +8,9 @@
 #include "utils.h"
 #include "logger.h"
 #include "modelentrymanager.h"
+#include "apilocal.h"
+#include "playermodelmanager_api.h"
+#include "playermodelmanager_advanced_api.h"
 
 RECOMP_EXPORT bool PlayerModelManager_Actor_isModelApplied(Actor *actor, PlayerModelManagerHandle h) {
     const ModelEntry *entryToCheck = ModelEntryManager_getEntry(h);
@@ -66,5 +69,126 @@ RECOMP_EXPORT Mtx *PlayerModelManager_Actor_getMatrix(Actor *actor, Link_Equipme
 }
 
 RECOMP_EXPORT bool PlayerModelManager_Actor_hasAppearanceData(Actor *actor) {
-    return !!ProxyActorExt_getPlayerProxy(actor);
+    return ProxyActorExt_isActorHasAppearanceData(actor);
+}
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_setFormModelType(Actor *actor, PlayerModelManagerModelType type) {
+    if (Utils_isFormModelType(type)) {
+        FormProxyId id;
+
+        bool isFormModel = true;
+
+        switch (type) {
+            case PMM_MODEL_TYPE_CHILD:
+            case PMM_MODEL_TYPE_ADULT:
+                id = FORM_PROXY_ID_HUMAN;
+                break;
+
+            case PMM_MODEL_TYPE_GORON:
+                id = FORM_PROXY_ID_GORON;
+                break;
+
+            case PMM_MODEL_TYPE_DEKU:
+                id = FORM_PROXY_ID_DEKU;
+                break;
+
+            case PMM_MODEL_TYPE_ZORA:
+                id = FORM_PROXY_ID_ZORA;
+                break;
+
+            case PMM_MODEL_TYPE_FIERCE_DEITY:
+                id = FORM_PROXY_ID_FIERCE_DEITY;
+                break;
+
+            default:
+                isFormModel = false;
+                break;
+        }
+
+        if (isFormModel) {
+            return ProxyActorExt_setFormProxyId(actor, id);
+        }
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_getTunicColor(Actor *actor, Color_RGBA8 *out) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (out && fp) {
+        *out = FormProxy_getCurrentTunicColor(fp);
+        return true;
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT PlayerModelManagerModelType PlayerModelManager_Actor_getFormModelType(Actor *actor) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (fp) {
+        return FormProxy_getModelType(fp);
+    }
+
+    return PMM_MODEL_TYPE_NONE;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_getModelSkeleton(Actor *actor, FlexSkeletonHeader *dest) {
+    if (dest) {
+        FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+        if (fp) {
+            *dest = *FormProxy_getSkeleton(fp);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_getModelShieldingSkeleton(Actor *actor, FlexSkeletonHeader *dest) {
+    if (dest) {
+        FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+        if (fp) {
+            *dest = *FormProxy_getShieldingSkeleton(fp);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT bool PlayerModelManager_Actor_getModelInternalName(Actor *actor, PlayerModelManagerModelType type, char outBuf[], size_t outBufSize) {
+    PlayerProxyHandle h = ProxyActorExt_getAppearanceDataHandleRaw(actor);
+    if (h) {
+        return PlayerModelManager_AppearanceData_getModelInternalName(h, type, outBuf, outBufSize);
+    }
+
+    return false;
+}
+
+RECOMP_EXPORT TexturePtr PlayerModelManager_Actor_getEyesTexturePtr(Actor *actor, PlayerEyeIndex index) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (fp) {
+        return FormProxy_getEyesTexturePtr(fp, index);
+    }
+
+    return NULL;
+}
+
+RECOMP_EXPORT TexturePtr PlayerModelManager_Actor_getMouthTexturePtr(Actor *actor, PlayerMouthIndex index) {
+    FormProxy *fp = ProxyActorExt_getFormProxy(actor);
+
+    if (fp) {
+        return FormProxy_getMouthTexturePtr(fp, index);
+    }
+
+    return NULL;
+}
+
+RECOMP_EXPORT AppearanceDataHandle PlayerModelManager_Actor_getAppearanceDataHandle(Actor *actor) {
+    return ProxyActorExt_getAppearanceDataHandleCopy(actor);
 }
