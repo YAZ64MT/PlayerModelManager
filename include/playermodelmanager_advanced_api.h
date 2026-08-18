@@ -74,6 +74,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignD
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignModel(AppearanceDataHandle h, PlayerModelManagerModelType type, const char *internalName));
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_releaseHandle(AppearanceDataHandle h));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool bool PlayerModelManager_AppearanceData_removeModel(AppearanceDataHandle h, PlayerModelManagerModelType type));
 
 RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_setTunicColor(AppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 color));
 

@@ -39,6 +39,16 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignModel(AppearanceDataH
     return false;
 }
 
+RECOMP_EXPORT bool PlayerModelManager_AppearanceData_removeModel(AppearanceDataHandle h, PlayerModelManagerModelType type) {
+    PlayerProxy *pp = PlayerProxyManager_getPlayerProxy(h);
+
+    if (pp) {
+        return ModelEntryManager_applyByInternalName(pp, type, "");
+    }
+
+    return false;
+}
+
 RECOMP_EXPORT bool PlayerModelManager_AppearanceData_releaseHandle(AppearanceDataHandle h) {
     if (h == gPlayer1ProxyHandle || h == gPlayer2ProxyHandle) {
         return true;
