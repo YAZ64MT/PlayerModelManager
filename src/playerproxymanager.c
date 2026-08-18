@@ -167,6 +167,10 @@ void updatePlayerProxyManager_on_UpdateMain(void) {
 
         PlayerProxy_updateInterpolationStatus(curr->pp);
 
+        if (curr->minLifetime > 0) {
+            curr->minLifetime--;
+        }
+
         if (curr->allocType == PPALLOC_REF_COUNT && curr->refCount <= 0 && curr->minLifetime == 0) {
             PlayerProxy_destroy(curr->pp);
             if (curr == sPlayerProxyEntryListStart) {
@@ -182,10 +186,6 @@ void updatePlayerProxyManager_on_UpdateMain(void) {
             }
 
             recomp_free(curr);
-        }
-
-        if (curr->minLifetime > 0) {
-            curr->minLifetime--;
         }
 
         curr = next;
