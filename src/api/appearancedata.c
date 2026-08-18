@@ -40,12 +40,11 @@ RECOMP_EXPORT bool PlayerModelManager_AppearanceData_assignModel(AppearanceDataH
 }
 
 RECOMP_EXPORT bool PlayerModelManager_AppearanceData_releaseHandle(AppearanceDataHandle h) {
-    if (h != gPlayer1ProxyHandle && h != gPlayer2ProxyHandle) {
-        PlayerProxyManager_releaseReference(h);
+    if (h == gPlayer1ProxyHandle || h == gPlayer2ProxyHandle) {
         return true;
     }
 
-    return false;
+    return PlayerProxyManager_releaseReference(h);
 }
 
 RECOMP_EXPORT bool PlayerModelManager_AppearanceData_setTunicColor(AppearanceDataHandle h, PlayerModelManagerModelType type, Color_RGBA8 color) {

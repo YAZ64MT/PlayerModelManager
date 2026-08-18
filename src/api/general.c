@@ -128,6 +128,10 @@ static bool isStrValid(const char *callerName, const char *strToVerify, size_t m
         return false;
     }
 
+    if (strToVerify[0] == '\0') {
+        Logger_printError("%s: String passed in was empty! Aborting!", callerName);
+    }
+
     bool isTooLong = isStrTooLong(strToVerify, maxLen);
 
     if (isTooLong) {

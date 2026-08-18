@@ -373,8 +373,6 @@ bool PlayerProxy_tryApplyEntry(PlayerProxy *pp, PlayerModelManagerModelType mode
         }
 
         if (PlayerProxy_forceApplyEntry(pp, modelType, newEntry)) {
-            const char *name = newEntry ? ModelEntry_getInternalName(newEntry) : "";
-
             if (pp == gPlayer1Proxy) {
                 onMainPlayerAppearanceChanged(modelType);
             } else if (pp == gPlayer2Proxy) {
