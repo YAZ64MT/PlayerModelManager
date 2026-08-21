@@ -149,7 +149,7 @@ RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_assignM
 // Removes the custom model in the AppearanceData for the passed in model type and updates its the display lists
 //
 // Returns true if the model was removed, false otherwise
-RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool bool PlayerModelManager_AppearanceData_removeModel(AppearanceDataHandle h, PlayerModelManagerModelType type));
+RECOMP_IMPORT(YAZMT_PMM_MOD_NAME, bool PlayerModelManager_AppearanceData_removeModel(AppearanceDataHandle h, PlayerModelManagerModelType type));
 
 // Sets the tunic color of the AppearanceData for the passed in model type
 //
